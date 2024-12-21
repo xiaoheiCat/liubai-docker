@@ -12,8 +12,25 @@ export function useCetInputElement(
   const {
     inputEl: selectImagesEl,
     onFileChange: onImageChange,
-    onTapChooseFile: onTapChooseImage,
+    chooseFile,
   } = useInputElement(onNewImages)
+
+  const onTapChooseImage = async () => {
+    console.log("onTapChooseImage...............")
+    const filePickerAcceptType: FilePickerAcceptType = {
+      description: "Images",
+      accept: {
+        "image/*": [".png", ".gif", ".jpeg", ".jpg"]
+      },
+    }
+    const files = await chooseFile({ 
+      id: "for_image",
+      multiple: true, 
+      types: [filePickerAcceptType],
+    })
+    if(!files) return
+    emit("imagechange", files)
+  }
 
   return {
     selectImagesEl,

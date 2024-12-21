@@ -31,6 +31,10 @@ export async function loadGoogleIdentityService(
   s.onload = () => {
     const gAccounts = window.google?.accounts
     if(!gAccounts) return
+    if(!lpData.enable) {
+      console.warn("don't invoke Google One-Tap because lpData.enable is false")
+      return
+    }
 
     const fedCM = liuApi.canIUse.fedCM()
 
@@ -69,6 +73,12 @@ async function handleCredentialResponse(
   lpData: LpData,
   res: GIS_CredentialResponse,
 ) {
+  // 0. check out enable
+  if(!lpData.enable) {
+    console.warn("don't use Google One-Tap")
+    console.log("because lpData.enable has been already set to false")
+    return
+  }
 
   // 1. 获取 google_id_token 和 state
   const google_id_token = res.credential

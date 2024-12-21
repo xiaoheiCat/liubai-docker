@@ -1,6 +1,4 @@
 import type { ToolBarProps, ToolBarEmits } from "./types"
-import { ref } from "vue"
-import liuUtil from "~/utils/liu-util"
 import { useInputElement } from "~/hooks/elements/useInputElement"
 
 export function useTbInputElements(
@@ -20,14 +18,35 @@ export function useTbInputElements(
   const {
     inputEl: selectImagesEl,
     onFileChange: onImageChange,
-    onTapChooseFile: onTapImage,
+    chooseFile: chooseFile1,
   } = useInputElement(onNewImage)
+
+  const onTapImage = async () => {
+    const filePickerAcceptType: FilePickerAcceptType = {
+      description: "Images",
+      accept: {
+        "image/*": [".png", ".gif", ".jpeg", ".jpg"]
+      },
+    }
+    const images = await chooseFile1({ 
+      id: "for_image",
+      types: [filePickerAcceptType],
+    })
+    if(!images) return
+    emit("imagechange", images)
+  }
+
 
   const {
     inputEl: selectFileEl,
     onFileChange: onFileChange,
-    onTapChooseFile: onTapFile,
+    chooseFile: chooseFile2,
   } = useInputElement(onNewFile)
+  const onTapFile = async () => {
+    const files = await chooseFile2({ id: "for_file" })
+    if(!files) return
+    emit("filechange", files)
+  }
 
   return {
     selectImagesEl,

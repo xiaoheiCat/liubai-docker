@@ -140,8 +140,24 @@ function canAddToHomeScreenInSafari() {
   return res2 >= 0
 }
 
+// reference: https://web.dev/patterns/files/open-one-or-multiple-files
+function fileSystemAccessAPI() {
+  const supportsFileSystemAccess =
+    "showOpenFilePicker" in window &&
+    (() => {
+      try {
+        return window.self === window.top;
+      } catch {
+        return false;
+      }
+    })();
+  
+  return supportsFileSystemAccess
+}
+
 
 export default {
+  fileSystemAccessAPI,
   isSafeBrowser,
   viewTransitionApi,
   cssDetectTextOverflow,

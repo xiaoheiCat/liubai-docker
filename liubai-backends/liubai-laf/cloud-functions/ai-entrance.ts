@@ -507,9 +507,11 @@ class AiDirective {
     // 1. get the user's ai room
     const room = await AiHelper.getMyAiRoom(entry)
     if(!room) return
+    const roomId = room._id
 
     // 2. find the bot in the room
-    const theBot = room.characters.find(v => v === bot.character)
+    const characterKicked = bot.character
+    const theBot = room.characters.find(v => v === characterKicked)
     if(!theBot) {
       const msg2 = t("already_left", { botName: bot.name })
       TellUser.text(entry, msg2)
@@ -517,22 +519,42 @@ class AiDirective {
     }
 
     // 3. remove the bot from the room
-    const newBots = room.characters.filter(v => v !== bot.character)
+    const oldCharacters = room.characters
+    const newCharacters = oldCharacters.filter(v => v !== characterKicked)
     const u3: Partial<Table_AiRoom> = {
-      characters: newBots,
+      characters: newCharacters,
       updatedStamp: getNowStamp(),
     }
     const rCol = db.collection("AiRoom")
-    const res3 = await rCol.doc(room._id).update(u3)
+    const res3 = await rCol.doc(roomId).update(u3)
 
-    // 4. send a message to user
-    const msg4 = t("bot_left", { botName: bot.name })
-    TellUser.text(entry, msg4)
+    // 4. get non-used characters
+    let addedList = await AiHelper.getNonUsedCharacters(roomId)
+    addedList = addedList.filter(v => !Boolean(oldCharacters.includes(v)))
+    const reservedNum = newCharacters.length < 1 ? 4 : 3
+    if(addedList.length > reservedNum) {
+      addedList.splice(reservedNum, addedList.length - reservedNum)
+    }
 
-    // 5. log
-    LogHelper.kick([bot.character], user)
+    // 5. send a message to user
+    const msg5 = t("bot_left", { botName: bot.name })
+    const gzhType = AiHelper.getGzhType()
+    if(gzhType === "service_account" && addedList.length > 0) {
+      // 5.1 send menu
+      const menuList: AiMenuItem[] = []
+      const prefixMsg = msg5  + "\n\n" + t("operation_title")
+      addedList.forEach(v => menuList.push({ operation: "add", character: v }))
+      TellUser.menu(entry, prefixMsg, menuList, "")
+    }
+    else {
+      // 5.2 send text
+      TellUser.text(entry, msg5)
+    }
 
-    return res3    
+    // 6. log
+    LogHelper.kick([characterKicked], user)
+
+    return res3
   }
 
   private static async _showThereAre3(
@@ -1324,9 +1346,9 @@ class BaseBot {
     if(!txt6) return
 
     // 2. reply to user
-    const _env = process.env
     const finishReason = AiHelper.getFinishReason(chatCompletion)
-    if(finishReason === "length" && _env.LIU_WX_GZ_TYPE === "service_account") {
+    const gzhType = AiHelper.getGzhType()
+    if(finishReason === "length" && gzhType === "service_account") {
       TellUser.menu(
         aiParam.entry, 
         txt6, 
@@ -4216,16 +4238,9 @@ class AiHelper {
     return res
   }
 
-  static async checkIfNobodyHere(
-    entry: AiEntry, 
-    room: Table_AiRoom,
-  ) {
-    // 1. return false if there is at least one character
-    const len = room.characters.length
-    if(len >= 1) return false
-
-    // 2. get history for ever existed characters
-    const chats = await this.getLatestChat(room._id, 10)
+  static async getNonUsedCharacters(roomId: string) {
+    // 1. get history
+    const chats = await this.getLatestChat(roomId, 10)
     const everExistedCharacters: AiCharacter[] = []
     chats.forEach(v => {
       const c = v.character
@@ -4235,7 +4250,7 @@ class AiHelper {
       }
     })
 
-    // 3. get availableCharacters
+    // 2. get availableCharacters
     const availableCharacters = this.getAvailableCharacters()
     for(let i=0; i<availableCharacters.length; i++) {
       const v = availableCharacters[i]
@@ -4244,24 +4259,50 @@ class AiHelper {
         i--
       }
     }
-    if(availableCharacters.length < 1) return true
+    if(availableCharacters.length < 1) {
+      return []
+    }
 
-    // 4. randomly sort
+    // 3. randomly sort
     const addedList: AiCharacter[] = []
-    while(addedList.length < 3 && availableCharacters.length > 0) {
+    while(addedList.length < 5 && availableCharacters.length > 0) {
       const r = Math.floor(Math.random() * availableCharacters.length)
       const c = availableCharacters[r]
       addedList.push(c)
       availableCharacters.splice(r, 1)
     }
 
-    // 5. menu
+    return addedList
+  }
+
+  static async checkIfNobodyHere(
+    entry: AiEntry, 
+    room: Table_AiRoom,
+  ) {
+    // 1. return false if there is at least one character
+    const len = room.characters.length
+    if(len >= 1) return false
+
+    // 2. get history for ever existed characters
+    const addedList = await this.getNonUsedCharacters(room._id)
+    const len2 = addedList.length
+    if(len2 < 1) return false
+    if(len2 > 3) {
+      addedList.splice(3, len2 - 3)
+    }
+
+    // 3. menu
     const menuList: AiMenuItem[] = []
     addedList.forEach(v => menuList.push({ operation: "add", character: v }))
     const { t } = useI18n(aiLang, { user: entry.user })
     const prefixMessage = t("nobody_here") + "\n\n" + t("operation_title")
     TellUser.menu(entry, prefixMessage, menuList, "")
     return true
+  }
+
+  static getGzhType() {
+    const _env = process.env
+    return _env.LIU_WX_GZ_TYPE ?? "subscription_account"
   }
 
 }
@@ -4490,6 +4531,7 @@ class TellUser {
     fromCharacter?: AiCharacter
   ) {
     const _env = process.env
+    const gzhType = AiHelper.getGzhType()
     const { wx_gzh_openid, user } = entry
     const { t } = useI18n(aiLang, { user })
 
@@ -4534,7 +4576,7 @@ class TellUser {
 
     // 2. send to wx gzh
     if(wx_gzh_openid) {
-      if(_env.LIU_WX_GZ_TYPE === "subscription_account") {
+      if(gzhType === "subscription_account") {
         console.warn("we cannot send the menu to the user due to subscription_account")
         return
       }
