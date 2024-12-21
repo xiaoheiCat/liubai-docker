@@ -127,7 +127,7 @@ export default defineComponent({
       </div>
 
       <!-- 加附件 -->
-      <div class="liu-hover ma-item">
+      <div class="liu-hover ma-item" @click.stop="onTapAddAttachment">
 
         <input ref="selectFileEl" type="file" class="mai-input" title="" @change="onFileChange" />
 
