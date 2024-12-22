@@ -3316,7 +3316,6 @@ export class SafeGuard {
     const res = await q.get<Table_BlockList>()
     const list = res.data
     if(list.length < 1) {
-      console.log("no ip!")
       return true
     }
   

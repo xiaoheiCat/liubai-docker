@@ -21,7 +21,7 @@ export function useLpMain(
   const lpPhoneInput = ref<HTMLInputElement>()
   const lpSmsInput = ref<HTMLInputElement>()
   const lpmData = reactive<LpmData>({
-    current: 1,
+    current: 2,
     showEmailSubmit: false,
     showPhoneSubmit: false,
     emailVal: "",
@@ -42,9 +42,24 @@ export function useLpMain(
     phoneEnabled: loginWays.includes("phone"),
   })
 
-  const onTapSelect = (newIndex: number) => {
-    if(lpmData.current === newIndex) return
+  const onTapSelect = async (newIndex: number) => {
+    // 1. switch
+    const oldIndex = lpmData.current
+    if(oldIndex === newIndex) return
     lpmData.current = newIndex
+
+    // 2. warning tip about duplicated accounts
+    if(lpmData.current === 1) {
+      const res = await cui.showModal({
+        title: "⚠️",
+        content_key: "login.tip_1",
+        confirm_key: "login.tip_2",
+        isTitleEqualToEmoji: true,
+      })
+      if(res.confirm) {
+        lpmData.current = oldIndex
+      }
+    }
   }
 
   const calculateIndicator = () => {

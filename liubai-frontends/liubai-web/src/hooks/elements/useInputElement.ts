@@ -53,6 +53,12 @@ async function tryToShowOpenFilePicker(
 ) {
   // 1. using showOpenFilePicker
   let handles: FileSystemFileHandle[]
+  if(options) {
+    if(!options.startIn) {
+      options.startIn = "downloads"
+    }
+  }
+
   try {
     handles = await window.showOpenFilePicker(options)
     console.log("let me see handles: ")

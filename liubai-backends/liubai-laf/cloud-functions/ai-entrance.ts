@@ -1808,6 +1808,18 @@ class AiController {
   async run(aiParam: AiRunParam) {
     const { room, entry } = aiParam
 
+    // 0. randaomly wait for a while
+    if(!aiParam.isContinueCommand) {
+      const r = Math.round((Math.random() * 5)) + 3
+      console.log(`start to wait ${r} seconds`)
+      await valTool.waitMilli(r * SECONED)
+      const res0 = await AiHelper.canReply(aiParam)
+      if(!res0) {
+        console.warn("don't reply!")
+        return
+      }
+    }
+
     // 1. check bots in the room
     let characters = room.characters
     const newCharacters = characters.filter(c => AiHelper.isCharacterAvailable(c))
