@@ -62,7 +62,13 @@ const cha = inject(deviceChaKey)
         :class="{ 'cemt-item_above': located === 'popup' }"
         @click.stop="onTapFile"
       >
-        <input ref="selectFileEl" type="file" class="cemt-input" @change="onFileChange" title="" />
+        <input ref="selectFileEl" 
+          type="file" 
+          class="cemt-input" 
+          @change="onFileChange" 
+          accept="*"
+          title=""
+        />
         <svg-icon name="attachment" :color="icon_color" class="cemti-icon"></svg-icon>
       </div>
 

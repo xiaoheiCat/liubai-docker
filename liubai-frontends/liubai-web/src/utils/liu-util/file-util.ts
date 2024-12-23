@@ -1,10 +1,18 @@
 import type { LiuFileStore, LiuImageStore } from "~/types"
 import time from "../basic/time"
+import { getCharacteristic } from "../liu-api/characteristic"
 
 const MIN_3 = 3 * time.MINUTE
 
 // 获取允许的图片类型 由 , 拼接而成的字符串
 export function getAcceptImgTypesString() {
+  const cha = getCharacteristic()
+
+  // reference: https://blog.csdn.net/soslsboy/article/details/85229226
+  if(cha.isAndroid) {
+    return "image/*"
+  }
+
   return "image/png,image/jpg,image/jpeg,image/gif,image/webp"
 } 
 
@@ -125,25 +133,27 @@ export function getArrayFromFileList(fileList: FileList): File[] {
   return arr
 }
 
-/**
- * 从文件中获取图片类型的文件，并且不会改变原数组
- */
+function isImageFile(file: File) {
+  const { type } = file
+  const arr = getAcceptImgTypesArray()
+  if(arr.includes(type)) return true
+  return type.startsWith("image/")
+}
+
 export function getOnlyImageFiles(files: File[]): File[] {
   const imgFiles: File[] = []
-  const arr = getAcceptImgTypesArray()
   for(let i=0; i<files.length; i++) {
     const v = files[i]
-    if(arr.includes(v.type)) imgFiles.push(v)
+    if(isImageFile(v)) imgFiles.push(v)
   }
   return imgFiles
 }
 
 export function getNotImageFiles(files: File[]): File[] {
   const newList: File[] = []
-  const arr = getAcceptImgTypesArray()
   for(let i=0; i<files.length; i++) {
     const v = files[i]
-    if(!arr.includes(v.type)) newList.push(v)
+    if(!isImageFile(v)) newList.push(v)
   }
   return newList
 }

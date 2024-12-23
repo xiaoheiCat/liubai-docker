@@ -129,7 +129,14 @@ export default defineComponent({
       <!-- 加附件 -->
       <div class="liu-hover ma-item" @click.stop="onTapAddAttachment">
 
-        <input ref="selectFileEl" type="file" class="mai-input" title="" @change="onFileChange" />
+        <input 
+          ref="selectFileEl" 
+          type="file" 
+          class="mai-input" 
+          title="" 
+          accept="*"
+          @change="onFileChange"
+        />
 
         <div class="mai-icon">
           <svg-icon name="attachment" class="mai-svgicon" :color="default_color"></svg-icon>

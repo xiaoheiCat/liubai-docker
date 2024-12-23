@@ -38,7 +38,15 @@ export function useInputElement(
     console.warn("the environment is not supporting fileSystemAccessAPI")
     const el = inputEl.value
     if(!el) return
-    el.click()
+
+    if("showPicker" in HTMLInputElement.prototype) {
+      console.log("show picker!")
+      el.showPicker()
+    }
+    else {
+      console.log("click!")
+      el.click()
+    }
   }
 
   return {
