@@ -66,7 +66,8 @@
     "ok": "好的",
     "check_it_out": "去看看",
     "privacy": "隱私",
-    "back_home": "回首頁"
+    "back_home": "回首頁",
+    "scan_with_wx": "請用微信掃描"
   },
   "editor": {
     "when": "什麼時候",
@@ -518,7 +519,6 @@
     "alipay": "支付寶",
     "wxpay": "微信支付",
     "go_to_group": "進入 VIP 群組",
-    "scan_with_wx": "請用微信掃描",
     "view_benefits": "檢視權益"
   },
   "a2hs": {

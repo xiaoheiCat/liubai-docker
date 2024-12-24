@@ -34,6 +34,7 @@ const {
   onTapNickname,
   onTapVersionUpdate,
   onTapA2HS,
+  onTapContact,
   version,
   appName,
 } = useSettingContent()
@@ -413,8 +414,23 @@ const iconColor = "var(--main-normal)"
         
 
         <!-- Contact -->
-        <a v-if="data.contactLink" class="liu-no-user-select liu-hover sc-bar" 
-          :href="data.contactLink"
+        <div v-if="data.contactLink" class="liu-no-user-select liu-hover sc-bar"
+          @click.stop="onTapContact"
+        >
+          <div class="scb-hd">
+            <span>{{ t('setting.contact_dev') }}</span>
+          </div>
+          <div class="scb-footer">
+            <div class="scb-footer-icon">
+              <svg-icon class="scbf-back"
+                name="arrow-right2"
+                :color="iconColor"
+              ></svg-icon>
+            </div>
+          </div>
+        </div>
+        <a v-else-if="data.emailLink" class="liu-no-user-select liu-hover sc-bar" 
+          :href="data.emailLink"
         >
           <div class="scb-hd">
             <span>{{ t('setting.contact_dev') }}</span>

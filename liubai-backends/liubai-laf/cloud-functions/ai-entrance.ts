@@ -1810,7 +1810,7 @@ class AiController {
 
     // 0. randaomly wait for a while
     if(!aiParam.isContinueCommand) {
-      const r = Math.round((Math.random() * 5)) + 3
+      const r = Math.floor((Math.random() * 3)) + 3
       console.log(`start to wait ${r} seconds`)
       await valTool.waitMilli(r * SECONED)
       const res0 = await AiHelper.canReply(aiParam)

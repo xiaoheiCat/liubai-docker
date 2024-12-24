@@ -175,6 +175,15 @@ const system_wx_env = `
 其他限制：只能与人们对话，不能与其他机器人/LLM/人工智能助手进行协作和交流
 `.trim()
 
+const system_wx_entry = `
+联系客服、联系开发者: {LIU_CUSTOMER_SERVICE}
+我的日程: {LIU_DOMAIN}/schedule
+我的收藏: {LIU_DOMAIN}/favorite
+我的看板: {LIU_DOMAIN}/state
+我的标签: {LIU_DOMAIN}/tags
+开源地址: https://github.com/yenche123/liubai
+`.trim()
+
 const system_example = `
 下面使用 <user> 标签表示人们发来的消息，<assistant> 标签表示你的回复
 <user>
@@ -256,6 +265,9 @@ ${system_intro}
 【当前环境】
 ${system_wx_env}
 
+【常用入口、捷径、网址】
+${system_wx_entry}
+
 【问答示例】
 ${system_example}
 
@@ -275,6 +287,9 @@ ${system_intro}
 
 【当前环境】
 ${system_wx_env}
+
+【常用入口、捷径、网址】
+${system_wx_entry}
 
 【问答示例】
 ${system_example}
@@ -296,6 +311,9 @@ ${system_intro}
 【当前环境】
 ${system_wx_env}
 
+【常用入口、捷径、网址】
+${system_wx_entry}
+
 【问答示例】
 ${system_example}
 
@@ -315,6 +333,9 @@ ${system_intro}
 
 【当前环境】
 ${system_wx_env}
+
+【常用入口、捷径、网址】
+${system_wx_entry}
 
 【问答示例】
 ${system_example}
@@ -336,6 +357,9 @@ ${system_intro}
 【当前环境】
 ${system_wx_env}
 
+【常用入口、捷径、网址】
+${system_wx_entry}
+
 【问答示例】
 ${system_example}
 
@@ -356,6 +380,9 @@ ${system_intro}
 【当前环境】
 ${system_wx_env}
 
+【常用入口、捷径、网址】
+${system_wx_entry}
+
 【问答示例】
 ${system_example}
 
@@ -375,6 +402,9 @@ ${system_intro}
 
 【当前环境】
 ${system_wx_env}
+
+【常用入口、捷径、网址】
+${system_wx_entry}
 
 【问答示例】
 ${system_example}

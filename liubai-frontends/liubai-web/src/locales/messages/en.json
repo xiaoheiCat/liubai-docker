@@ -66,7 +66,8 @@
     "ok": "OK",
     "check_it_out": "Check it out",
     "privacy": "Privacy",
-    "back_home": "Back to Home"
+    "back_home": "Back to Home",
+    "scan_with_wx": "Please scan with WeChat"
   },
   "editor": {
     "when": "When",
@@ -517,7 +518,6 @@
     "alipay": "Alipay",
     "wxpay": "WeChat Pay",
     "go_to_group": "Join VIP Group",
-    "scan_with_wx": "Please scan with WeChat",
     "view_benefits": "View Benefits"
   },
   "a2hs": {

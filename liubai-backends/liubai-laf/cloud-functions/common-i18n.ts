@@ -731,7 +731,7 @@ interface WxTextReplyItem {
 
 export const wxTextRepliesItems: WxTextReplyItem[] = [
   {
-    keywords: ["人工", "客服", "人工客服", "联系客服", "联系"],
+    keywords: ["人工", "客服", "人工客服", "联系客服", "联系", "联系开发者"],
     replies: [
       {
         msgtype: "text",
@@ -742,7 +742,7 @@ export const wxTextRepliesItems: WxTextReplyItem[] = [
     ]
   },
   {
-    keywords: ["聯繫", "聯繫客服"],
+    keywords: ["聯繫", "聯繫客服", "聯繫開發者"],
     replies: [
       {
         msgtype: "text",
@@ -753,7 +753,7 @@ export const wxTextRepliesItems: WxTextReplyItem[] = [
     ]
   },
   {
-    keywords: ["Customer Service", "Contact"],
+    keywords: ["Customer Service", "Contact", "Contact Customer Service", "Contact Developer"],
     replies: [
       {
         msgtype: "text",

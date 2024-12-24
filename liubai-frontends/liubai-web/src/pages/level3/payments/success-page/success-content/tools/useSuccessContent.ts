@@ -35,7 +35,7 @@ export function useSuccessContent() {
     cui.previewImage({
       imgs: [{ src, id: "group-qrcode", width: 250, height: 250 }]
     })
-    cui.showSnackBar({ text_key: "payment.scan_with_wx" })
+    cui.showSnackBar({ text_key: "common.scan_with_wx" })
   }
 
   onMounted(() => {

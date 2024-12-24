@@ -28,6 +28,7 @@ import liuReq from "~/requests/liu-req"
 import APIs from "~/requests/APIs"
 import liuUtil from "~/utils/liu-util"
 import { useNetworkStore } from "~/hooks/stores/useNetworkStore"
+import { useQRCode } from "~/hooks/useVueUse"
 
 export function useSettingContent() {
 
@@ -36,11 +37,8 @@ export function useSettingContent() {
   const hasBackend = liuEnv.hasBackend()
   const _env = liuEnv.getEnv()
   const onceData = localCache.getOnceData()
-  let contactLink = _env.CUSTOMER_SERVICE
-  if(!contactLink) {
-    const email = LIU_ENV.author?.email
-    if(email) contactLink = `mailto:${email}`
-  }
+  const contactLink = _env.CUSTOMER_SERVICE
+  const emailLink = LIU_ENV.author?.email
 
   const data = reactive<SettingContentData>({
     language: "system",
@@ -54,6 +52,7 @@ export function useSettingContent() {
     openDebug: false,
     mobileDebug: Boolean(onceData.mobile_debug),
     contactLink,
+    emailLink,
     showA2HS: false,
   })
 
@@ -79,6 +78,22 @@ export function useSettingContent() {
     toA2HS?.()
   }
 
+  const contactQR = useQRCode(contactLink ?? "")
+  const onTapContact = () => {
+    if(!contactLink) return
+    window.open(contactLink, "_blank")
+    // const cha = liuApi.getCharacteristic()
+    // if(cha.isWeChat || cha.isPC) {
+    //   window.open(contactLink, "_blank")
+    //   return
+    // }
+    // const src = contactQR.value
+    // cui.previewImage({
+    //   imgs: [{ src, id: "contact-qrcode", width: 250, height: 250 }]
+    // })
+    // cui.showSnackBar({ text_key: "common.scan_with_wx" })
+  }
+
   return {
     myProfile,
     prefix,
@@ -94,6 +109,7 @@ export function useSettingContent() {
     onTapNickname: () => whenTapNickname(myProfile),
     onTapVersionUpdate: () => whenTapVersionUpdate(hasNewVersion),
     onTapA2HS,
+    onTapContact,
     version,
     appName,
   }
