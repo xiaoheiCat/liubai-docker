@@ -19,6 +19,7 @@ export default defineConfig({
 
     nav: [
       { text: "指南", link: "/guide/what-is-liubai", activeMatch: "/guide/" },
+      { text: "文章", link: "/article/2024/supercharge-yourself", activeMatch: "/article/" },
       { text: "网页版", link: "https://my.liubai.cc" },
     ],
 
@@ -69,6 +70,17 @@ export default defineConfig({
             { text: "隐私政策", link: "/guide/rules/privacy-policy" },
           ]
         }
+      ],
+
+      "/article": [
+        {
+          text: "在微信中使用多个 AI",
+          link: "/article/2024/how-to-use-multi-ai-on-wechat"
+        },
+        {
+          text: "开篇",
+          link: "/article/2024/supercharge-yourself"
+        }
       ]
     },
 
@@ -86,4 +98,11 @@ export default defineConfig({
     }
   },
   lastUpdated: true,
+
+  markdown: {
+    image: {
+      lazyLoading: true,
+    }
+  },
+
 })
