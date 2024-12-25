@@ -87,20 +87,14 @@ export function useSettingContent() {
   const onTapContact = () => {
     if(!contactLink) return
     window.open(contactLink, "_blank")
-    // const cha = liuApi.getCharacteristic()
-    // if(cha.isWeChat || cha.isPC) {
-    //   window.open(contactLink, "_blank")
-    //   return
-    // }
-    // const src = contactQR.value
-    // cui.previewImage({
-    //   imgs: [{ src, id: "contact-qrcode", width: 250, height: 250 }]
-    // })
-    // cui.showSnackBar({ text_key: "common.scan_with_wx" })
   }
 
   const onTapWxGzh = () => {
-
+    const src = "/images/third-party/follow-on-weixin.png"
+    cui.previewImage({
+      imgs: [{ src, id: "gzh-qrcode", width: 500, height: 150 }]
+    })
+    cui.showSnackBar({ text_key: "common.scan_with_wx" })
   }
 
   return {
