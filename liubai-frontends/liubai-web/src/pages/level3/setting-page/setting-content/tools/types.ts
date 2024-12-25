@@ -32,6 +32,10 @@ export interface SettingContentData {
   termsList: TermsItem[]
   hasBackend: boolean
 
+  // community
+  redLink: string
+  openSourceLink: string
+
   debugBtn: boolean
   openDebug: boolean
   mobileDebug: boolean
@@ -39,4 +43,5 @@ export interface SettingContentData {
   contactLink?: string
   emailLink?: string
   showA2HS: boolean
+  
 }

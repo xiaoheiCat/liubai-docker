@@ -35,6 +35,7 @@ const {
   onTapVersionUpdate,
   onTapA2HS,
   onTapContact,
+  onTapWxGzh,
   version,
   appName,
 } = useSettingContent()
@@ -218,6 +219,65 @@ const iconColor = "var(--main-normal)"
 
 
       </div>
+
+      <!-- Community -->
+      <div class="liu-no-user-select sc-title">
+        <span>{{ t('setting.community') }}</span>
+      </div>
+      <div class="sc-box">
+        <!-- RED -->
+        <a class="liu-no-user-select liu-hover sc-bar" 
+          :href="data.redLink" target="_blank"
+        >
+          <div class="scb-hd">
+            <span>{{ t('setting.xhs') }}</span>
+          </div>
+          <div class="scb-footer">
+            <div class="scb-footer-icon">
+              <svg-icon class="scbf-svg-icon"
+                name="logos-xhs"
+                :color="iconColor"
+              ></svg-icon>
+            </div>
+          </div>
+        </a>
+
+        <!-- wechat gzh -->
+        <div class="liu-no-user-select liu-hover sc-bar"
+          @click.stop="onTapWxGzh"
+        >
+          <div class="scb-hd">
+            <span>{{ t('setting.wx_gzh') }}</span>
+          </div>
+          <div class="scb-footer">
+            <div class="scb-footer-icon">
+              <svg-icon class="scbf-svg-icon"
+                name="logos-wechat-half-fill"
+                :color="iconColor"
+              ></svg-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- GitHub -->
+        <a class="liu-no-user-select liu-hover sc-bar" 
+          :href="data.openSourceLink" target="_blank"
+        >
+          <div class="scb-hd">
+            <span>GitHub</span>
+          </div>
+          <div class="scb-footer">
+            <div class="scb-footer-icon">
+              <svg-icon class="scbf-svg-icon"
+                name="logos-github"
+                :color="iconColor"
+              ></svg-icon>
+            </div>
+          </div>
+        </a>
+
+      </div>
+
 
 
       <!-- 导入 & 导出 -->

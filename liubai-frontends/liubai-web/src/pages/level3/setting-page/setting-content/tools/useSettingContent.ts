@@ -29,6 +29,7 @@ import APIs from "~/requests/APIs"
 import liuUtil from "~/utils/liu-util"
 import { useNetworkStore } from "~/hooks/stores/useNetworkStore"
 import { useQRCode } from "~/hooks/useVueUse"
+import thirdLink from "~/config/third-link"
 
 export function useSettingContent() {
 
@@ -48,6 +49,10 @@ export function useSettingContent() {
     openTerms: false,
     termsList: getTermsList(),
     hasBackend,
+
+    redLink: thirdLink.RED_FOLLOW_URL,
+    openSourceLink: thirdLink.OPEN_SOURCE_URL,
+
     debugBtn: Boolean(_env.DEBUG_BTN),
     openDebug: false,
     mobileDebug: Boolean(onceData.mobile_debug),
@@ -94,6 +99,10 @@ export function useSettingContent() {
     // cui.showSnackBar({ text_key: "common.scan_with_wx" })
   }
 
+  const onTapWxGzh = () => {
+
+  }
+
   return {
     myProfile,
     prefix,
@@ -110,6 +119,7 @@ export function useSettingContent() {
     onTapVersionUpdate: () => whenTapVersionUpdate(hasNewVersion),
     onTapA2HS,
     onTapContact,
+    onTapWxGzh,
     version,
     appName,
   }

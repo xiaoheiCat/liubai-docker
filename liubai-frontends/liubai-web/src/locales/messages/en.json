@@ -422,7 +422,10 @@
     "phone": "Phone",
     "bound": "Bound",
     "not_yet_bound": "Not yet bound",
-    "unbind_unsupported": "Unbinding has not been supported yet"
+    "unbind_unsupported": "Unbinding has not been supported yet",
+    "community": "Community",
+    "wx_gzh": "WeChat Public Account",
+    "xhs": "RED"
   },
   "export": {
     "markdown": "Export as markdown files",
