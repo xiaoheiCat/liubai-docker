@@ -21,7 +21,7 @@
 
 ✅ 响应式设计: 支持 300px ~ 1920px 宽度的屏幕，从 📱 到 💻
 
-✅ AI 加持: 已连接 Baichuan / DeepSeek / Kimi / MiniMax / Stepfun / Zhipu / 01.ai 等大模型，它们被直接装在你的微信里。
+✅ AI 加持: 已连接 Baichuan / DeepSeek / Kimi / MiniMax / Stepfun / Zhipu / 01.ai 等大模型，它们被直接装在你的微信里。关于微信的部分使用官方[客服消息 API](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Service_Center_messages.html)。
 
 ✅ 隐私: 支持原子化管理每张卡片，让你设置 “仅保存本地” 或 “拒绝 AI 读取”；你的数据，你的自由。
 
