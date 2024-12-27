@@ -1261,6 +1261,7 @@ class BaseBot {
     }
     const res4 = await this.chat(newChatParam, bot)
     if(!res4) {
+      console.warn("no result of chat in _continueAfterWebSearch......")
       return
     }
 
