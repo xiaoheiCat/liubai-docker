@@ -474,7 +474,6 @@ async function handleStatistics() {
   })
   const yesterdayDate = addDays(todayDate, -1)
   const date = LiuDateUtil.getYYYYMMDD(yesterdayDate.getTime())
-  console.log("see date in handleStatistics:::", date)
 
   // 4. get overview
   const data4 = await _getStatisticForOverview()
@@ -487,8 +486,12 @@ async function handleStatistics() {
   const url = `${baseURL}/api/v2/tables/${tableId}/records`
   const headers = { "xc-token": token }
   const res = await liuReq(url, body, { method: "POST", headers })
-  console.log("see result from nocodb: ")
-  console.log(res)
+
+  if(res.code !== "0000" || !res.data?.Id) {
+    console.warn("fail to add row into statistics!")
+    console.log(res)
+  }
+
   return res
 }
 

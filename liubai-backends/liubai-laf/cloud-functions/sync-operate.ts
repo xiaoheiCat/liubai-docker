@@ -194,8 +194,6 @@ async function agree_aichat(
       newContent.stateStamp = b6.insertedStamp
     }
   }
-  console.log("see newContent: ")
-  console.log(newContent)
 
   // 8. save content
   const cCol = db.collection("Content")
@@ -312,9 +310,6 @@ async function addNewContentIntoKanban(
   }
   const wCol = db.collection("Workspace")
   const res3 = await wCol.doc(spaceId).update(d3)
-
-  console.warn("addNewContentIntoKanban res3: ")
-  console.log(res3)
 
   return true
 }

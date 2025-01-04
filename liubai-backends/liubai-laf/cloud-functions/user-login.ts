@@ -1609,16 +1609,8 @@ async function checkIfTooManyTokens(
   if(list.length < 1) return
   const id = list[0]._id
   if(!id) return
-
-  console.log("checkIfTooManyTokens res1: ")
-  console.log(res1)
-  console.log(" ")
-
   const u = { isOn: "N", updatedStamp: getNowStamp() }
   const res2 = await db.collection("Token").where({ _id: id }).update(u)
-  console.log("checkIfTooManyTokens res2: ")
-  console.log(res2)
-  console.log(" ")
 }
 
 /** 当用户登录时，去修改 user 上的必要信息 */
