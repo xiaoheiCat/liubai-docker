@@ -90,23 +90,20 @@ export async function main(ctx: FunctionContext) {
   else if(oT === "unbind-phone") {
     res = await handle_unbind(vRes, "phone")
   }
-  else if(oT === "unbind-wechat") {
-    res = await handle_unbind(vRes, "wechat")
-  }
   else if(oT === "unbind-email") {
     res = await handle_unbind(vRes, "email")
   }
 
-  const stamp2 = getNowStamp()
-  const diffS = stamp2 - stamp1
-  console.log(`调用 user-settings for ${oT} 耗时: ${diffS}ms`)
+  // const stamp2 = getNowStamp()
+  // const diffS = stamp2 - stamp1
+  // console.log(`调用 user-settings for ${oT} 耗时: ${diffS}ms`)
 
   return res
 }
 
 async function handle_unbind(
   vRes: VerifyTokenRes_B,
-  unbindType: "phone" | "wechat" | "email",
+  unbindType: "phone" | "email",
 ) {
   // 1. get the user
   const userId = vRes.userData._id
@@ -122,10 +119,6 @@ async function handle_unbind(
   if(unbindType === "phone") {
     if(!user.phone) return { code: "0001" }
     u.phone = _.remove()
-  }
-  if(unbindType === "wechat") {
-    if(!user.wx_gzh_openid) return { code: "0001" }
-    u.wx_gzh_openid = _.remove()
   }
   if(unbindType === "email") {
     if(!user.email) return { code: "0001" }

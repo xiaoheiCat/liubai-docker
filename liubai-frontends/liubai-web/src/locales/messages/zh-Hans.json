@@ -426,7 +426,10 @@
     "unbind_unsupported": "暂不支持解绑",
     "community": "社区",
     "wx_gzh": "微信公众号",
-    "xhs": "小红书"
+    "xhs": "小红书",
+    "unbind": "解绑",
+    "modify": "修改",
+    "rebind": "重新绑定"
   },
   "export": {
     "markdown": "导出成 markdown 文件",

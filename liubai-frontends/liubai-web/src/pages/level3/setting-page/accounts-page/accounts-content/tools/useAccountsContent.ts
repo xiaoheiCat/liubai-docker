@@ -31,10 +31,6 @@ export function useAccountsContent() {
   }
 
   const onTapWeChat = () => {
-    if(acData.wx_gzh_openid) {
-      _showUnsupported()
-      return
-    }
     toBindWeChat(acData)
   }
 

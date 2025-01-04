@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
 import { useAccountsContent } from './tools/useAccountsContent';
+import AcItem from "./ac-item.vue";
+import type { MenuItem } from '~/components/common/liu-menu/tools/types';
 
 const {
   acData,
@@ -11,7 +13,8 @@ const {
 
 const { t } = useI18n()
 
-const iconColor = "var(--main-normal)"
+const menus1: MenuItem[] = [{ text_key: "setting.rebind" }]
+const menus2: MenuItem[] = [{ text_key: "setting.modify" }, { text_key: "setting.unbind" }]
 
 </script>
 <template>
@@ -23,94 +26,39 @@ const iconColor = "var(--main-normal)"
   <div v-if="acData.pageState < 0" class="ac-container">
 
     <!-- Phone -->
-    <div class="liu-no-user-select liu-hover ac-item" @click.stop="onTapPhone">
-
-      <div class="ac-logo">
-        <svg-icon name="emojis-mobile_phone_color"
-          class="ac-logo-icon"
-          :cover-fill-stroke="false"
-        ></svg-icon>
+    <LiuMenu :menu="menus2" v-if="acData.phone_pixelated" min-width-str="90px">
+      <div class="liu-no-user-select liu-hover ac-item">
+        <AcItem icon-name="emojis-mobile_phone_color"
+          :hd="t('setting.phone')"
+          :bd="acData.phone_pixelated"
+        ></AcItem>
       </div>
-
-      <div class="aci-info">
-        <div class="aci-hd">
-          <span>{{ t('setting.phone') }}</span>
-        </div>
-        <div class="aci-bd" v-if="acData.phone_pixelated">
-          <span>{{ acData.phone_pixelated }}</span>
-        </div>
-        <div class="aci-bd aci-bd_not_yet" v-else>
-          <span>{{ t('setting.not_yet_bound') }}</span>
-        </div>
-      </div>
-
-      <div class="aci-footer">
-        <svg-icon name="arrow-right2" :color="iconColor"
-          class="aci-footer-arrow"
-        ></svg-icon>
-      </div>
-
+    </LiuMenu>
+    <div class="liu-no-user-select liu-hover ac-item" v-else @click.stop="onTapPhone">
+      <AcItem icon-name="emojis-mobile_phone_color" :hd="t('setting.phone')"></AcItem>
     </div>
 
     <!-- WeChat -->
-    <div class="liu-no-user-select liu-hover ac-item" @click.stop="onTapWeChat">
-
-      <div class="ac-logo">
-        <div class="ac-logo-image ac-logo-wechat"></div>
+    <LiuMenu :menu="menus1" v-if="acData.wx_gzh_openid" min-width-str="60px"
+      @tapitem="onTapWeChat"
+    >
+      <div class="liu-no-user-select liu-hover ac-item">
+        <AcItem wechat-logo
+          :hd="t('setting.wechat')"
+          :bd="acData.wx_gzh_nickname || t('setting.bound')"
+        ></AcItem>
       </div>
-
-      <div class="aci-info">
-        <div class="aci-hd">
-          <span>{{ t('setting.wechat') }}</span>
-        </div>
-        <div class="aci-bd" v-if="acData.wx_gzh_openid">
-          <span v-if="acData.wx_gzh_nickname">{{ acData.wx_gzh_nickname }}</span>
-          <span v-else>{{ t('setting.bound') }}</span>
-        </div>
-        <div class="aci-bd aci-bd_not_yet" v-else>
-          <span>{{ t('setting.not_yet_bound') }}</span>
-        </div>
-      </div>
-
-      <div class="aci-footer">
-        <svg-icon name="arrow-right2" :color="iconColor"
-          class="aci-footer-arrow"
-        ></svg-icon>
-      </div>
-
+    </LiuMenu>
+    <div class="liu-no-user-select liu-hover ac-item" v-else @click.stop="onTapWeChat">
+      <AcItem wechat-logo :hd="t('setting.wechat')"></AcItem>
     </div>
-
 
     <!-- Email -->
     <div class="liu-no-user-select liu-hover ac-item" @click.stop="onTapEmail">
-
-      <div class="ac-logo">
-        <svg-icon name="emojis-e_mail_color"
-          class="ac-logo-icon"
-          :cover-fill-stroke="false"
-        ></svg-icon>
-      </div>
-
-      <div class="aci-info">
-        <div class="aci-hd">
-          <span>{{ t('setting.email') }}</span>
-        </div>
-        <div class="aci-bd" v-if="acData.email">
-          <span>{{ acData.email }}</span>
-        </div>
-        <div class="aci-bd aci-bd_not_yet" v-else>
-          <span>{{ t('setting.not_yet_bound') }}</span>
-        </div>
-      </div>
-
-      <div class="aci-footer">
-        <svg-icon name="arrow-right2" :color="iconColor"
-          class="aci-footer-arrow"
-        ></svg-icon>
-      </div>
-
+      <AcItem icon-name="emojis-e_mail_color" :hd="t('setting.email')"
+        :bd="acData.email"
+      ></AcItem>
     </div>
-
 
   </div>
 
@@ -143,67 +91,6 @@ const iconColor = "var(--main-normal)"
     border-radius: 8px;
   }
 }
-
-.ac-logo {
-  width: 32px;
-  height: 32px;
-  margin-inline-end: 16px;
-  position: relative;
-
-  .ac-logo-icon {
-    width: 100%;
-    height: 100%;
-  }
-
-  .ac-logo-image {
-    width: 100%;
-    height: 100%;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-  }
-
-  .ac-logo-wechat {
-    background-image: url('/images/third-party/wechat.png');
-  }
-}
-
-.aci-info {
-  flex: 3;
-  position: relative;
-}
-
-.aci-hd {
-  font-size: var(--desc-font);
-  font-weight: 700;
-  color: var(--main-normal);
-  margin-block-end: 2px;
-}
-
-.aci-bd {
-  font-size: var(--mini-font);
-  color: var(--main-code);
-}
-
-.aci-bd_not_yet {
-  color: var(--main-tip);
-  font-style: italic;
-}
-
-.aci-footer {
-  flex: 1;
-  position: relative;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.aci-footer-arrow {
-  width: 20px;
-  height: 20px;
-}
-
-
-
 
 
 </style>

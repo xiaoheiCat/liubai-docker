@@ -426,7 +426,10 @@
     "unbind_unsupported": "暫不支援解綁",
     "community": "社群",
     "wx_gzh": "微信公眾號",
-    "xhs": "小紅書"
+    "xhs": "小紅書",
+    "unbind": "解除綁定",
+    "modify": "修改",
+    "rebind": "重新綁定"
   },
   "export": {
     "markdown": "匯出成 markdown 文件",

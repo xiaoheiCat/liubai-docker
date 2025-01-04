@@ -599,7 +599,7 @@ async function bind_wechat_gzh(
 
   // binding two accounts is allowed, but binding three is not
   const len6 = list6.length
-  if(len6 > (MAX_ACCOUNTS_TO_BIND - 1)) {
+  if(len6 >= 1) {
     const user6 = list6[0]
     const name6 = await getAccountName(user6)
     const already_bound_msg = t("already_bound", { account: name6 })
@@ -690,7 +690,7 @@ async function make_user_subscribed(
     wx_gzh.subscribe_time = newSubTime
   }
   if(!needUpdate) {
-    console.warn("there is no need to update user")
+    console.warn("there is no need to update user in make_user_subscribed")
     console.log(user)
     return false
   }

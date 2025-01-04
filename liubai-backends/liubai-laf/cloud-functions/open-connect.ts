@@ -138,21 +138,14 @@ async function handle_bind_wechat(
   // 0. get params
   const userId = vRes.userData._id
 
-  // 1. return directly if wx_gzh_openid exists and subscribe === 1
-  const { wx_gzh_openid, thirdData } = vRes.userData
-  const subscribe = thirdData?.wx_gzh?.subscribe
-  if(wx_gzh_openid && subscribe === 1) {
-    return { code: "Y0001" }
-  }
-
-  // 2. checking out memberId
+  // 1. checking out memberId
   const memberId = body.memberId
   if(memberId && typeof memberId === "string") {
     const res2 = await checkIfMemberIdIsMine(memberId, userId)
     if(res2) return res2
   }
 
-  // 3. checking out credential
+  // 2. checking out credential
   const cCol = db.collection("Credential")
   const w3: Partial<Table_Credential> = {
     infoType: "bind-wechat",
