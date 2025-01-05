@@ -11,7 +11,6 @@ import { useWorkspaceStore } from "~/hooks/stores/useWorkspaceStore";
 import { storeToRefs } from "pinia";
 import commonPack from "~/utils/controllers/tools/common-pack";
 import { useInputElement } from "~/hooks/elements/useInputElement";
-import liuApi from "~/utils/liu-api";
 
 export function useMoreArea(
   props: CmaProps,
@@ -100,25 +99,8 @@ export function useMoreArea(
     })
   }
 
-  const onNewFile = (files: File[], el: HTMLInputElement) => {
-    console.log("onNewFile.......:::")
-    console.log(files)
-    emits("filechange", files)
-    el.blur()
-  }
-  const {
-    inputEl: selectFileEl,
-    onFileChange,
-    chooseFile,
-  } = useInputElement(onNewFile)
+  const { chooseFile } = useInputElement()
   const onTapAddAttachment = async () => {
-    console.log("onTapAddAttachment......")
-    const fsaAPI = liuApi.canIUse.fileSystemAccessAPI()
-    if(!fsaAPI) {
-      console.warn("Choosing File is not supported")
-      console.log("so we use input[type=file] instead")
-      return
-    }
     const files = await chooseFile({ id: "for_file" })
     if(!files || files.length < 1) return
     emits("filechange", files)
@@ -160,8 +142,7 @@ export function useMoreArea(
     }
   }
 
-  return { 
-    selectFileEl,
+  return {
     data,
     remindMenu,
     privacyMenu,
@@ -173,7 +154,6 @@ export function useMoreArea(
     onSyncCloudChange,
     onTapAddTitle,
     onTapClearTitle,
-    onFileChange,
     onTapAddAttachment,
     onTapClearAttachment,
     onTapAddSite,

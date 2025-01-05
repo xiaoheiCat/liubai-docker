@@ -5,16 +5,7 @@ export function useCetInputElement(
   props: CetProps, 
   emit: CetEmit
 ) {
-  const onNewImages = (files: File[]) => {
-    emit("imagechange", files)
-  }
-
-  const {
-    inputEl: selectImagesEl,
-    onFileChange: onImageChange,
-    chooseFile,
-  } = useInputElement(onNewImages)
-
+  const { chooseFile } = useInputElement()
   const onTapChooseImage = async () => {
     console.log("onTapChooseImage...............")
     const filePickerAcceptType: FilePickerAcceptType = {
@@ -28,13 +19,11 @@ export function useCetInputElement(
       multiple: true, 
       types: [filePickerAcceptType],
     })
-    if(!files) return
+    if(!files || files.length < 1) return
     emit("imagechange", files)
   }
 
   return {
-    selectImagesEl,
-    onImageChange,
     onTapChooseImage,
   }
 }

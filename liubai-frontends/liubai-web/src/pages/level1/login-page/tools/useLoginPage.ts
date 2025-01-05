@@ -185,6 +185,9 @@ function initGoTo(
 function checkIfRedirectToA2HS(
   rr: RouteAndLiuRouter,
 ) {
+  const res0 = liuEnv.hasBackend()
+  if(!res0) return
+
   const res1 = liuUtil.check.isJustAppSetup()
   if(!res1) return
 
