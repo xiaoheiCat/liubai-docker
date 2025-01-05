@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import liuUtil from "~/utils/liu-util";
 import { useI18n } from 'vue-i18n';
 import { useCeToolbar } from './tools/useCeToolbar';
 import { useCetInputElement } from "./tools/useCetInputElement";
@@ -10,8 +9,6 @@ const props = defineProps(cetProps)
 const emit = defineEmits<CetEmit>()
 
 const {
-  selectImagesEl,
-  onImageChange,
   onTapChooseImage,
 } = useCetInputElement(props, emit)
 
@@ -35,14 +32,6 @@ const icon_color = "var(--main-normal)"
     <div class="liu-hover liu-hover_first cet-item" :aria-label="t('editor.image')"
       @click.stop="onTapChooseImage"
     >
-      <input ref="selectImagesEl" 
-        type="file" 
-        :accept="liuUtil.getAcceptImgTypesString()" 
-        class="ceti-input" 
-        @change="onImageChange"
-        title=""
-        multiple
-      />
       <svg-icon name="editor-image" class="ceti-icon" :color="icon_color" />
     </div>
 

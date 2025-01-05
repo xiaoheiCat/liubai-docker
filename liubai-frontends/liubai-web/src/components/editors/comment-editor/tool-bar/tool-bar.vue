@@ -17,11 +17,7 @@ const {
 } = useFormatClear(props)
 
 const {
-  selectImagesEl,
-  onImageChange,
   onTapImage,
-  selectFileEl,
-  onFileChange,
   onTapFile,
 } = useTbInputElements(props, emit)
 
@@ -46,14 +42,6 @@ const cha = inject(deviceChaKey)
         :aria-label="t('editor.image')"
         @click.stop="onTapImage"
       >
-        <input ref="selectImagesEl" 
-          type="file" 
-          :accept="liuUtil.getAcceptImgTypesString()" 
-          class="cemt-input"
-          @change="onImageChange" 
-          title="" 
-          multiple 
-        />
         <svg-icon name="editor-image" :color="icon_color" class="cemti-icon"></svg-icon>
       </div>
 
@@ -62,13 +50,6 @@ const cha = inject(deviceChaKey)
         :class="{ 'cemt-item_above': located === 'popup' }"
         @click.stop="onTapFile"
       >
-        <input ref="selectFileEl" 
-          type="file" 
-          class="cemt-input" 
-          @change="onFileChange" 
-          accept="*"
-          title=""
-        />
         <svg-icon name="attachment" :color="icon_color" class="cemti-icon"></svg-icon>
       </div>
 
