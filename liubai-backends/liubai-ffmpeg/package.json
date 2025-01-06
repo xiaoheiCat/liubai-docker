@@ -1,6 +1,6 @@
 {
   "name": "liubai-ffmpeg",
-  "version": "1.0.0",
+  "version": "0.5.6",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -14,8 +14,8 @@
   },
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
-    "express": "^4.16.3",
-    "fluent-ffmpeg": "^2.1.2",
-    "nodemon": "^1.17.3"
+    "express": "^4.21.2",
+    "fluent-ffmpeg": "^2.1.3",
+    "nodemon": "^3.1.9"
   }
 }
