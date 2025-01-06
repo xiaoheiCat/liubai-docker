@@ -223,18 +223,15 @@ async function handle_voice(
   }
   const amrId = String(getNowStamp())
 
-  console.log("amrUrl: ")
-  console.log(amrUrl)
-  console.log("amrId: ")
-  console.log(amrId)
-
   // 5. my amr to mp3 service
   const url5 = new URL(`${ffmpegDomain}/new`)
   const sP5 = url5.searchParams
   sP5.set("id", amrId)
   sP5.set("url", amrUrl)
+  const link5 = url5.toString()
+
   try {
-    const res5 = await liuReq(url5.toString(), undefined, { 
+    const res5 = await liuReq(link5, undefined, { 
       method: "GET" 
     })
     const data5 = res5?.data
