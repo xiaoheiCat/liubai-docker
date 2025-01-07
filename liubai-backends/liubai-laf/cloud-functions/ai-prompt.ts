@@ -18,29 +18,6 @@ import { i18nFill } from "@/common-i18n"
 
 /***************************** Bots ***************************/
 export const aiBots: AiBot[] = [
-
-  /** chat using secondary providers */
-  // {
-  //   name: "DeepSeek",
-  //   character: "deepseek",
-  //   provider: "deepseek",
-  //   secondaryProvider: "siliconflow",
-  //   model: "deepseek-ai/DeepSeek-V2.5",
-  //   abilities: ["chat", "tool_use"],
-  //   alias: ["深度求索"],
-  //   maxWindowTokenK: 64,
-  // },
-  // {
-  //   name: "智谱",
-  //   character: "zhipu",
-  //   provider: "zhipu",
-  //   secondaryProvider: "siliconflow",
-  //   model: "THUDM/glm-4-9b-chat",
-  //   abilities: ["chat", "tool_use"],
-  //   alias: ["智谱AI", "智谱清言", "ChatGLM"],
-  //   maxWindowTokenK: 128,
-  // },
-
   /** chat using official providers */
   {
     name: "百小应",
@@ -68,7 +45,7 @@ export const aiBots: AiBot[] = [
     character: "hailuo",
     provider: "minimax",
     model: "abab6.5s-chat",
-    abilities: ["chat", "tool_use", "image_to_text"],
+    abilities: ["chat", "tool_use", "image_to_text", "input_audio"],
     alias: ["MM智能助理", "海螺AI"],
     maxWindowTokenK: 245,
     metaData: {
@@ -138,7 +115,7 @@ export const aiBots: AiBot[] = [
     name: "万知",
     character: "wanzhi",
     provider: "zero-one",
-    model: "yi-vision",                
+    model: "yi-vision-v2",                
     abilities: ["chat", "image_to_text"],
     alias: ["零一万物", "01.ai", "01", "零一"],
     maxWindowTokenK: 16,

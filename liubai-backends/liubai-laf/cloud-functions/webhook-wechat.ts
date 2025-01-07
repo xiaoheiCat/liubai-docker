@@ -6,6 +6,7 @@ import * as crypto from "crypto";
 import type { 
   LiuErrReturn, 
   LiuRqReturn,
+  Ns_FFmpeg,
   Table_Credential,
   Table_Member,
   Table_User,
@@ -207,16 +208,16 @@ async function handle_voice(
     return
   }
 
-  // 2. send unsupported message
-  const msg = _getUnsupportedMsg("voice_unsupported")
-  sendText(wx_gzh_openid, msg)
+  // // 2. send unsupported message
+  // const msg = _getUnsupportedMsg("voice_unsupported")
+  // sendText(wx_gzh_openid, msg)
 
   // 3. get user
   const user = await getUserByWxGzhOpenid(wx_gzh_openid)
   if(!user) return
 
   // 4. get voice link
-  const amrUrl = await getVoiceLink(wx_media_id)
+  const amrUrl = await getVoiceLink(wx_media_id_16k ?? wx_media_id)
   if(!amrUrl) {
     console.warn("we cannot get amrUrl")
     return
@@ -230,46 +231,38 @@ async function handle_voice(
   sP5.set("url", amrUrl)
   const link5 = url5.toString()
 
+  let data5: LiuRqReturn<Ns_FFmpeg.Res_ArmToMp3> | undefined
   try {
-    const res5 = await liuReq(link5, undefined, { 
-      method: "GET" 
-    })
-    const data5 = res5?.data
-    console.warn("see result of amr to mp3:::")
-    console.log(res5)
-    console.log(data5)
+    const res5 = await liuReq<LiuRqReturn<Ns_FFmpeg.Res_ArmToMp3>>(
+      link5, 
+      undefined, 
+      { method: "GET" },
+    )
+    data5 = res5?.data
   }
   catch(err) {
     console.warn("my amr to mp3 service fails")
     console.log(err)
   }
 
-  // // 4. download voice
-  // const res4 = await downloadVoice(wx_media_id)
-  // if(!res4) return
-  // const size4 = res4.fileBlob.size
-  // const type4 = res4.fileBlob.type
+  // 6. handle the result of tranform
+  if(!data5) return
+  const mp3Path = data5.data?.mp3Path
+  if(!mp3Path) return
+  const audio_url = `${ffmpegDomain}${mp3Path}`
+  console.log("let me see mp3 url: ")
+  console.log(audio_url)
 
-  // console.log("size4: ", size4)
-  // console.log("type4: ", type4)
+  // 7. get to ai system
+  get_into_ai({
+    user,
+    msg_type: "voice",
+    audio_url,
+    wx_media_id,
+    wx_media_id_16k,
+    wx_gzh_openid,
+  })
 
-  // if(size4 > MB) {
-  //   console.warn("the audio is too large!")
-  //   console.log(size4)
-  //   return
-  // }
-  
-  // // 5. get to ai system
-  // get_into_ai({ 
-  //   user, 
-  //   msg_type: "voice", 
-  //   file_type: type4,
-  //   file_base64: res4.b64,
-  //   file_blob: res4.fileBlob,
-  //   wx_media_id, 
-  //   wx_media_id_16k,
-  //   wx_gzh_openid,
-  // })
 }
 
 async function handle_video(
@@ -792,14 +785,6 @@ async function downloadVoice(
     console.log(err)
   }
 }
-
-// TODO WIP!
-async function convertAMRtoMP3(
-
-) {
-  
-}
-
 
 // when user sends text, check out if we have to reply automatically
 async function autoReplyAfterReceivingText(

@@ -627,10 +627,11 @@ export type AiInfoType = "user" | "assistant" | "summary" | "clear" |
 // tool_use: 使用工具
 
 
-export type AiAbility = "chat" | "text_to_image" | "image_to_text" | "tool_use"
+export type AiAbility = "chat" | "text_to_image" | "image_to_text" | "tool_use" | "input_audio"
 // chat: interact with plain-text
 // text_to_image: user inputs text and LLM return image
 // image_to_text: user inputs image and LLM return text
+// input_audio: user inputs audio and LLM can understand
 
 export type AiMsgType = "text" | "image" | "voice"
 
@@ -675,11 +676,8 @@ export interface AiEntry {
   msg_type: AiMsgType
   text?: string
   image_url?: string
-
-  // file, including audio file
-  file_type?: string
-  file_blob?: Blob
-  file_base64?: string
+  audio_url?: string
+  audio_base64?: string
 
   // from weixin gzh
   wx_media_id?: string
@@ -1284,6 +1282,7 @@ export interface Table_LogAi extends BaseTable {
   costUsage?: LiuAi.Usage
   costBaseUrl?: string
   userId?: string
+  choices?: any
 }
 
 /** User表 */
@@ -1647,11 +1646,9 @@ export interface Table_AiChat extends BaseTable {
   msgType?: AiMsgType
   text?: string
   imageUrl?: string
+  audioUrl?: string
+  audioBase64?: string
   contentId?: string      // content which has been connected to this chat
-
-  // about file
-  fileType?: string
-  fileBase64?: string     // like for audio
 
   // about LLM
   model?: string           // like "gpt-4o"
@@ -3372,6 +3369,10 @@ export namespace Ns_SiliconFlow {
     seed: number
   }
 
+  export interface AudioToTextRes {
+    text: string
+  }
+
 }
 
 
@@ -3458,4 +3459,10 @@ export namespace Ns_Stepfun {
     }>
   }
 
+}
+
+export namespace Ns_FFmpeg {
+  export interface Res_ArmToMp3 {
+    mp3Path: string
+  }
 }
