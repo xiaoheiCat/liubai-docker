@@ -184,6 +184,14 @@ bash entrypoint.sh
 
 授权完毕之后，再 `git push` 一下，应该就没问题了。
 
+## 立即体验
+
+上面提到的服务已经部署在“留白记事”上了，现在关注“留白记事”微信公众号，发送语音给它，就会调用上方提到的 `amr` 转 `mp3` 服务。
+
+目前大模型厂商 7 小虎中，MiniMax 是允许开发者在 `messages` 中直接传入 `mp3` 格式的 `base64`。看到这里，你还不快去试试，原生地在微信中使用多模态！
+
+<img src="../2024/assets1222/weixin.png" alt="scan with weixin" width="380" >
+
 ## 结语
 
 综合上文，我们使用了 `devbox` 完成了一个 `amr` 转 `mp3` 的服务。
