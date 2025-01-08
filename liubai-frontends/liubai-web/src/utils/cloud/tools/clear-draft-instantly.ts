@@ -1,5 +1,4 @@
-import type { SyncSetAtom } from "~/types/cloud/sync-set/types"
-import type { Res_SyncGet_Client } from "~/types/cloud/sync-get/types"
+import type { Res_SyncSet_Client, SyncSetAtom } from "~/types/cloud/sync-set/types"
 import { whenDraftClear } from "./add-upload-task"
 import ider from "~/utils/basic/ider"
 import time from "~/utils/basic/time"
@@ -26,11 +25,7 @@ export async function clearDraftInstantly(draftId: string, userId: string) {
 
   // 3. request
   const url3 = APIs.SYNC_SET
-  console.log("get to clear draft instantly......")
-  const res3 = await liuReq.request<Res_SyncGet_Client>(url3, opt2)
-  console.warn("clear draft instantly res3: ")
-  console.log(res3)
-  console.log(" ")
+  const res3 = await liuReq.request<Res_SyncSet_Client>(url3, opt2)
 
   // 4. handle response
   const results = res3.data?.results

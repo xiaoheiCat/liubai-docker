@@ -82,9 +82,10 @@ import {
 import cloud from "@lafjs/cloud"
 import { useI18n, aiLang, getCurrentLocale } from "@/common-i18n"
 import * as vbot from "valibot"
-import { WxGzhUploader } from "@/file-utils"
+import { downloadFile, responseToFormData, WxGzhUploader } from "@/file-utils"
 import { createRandom } from "@/common-ids"
 import { addDays, set as date_fn_set } from "date-fns"
+import axios from "axios"
 
 const db = cloud.database()
 const _ = db.command
@@ -102,6 +103,7 @@ const MAX_TIMES_MEMBERSHIP = 200
 
 const SEC_15 = SECONED * 15
 const MIN_3 = MINUTE * 3
+const MIN_5 = MINUTE * 5
 const HOUR_12 = HOUR * 12
 const INDEX_TO_PRESERVE_IMAGES = 12     // the images which appears in the first INDEX_TO_PRESERVE_IMAGES will be preserved rather than compressed to text like [image]
 
@@ -206,6 +208,7 @@ interface PostRunParam {
 interface TurnChatsIntoPromptOpt {
   abilities?: AiAbility[]
   metaData?: AiBotMetaData
+  character?: AiCharacter
 }
 
 interface BaseLLMChatOpt {
@@ -228,10 +231,10 @@ export async function get_into_ai(
   if(!res0) return
 
   // 1. check out text or image_url
-  const { msg_type, image_url, text, file_blob } = entry
+  const { msg_type, image_url, text, audio_url } = entry
   if(msg_type === "text" && !text) return
   if(msg_type === "image" && !image_url) return
-  if(msg_type === "voice" && !file_blob) return
+  if(msg_type === "voice" && !audio_url) return
 
   // 1.1 check out text
   if(msg_type === "text" && text) {
@@ -270,9 +273,16 @@ export async function get_into_ai(
   }
 
   // 4.3 transcibe voice msg
-  if(msg_type === "voice" && file_blob) {
-    
-    return
+  if(msg_type === "voice" && !text) {
+    const transcriber = new Transcriber(audio_url ?? "")
+    const res4_3 = await transcriber.run()
+    const text4_3 = res4_3?.text
+    if(!text4_3) {
+      console.warn("fail to transcribe voice msg, so return")
+      return
+    }
+    entry.text = text4_3
+    entry.audio_base64 = res4_3?.audioBase64
   }
 
   // 5. add the current message into db
@@ -781,6 +791,7 @@ class BaseLLM {
       costUsage: usage,
       costBaseUrl: this._baseUrl,
       userId: opt?.user?._id,
+      choices: chatCompletion.choices,
     }
     logCol.add(aLog)
   }
@@ -823,7 +834,8 @@ class BaseBot {
     //   console.log(printMsg)
     // }
     // else {
-    //   console.log(params.messages)
+    //   const printMsg = valTool.objToStr({ messages: params.messages })
+    //   console.log(printMsg)
     // }
     
 
@@ -921,11 +933,12 @@ class BaseBot {
     chats = this._clipChats(bot, chats, user)
 
     // 3. get prompts and add system prompt
-    const prompts = AiHelper.turnChatsIntoPrompt(
-      chats,
-      user,
-      { abilities: bot.abilities, metaData: bot.metaData },
-    )
+    const chatIntoPrompter = new ChatIntoPrompter(user, { 
+      abilities: bot.abilities, 
+      metaData: bot.metaData,
+      character: bot.character,
+    })
+    const prompts = chatIntoPrompter.run(chats)
 
     // 4. handle current date & time 
     // then add system prompt
@@ -1247,10 +1260,21 @@ class BaseBot {
         t,
         assistantName,
       )
-      console.warn("see newPrompts in _continueAfterWebSearch: ")
-      console.log(newPrompts)
       if(newPrompts.length < 1) return
       prompts.push(...newPrompts)
+    }
+
+    // print last 3 prompts
+    const msgLength = prompts.length
+    console.log(`last 3 prompts in _continueAfterWebSearch: `)
+    if(msgLength > 3) {
+      const messages2 = prompts.slice(msgLength - 3)
+      const printMsg = valTool.objToStr({ messages: messages2 })
+      console.log(printMsg)
+    }
+    else {
+      const printMsg = valTool.objToStr({ messages: prompts })
+      console.log(printMsg)
     }
 
     // 4. new chat create param
@@ -1271,7 +1295,7 @@ class BaseBot {
     const choice5 = res4.choices?.[0]
     const msg5 = choice5?.message
     console.log(msg5)
-    if(msg5.tool_calls) {
+    if(msg5?.tool_calls) {
       console.log(msg5.tool_calls[0])
     }
 
@@ -1405,7 +1429,10 @@ class BaseBot {
       return
     }
     let { finish_reason, message } = firstChoice
-    if(!message) return
+    if(!message) {
+      console.warn(`${c} no message! see firstChoice: `)
+      console.log(firstChoice)
+    }
     let { tool_calls } = message
 
     // 1.1 try to transform text into tool
@@ -1581,15 +1608,18 @@ class BotMiniMax extends BaseBot {
     const maxToken = AiHelper.getMaxToken(totalToken, chats[0], bot)
 
     // 5. to chat
-    const chatParam: OpenAI.Chat.ChatCompletionCreateParams = {
+    const chatParam: OaiCreateParam = {
       messages: prompts,
       max_tokens: maxToken,
       model,
       tools,
     }
     const chatCompletion = await this.chat(chatParam, bot)
+
+    // 6. handle audio result
+    this.handleAudio(chatParam, chatCompletion)
     
-    // 6. post run
+    // 7. post run
     const postParam: PostRunParam = {
       aiParam,
       chatParam,
@@ -1599,6 +1629,56 @@ class BotMiniMax extends BaseBot {
     const res6 = await this.postRun(postParam)
     return res6
   }
+
+  /** remove audio prompt from user 
+   * and replace it with choice[0].messages[0]
+  */
+  private handleAudio(
+    chatParam: OaiCreateParam,
+    chatCompletion?: OaiChatCompletion,
+  ) {
+    // 1. check out if there is message
+    const choice = chatCompletion?.choices[0]
+    if(!choice || choice.message) {
+      return
+    }
+    const choice2 = choice as any
+    const messages = choice2?.messages as OaiPrompt[] | undefined
+    if(!messages) return
+
+    // 2. get assistant message
+    const assistantMsg = messages.find(v => v.role === "assistant")
+    if(assistantMsg) {
+      console.warn("update assistant message: ")
+      console.log(assistantMsg)
+      delete assistantMsg.name
+      choice.message = assistantMsg as OaiMessage
+    }
+
+    // 3. get last user message whose type if input_audio
+    const prompts = chatParam.messages
+    const pLength = prompts.length
+    if(pLength < 1) return
+    const lastPrompt = prompts[pLength - 1]
+    if(!lastPrompt) return
+    if(lastPrompt.role !== "user") return
+    const lastContent = lastPrompt.content
+    if(!Array.isArray(lastContent)) return
+
+    const lastPart = lastContent[0]
+    if(lastPart.type !== "input_audio") return
+
+    const userMsg = messages.find(v => v.role === "user")
+    if(userMsg) {
+      console.warn("update last prompt: ")
+      console.log(userMsg)
+      delete userMsg.name
+      prompts[pLength - 1] = userMsg
+    }
+  }
+
+
+
 }
 
 class BotMoonshot extends BaseBot {
@@ -1808,9 +1888,10 @@ class AiController {
 
   async run(aiParam: AiRunParam) {
     const { room, entry } = aiParam
+    const { msg_type } = entry
 
     // 0. randaomly wait for a while
-    if(!aiParam.isContinueCommand) {
+    if(!aiParam.isContinueCommand && msg_type !== "voice") {
       const r = Math.floor((Math.random() * 3)) + 3
       console.log(`start to wait ${r} seconds`)
       await valTool.waitMilli(r * SECONED)
@@ -1943,10 +2024,10 @@ class AiController {
     // 4. add warning into suffixMessage
     suffixMessage += t("generative_ai_warning")
 
-    console.warn("ready to send menu........")
-    console.log(prefixMessage)
-    console.log(menuList)
-    console.log(suffixMessage)
+    // console.warn("ready to send menu........")
+    // console.log(prefixMessage)
+    // console.log(menuList)
+    // console.log(suffixMessage)
 
     // 5. send
     await valTool.waitMilli(500)
@@ -2120,7 +2201,8 @@ class AiCompressor {
     const system2 = p("system_2")
 
     // 2. add two system prompts to the prompts
-    const prompts = AiHelper.turnChatsIntoPrompt(chats, user)
+    const chatIntoPrompter = new ChatIntoPrompter(user)
+    const prompts = chatIntoPrompter.run(chats)
     prompts.reverse()
     prompts.unshift({ role: "system", content: system1 })
     prompts.push({ role: "user", content: system2 })
@@ -3518,9 +3600,9 @@ class AiHelper {
     const { 
       msg_type,
       text, 
-      image_url, 
-      file_base64,
-      file_type,
+      image_url,
+      audio_url,
+      audio_base64,
       wx_gzh_openid,
       wx_media_id,
       wx_media_id_16k,
@@ -3534,8 +3616,8 @@ class AiHelper {
       msgType: msg_type,
       text,
       imageUrl: image_url,
-      fileType: file_type,
-      fileBase64: file_base64,
+      audioUrl: audio_url,
+      audioBase64: audio_base64,
       wxMediaId: wx_media_id,
       wxMediaId16K: wx_media_id_16k,
       userId,
@@ -3632,8 +3714,7 @@ class AiHelper {
       infoType, 
       usage, 
       text, 
-      imageUrl, 
-      msgType,
+      imageUrl,
     } = chat
     if(infoType === "assistant" || infoType === "summary") {
       const token1 = usage?.completion_tokens
@@ -3660,10 +3741,6 @@ class AiHelper {
       }
       toolToken2 += 10
       token += Math.max(toolToken1, toolToken2)
-    }
-
-    if(msgType === "voice") {
-      token += 400
     }
 
     return token
@@ -3755,75 +3832,6 @@ class AiHelper {
     return false
   }
 
-
-  private static _getToolMsg(
-    tool_call_id: string,
-    t: T_I18N,
-    v: Table_AiChat,
-  ) {
-    const { funcName, contentId } = v
-
-    let toolMsg: OaiToolPrompt | undefined
-    if (funcName === "add_note") {
-      if (contentId) {
-        toolMsg = { role: "tool", content: t("added_note"), tool_call_id }
-      }
-      else {
-        toolMsg = { role: "tool", content: t("not_agree_yet"), tool_call_id }
-      }
-    }
-    else if (funcName === "add_todo") {
-      if (contentId) {
-        toolMsg = { role: "tool", content: t("added_todo"), tool_call_id }
-      }
-      else {
-        toolMsg = { role: "tool", content: t("not_agree_yet"), tool_call_id }
-      }
-    }
-    else if (funcName === "add_calendar") {
-      if (contentId) {
-        toolMsg = { role: "tool", content: t("added_calendar"), tool_call_id }
-      }
-      else {
-        toolMsg = { role: "tool", content: t("not_agree_yet"), tool_call_id }
-      }
-    }
-    else if(funcName === "web_search") {
-      if(v.text && v.webSearchData && v.webSearchProvider) {
-        toolMsg = { role: "tool", content: v.text, tool_call_id }
-      }
-    }
-    else if(funcName === "draw_picture") {
-      if(v.text && v.drawPictureUrl) {
-        toolMsg = { 
-          role: "tool", 
-          content: `[Finish to draw]`, 
-          tool_call_id,
-        }
-      }
-    }
-    else if(funcName === "get_cards") {
-      if(v.text) {
-        toolMsg = {
-          role: "tool",
-          content: v.text,
-          tool_call_id,
-        }
-      }
-    }
-    else if(funcName === "get_schedule") {
-      if(v.text) {
-        toolMsg = {
-          role: "tool",
-          content: v.text,
-          tool_call_id,
-        }
-      }
-    }
-
-    return toolMsg
-  }
-
   // 调用完工具后，将返回结果返回 LLM 时，若当前模型不支持 tool_use
   // 对返回结果进行转换
   static turnToolCallsIntoNormalPrompts(
@@ -3854,165 +3862,6 @@ class AiHelper {
       }
     ]
     return prompts
-  }
-
-  private static _turnToolCallIntoNormalAssistantMsg(
-    t: T_I18N,
-    v: Table_AiChat,
-    opt?: TurnChatsIntoPromptOpt,
-  ) {
-    // 1. get params
-    const { funcName, funcJson, character } = v
-    if(!funcName) return
-    
-    // 2. change prompt if funcName is draw_picture
-    // just because text field storages the translated prompt
-    if(funcName === "draw_picture" && v.text && funcJson) {
-      funcJson.prompt = v.text
-    }
-
-    // 3. handle content
-    const funcArgs = funcJson ? valTool.objToStr(funcJson) : "{}"
-    const msg = t("bot_call_tools", { funcName, funcArgs })
-    const assistantName = AiHelper.getCharacterName(character)
-    const assistantMsg: OaiPrompt = {
-      role: "assistant",
-      content: msg,
-      name: assistantName,
-    }
-    return assistantMsg
-  }
-
-  private static _getAssistantMsgWithToolMsg(
-    tool_calls: OaiToolCall[],
-    v: Table_AiChat,
-  ) {
-    const { character, funcName, text } = v
-    const assistantName = this.getCharacterName(character)
-    let msg: OaiPrompt = {
-      role: "assistant",
-      tool_calls,
-      name: assistantName,
-    }
-
-    if(funcName === "draw_picture" && text) {
-      const aToolCall = tool_calls[0]
-      if(!aToolCall) return msg
-      const theFunc = aToolCall["function"]
-      if(!theFunc) return msg
-      const drawArgsStr = theFunc["arguments"]
-      if(!drawArgsStr) return msg
-      const drawArgs = valTool.strToObj(drawArgsStr)
-      drawArgs.prompt = text
-      const drawArgsStr2 = valTool.objToStr(drawArgs)
-      theFunc["arguments"] = drawArgsStr2
-    }
-
-    return msg
-  }
-
-
-  static turnChatsIntoPrompt(
-    chats: Table_AiChat[],
-    user: Table_User,
-    opt?: TurnChatsIntoPromptOpt,
-  ) {
-    const _this = this
-    const messages: OaiPrompt[] = []
-    const { t } = useI18n(aiLang, { user })
-    const abilities = opt?.abilities ?? ["chat"]
-    const canUseTool = abilities.includes("tool_use")
-
-    for(let i=0; i<chats.length; i++) {
-      const v = chats[i]
-      const { 
-        infoType, 
-        text, 
-        imageUrl, 
-        character, 
-        fileBase64,
-        msgType,
-        tool_calls,
-      } = v
-
-      if(infoType === "user") {
-        if(text) {
-          messages.push({ role: "user", content: text })
-        }
-        else if(imageUrl) {
-          messages.push({ 
-            role: "user", 
-            content: [{ type: "image_url", image_url: { url: imageUrl } }]
-          })
-        }
-        else if(msgType === "voice" && fileBase64) {
-          // messages.push({
-          //   role: "user",
-          //   content: [{
-          //     type: "input_audio",
-          //     input_audio: {
-          //       data: fileBase64,
-          //       format: "mp3",
-          //     }
-          //   }]
-          // })
-        }
-
-      }
-      else if(infoType === "assistant") {
-        if(text) {
-          const assistantName = this.getCharacterName(character)
-          messages.push({ role: "assistant", content: text, name: assistantName })
-        }
-      }
-      else if(infoType === "summary") {
-        if(!text) continue
-        const summary = `【前方对话摘要】\n${text}`
-        messages.push({
-          role: opt?.metaData?.onlyOneSystemRoleMsg ? "user" : "system",
-          content: summary,
-        })
-      }
-      else if(infoType === "background") {
-        if(!text) continue
-        const background = `【背景信息】\n${text}`
-        messages.push({
-          role: opt?.metaData?.onlyOneSystemRoleMsg ? "user" : "system",
-          content: background,
-        })
-      }
-      else if(infoType === "tool_use" && tool_calls) {
-        const tool_call_id = tool_calls[0]?.id
-        if(!tool_call_id) continue
-
-        // 1. add tool_call_result prompt 
-        // where the role is "tool" and  tool_call_id is attached
-        let toolMsg = _this._getToolMsg(tool_call_id, t, v)
-
-        // 2. if we can use tool
-        if(canUseTool) {  
-          if(toolMsg) {
-            messages.push(toolMsg)
-            let assistantMsg2 = _this._getAssistantMsgWithToolMsg(tool_calls, v)
-            messages.push(assistantMsg2)
-            continue
-          }
-        }
-
-        // 3. otherwise, turn the tool_call_result prompt into a user prompt
-        if(toolMsg) {
-          messages.push({ role: "user", content: toolMsg.content }) 
-        }
-        const assistantMsg3 = _this._turnToolCallIntoNormalAssistantMsg(t, v, opt)
-        if(assistantMsg3) {
-          messages.push(assistantMsg3)
-        }
-
-      }
-      
-    }
-
-    return messages
   }
 
   static getMaxToken(
@@ -4319,6 +4168,273 @@ class AiHelper {
   }
 
 }
+
+
+class ChatIntoPrompter {
+
+  private _user: Table_User
+  private _canUseTool: boolean
+  private _canInputAudio: boolean
+  private _opt?: TurnChatsIntoPromptOpt
+
+  constructor(user: Table_User, opt?: TurnChatsIntoPromptOpt) {
+    this._user = user
+
+    const abilities = opt?.abilities ?? ["chat"]
+    this._opt = opt
+    this._canUseTool = abilities.includes("tool_use")
+    this._canInputAudio = abilities.includes("input_audio")
+  }
+
+  run(
+    chats: Table_AiChat[],
+  ) {
+    const _this = this
+    const messages: OaiPrompt[] = []
+    const opt = _this._opt
+    const cLength = chats.length
+    
+    for(let i=0; i<cLength; i++) {
+      const v = chats[i]
+
+      if(v.infoType === "user") {
+        const userPrompt = _this.turnForUser(v, i, cLength)
+        if(userPrompt) messages.push(userPrompt)
+      }
+      else if(v.infoType === "assistant") {
+        if(v.text) {
+          const assistantName = AiHelper.getCharacterName(v.character)
+          messages.push({ role: "assistant", content: v.text, name: assistantName })
+        }
+      }
+      else if(v.infoType === "summary") {
+        if(!v.text) continue
+        const summary = `【前方对话摘要】\n${v.text}`
+        messages.push({
+          role: opt?.metaData?.onlyOneSystemRoleMsg ? "user" : "system",
+          content: summary,
+        })
+      }
+      else if(v.infoType === "background") {
+        if(!v.text) continue
+        const background = `【背景信息】\n${v.text}`
+        messages.push({
+          role: opt?.metaData?.onlyOneSystemRoleMsg ? "user" : "system",
+          content: background,
+        })
+      }
+      else if(v.infoType === "tool_use") {
+        const toolMsgs = _this.turnForToolUse(v)
+        if(toolMsgs) messages.push(...toolMsgs)
+      }
+    }
+
+    return messages
+  }
+
+  private turnForToolUse(v: Table_AiChat) {
+    const {
+      tool_calls,
+    } = v
+    if(!tool_calls) return
+    const tool_call_id = tool_calls[0]?.id
+    if(!tool_call_id) return
+    const user = this._user
+    const { t } = useI18n(aiLang, { user })
+    const canUseTool = this._canUseTool
+
+    // 1. add tool_call_result prompt 
+    // where the role is "tool" and  tool_call_id is attached
+    const toolMsg = this._getToolMsg(tool_call_id, t, v)
+
+    // 2. if we can use tool
+    if(canUseTool && toolMsg) {
+      const msg2 = this._getAssistantMsgWithToolMsg(tool_calls, v)
+      return [toolMsg, msg2]
+    }
+
+    // 3. otherwise, turn the tool_call_result prompt into a user prompt
+    let tmpPrompts: OaiPrompt[] = []
+    if(toolMsg) tmpPrompts.push(toolMsg)
+    const msg3 = this._turnToolCallIntoNormalAssistantMsg(t, v)
+    if(msg3) tmpPrompts.push(msg3)
+    return tmpPrompts
+  }
+
+
+  private _turnToolCallIntoNormalAssistantMsg(
+    t: T_I18N,
+    v: Table_AiChat,
+  ) {
+    // 1. get params
+    const { funcName, funcJson, character } = v
+    if(!funcName) return
+    
+    // 2. change prompt if funcName is draw_picture
+    // just because text field storages the translated prompt
+    if(funcName === "draw_picture" && v.text && funcJson) {
+      funcJson.prompt = v.text
+    }
+
+    // 3. handle content
+    const funcArgs = funcJson ? valTool.objToStr(funcJson) : "{}"
+    const msg = t("bot_call_tools", { funcName, funcArgs })
+    const assistantName = AiHelper.getCharacterName(character)
+    const assistantMsg: OaiPrompt = {
+      role: "assistant",
+      content: msg,
+      name: assistantName,
+    }
+    return assistantMsg
+  }
+
+  private _getAssistantMsgWithToolMsg(
+    tool_calls: OaiToolCall[],
+    v: Table_AiChat,
+  ) {
+    const { character, funcName, text } = v
+    const assistantName = AiHelper.getCharacterName(character)
+    let msg: OaiPrompt = {
+      role: "assistant",
+      tool_calls,
+      name: assistantName,
+    }
+
+    if(funcName === "draw_picture" && text) {
+      const aToolCall = tool_calls[0]
+      if(!aToolCall) return msg
+      const theFunc = aToolCall["function"]
+      if(!theFunc) return msg
+      const drawArgsStr = theFunc["arguments"]
+      if(!drawArgsStr) return msg
+      const drawArgs = valTool.strToObj(drawArgsStr)
+      drawArgs.prompt = text
+      const drawArgsStr2 = valTool.objToStr(drawArgs)
+      theFunc["arguments"] = drawArgsStr2
+    }
+
+    return msg
+  }
+
+
+  private _getToolMsg(
+    tool_call_id: string,
+    t: T_I18N,
+    v: Table_AiChat,
+  ) {
+    const { funcName, contentId } = v
+
+    let toolMsg: OaiToolPrompt | undefined
+    if (funcName === "add_note") {
+      if (contentId) {
+        toolMsg = { role: "tool", content: t("added_note"), tool_call_id }
+      }
+      else {
+        toolMsg = { role: "tool", content: t("not_agree_yet"), tool_call_id }
+      }
+    }
+    else if (funcName === "add_todo") {
+      if (contentId) {
+        toolMsg = { role: "tool", content: t("added_todo"), tool_call_id }
+      }
+      else {
+        toolMsg = { role: "tool", content: t("not_agree_yet"), tool_call_id }
+      }
+    }
+    else if (funcName === "add_calendar") {
+      if (contentId) {
+        toolMsg = { role: "tool", content: t("added_calendar"), tool_call_id }
+      }
+      else {
+        toolMsg = { role: "tool", content: t("not_agree_yet"), tool_call_id }
+      }
+    }
+    else if(funcName === "web_search") {
+      if(v.text && v.webSearchData && v.webSearchProvider) {
+        toolMsg = { role: "tool", content: v.text, tool_call_id }
+      }
+    }
+    else if(funcName === "draw_picture") {
+      if(v.text && v.drawPictureUrl) {
+        toolMsg = { 
+          role: "tool", 
+          content: `[Finish to draw]`, 
+          tool_call_id,
+        }
+      }
+    }
+    else if(funcName === "get_cards") {
+      if(v.text) {
+        toolMsg = {
+          role: "tool",
+          content: v.text,
+          tool_call_id,
+        }
+      }
+    }
+    else if(funcName === "get_schedule") {
+      if(v.text) {
+        toolMsg = {
+          role: "tool",
+          content: v.text,
+          tool_call_id,
+        }
+      }
+    }
+
+    return toolMsg
+  }
+
+  private turnForUser(
+    v: Table_AiChat,
+    index: number,
+    chatsLength: number,
+  ): OaiPrompt | undefined {
+    const {
+      text, 
+      imageUrl,
+      audioBase64,
+      msgType,
+    } = v
+    const canInputAudio = this._canInputAudio
+    const c = this._opt?.character
+
+    if(imageUrl) {
+      return {
+        role: "user",
+        content: [{ type: "image_url", image_url: { url: imageUrl } }]
+      }
+    }
+    if(msgType === "voice" && audioBase64 && canInputAudio) {
+      const audioPrompt: OaiPrompt = {
+        role: "user",
+        content: [
+          {
+            type: "input_audio",
+            input_audio: {
+              data: audioBase64,
+              format: "mp3",
+            }
+          }
+        ]
+      }
+      if(!c) return audioPrompt
+      if(c === "hailuo" && index === 0) {
+        return audioPrompt
+      }
+    }
+
+    if(text) {
+      return {
+        role: "user",
+        content: text,
+      }
+    }
+
+  }
+
+}
+
 
 class UserHelper {
 
@@ -5047,6 +5163,72 @@ export class Translator {
 
 
 }
+
+
+/*************** Turn Audio into Text  **************/
+
+export class Transcriber {
+
+  private _audioUrl: string
+
+  constructor(audioUrl: string) {
+    this._audioUrl = audioUrl
+  }
+
+  async run() {
+    // 1. get params
+    const _env = process.env
+    const baseUrl = _env.LIU_SILICONFLOW_BASE_URL
+    const apiKey = _env.LIU_SILICONFLOW_API_KEY
+    if(!baseUrl || !apiKey) {
+      console.warn("there is no baseUrl or apiKey in Transcriber")
+      return
+    }
+
+    // 2. download file
+    const res2 = await downloadFile(this._audioUrl)
+    const { code, data, errMsg } = res2
+    if(code !== "0000" || !data) {
+      console.warn("download file err:::")
+      console.log(code)
+      console.log(errMsg)
+      return
+    }
+    
+    // 3. get formdata
+    const response = data.res
+    const filename = `` + getNowStamp() + `.mp3`
+    const { form, b64 } = await responseToFormData(response, { 
+      formKey: "file",
+      filename,
+    })
+    form.append("model", "FunAudioLLM/SenseVoiceSmall")
+
+    // 4. transcribe
+    const headers = {
+      "Authorization": "Bearer " + apiKey,
+      "Content-Type": "multipart/form-data",
+    }
+    const url4 = baseUrl + "/audio/transcriptions"
+    let data4: Ns_SiliconFlow.AudioToTextRes | undefined
+    try {
+      const res4 = await axios.post(url4, form, { headers })
+      console.warn("the result or transcribe: ")
+      console.log(res4.data)
+      data4 = res4.data
+    }
+    catch(err) {
+      console.warn("Transcriber error: ")
+      console.log(err)
+    }
+
+    // 5. return
+    return { text: data4?.text, audioBase64: b64 }
+  }
+
+
+}
+
 
 class LogHelper {
 

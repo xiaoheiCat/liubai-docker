@@ -103,6 +103,7 @@ export async function blobToFormData(
 ) {
   const arrayBuffer = await fileBlob.arrayBuffer()
   const buffer = Buffer.from(arrayBuffer)
+  const b64 = buffer.toString("base64")
 
   const contentType = fileBlob.type
   const formKey = opt?.formKey ?? "media"
@@ -119,7 +120,7 @@ export async function blobToFormData(
     filename,
   })
   
-  return { form }
+  return { form, b64 }
 }
 
 // turn response into buffer

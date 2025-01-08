@@ -297,9 +297,6 @@ async function handle_set_wechat(
     updatedStamp: getNowStamp(),
   }
   const res2 = await mCol.doc(memberId).update(w2)
-  console.log("set wechat result: ")
-  console.log(res2)
-
   return { code: "0000" }
 }
 

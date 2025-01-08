@@ -175,6 +175,10 @@ declare global {
       LIU_NOCODB_TOKEN?: string              // get it from https://app.nocodb.com/#/account/tokens
       LIU_NOCODB_TABLE_1?: string            // overview table
       LIU_NOCODB_TABLE_2?: string            // AiStatistic table
+
+      /** devbox + ffmpeg */
+      LIU_FFMPEG_BASEURL?: string            // like "https://xxxxxx.sealoshzh.site"
+
     }
   }
 }
