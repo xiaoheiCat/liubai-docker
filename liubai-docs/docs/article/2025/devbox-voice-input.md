@@ -1,4 +1,4 @@
-# 用 devbox 实现微信语音输入
+# 如何使用 devbox 实现微信语音输入
 
 ## 背景
 
@@ -100,7 +100,7 @@ ffmpeg -version                        # verify if installed successfully
 
 ![entrypoint](./assets0108/07.png)
 
-我们在根目录上，也就是跟 `liubai/` 同级的位置（如上图所示），创建一个 `entrypoint.shell` 文件，内容如下:
+我们在根目录上，也就是跟 `liubai/` 同级的位置（如上图所示），创建一个 `entrypoint.sh` 文件，内容如下:
 
 ```shell
 #!/bin/bash
@@ -156,5 +156,46 @@ bash entrypoint.sh
 
 ### 9. 部署到生产环境
 
+我们在 devbox web ui 上点击 `发布版本`。
+
+![](./assets0108/11.png)
+
+发版过程中，你的 IDE 会短暂断开连接，这是正常的。
+
+发版后，我们点击 `上线`，按照最低配置点击完成即可。
+
+等待几分钟后，你就拥有另一个公网可访问链接，这就是生产环境的 `amr` 转换为 `mp3` 服务啦！
+
+## 在 devbox 上 git commit
+
+在 devbox 上，我们可能会想开发完后提交 git commit，这个时候需要远程服务器拥有远程仓库的推送权限。
+
+下面以 GitHub 为例，分享一下我遇到的情况。
+
+在 Terminal 上运行 `git push origin 你的分支名` 时，Terminal 会在浏览器上打开一个 GitHub 页面，要求你输入 IDE 上的授权码，如下二图所示。
+
+![](./assets0108/12.png)
+
+![](./assets0108/13.png)
+
+但这个操作可能会授权失败，这个时候在 IDE 右下角会弹出通知，让你用 `Personal access tokens` 进行授权，如下图所示：
+
+![](./assets0108/14.png)
+
+授权完毕之后，再 `git push` 一下，应该就没问题了。
+
+## 结语
+
+综合上文，我们使用了 `devbox` 完成了一个 `amr` 转 `mp3` 的服务。
+
+本文的核心在于 **devbox 使用体感** 那一节，我们简单介绍了 `devbox` 与传统开发的区别，由于 `Connect to SSH Host` 的能力，我们直接操作了远程服务器，在其上完成了软件的安装和核心代码的开发。
+
+借由 `devbox` 对底层容器的优化，它让我们拥有**开发即部署**的能力，开发完直接在开发服务器上验证结果；同时 `devbox` 能对整个虚拟器进行快照，解决了 `开发环境` 和 `生产环境` 的一致性难题，让我们在生产环境上无需重走一遍安装依赖以及底层软件的流程，达到生产环境开箱即用的效果。
+
+对于本文有任何疑问，欢迎在评论区留言，或者在 liubai 上[提交 issue](https://github.com/yenche123/liubai/issues) 与我交流！
+
+## 本文作者
+
+- [Yanzhe](https://github.com/yenche123)，留白记事开发者。留白记事是一款集合多个 AI 的生产力工具，让你在微信上即可管理你的笔记、日程、任务和待办清单！
 
 

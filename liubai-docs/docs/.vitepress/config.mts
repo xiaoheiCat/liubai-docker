@@ -74,6 +74,10 @@ export default defineConfig({
 
       "/article": [
         {
+          text: "使用 devbox 实现 amr 转 mp3",
+          link: "/article/2025/devbox-voice-input"
+        },
+        {
           text: "在微信中使用多个 AI",
           link: "/article/2024/how-to-use-multi-ai-on-wechat"
         },
