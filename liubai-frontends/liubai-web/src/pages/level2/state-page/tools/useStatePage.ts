@@ -130,13 +130,12 @@ async function toAddState(
   const now = time.getTime()
 
   // 去创建
-  let atom = {
+  const atom: LiuAtomState = {
     id: ider.createStateId(),
     showInIndex: rData.showInIndex,
     showFireworks: rData.showFireworks,
     text: rData.text,
     color: rData.color,
-    contentIds: [],
     updatedStamp: now,
     insertedStamp: now,
   }
@@ -152,7 +151,7 @@ async function toAddState(
     showInIndex: atom.showInIndex,
     showFireworks: atom.showInIndex,
     text: atom.text,
-    colorShow: liuUtil.colorToShow(atom.color),
+    colorShow: liuUtil.colorToShow(atom.color as string),
     threads: [],
     updatedStamp: now,
     insertedStamp: now,

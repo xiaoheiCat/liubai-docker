@@ -39,7 +39,6 @@ export default {
                                  // 见 open-util.ts toWhatDetail()
 
   max_kanban_thread: 16,   // 最多 max_kanban_thread 个动态展示在列表里
-                           // 则有 max_kanban_thread+1 个 id 存到 workspace.stateList[].contentIds 中
   max_kanban_column: 8,    // 看板里，最多有几个列表
 
   sidebar_spacing: 10,      // sidebar 到 main-view 的间距，用于拖动区域变大
