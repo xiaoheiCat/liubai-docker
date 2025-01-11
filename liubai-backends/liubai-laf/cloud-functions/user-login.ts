@@ -438,25 +438,36 @@ async function handle_scan_login(
   }
 
   // 7.1 login with wx_gzh_openid
+  const opt7 = { client_key }
   if(infoType === "wx-gzh-scan" && wx_gzh_openid) {
-    const opt7_1 = { client_key }
-    const res7_1 = await tryToSignInWithWxGzhOpenId(ctx, body, wx_gzh_openid, opt7_1)
+    const res7_1 = await tryToSignInWithWxGzhOpenId(
+      ctx, body, wx_gzh_openid, opt7
+    )
     
-    if(res7_1) {
-      // 7.2 TODO: send message to user: login successfully
+    if(res7_1.code === "0000") {
       const lang = res7_1.data?.language
       sendLoginMsgToWxGzhUser(ctx, wx_gzh_openid, "wx-gzh-scan", { body, lang })
       _removeCredential()
-      return res7_1
     }
 
-    return { code: "E4003", errMsg: "sign in with wx_gzh_openid failed" }
+    return res7_1
+  }
+
+  // 7.2 login with userId
+  if(infoType === "auth-code" && fir3.userId) {
+    const res7_2 = await tryToSignInWithUserId(
+      ctx, body, fir3.userId, opt7
+    )
+    if(res7_2.code === "0000") {
+      _removeCredential()
+    }
+    return res7_2
   }
 
   return { code: "E4003", errMsg: "no way to log in" }
 }
 
-/****************************** Detect qr code *************************/
+/********************* Detect credential for qr code *********************/
 async function handle_scan_check(
   ctx: FunctionContext,
   body: Record<string, string>,
@@ -484,7 +495,10 @@ async function handle_scan_check(
   // 2. check if it is available
   const now2 = getNowStamp()
   const { expireStamp, verifyNum, infoType } = fir1
-  const info_types: Table_Credential_Type[] = ["wx-gzh-scan"]
+  const info_types: Table_Credential_Type[] = [
+    "wx-gzh-scan",
+    "auth-code",
+  ]
   if(!info_types.includes(infoType)) {
     return { code: "E4003", errMsg: "infoType is not supported" }
   }
@@ -657,30 +671,19 @@ async function handle_users_select(
   }
 
   // 10. to login
-  const res2 = await findUserById(userId)
-
-  // 拒绝登录、或异常
-  if(res2.type === 1) {
-    return res2.rqReturn
+  const opt10 = {
+    client_key, thirdData: c.thirdData
   }
-
-  // 去登录
-  if(res2.type === 2) {
-    const opt1 = {
-      client_key, thirdData: c.thirdData
-    }
-    const res3 = await sign_in(ctx, body, res2.userInfos, opt1)
-
-    // to delete credential
-    col.where({ _id: c._id }).remove()
-
-    return res3
+  const res10 = await tryToSignInWithUserId(
+    ctx,
+    body,
+    userId,
+    opt10,
+  )
+  if(res10.code === "0000") {
+    col.doc(c._id).remove()
   }
-
-  return { 
-    code: "E5001", 
-    errMsg: "it is impossible to sign up because userId is given",
-  }
+  return res10
 }
 
 /******************************** 用 google one-tap 登录 *************************/
@@ -1567,19 +1570,44 @@ function getDeviceI18nStr(
   return deviceStr
 }
 
+async function tryToSignInWithUserId(
+  ctx: FunctionContext,
+  body: Record<string, string>,
+  userId: string,
+  opt: SignInOpt,
+): Promise<LiuRqReturn<Res_UserLoginNormal>> {
+  const res1 = await findUserById(userId)
+  const rType = res1.type
+  if(rType === 1) {
+    return res1.rqReturn
+  }
+  if(rType === 2) {
+    const uLength = res1.userInfos.length
+    if(uLength > 1) {
+      return { 
+        code: "E5001",
+        errMsg: "there is more than one user with userId",
+      }
+    }
 
+    const res2 = await sign_in(ctx, body, res1.userInfos, opt)
+    return res2
+  }
+  return { code: "E5001", errMsg: "there is no user with userId" }
+}
 
 async function tryToSignInWithWxGzhOpenId(
   ctx: FunctionContext,
   body: Record<string, string>,
   wx_gzh_openid: string,
   opt: SignInOpt,
-): Promise<LiuRqReturn<Res_UserLoginNormal> | undefined> {
+): Promise<LiuRqReturn<Res_UserLoginNormal>> {
   const res1 = await findUserByWxOpenId(wx_gzh_openid)
-  if(res1.type === 1) {
+  const rType = res1.type
+  if(rType === 1) {
     return res1.rqReturn
   }
-  if(res1.type === 2) {
+  if(rType === 2) {
     const res2 = await sign_in(ctx, body, res1.userInfos, opt)
 
     // handle avatar
@@ -1591,8 +1619,9 @@ async function tryToSignInWithWxGzhOpenId(
 
     return res2
   }
-}
 
+  return { code: "E5001", errMsg: "there is no user with wx_gzh_openid" }
+}
 
 /** 登录后，检查 token 是否过多，过多的拿去销毁 */
 async function checkIfTooManyTokens(

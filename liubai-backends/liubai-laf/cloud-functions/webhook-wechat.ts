@@ -460,7 +460,7 @@ async function login_with_wechat_gzh(
       meta_data,
       updatedStamp: getNowStamp(),
     }
-    const res2 = await cCol.doc(cId).update(w2)
+    await cCol.doc(cId).update(w2)
   }
 
   // 3. get user by wx_gzh_openid
