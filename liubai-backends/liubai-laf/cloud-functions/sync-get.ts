@@ -554,6 +554,7 @@ async function toThreadListFromContent(
     excluded_ids,
     tagId,
     stateId,
+    skip,
   } = atom
   let sort = atom.sort ?? "desc"
 
@@ -577,6 +578,7 @@ async function toThreadListFromContent(
   const isTodayFuture = vT === "TODAY_FUTURE"
   const isPast = vT === "PAST"
   const oState = isTrash ? "REMOVED" : "OK"
+  const isKanban = vT === "STATE"
 
   const w: Record<string, any> = {
     oState,
@@ -609,7 +611,7 @@ async function toThreadListFromContent(
   else if(isTrash) {
     w.removedStamp = _.gt(0)
   }
-  else if(vT === "STATE") {
+  else if(isKanban) {
     w.stateId = stateId
   }
   else if(vT === "TAG") {
@@ -631,6 +633,7 @@ async function toThreadListFromContent(
   }
   else if(isPin) key = "pinStamp"
   else if(isTrash) key = "removedStamp"
+  else if(isKanban) key = "stateStamp"
 
   if(lastItemStamp) {
     if(sort === "desc") {
@@ -645,6 +648,10 @@ async function toThreadListFromContent(
   // 3. to query
   let q3 = db.collection("Content").where(w)
   q3 = q3.orderBy(key, sort).limit(limit)
+  if(skip) {
+    q3 = q3.skip(skip)
+  }
+
   const res3 = await q3.get<Table_Content>()
   const results = res3.data ?? []
 

@@ -15,9 +15,6 @@ import { useEnterIntoApp } from "~/hooks/useEnterIntoApp";
 import time from "~/utils/basic/time";
 import valTool from "~/utils/basic/val-tool";
 import { db } from "~/utils/db";
-import { 
-  deleteThreadsFromWorkspaceStateCfg 
-} from "~/hooks/thread/specific-operate/delete-related"
 import type {
   BulkUpdateAtom_UploadTask
 } from "~/utils/cloud/upload-tasks/tools/types"
@@ -74,11 +71,6 @@ async function handleRemovedContents() {
   const col = db.contents.where(w).between(b1, b2, false, false)
   const results = await col.limit(50).sortBy("updatedStamp")
   if(results.length < 1) return
-
-  const ids = results.map(v => v._id)
-
-  // 1. 先去修改 workspace.stateConfig
-  await deleteThreadsFromWorkspaceStateCfg(ids)
 
   const list = results.map((v, i) => {
     v.oState = "DELETED"

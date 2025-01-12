@@ -38,7 +38,6 @@ import {
   type AiToolGetScheduleParam,
   type Table_Content,
   type SortWay,
-  type Table_Workspace,
   type Table_LogAi,
   type AiBotMetaData,
   Ns_Zhipu,
@@ -59,8 +58,6 @@ import {
   liuReq,
   decryptEncData,
   getSummary,
-  SpaceUtil,
-  sortListWithIds,
 } from "@/common-util"
 import { WxGzhSender } from "@/service-send"
 import { 
@@ -2888,8 +2885,10 @@ class ToolHandler {
     // 3. get contents
     const cCol = db.collection("Content")
     if(cardType === "TODO" || cardType === "FINISHED") {
-      contents = await this._getCardsForState(cardType, userId, q2)
-      if(!contents) return
+      q2.stateId = cardType
+      const q3_0 = cCol.where(q2).orderBy("stateStamp", "desc").limit(10)
+      const res3_0 = await q3_0.get<Table_Content>()
+      contents = res3_0.data
       if(cardType === "TODO") {
         textToBot = t("todo_cards")
         textToUser = t("bot_read_todo", { bot: bot.name })
@@ -2956,47 +2955,10 @@ class ToolHandler {
     }
   }
 
-
-  private async _getCardsForState(
-    cardType: "TODO" | "FINISHED",
-    userId: string,
-    q: Record<string, any>,
-  ): Promise<Table_Content[] | undefined> {
-    // 1. get space
-    const q1: Partial<Table_Workspace> = {
-      infoType: "ME",
-      owner: userId,
-      oState: "OK",
-    }
-    const wCol = db.collection("Workspace")
-    const res1 = await wCol.where(q1).getOne<Table_Workspace>()
-    const space = res1.data
-    if(!space) return
-
-    // 2. get the state
-    const sCfg = space.stateConfig ?? SpaceUtil.getDefaultStateCfg()
-    const theState = sCfg.stateList.find(v => v.id === cardType)
-    const ids = theState?.contentIds ?? []
-    if(ids.length < 1) return []
-
-    // 3. query contents
-    if(ids.length > 10) {
-      ids.splice(10, ids.length - 10)
-    }
-    q._id = _.in(ids)
-    const cCol = db.collection("Content")
-    const res3 = await cCol.where(q).get<Table_Content>()
-    const contents = res3.data
-    if(contents.length < 2) return contents
-    const sortedContents = sortListWithIds(contents, ids)
-    return sortedContents
-  }
-
 }
 
 
 class TransformContent {
-
 
   static getCardData(v: Table_Content) {
     const data = decryptEncData(v)

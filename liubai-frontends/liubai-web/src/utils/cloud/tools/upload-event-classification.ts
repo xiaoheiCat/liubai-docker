@@ -25,7 +25,6 @@ export const content_evts: LiuUploadTask[] = [
 const workspace_evts: LiuUploadTask[] = [
   "workspace-tag",
   "workspace-state_config",
-  "undo_workspace-state_config",
 ]
 
 const member_evts: LiuUploadTask[] = [

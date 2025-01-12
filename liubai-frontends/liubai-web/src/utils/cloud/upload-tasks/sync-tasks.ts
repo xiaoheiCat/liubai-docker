@@ -17,7 +17,6 @@ import type {
 import liuReq from "~/requests/liu-req";
 import { useSyncStore, type SyncStoreAtom } from "~/hooks/stores/useSyncStore"
 import newIds from "./tools/handle-new-ids"
-import { type UploadTaskParam } from "../tools/types";
 import usefulTool from "~/utils/basic/useful-tool";
 
 export async function syncTasks(tasks: UploadTaskLocalTable[]) {
@@ -76,7 +75,6 @@ async function afterSyncSet(
   results: SyncSetAtomRes[],
   atoms: SyncSetAtom[],
 ) {
-
   // 1. those results have new ids
   const list: SyncStoreAtom[] = []
   for(let i=0; i<results.length; i++) {
@@ -119,18 +117,17 @@ async function afterSyncSet(
     }
   }
 
-
   // 2. delete these tasks
   const delete_list = atoms.map(v => v.taskId)
   await deleteUploadTasks(delete_list)
 
   // 3. replace data
   const d1 = time.getTime()
-  const res3 = await dataHasNewIds(list)
+  await dataHasNewIds(list)
   const d2 = time.getTime()
   // console.log(`dataHasNewIds 耗时: ${d2 - d1}ms`)
 
-  return res3
+  return true
 }
 
 async function deleteUploadTasks(
@@ -201,10 +198,8 @@ async function replaceInSpecificTable<T extends ReplaceTable>(
   await table.bulkDelete(delete_ids)
 
   // 5. check all table to update
-  let moreTasks: UploadTaskParam[] = []
   if(tableName === "contents") {
-    const res5_1 = await newIds.handle_new_contentIds(first_ids, new_ids)
-    moreTasks.push(...res5_1)
+    await newIds.handle_new_contentIds(first_ids, new_ids)
   }
   else if(tableName === "collections") {
     await newIds.handle_new_collectionIds(first_ids, new_ids)
@@ -212,14 +207,12 @@ async function replaceInSpecificTable<T extends ReplaceTable>(
   else if(tableName === "drafts") {
     await newIds.handle_new_draftIds(first_ids, new_ids)
   }
-
-  return moreTasks
 }
 
 async function dataHasNewIds(
   list: SyncStoreAtom[],
 ) {
-  if(list.length < 1) return []
+  if(list.length < 1) return
 
   const list_content = list.filter(v => {
     return v.whichType === "comment" || v.whichType === "thread"
@@ -227,19 +220,13 @@ async function dataHasNewIds(
   const list_collection = list.filter(v => v.whichType === "collection")
   const list_draft = list.filter(v => v.whichType === "draft")
 
-  let moreTasks: UploadTaskParam[] = []
-  const res1 = await replaceInSpecificTable("contents", list_content)
-  const res2 = await replaceInSpecificTable("collections", list_collection)
-  const res3 = await replaceInSpecificTable("drafts", list_draft)
-  if(res1) moreTasks.push(...res1)
-  if(res2) moreTasks.push(...res2)
-  if(res3) moreTasks.push(...res3)
+  await replaceInSpecificTable("contents", list_content)
+  await replaceInSpecificTable("collections", list_collection)
+  await replaceInSpecificTable("drafts", list_draft)
 
   // notify via useSyncStore()
   const sStore = useSyncStore()
   sStore.afterSync(list)
-
-  return moreTasks
 }
 
 

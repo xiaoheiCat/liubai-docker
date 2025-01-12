@@ -591,9 +591,24 @@ async function _getStatisticForOverview() {
   const res14 = await uCol.where(w2).count()
   const E30 = res14.total
 
+  // 15. get Total users
+  const w3 = { oState: "NORMAL" }
+  const res15 = await uCol.where(w3).count()
+  const Total_Users = res15.total
+
+  // 16. get the number of devices
+  const w4 = {
+    "isOn": "Y",
+    "lastSet": _.gte(ONE_DAY_AGO),
+  }
+  const tCol = db.collection("Token")
+  const res16 = await tCol.where(w4).count()
+  const Devices = res16.total
+
   return {
     D1, D2, D3, D5, D7, D14, D30,
     E1, E2, E3, E5, E7, E14, E30,
+    Total_Users, Devices,
   }
 }
 

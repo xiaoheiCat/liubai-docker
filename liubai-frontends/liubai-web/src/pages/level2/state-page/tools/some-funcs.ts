@@ -6,7 +6,6 @@ import type { ContentLocalTable } from "~/types/types-table"
 import { useWorkspaceStore } from "~/hooks/stores/useWorkspaceStore"
 import ider from "~/utils/basic/ider"
 import { equipThreads } from "~/utils/controllers/equip/threads"
-import { setStateForNewThread } from "~/hooks/thread/specific-operate/state"
 import { LocalToCloud } from "~/utils/cloud/LocalToCloud"
 import liuEnv from "~/utils/liu-env"
 
@@ -14,6 +13,12 @@ export async function addNewThreadToKanban(
   stateId: string,
   inputTxt: string,
 ) {
+
+  // console.warn("addNewThreadToKanban......")
+  // console.log(inputTxt)
+  // console.log(stateId)
+  // console.log(" ")
+
   // 1. get current space info
   const wStore = useWorkspaceStore()
   const spaceId = wStore.spaceId
@@ -53,6 +58,7 @@ export async function addNewThreadToKanban(
     editedStamp: now,
 
     stateId,
+    stateStamp: now,
     search_other,
     spaceId,
     spaceType,
@@ -65,7 +71,6 @@ export async function addNewThreadToKanban(
 
   // 4. notify other components
   const threadShows = await equipThreads([aThread])
-  await setStateForNewThread(threadShows[0])
   const tStore = useThreadShowStore()
   tStore.setNewThreadShows(threadShows)
 

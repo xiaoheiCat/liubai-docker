@@ -40,6 +40,8 @@ Build! Anyway
 see: "manifest-declared icons"
 https://webkit.org/blog/12445/new-webkit-features-in-safari-15-4/#:~:text=takes%20precedence%20over-,manifest%2Ddeclared%20icons,-in%20order%20to
 
+11. 运行 `pnpm knip` 可以查看未被使用的死代码。
+
 ## 彻底解决 pnpm 网络请求超时的问题
 
 > [!WARNING]

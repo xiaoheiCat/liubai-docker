@@ -16,7 +16,6 @@ import { getTagIdsParents } from "~/utils/system/tag-related";
 import type { SpaceType } from "~/types/types-basic";
 import { LocalToCloud } from "~/utils/cloud/LocalToCloud";
 import { resetBasicCeData } from "./some-funcs";
-import { setStateForNewThread } from "~/hooks/thread/specific-operate/state";
 import cui from "~/components/custom-ui";
 import liuEnv from "~/utils/liu-env";
 
@@ -145,9 +144,6 @@ async function releaseAsync(
 
   // 3. notify other components
   const threadShows = await equipThreads([newThread])
-  if(newThread.stateId) {
-    await setStateForNewThread(threadShows[0])
-  }
   ctx.threadShowStore.setNewThreadShows(threadShows)
 
   // 3.1 emit
@@ -319,9 +315,6 @@ async function updateAsync(
   const theThread = await localReq.getContentById(threadId)
   if(!theThread) return
   const threadShows = await equipThreads([theThread])
-  if(oldContent.stateId !== theThread.stateId) {
-    await setStateForNewThread(threadShows[0])
-  }
   ctx.threadShowStore.setUpdatedThreadShows(threadShows, "edit")
 
   // 5. emits to page

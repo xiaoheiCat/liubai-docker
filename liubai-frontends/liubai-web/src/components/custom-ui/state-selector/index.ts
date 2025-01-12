@@ -11,6 +11,7 @@ import type { RouteAndLiuRouter } from "~/routes/liu-router"
 import { openIt, closeIt, handleCustomUiQueryErr } from "../tools/useCuiTool"
 import liuUtil from "~/utils/liu-util"
 import type { LiuTimeout } from "~/utils/basic/type-tool"
+import cfg from "~/config"
 
 let _resolve: SsResolver | undefined
 const list = ref<SsItem[]>([])
@@ -190,7 +191,7 @@ function _toOpen() {
 
   toggleTimeout = setTimeout(() => {
     show.value = true
-  }, 16)
+  }, cfg.frame_duration)
 }
 
 function _toClose() {

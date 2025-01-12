@@ -117,6 +117,9 @@ function handleLastItemStamp(
   else if(vT === "TODAY_FUTURE" || vT === "PAST") {
     tlData.lastItemStamp = lastThread.calendarStamp ?? 0
   }
+  else if(vT === "STATE") {
+    tlData.lastItemStamp = lastThread.stateStamp ?? 0
+  }
   else {
     tlData.lastItemStamp = lastThread.createdStamp
   }

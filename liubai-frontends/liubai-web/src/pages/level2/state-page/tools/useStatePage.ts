@@ -21,9 +21,12 @@ import cfg from "~/config"
 import ider from "~/utils/basic/ider"
 import liuUtil from "~/utils/liu-util"
 import localCache from "~/utils/system/local-cache"
-import { type SyncGet_CheckContents } from "~/types/cloud/sync-get/types"
+import { 
+  type LiuDownloadParcel, 
+  type SyncGet_ThreadList, 
+  type SyncGet_CheckContents,
+} from "~/types/cloud/sync-get/types"
 import { CloudMerger } from "~/utils/cloud/CloudMerger"
-import valTool from "~/utils/basic/val-tool"
 import { CloudEventBus } from "~/utils/cloud/CloudEventBus"
 import { useAwakeNum } from "~/hooks/useCommon"
 
@@ -127,13 +130,12 @@ async function toAddState(
   const now = time.getTime()
 
   // 去创建
-  let atom = {
+  const atom: LiuAtomState = {
     id: ider.createStateId(),
     showInIndex: rData.showInIndex,
     showFireworks: rData.showFireworks,
     text: rData.text,
     color: rData.color,
-    contentIds: [],
     updatedStamp: now,
     insertedStamp: now,
   }
@@ -149,7 +151,7 @@ async function toAddState(
     showInIndex: atom.showInIndex,
     showFireworks: atom.showInIndex,
     text: atom.text,
-    colorShow: liuUtil.colorToShow(atom.color),
+    colorShow: liuUtil.colorToShow(atom.color as string),
     threads: [],
     updatedStamp: now,
     insertedStamp: now,
@@ -271,6 +273,7 @@ function initKanbanColumns(
   const spaceIdRef = storeToRefs(wStore).spaceId
 
   const _getData = () => {
+    // console.log("initKanbanColumns......")
     toGetColumns(ctx)
     toGetThreads(ctx)
   }
@@ -291,76 +294,90 @@ async function toGetThreads(
   cloud: boolean = true,
 ) {
   const { kanban } = ctx
-  const unknown_ids: string[] = []
   for(let i=0; i<kanban.columns.length; i++) {
     const col = kanban.columns[i]
-
     const opt = {
       stateId: col.id, 
       excludeInKanban: false,
     }
-    const data = await stateController.getThreadsOfAState(opt)
-
+    const data = await stateController.getThreads(opt)
+    // console.log("see threads: ")
+    // console.log(data.threads)
     col.hasMore = data.hasMore
     col.threads = data.threads
-
-    if(data.unknown_ids) {
-      unknown_ids.push(...data.unknown_ids)
-    }
   }
 
-  // console.log("unknown_ids in useStatePage:::")
-  // console.log(unknown_ids)
-  // console.log(" ")
-
   if(cloud) {
-    loadCloud(ctx, unknown_ids)
+    loadCloud(ctx)
   }
 }
 
 
 async function loadCloud(
   ctx: StatePageCtx,
-  unknown_ids: string[],
 ) {
+  // 1. check if we has logged in
   const hasBE = localCache.hasLoginWithBackend()
   if(!hasBE) return
-  if(unknown_ids.length < 1) return
+  const { kanban } = ctx
+  const wStore = useWorkspaceStore()
+  const spaceId = wStore.spaceId
+  if(!spaceId) {
+    console.warn("no spaceId!")
+    return
+  }
+  const ids: string[] = []
 
-  const MAX_TIMES = 8
-  let runTimes = 0
-  let loadAgain = false
-
-  console.log("start to poll cloud................")
-  console.time("useStatePage::loadCloud")
-
-  // 1. sync with cloud using while loops
-  while(true) {
-    runTimes += 1
-    if(runTimes > MAX_TIMES) break
-
-    let tmpList = unknown_ids.splice(0, 16)
-    if(tmpList.length < 1) break
-
-    const param: SyncGet_CheckContents = {
-      taskType: "check_contents",
-      ids: tmpList,
+  // 2. to fetch
+  const promises: Array<Promise<LiuDownloadParcel[] | undefined>> = []
+  for(let i=0; i<kanban.columns.length; i++) {
+    const col = kanban.columns[i]
+    const param: SyncGet_ThreadList = {
+      taskType: "thread_list",
+      spaceId,
+      viewType: "STATE",
+      limit: cfg.max_kanban_thread,
+      stateId: col.id,
     }
-    const res = await CloudMerger.request(param, { delay: 16 })
-    if(!res) break
-    
-    loadAgain = true
-
-    if(unknown_ids.length < 1) {
-      break
-    }
-
-    await valTool.waitMilli(1000)
+    const pro = CloudMerger.request(param, { maxStackNum: 5 })
+    promises.push(pro)
+    ids.push(...col.threads.map(v => v._id))
   }
 
-  console.timeEnd("useStatePage::loadCloud")
+  // 3. wait all promises
+  const res3 = await Promise.all(promises)
+  // console.warn("loadCloud in useStatePage: ")
+  // console.log(res3)
 
-  if(loadAgain) {
+  // 4. handle ids which are not synced
+  let hasAnyPromiseSuccess = false
+  for(let i=0; i<res3.length; i++) {
+    const parcels = res3[i]
+    if(!parcels) continue
+    hasAnyPromiseSuccess = true
+    for(let j=0; j<parcels.length; j++) {
+      const v = parcels[j]
+      const idx = ids.indexOf(v.id)
+      if(idx >= 0){
+        ids.splice(idx, 1)
+      }
+    }
+  }
+
+  // 5. sync ids
+  if(hasAnyPromiseSuccess && ids.length > 0) {
+    console.warn("check ids: ")
+    console.log(ids)
+    const param5: SyncGet_CheckContents = {
+      taskType: "check_contents",
+      ids,
+    }
+    const res5 = await CloudMerger.request(param5)
+    console.log("check ids res5: ")
+    console.log(res5)
+  }
+
+  if(hasAnyPromiseSuccess) {
     toGetThreads(ctx, false)
   }
 }

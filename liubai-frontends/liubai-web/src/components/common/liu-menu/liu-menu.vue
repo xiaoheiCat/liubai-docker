@@ -115,6 +115,16 @@ const onMenuHide = () => {
         
         </template>
 
+
+        <div class="menu-footer" v-if="moreLink">
+          <a class="menu-footer-link" :href="moreLink" target="_blank">
+            <SvgIcon name="info" class="menu-info-icon"
+              color="var(--main-note)"
+            ></SvgIcon>
+            <span>{{ t('common.learn_more') }}</span>
+          </a>
+        </div>
+
       </div>
     </template>
 
@@ -217,6 +227,34 @@ const onMenuHide = () => {
     cursor: not-allowed;
   }
 
+  .menu-footer {
+    margin-bottom: 4px;
+  }
+
+  .menu-footer-link {
+    padding: 4px 8px;
+    font-size: var(--state-font);
+    color: var(--main-note);
+    display: flex;
+    align-items: center;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .menu-info-icon {
+    width: 16px;
+    height: 16px;
+    margin-inline-end: 4px;
+  }
+
+}
+
+@media(hover: hover) {
+  .menu-container {
+    .menu-footer-link:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 

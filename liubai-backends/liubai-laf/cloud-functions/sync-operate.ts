@@ -203,11 +203,6 @@ async function agree_aichat(
     return { code: "E5001", errMsg: "fail to get contentId" }
   }
 
-  // 9. update stateConfig of space
-  if(todoIdx >= 0) {
-    addNewContentIntoKanban(contentId, "TODO", space)
-  }
-
   // 10. update ai chat
   const now10 = getNowStamp()
   const u10: Partial<Table_AiChat> = { contentId, updatedStamp: now10 }
@@ -278,42 +273,6 @@ async function getSharedData(
     }
   }
 }
-
-
-async function addNewContentIntoKanban(
-  contentId: string,
-  stateId: string,
-  space: Table_Workspace,
-) {
-  // 1. get the specific kanban
-  const spaceId = space._id
-  const sCfg = space.stateConfig ?? SpaceUtil.getDefaultStateCfg()
-  const stateList = sCfg.stateList
-  const theState = stateList.find(v => v.id === stateId)
-  if(!theState) return
-
-  // 2. update the kanban
-  const now = getNowStamp()
-  const ids = theState.contentIds ?? []
-  ids.unshift(contentId)
-  if(ids.length > 16) {
-    ids.pop()
-  }
-  theState.contentIds = ids
-  theState.updatedStamp = now
-  sCfg.updatedStamp = now
-
-  // 3. construct update data
-  const d3: Partial<Table_Workspace> = {
-    stateConfig: sCfg,
-    updatedStamp: now,
-  }
-  const wCol = db.collection("Workspace")
-  const res3 = await wCol.doc(spaceId).update(d3)
-
-  return true
-}
-
 
 function preCheck(
   body: Record<string, any>,

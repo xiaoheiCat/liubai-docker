@@ -9,7 +9,6 @@ import { db } from "~/utils/db"
 import localCache from "~/utils/system/local-cache"
 import { handleFiles } from "./handle-files"
 import { syncTasks } from "./sync-tasks"
-import { type UploadTaskParam } from "../tools/types"
 import valTool from "~/utils/basic/val-tool"
 
 /** check 10 tasks */
@@ -30,7 +29,6 @@ const MAX_TIMES = 3
 export async function handleUploadTasks() {
 
   let times = 0
-  const moreTasks: UploadTaskParam[] = []
 
   while(true) {
     times++
@@ -56,13 +54,9 @@ export async function handleUploadTasks() {
 
     // wait for a while to avoid too many requests
     await valTool.waitMilli(1000)
-
-    if(!res) break
-    if(typeof res === "boolean") {
-      continue
-    }
-    moreTasks.push(...res)
+    
+    if(!res) return false
   }
 
-  return moreTasks
+  return true
 }

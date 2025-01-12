@@ -1,129 +1,77 @@
 
 import type { ThreadShow } from "~/types/types-content";
 import threadOperate from "~/hooks/thread/thread-operate";
-import { useWorkspaceStore } from "~/hooks/stores/useWorkspaceStore";
-import stateController from "~/utils/controllers/state-controller/state-controller";
-import type { LiuTimeout } from "~/utils/basic/type-tool";
-import valTool from "~/utils/basic/val-tool";
+import time from "~/utils/basic/time";
+import typeCheck from "~/utils/basic/type-check";
 
-interface CrossData {
-  stateId: string
-  threadId: string
-}
-
-// 被移动到其他 column 的 id
-let crossData: CrossData | null = null
-
-// 当有状态被添加时
-export async function whenThreadInserted(
-  newStateId: string,
-  thread: ThreadShow
-) {
-
-  console.log("有动态被添加到 kanban 里了...................")
-  const oldStateId = thread.stateId
-  crossData = {
-    stateId: newStateId,
-    threadId: thread._id,
-  }
-  
-  if(newStateId === oldStateId) return
-  const res = await threadOperate.setNewStateForThread(thread, newStateId)
-  if(res) thread.stateId = newStateId
-}
-
-
-interface WtluData {
-  stateId: string
-  threads: ThreadShow[]
-}
-let waitList: WtluData[] = []
-let waitTimeout: LiuTimeout
 export function whenThreadListUpdated(
   stateId: string,
-  threads: ThreadShow[]
+  threads: ThreadShow[],
 ) {
-  waitList.push({ stateId, threads })
-  if(waitTimeout) return
-  waitTimeout = setTimeout(() => {
-    waitTimeout = undefined
-    updateStateList()
-  }, 300)
-}
+  const now = time.getTime()
+  const total = threads.length
 
-async function updateStateList() {
-  if(waitList.length < 1) return
+  const _getNewStateStamp = (i: number, threads: ThreadShow[]) => {
+    const v = threads[i]
+    const theStamp = v.stateStamp ?? now
+    const nextOne = threads[i + 1]
+    const nextStamp = nextOne?.stateStamp ?? now
+    const prevOne = i > 0 ? threads[i - 1] : undefined
+    const prevStamp = prevOne?.stateStamp ?? now
 
-  const wStore = useWorkspaceStore()
-  const currentSpace = wStore.currentSpace
-  if(!currentSpace) return false
-
-
-  console.log("有 kanban 被更新了...............")
-
-  const stateList = stateController.getStates()
-  for(let i=0; i<stateList.length; i++) {
-    const v1 = stateList[i]
-    const v2 = waitList.find(v => v1.id === v.stateId)
-    if(!v2) continue
-
-    const oldContentIds = v1.contentIds ?? []
-    const newContentIds = v2.threads.map(v => v._id)
-    let contentIds: string[] = []
-
-    for(let j=0; j<oldContentIds.length; j++) {
-      const t1 = oldContentIds[j]
-      const t2 = newContentIds[0]
-
-      // t1 已于 contentId 中
-      if(contentIds.includes(t1)) {
-        continue
-      }
-
-      if(t1 && t1 === t2) {
-        // 位置一样
-        contentIds.push(t2)
-        newContentIds.splice(0, 1)
-        continue
-      }
-
-      // 读到旧的 id 被跨栏移动，代表不应该出现在该 column 里
-      if(t1 && t1 === crossData?.threadId) {
-        continue
-      }
-
-      // 读到新的 id 被跨栏移动，代表它就应该出现在这里
-      // 这时要 j-- 因为下一轮还要再从此刻的 t1 开始
-      if(t2 && t2 === crossData?.threadId) {
-        contentIds.push(t2)
-        newContentIds.splice(0, 1)
-        j--
-        continue
-      }
-
-      // 检查 t1 有没有在 newContentIds 里
-      // 如果没有，就代表是其他端的动态，请为它保留
-      if(t1 && !newContentIds.includes(t1)) {
-        contentIds.push(t1)
-        continue
-      }
-
-      // 以上情况都不符合，则以 newContentIds 为准
-      contentIds.push(t2)
-      newContentIds.splice(0, 1)
+    if(!typeCheck.isNumber(theStamp)) {
+      return now
+    }
+    if(total <= 1) {
+      return theStamp
     }
 
-    if(newContentIds.length > 0) {
-      contentIds = contentIds.concat(newContentIds)
+    // 1. check out first one
+    if(i === 0 && nextOne) {
+      if(theStamp <= nextStamp) return now
+      return theStamp
     }
-    contentIds = valTool.uniqueArray(contentIds)
+
+    // 2. check out last one
+    if(i === total - 1 && prevOne) {
+      if(theStamp >= prevStamp) return prevStamp - time.MINUTE
+      return theStamp
+    }
+
+    // 3. check out the one in the middle
+    if(prevStamp > nextStamp) {
+      if(prevStamp <= theStamp && nextStamp <= theStamp) {
+        console.warn("当前 stamp 特别突出！")
+        const newStamp1 = Math.round((nextStamp + prevStamp) / 2)
+        return newStamp1
+      }
+      if(prevStamp >= theStamp && nextStamp >= theStamp) {
+        console.warn("当前 stamp 特别凹陷！")
+        const newStamp2 = Math.round((nextStamp + prevStamp) / 2)
+        return newStamp2
+      }
+    }
     
-    v1.contentIds = contentIds
+    return theStamp
   }
 
-
-  waitList = []
-  crossData = null
-
-  const res = await stateController.setNewStateList(stateList)
+  for(let i=0; i<total; i++) {
+    const v = threads[i]
+    let newStamp = _getNewStateStamp(i, threads)
+    if(isNaN(newStamp)) {
+      newStamp = now
+    }
+    if(v.stateId !== stateId || v.stateStamp !== newStamp) {
+      console.warn("old stateId: ", v.stateId)
+      console.log("new stateId: ", stateId)
+      console.log("old stamp: ", v.stateStamp)
+      console.log("new stamp: ", newStamp)
+      console.log("see desc: ", v.desc)
+      console.log(" ")
+      threadOperate.updateStateForThread(v, stateId, newStamp)
+      v.stateId = stateId
+      v.stateStamp = newStamp
+    }
+  }
 }
+

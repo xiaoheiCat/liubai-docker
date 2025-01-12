@@ -22,6 +22,7 @@ import {
   floatUp,
   undoFloatUp,
   setNewStateForThread,
+  updateStateForThread,
 } from "./specific-operate/state"
 
 export default {
@@ -45,4 +46,5 @@ export default {
   floatUp,
   undoFloatUp,
   setNewStateForThread,
+  updateStateForThread,
 }

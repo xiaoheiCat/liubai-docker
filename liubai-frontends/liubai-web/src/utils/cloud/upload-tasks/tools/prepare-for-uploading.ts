@@ -367,13 +367,6 @@ async function organizeAtom(task: UploadTaskLocalTable) {
     }
     isOK = true
   }
-  else if(ut === "undo_workspace-state_config" && workspace) {
-    atom.workspace = {
-      id: workspace._id,
-      stateConfig: workspace.stateConfig,
-    }
-    isOK = true
-  }
   else if(ut === "member-avatar" && member) {
     atom.member = whenMemberAvatar(member)
     isOK = true

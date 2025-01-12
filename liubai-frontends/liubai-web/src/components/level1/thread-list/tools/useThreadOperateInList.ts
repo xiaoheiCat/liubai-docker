@@ -306,7 +306,10 @@ async function handle_pin(ctx: ToCtx) {
 async function handle_collect(ctx: ToCtx) {
   const { memberId, userId, thread, tlData, position } = ctx
   const oldThread = liuUtil.copy.newData(thread)
-  const { newFavorite, tipPromise } = await threadOperate.toCollect(oldThread, memberId, userId)
+  const { 
+    newFavorite, 
+    tipPromise,
+  } = await threadOperate.toCollect(oldThread, memberId, userId)
 
   // 1. 来判断当前列表里的该 item 是否要删除
   let removedFromList = false
@@ -334,11 +337,11 @@ async function handle_collect(ctx: ToCtx) {
 // 支持撤回，因为只是修改 wStore 里的
 async function handle_float_up(ctx: ToCtx) {
   const { memberId, userId, thread, props, tlData, position } = ctx
-  const theThread = liuUtil.copy.newData(thread)
+  const oldThread = liuUtil.copy.newData(thread)
 
   const { 
     tipPromise, 
-  } = await threadOperate.floatUp(theThread, memberId, userId)
+  } = await threadOperate.floatUp(oldThread, memberId, userId)
   if(!tipPromise) return
 
   // 1. 来判断当前列表里的该 item 是否要删除
@@ -354,11 +357,11 @@ async function handle_float_up(ctx: ToCtx) {
   if(res2.result !== "tap") return
 
   // 3. 去执行公共的取消逻辑
-  await threadOperate.undoFloatUp(theThread, memberId, userId)
+  await threadOperate.undoFloatUp(oldThread, memberId, userId)
   
   // 4. 判断是否要重新加回
   if(removedFromList) {
-    _toShowAgain(tlData, position, theThread)
+    _toShowAgain(tlData, position, oldThread)
   }
 }
 

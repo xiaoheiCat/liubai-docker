@@ -92,9 +92,6 @@ export async function deleteForever(
   newThread.oState = "DELETED"
   newThread.updatedStamp = time.getTime()
 
-  // 2. 检查 workspace.stateConfig
-  await deleteThreadsFromWorkspaceStateCfg([newThread._id])
-
   // 3. 操作 db
   const res2 = await dbOp.deleteForever(newThread._id)
 
@@ -102,35 +99,5 @@ export async function deleteForever(
   const tsStore = useThreadShowStore()
   tsStore.setUpdatedThreadShows([newThread], "delete_forever")
   
-  return true
-}
-
-
-/**
- * 检查各个工作区里的 “状态” 
- * 确认是否具备这些被删除的动态，若有，去从看板中移除
- */
-export async function deleteThreadsFromWorkspaceStateCfg(
-  threadIds: string[]
-) {
-  const stateList = stateController.getStates()
-  if(stateList.length < 1) return true
-
-  let hasFound = false
-  for(let i=0; i<stateList.length; i++) {
-    const v = stateList[i]
-    const { contentIds } = v
-    if(!contentIds) continue
-    threadIds.forEach(v2 => {
-      const idx = contentIds.indexOf(v2)
-      if(idx < 0) return
-      hasFound = true
-      contentIds.splice(idx, 1)
-    })
-  }
-
-  if(!hasFound) return true
-
-  const res = await stateController.setNewStateList(stateList)
   return true
 }

@@ -18,6 +18,7 @@ export interface MaData {
   scDisabled: boolean
   aiReadable: BaseIsOn
   aiReadDisabled: boolean
+  privacyLink: string
 
   // 浅浅记录一下 什么时候的 Date 类型，这样子再选择时，定位到该日期
   whenDate?: Date

@@ -178,13 +178,6 @@ async function deleteKanban(
   }
   const res2 = await stateController.setNewStateList(stateList)
 
-  // 4. 更新 db.contents
-  const res3 = await _updateThreadsWhenDeleteState(stateId)
-  if(!res3) {
-    _showErr()
-    return
-  }
-
   // 5. 使用 gStore 通知全局
   const gStore = useGlobalStateStore()
   const newData: KanbanStateChange = {
@@ -212,87 +205,35 @@ async function addThreadToKanban(
   const excludeThreads = aCol.threads.map(v => v._id)
   const res = await cui.showSearchEditor({ type: "select_thread", excludeThreads })
 
-  // 1.2 addd new thread instantly
+  // 2 add new thread instantly
   const { action, threadId, inputTxt } = res
+  console.warn("addThreadToKanban :::")
+  console.log(action)
+  console.log(threadId)
+  console.log(inputTxt)
+  console.log(" ")
+  
   if(action === "confirm" && inputTxt) {
     addNewThreadToKanban(stateId, inputTxt)
     return
   }
   if(action !== "confirm" || !threadId) return
 
-  // 2. 先把已在 kanban 里的该 thread 删除，再添加到 kanban 为 stateId 的第一项
-  const stateList = stateController.getStates()
-  stateList.forEach(v1 => {
-    let { contentIds } =  v1
-    if(contentIds) {
-      contentIds = contentIds.filter(v2 => v2 !== threadId)
-    }
-    if(v1.id === stateId) {
-      if(!contentIds) contentIds = []
-      contentIds.unshift(threadId)
-    }
-    v1.contentIds = contentIds
-  })
-
-  // 3. 发起更新 stateList for workspace
-  const res2 = await stateController.setNewStateList(stateList, {
-    speed: "slow",
-  })
-
-  // 4. 更新 content
+  // 3. 更新 content
   const newStateStamp = time.getTime()
   const res3 = await dbOp.setStateId(threadId, stateId, newStateStamp)
 
-  // 5. 加载该 thread
+  // 4. 加载该 thread
   const newThread = await threadController.getData({ id: threadId })
   if(!newThread) return
 
-  // 6. 使用 useThreadShowStore 通知全局
+  // 5. 使用 useThreadShowStore 通知全局
   const tStore = useThreadShowStore()
   tStore.setUpdatedThreadShows([newThread], "state")
 
-  // 7. just upload content because workspace has been uploaded
-  //   in stateController.setNewStateList
+  // 6. save to cloud
   cloudOp.saveContentToCloud(newThread, newThread.updatedStamp)
 }
-
-
-function _showErr() {
-  cui.showModal({
-    title_key: "tip.fail_to_operate",
-    content_key: "tip.try_again_later",
-    showCancel: false
-  })
-}
-
-// TODO: 向云端批量更新 contents 的 stateId 
-async function _updateThreadsWhenDeleteState(
-  stateId: string
-) {
-
-  let modifiedObj = {
-    stateId: undefined,
-    updatedStamp: time.getTime()
-  }
-
-  let res: any
-  try {
-    res = await db.contents.where({ stateId }).modify(modifiedObj)
-  }
-  catch(err) {
-    console.log("modify 失败........")
-    console.log(err)
-    console.log(" ")
-    return false
-  }
-
-  console.log("modify 成功........")
-  console.log(res)
-  console.log(" ")
-
-  return true
-}
-
 
 
 export default {

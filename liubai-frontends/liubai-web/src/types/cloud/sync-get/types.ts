@@ -76,6 +76,9 @@ export interface SyncGet_ThreadList {
 
   // 加载特定状态的动态
   stateId?: string
+
+  // 跳过 skip 个动态
+  skip?: number
 }
 
 export interface SyncGet_ThreadData {

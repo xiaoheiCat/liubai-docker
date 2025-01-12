@@ -1,13 +1,22 @@
 {
   "name": "liubai",
-  "version": "0.6.0",
+  "private": true,
+  "version": "0.7.0",
   "description": "Supercharge yourself!",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "bump-version": "lerna version --no-git-tag-version"
   },
-  "keywords": ["Local First", "AI Native", "Produtivity Tools", "Tools for Thought"],
+  "keywords": [
+    "Local First",
+    "AI Native",
+    "Produtivity Tools",
+    "Tools for Thought"
+  ],
   "author": "yenche123 <tsuiyenche@outlook.com> (https://github.com/yenche123)",
   "license": "AGPL-3.0-or-later",
-  "dependencies": {}
+  "devDependencies": {
+    "lerna": "^8.1.9"
+  }
 }

@@ -6,7 +6,7 @@ import type {
   KanbanProps,
 } from "./types";
 import stateController from "~/utils/controllers/state-controller/state-controller";
-import { whenThreadInserted, whenThreadListUpdated } from "./handleKanbanSort"
+import { whenThreadListUpdated } from "./handleKanbanSort"
 import { kanbanInnerChangeKey } from "~/utils/provide-keys"
 import time from "~/utils/basic/time";
 import { MenuItem } from "~/components/common/liu-menu/tools/types";
@@ -59,15 +59,15 @@ export function useKanbanColumns(
   }
 
   const onThreadInserted = (stateId: string, data: ColumnInsertData) => {
-    _setInnerStamp()
-    whenThreadInserted(stateId, data.value)
+    // console.log("onThreadInserted......")
+    // console.log(data)
   }
 
   const onThreadsUpdated = (
     stateId: string, 
     threads: ThreadShow[],
-    fr: "list-view" | "kanban-view",
   ) => {
+    // console.log("onThreadsUpdated......")
     _setInnerStamp()
     whenThreadListUpdated(stateId, threads)
   }
@@ -139,7 +139,7 @@ function whenColumnsSorted(
     return
   }
 
-  console.log("次序有发生变化哦..........")
+  // console.warn("次序有发生变化哦..........")
 
   stateController.stateListSorted(newStateIds)
 }

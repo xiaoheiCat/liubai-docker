@@ -30,6 +30,7 @@ import { handleCalendarList } from "./handle-calendar"
 import { type ThreadListViewType } from "~/types/types-view"
 import time from "~/utils/basic/time"
 import { preLoadCreateFirst, preLoadEditFirst } from "./pre-download"
+import cfg from "~/config"
 
 const SEC_15 = time.SECONED * 15
 const MIN_THREADS = 9      // 最少应该有的个数，若少于这个个数，checkList 会触发重新加载
@@ -269,10 +270,16 @@ async function loadList(
     viewType: vT,
     lastItemStamp,
   }
+  const opt3: SyncGet_ThreadList = {
+    taskType: "thread_list",
+    ...opt1,
+  }
 
   // 1. 开始去数据库加载动态
   if(vT === "STATE") {
     if(!stateId) return
+    opt1.stateId = stateId
+    opt3.stateId = stateId
 
     // 用 stateController 去加载 某个状态下的更多动态
     const sOpt = {
@@ -280,12 +287,11 @@ async function loadList(
       excludeInKanban: true,
       lastItemStamp,
     }
-    const sData = await stateController.getThreadsOfAState(sOpt)
-    results = sData.threads
-    opt1.stateId = stateId
-    opt1.excluded_ids = sData.excluded_ids
-    if(!sData.hasMore) {
-      tlData.hasReachedBottom = true
+    const stateData = await stateController.getThreads(sOpt)
+    results = stateData.threads
+    if(!stateData.hasMore) tlData.hasReachedBottom = true
+    if(!lastItemStamp) {
+      opt3.skip = cfg.max_kanban_thread
     }
   }
   else {
@@ -293,13 +299,16 @@ async function loadList(
 
     if(vT === "FAVORITE") {
       opt1.collectType = "FAVORITE"
+      opt3.collectType = "FAVORITE"
     }
     else if(vT === "PINNED") {
       delete opt1.lastItemStamp
+      delete opt3.lastItemStamp
     }
     else if(vT === "TAG") {
       if(!tagId) return
       opt1.tagId = tagId
+      opt3.tagId = tagId
     }
 
     results = await threadController.getList(opt1)
@@ -342,7 +351,7 @@ async function loadList(
 
   // 6. load cloud
   if(cloud) {
-    loadCloud(ctx, opt1, cloudOpt)
+    loadCloud(ctx, opt1, cloudOpt, opt3)
   }
 }
 
@@ -355,19 +364,14 @@ async function loadCloud(
   ctx: TlContext,
   opt1: TcListOption,
   opt2: LoadCloudOpt,
+  opt3: SyncGet_ThreadList,
 ) {
+  // 1. check if we need to load from cloud
   const hasLogin = localCache.hasLoginWithBackend()
   if(!hasLogin) return
-
   const nStore = useNetworkStore()
   if(nStore.level < 1) {
     return
-  }
-
-  // 1. param for request
-  const param1: SyncGet_ThreadList = {
-    taskType: "thread_list",
-    ...opt1,
   }
 
   // 2. set delay
@@ -385,7 +389,9 @@ async function loadCloud(
   }
 
   // 3. request
-  const res1 = await CloudMerger.request(param1, { delay, maxStackNum: 4 })
+  console.log("loadCloud opt3: ")
+  console.log(opt3)
+  const res1 = await CloudMerger.request(opt3, { delay, maxStackNum: 4 })
   if(!res1) return
 
   // 4. get ids for checking contents
@@ -440,9 +446,9 @@ async function loadAgain(
       excludeInKanban: true,
       lastItemStamp: opt1.lastItemStamp,
     }
-    const sData = await stateController.getThreadsOfAState(sOpt)
-    results = sData.threads
-    if(sData.hasMore) hasMore = true
+    const stateData = await stateController.getThreads(sOpt)
+    results = stateData.threads
+    if(stateData.hasMore) hasMore = true
   }
   else {
     results = await threadController.getList(opt1)

@@ -36,6 +36,7 @@ async function getList(
   const isTrash = vT === "TRASH"
   const isTodayFuture = vT === "TODAY_FUTURE"
   const isPast = vT === "PAST"
+  const isKanban = vT === "STATE"
 
   const oState: OState = isTrash ? "REMOVED" : "OK"
   const { REMOVING_DAYS } = liuEnv.getEnv()
@@ -87,6 +88,7 @@ async function getList(
   let key = oState === 'OK' ? "createdStamp" : "updatedStamp"
   if(isPin) key = "pinStamp"
   else if(isTrash) key = "removedStamp"
+  else if(isKanban) key = "stateStamp"
 
   if(isCalendar) {
     const w = ["oState", "infoType", "calendarStamp"]

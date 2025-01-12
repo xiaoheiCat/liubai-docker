@@ -94,16 +94,6 @@ class LocalToCloud {
     this.lastStartToUpload = time.getTime()
     const res2 = await handleUploadTasks()
     this.lastStartToUpload = undefined
-
-    // 3. add more tasks after handleUploadTasks
-    if(res2.length < 1) return
-    const _this = this
-    res2.forEach(v => {
-      console.warn("add more task!")
-      console.log(v)
-      _this.addTask(v, { speed: "slow" })
-    })
-
   }
 
   private static preCheck() {

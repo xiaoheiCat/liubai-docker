@@ -597,6 +597,8 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
       text: {
         content: `🪧 指路牌
 
+📨 <a href="{LIU_DOMAIN}/">收件箱</a>
+
 📆 <a href="{LIU_DOMAIN}/schedule">我的日程</a>
 
 ⭐ <a href="{LIU_DOMAIN}/favorite">我的收藏</a>
@@ -604,6 +606,8 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
 📂 <a href="{LIU_DOMAIN}/state">我的看板</a>
 
 📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">开发者的小红书</a>
+
+🌐 <a href="https://github.com/yenche123/liubai">开源地址</a>
 `,
       }
     }
@@ -640,6 +644,8 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
       text: {
         content: `🪧 指路牌
 
+📨 <a href="{LIU_DOMAIN}/">收件匣</a>
+
 📆 <a href="{LIU_DOMAIN}/schedule">我的行程</a>
 
 ⭐ <a href="{LIU_DOMAIN}/favorite">我的收藏</a>
@@ -647,6 +653,8 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
 📂 <a href="{LIU_DOMAIN}/state">我的看板</a>
 
 📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">開發者的小紅書</a>
+
+🌐 <a href="https://github.com/yenche123/liubai">開源網址</a>
 `,
       }
     }
@@ -683,6 +691,8 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
       text: {
         content: `🪧 Guidebook
 
+📨 <a href="{LIU_DOMAIN}/">My Inbox</a>
+
 📆 <a href="{LIU_DOMAIN}/schedule">My Schedule</a>
 
 ⭐ <a href="{LIU_DOMAIN}/favorite">My Favorite</a>
@@ -690,6 +700,8 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
 📂 <a href="{LIU_DOMAIN}/state">My Board</a>
 
 📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">Follow me on RED</a>
+
+🌐 <a href="https://github.com/yenche123/liubai">Open Source</a>
 `,
       }
     }

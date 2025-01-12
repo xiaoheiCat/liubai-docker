@@ -11,9 +11,9 @@ export interface MenuItem {
   [otherKey: string]: any
 }
 
-export type MenuTrigger = "click" | "hover" | "focus" | "touch"
+type MenuTrigger = "click" | "hover" | "focus" | "touch"
 
-export type MenuPlacement = "bottom" | "bottom-start" | "bottom-end" 
+type MenuPlacement = "bottom" | "bottom-start" | "bottom-end" 
 | "auto" | "top" | "top-start" | "top-end"
 
 export interface LiuMenuProps {
@@ -27,6 +27,7 @@ export interface LiuMenuProps {
   hideTriggers: MenuTrigger[]
   autoHideAfterTappingItem: boolean
   hasCheckbox: boolean
+  moreLink?: string
 }
 
 export const liumenu_props = {
@@ -68,5 +69,8 @@ export const liumenu_props = {
   hasCheckbox: {
     type: Boolean,
     default: false,
+  },
+  moreLink: {
+    type: String,
   }
 }

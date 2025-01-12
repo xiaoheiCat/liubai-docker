@@ -1990,6 +1990,9 @@ export interface SyncGet_ThreadList {
 
   // 加载特定状态的动态
   stateId?: string
+
+  // 跳过 skip 个动态
+  skip?: number
 }
 
 export const Sch_SyncGet_ThreadList = vbot.object({
@@ -2005,6 +2008,7 @@ export const Sch_SyncGet_ThreadList = vbot.object({
   specific_ids: sch_opt_arr(Sch_Id, [vbot.maxLength(32)]),
   excluded_ids: sch_opt_arr(Sch_Id, [vbot.maxLength(32)]),
   stateId: Sch_Opt_Str,
+  skip: Sch_Opt_Num,
 })
 
 export interface SyncGet_ThreadData {

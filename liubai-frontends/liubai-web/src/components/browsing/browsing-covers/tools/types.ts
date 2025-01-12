@@ -2,8 +2,7 @@ import type { ImageShow } from '~/types';
 import type { ImgLayout } from "~/types/other/types-custom"
 import type { PropType } from "vue"
 
-
-export type BcPurpose = "thread" | "comment" | "import"
+type BcPurpose = "thread" | "comment" | "import"
 
 export interface BrowsingCoversProps {
   covers?: ImageShow[]

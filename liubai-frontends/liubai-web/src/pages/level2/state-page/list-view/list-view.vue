@@ -166,7 +166,7 @@ const showScrollbarProperty = middleBridge.canShowScrollbarProperty()
           :state-id="item.id"
           :prefix="prefix"
           @sort-insert="onThreadInserted(item.id, $event)"
-          @threadsupdated="onThreadsUpdated(item.id, $event, 'kanban-view')"
+          @threadsupdated="onThreadsUpdated(item.id, $event)"
           @tapitem="onTapThreadItem"
           @tapadd="() => onTapAddThread(item.id)"
         ></LvColumn>
