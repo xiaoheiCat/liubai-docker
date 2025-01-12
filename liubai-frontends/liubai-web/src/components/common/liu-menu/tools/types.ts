@@ -27,6 +27,7 @@ export interface LiuMenuProps {
   hideTriggers: MenuTrigger[]
   autoHideAfterTappingItem: boolean
   hasCheckbox: boolean
+  moreLink?: string
 }
 
 export const liumenu_props = {
@@ -68,5 +69,8 @@ export const liumenu_props = {
   hasCheckbox: {
     type: Boolean,
     default: false,
+  },
+  moreLink: {
+    type: String,
   }
 }

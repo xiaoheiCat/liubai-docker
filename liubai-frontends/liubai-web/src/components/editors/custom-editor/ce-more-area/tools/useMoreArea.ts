@@ -27,6 +27,7 @@ export function useMoreArea(
     scDisabled: false,
     aiReadable: "Y",
     aiReadDisabled: false,
+    privacyLink: "https://docs.liubai.cc/article/2024/supercharge-yourself.html#privacy",
     remindType: "later",
   })
 

@@ -150,6 +150,7 @@ export default defineComponent({
         :hasCheckbox="true"
         @tapitem="onTapPrivacyItem"
         placement="top"
+        :more-link="data.privacyLink"
       >
 
         <div class="liu-hover ma-item">
