@@ -608,6 +608,8 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
 📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">开发者的小红书</a>
 
 🌐 <a href="https://github.com/yenche123/liubai">开源地址</a>
+
+🙋 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">常见问题</a>
 `,
       }
     }
@@ -655,6 +657,8 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
 📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">開發者的小紅書</a>
 
 🌐 <a href="https://github.com/yenche123/liubai">開源網址</a>
+
+🙋 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">常見問題</a>
 `,
       }
     }
@@ -702,6 +706,8 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
 📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">Follow me on RED</a>
 
 🌐 <a href="https://github.com/yenche123/liubai">Open Source</a>
+
+🙋 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">FAQ</a>
 `,
       }
     }

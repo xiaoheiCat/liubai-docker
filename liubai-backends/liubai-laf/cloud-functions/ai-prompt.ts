@@ -103,6 +103,15 @@ export const aiBots: AiBot[] = [
 
   /** image to text */
   {
+    name: "Kimi",
+    character: "kimi",
+    provider: "moonshot",
+    model: "moonshot-v1-8k-vision-preview",
+    abilities: ["chat", "tool_use", "image_to_text"],
+    alias: ["Moonshot", "月之暗面"],
+    maxWindowTokenK: 8,
+  },
+  {
     name: "跃问",
     character: "yuewen",
     provider: "stepfun",

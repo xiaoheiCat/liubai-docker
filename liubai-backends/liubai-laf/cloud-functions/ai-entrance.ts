@@ -100,7 +100,6 @@ const MAX_TIMES_MEMBERSHIP = 200
 
 const SEC_15 = SECONED * 15
 const MIN_3 = MINUTE * 3
-const MIN_5 = MINUTE * 5
 const HOUR_12 = HOUR * 12
 const INDEX_TO_PRESERVE_IMAGES = 12     // the images which appears in the first INDEX_TO_PRESERVE_IMAGES will be preserved rather than compressed to text like [image]
 
@@ -1694,6 +1693,7 @@ class BotMoonshot extends BaseBot {
     const model = bot.model
 
     // 3. handle other things
+    await ImageHelper.checkPromptsForBase64(prompts)
 
     // 4. calculate maxTokens
     const maxToken = AiHelper.getMaxToken(totalToken, chats[0], bot)
@@ -5188,6 +5188,58 @@ export class Transcriber {
     return { text: data4?.text, audioBase64: b64 }
   }
 
+
+}
+
+/*************** Turn image url into base64 ************/
+class ImageHelper {
+
+  static async checkPromptsForBase64(
+    prompts: OaiPrompt[],
+  ) {
+    const _this = this
+    for(let i=0; i<prompts.length; i++) {
+      const v = prompts[i]
+      const c1 = v.content
+      if(!c1) continue
+      if(typeof c1 === "string") continue
+      for(let j=0; j<c1.length; j++) {
+        const c2 = c1[j]
+        if(c2.type !== "image_url") continue
+        const url = c2.image_url.url
+        if(url.startsWith("data:image")) continue
+        if(!url.startsWith("http")) continue
+        console.log("get to convert image url to base64......")
+        const b64 = await _this.getBase64(url)
+        if(!b64) continue
+        c2.image_url.url = b64
+      }
+    }
+  }
+
+  static async getBase64(url: string) {
+    const res1 = await downloadFile(url)
+    const { code, data, errMsg } = res1
+    if(code !== "0000" || !data) {
+      console.warn("download file err in getBase64")
+      console.log(code)
+      console.log(errMsg)
+      return
+    }
+
+    const response = data.res
+    const filename = `` + getNowStamp() + `.mp3`
+    const { b64, contentType } = await responseToFormData(response, { 
+      formKey: "file",
+      filename,
+    })
+
+    console.warn("see contentType in getBase64: ")
+    console.log(contentType)
+
+    const imageBase64 = `data:${contentType};base64,${b64}`
+    return imageBase64
+  }
 
 }
 
