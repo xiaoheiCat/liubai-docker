@@ -104,7 +104,7 @@ export interface LiuRqOpt {
 }
 
 export interface DownloadFileOpt {
-  max_sec?: number       // max seconds for waiting. default 30
+  max_sec?: number       // max seconds for waiting. By default, it is 30
 }
 
 export interface DownloadFileRes {

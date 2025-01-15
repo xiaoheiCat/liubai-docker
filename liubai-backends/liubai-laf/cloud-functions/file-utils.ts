@@ -120,7 +120,7 @@ export async function blobToFormData(
     filename,
   })
   
-  return { form, b64 }
+  return { form, b64, contentType }
 }
 
 // turn response into buffer
