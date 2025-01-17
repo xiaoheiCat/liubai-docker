@@ -1,5 +1,5 @@
 {
-  "displayName": "Liubai",
-  "description": "Liubai for VS-Code-Based IDE",
+  "package.displayName": "Liubai",
+  "package.description": "Liubai for VS-Code-Based IDE",
   "liubai.helloWorld.title": "Liubai: Hello"
 }

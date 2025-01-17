@@ -1,7 +1,7 @@
 {
   "name": "liubai-vscode-extension",
-  "displayName": "%displayName%",
-  "description": "%description%",
+  "displayName": "%package.displayName%",
+  "description": "%package.description%",
   "publisher": "ptsd",
   "version": "0.0.1",
   "engines": {

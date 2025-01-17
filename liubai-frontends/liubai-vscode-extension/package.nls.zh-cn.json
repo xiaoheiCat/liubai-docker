@@ -1,5 +1,5 @@
 {
-  "displayName": "留白记事",
-  "description": "在 VS Code / Windsurf / Cursor 等 vscode-based IDE 中使用留白记事",
+  "package.displayName": "留白记事",
+  "package.description": "在 VS Code / Windsurf / Cursor 等 vscode-based IDE 中使用留白记事",
   "liubai.helloWorld.title": "Liubai: 你好"
 }

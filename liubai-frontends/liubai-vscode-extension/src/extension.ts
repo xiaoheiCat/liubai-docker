@@ -5,6 +5,9 @@ import { AuthenticationManager } from './managers/AuthenticationManager';
 import liuInfo from './utils/liu-info';
 import { i18n } from './locales/i18n';
 import liuUtil from './utils/liu-util';
+import APIs from './requests/APIs';
+import liuReq from './requests/liu-req';
+import { Res_HelloWorld } from './types/types-req';
 
 function isSafeEnvironment() {
 	const theCrypto = liuUtil.crypto.getCrypto()
@@ -47,11 +50,17 @@ export function activate(context: vscode.ExtensionContext) {
 	const authManager = AuthenticationManager.getInstance(context)
 
 	const disposable1 = vscode.commands.registerCommand(`${info.extensionId}.helloWorld`, async () => {
-		const title = i18n.t("appPrefix") + i18n.t("login.h1")
-		const confirmTxt = i18n.t("login.sign_in")
-		const cancelTxt = i18n.t("common.cancel")
-		const res = await vscode.window.showInformationMessage(title, confirmTxt, cancelTxt)
-		console.log("result: ", res)
+		// const title = i18n.t("appPrefix") + i18n.t("login.h1")
+		// const confirmTxt = i18n.t("login.sign_in")
+		// const cancelTxt = i18n.t("common.cancel")
+		// const res = await vscode.window.showInformationMessage(title, confirmTxt, cancelTxt)
+		// console.log("result: ", res)
+
+		console.log("start to request hello world")
+		const url = APIs.TIME
+		const res = await liuReq.request<Res_HelloWorld>(url)
+		console.log(res)
+
 	})
 
 	context.subscriptions.push(disposable1);

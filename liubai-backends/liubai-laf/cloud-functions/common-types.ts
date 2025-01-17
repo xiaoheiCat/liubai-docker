@@ -189,7 +189,7 @@ export const Sch_ThreadListViewType = vbot.picklist(threadListViewTypes)
 
 export const supportedClients = [
   "web",
-  "desktop",
+  "ide-extension",
 ] as const
 export type SupportedClient = typeof supportedClients[number]
 export const Sch_SupportedClient = vbot.picklist(supportedClients)
@@ -197,7 +197,7 @@ export const Sch_SupportedClient = vbot.picklist(supportedClients)
 // 各个客户端的最大 token 数
 export const clientMaximum: Record<SupportedClient, number> = {
   "web": 9,
-  "desktop": 3,
+  "ide-extension": 5,
 }
 
 export const supportedLocales = [
