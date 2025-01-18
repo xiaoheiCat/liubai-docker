@@ -3,7 +3,7 @@ import type { LiuErrReturn } from "~/types"
 import * as vscode from 'vscode';
 import time from "./basic/time";
 import valTool from "./basic/val-tool";
-import type { ReturnPromise } from "./basic/type-tool";
+import type { ReturnPromise, SimpleFunc } from "./basic/type-tool";
 
 
 function _getCustomerServiceLink() {
@@ -20,7 +20,7 @@ function _getCustomerServiceLink() {
 }
 
 export interface LiuProgressOpt {
-  location: vscode.ProgressLocation
+  location?: vscode.ProgressLocation
   titleKey?: string
   titleOpt?: Record<string, string | number>
   cancellable?: boolean
@@ -37,10 +37,11 @@ export async function showProgress<R>(
     title = i18n.t(opt.titleKey, opt.titleOpt)
   }
   const minMillis = opt.minMillis ?? 600
+  const notiLocation = opt.location ?? vscode.ProgressLocation.Notification
 
   const res2 = await w.withProgress({
     title,
-    location: opt.location,
+    location: notiLocation,
     cancellable: opt.cancellable,
   }, async (progress, token) => {
     const t1 = time.getLocalTime()
@@ -58,6 +59,49 @@ export async function showProgress<R>(
   })
 
   return res2
+}
+
+
+export type ProgressResolver = (res: boolean) => void
+
+export interface LiuProgressWithStopOpt {
+  location?: vscode.ProgressLocation
+  titleKey?: string
+  titleOpt?: Record<string, string | number>
+  cancellable?: boolean
+  onCancellationRequested?: SimpleFunc
+}
+
+export function showProgressWithStop(
+  opt: LiuProgressWithStopOpt,
+) {
+  const w = vscode.window
+  let title: string | undefined
+  if(opt.titleKey) {
+    title = i18n.t(opt.titleKey, opt.titleOpt)
+  }
+  let _resolve: ProgressResolver | undefined
+  const notiLocation = opt.location ?? vscode.ProgressLocation.Notification
+
+  w.withProgress({
+    title,
+    location: notiLocation,
+    cancellable: opt.cancellable,
+  }, (progress, token) => {
+    token.onCancellationRequested(() => {
+      opt.onCancellationRequested?.()
+    })
+    const _wait = (a: ProgressResolver) => {
+      _resolve = a
+    }
+    return new Promise(_wait)
+  })
+
+  const stop = () => {
+    _resolve?.(true)
+  }
+
+  return { stop }
 }
 
 

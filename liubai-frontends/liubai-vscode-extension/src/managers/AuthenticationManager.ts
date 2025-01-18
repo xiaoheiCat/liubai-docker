@@ -8,8 +8,9 @@ import APIs from '~/requests/APIs';
 import time from '~/utils/basic/time';
 import type { Res_HelloWorld, Res_UserLoginInit } from '~/types/types-req';
 import { i18n } from '~/locales/i18n';
-import { showErrMsg, showProgress, showWarning } from '~/utils/show-msg';
+import { showErrMsg, showProgress, showProgressWithStop, showWarning } from '~/utils/show-msg';
 import { createClientKey } from "./tools/common-tools"
+import type { SimpleFunc } from '~/utils/basic/type-tool';
 
 const LOGIN_DATA_KEY = `${cfg.appPrefix}login_data`
 const AUTH_CALLBACK_PATH = "/auth-complete"
@@ -26,6 +27,9 @@ export class AuthenticationManager {
   private _enc_client_key: string | undefined;
   private _credential: string | undefined;
   private _code: string | undefined;
+
+  // stop loading
+  private _stopProgressForLogging: SimpleFunc | undefined
 
   // `private` is in order to avoid new AuthenticationManager() 
   // from being called by outside
@@ -96,7 +100,6 @@ export class AuthenticationManager {
     const res3_2 = await showProgress({
       titleKey: "login.preparing",
       cancellable: true,
-      location: vscode.ProgressLocation.Notification,
     }, async () => {
       const url3_1 = APIs.LOGIN
       const res3_1 = await liuReq.request<Res_UserLoginInit>(url3_1, { 
@@ -118,16 +121,31 @@ export class AuthenticationManager {
     // 5. client_key, enc_client_key, and state
     _this._state = state
     const { aesKey, cipher } = await createClientKey(pk)
-    console.log("see aesKey: ")
-    console.log(aesKey)
-    console.log("see cipher: ")
-    console.log(cipher)
+    // console.log("see aesKey: ")
+    // console.log(aesKey)
+    // console.log("see cipher: ")
+    // console.log(cipher)
     if(!aesKey || !cipher) {
       showWarning("Fail to create client key")
       return
     }
     _this._client_key = aesKey
     _this._enc_client_key = cipher
+
+    await valTool.waitMilli(300)
+
+    // 6. show progress with "login.authorizing"
+    let isCancelled = false
+    const { stop } = showProgressWithStop({
+      titleKey: "login.authorizing",
+      cancellable: true,
+      onCancellationRequested() {
+        isCancelled = true
+      }
+    })
+    _this._stopProgressForLogging = stop
+
+
 
   }
 
