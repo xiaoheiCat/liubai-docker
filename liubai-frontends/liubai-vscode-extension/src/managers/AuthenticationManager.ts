@@ -303,10 +303,69 @@ export class AuthenticationManager {
 
 
 
-  private afterGettingCode() {
+  private async afterGettingCode() {
+    // 1. check out code and credential
     const code = this._code
     const cred = this._credential
-    if(!code || !cred) return
+    if(!code || !cred) {
+      console.warn("code and credential are required")
+      console.log(code)
+      console.log(cred)
+      return
+    }
+
+    // 2. check out key
+    const client_key = this._client_key
+    const enc_client_key = this._enc_client_key
+    if(!client_key || !enc_client_key) {
+      console.warn("client_key and enc_client_key are required")
+      console.log(client_key)
+      console.log(enc_client_key)
+      return
+    }
+
+    // 3. try to login
+    const url3 = APIs.LOGIN
+    const body3: UserLoginAPI.Param_AuthSubmit = {
+      operateType: "auth_submit",
+      credential: cred,
+      code,
+      enc_client_key,
+    }
+    const res3_2 = await showProgress({
+      titleKey: "login.logging",
+    }, async () => {
+      const res3_1 = await liuReq.request<UserLoginAPI.Res_Normal>(
+        url3,
+        body3,
+      )
+      return res3_1
+    })
+    if(!res3_2) return
+
+    // 4. show basic error
+    const code4 = res3_2.code
+    const data4 = res3_2.data
+    if(code4 !== "0000" || !data4) {
+      showErrMsg("login", res3_2)
+      return
+    }
+
+    // 5. get serial / token
+    const {
+       serial_id,
+       token,
+       spaceMemberList,
+    } = data4
+    if(!serial_id || !token || !spaceMemberList) {
+      console.warn("there is no serial_id, token, or spaceMemberList")
+      console.log(serial_id)
+      console.log(token)
+      console.log(spaceMemberList)
+      return
+    }
+    
+
 
   }
 

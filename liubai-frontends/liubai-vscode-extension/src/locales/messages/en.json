@@ -7,6 +7,7 @@
   "login.err": "[Login Error] ",
   "login.cannot_open_ide": "If you authorize this connection and the browser cannot open the current IDE, you can manually enter the authorization code.",
   "login.input_auth_code": "Enter Code",
+  "login.logging": "Logging in...",
   "common.cancel": "Cancel",
   "common.env_unsupported": "The current environment does not support running this extension",
   "tip.err_1": "An unknown error occurred. Please try again later.\n(Code: {code})",

@@ -7,6 +7,7 @@
   "login.err": "【登录异常】",
   "login.cannot_open_ide": "若授权后，浏览器无法打开当前 IDE，你可以手动输入授权码。",
   "login.input_auth_code": "输入授权码",
+  "login.logging": "登录中...",
   "common.cancel": "取消",
   "common.env_unsupported": "当前环境不支持运行本插件",
   "tip.err_1": "出现未知的错误，请稍后再试\n（状态码: {code}）",

@@ -1,3 +1,5 @@
+import type { LiuSpaceAndMember } from "./types-cloud"
+
 
 /********************** Hello World *******************/
 export interface Res_HelloWorld {
@@ -31,6 +33,13 @@ export namespace UserLoginAPI {
     googleOAuthClientId?: string
     wxGzhAppid?: string
     state?: string
+  }
+
+  export interface Res_Normal {
+    spaceMemberList?: LiuSpaceAndMember[]
+    serial_id?: string
+    token?: string
+    userId?: string
   }
 
 }

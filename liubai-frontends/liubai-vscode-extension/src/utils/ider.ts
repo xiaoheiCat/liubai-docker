@@ -15,12 +15,6 @@ function _createId(digits: number = 21) {
   return randomString
 }
 
-// don't modify `d0` just because whenDraftClear function 
-// in add-upload-task.ts is using it
-const createDraftId = () => {
-  return "d0" + _createId(18)
-}
-
 // don't modify `t0` just because _getNewProps function in
 // finish-comment.ts is using it
 const createThreadId = () => {
@@ -48,7 +42,6 @@ const createFileNonce = () => {
 }
 
 export default {
-  createDraftId,
   createThreadId,
   createRandom,
   createUploadTaskId,
