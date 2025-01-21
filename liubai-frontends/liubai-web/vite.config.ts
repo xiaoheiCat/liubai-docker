@@ -78,6 +78,8 @@ const vitePlugins: UserConfig['plugins'] = [
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
+  const nodeVersion = process.version
+  console.log("the current node version: ", nodeVersion)
 
   const _env = loadEnv(mode, projectRoot)
   const isProduction = mode === "production"
