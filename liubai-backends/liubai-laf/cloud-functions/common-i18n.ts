@@ -609,7 +609,7 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
 
 🌐 <a href="https://github.com/yenche123/liubai">开源地址</a>
 
-🙋 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">常见问题</a>
+📦 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">提问箱</a>
 `,
       }
     }
@@ -658,7 +658,7 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
 
 🌐 <a href="https://github.com/yenche123/liubai">開源網址</a>
 
-🙋 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">常見問題</a>
+📦 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">提問箱</a>
 `,
       }
     }
@@ -707,7 +707,7 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
 
 🌐 <a href="https://github.com/yenche123/liubai">Open Source</a>
 
-🙋 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">FAQ</a>
+📦 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">AMA</a>
 `,
       }
     }
