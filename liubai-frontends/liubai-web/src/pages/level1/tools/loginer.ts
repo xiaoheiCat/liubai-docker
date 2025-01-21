@@ -1,10 +1,10 @@
-import { type Res_UserLoginNormal } from "~/requests/req-types";
-import { type RouteAndLiuRouter } from "~/routes/liu-router";
+import type { Res_UserLoginNormal } from "~/requests/req-types";
+import type { RouteAndLiuRouter } from "~/routes/liu-router";
 import { useLoginStore } from "../login-page/tools/useLoginStore";
 import localCache from "~/utils/system/local-cache";
 import { redirectToLoginPage } from "./common-tools";
 import { handleUser, handleSpaceAndMembers } from "./cloud-into-db";
-import { LocalPreference } from "~/utils/system/tools/types";
+import type { LocalPreference } from "~/utils/system/tools/types";
 import { CloudEventBus } from "~/utils/cloud/CloudEventBus";
 import { useSystemStore } from "~/hooks/stores/useSystemStore";
 import liuConsole from "~/utils/debug/liu-console";

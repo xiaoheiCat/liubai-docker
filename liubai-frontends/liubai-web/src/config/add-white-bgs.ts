@@ -1,5 +1,5 @@
 // 需要在 iframe 里添加白色背景的域名
-import thirdLink from "./third-link"
+import type thirdLink from "./third-link"
 
 export type ThirdLinkKey = keyof typeof thirdLink
 

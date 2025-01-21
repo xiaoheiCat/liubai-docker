@@ -65,14 +65,14 @@ function liuDescToMd(
       plainText += slice
     }
     else if(type === "paragraph") {
-      let slice = liuDescToMd(content)
+      const slice = liuDescToMd(content)
       if(opt?.inBlockquote) {
         plainText += `> `
       }
       plainText += (slice + `\n`)
     }
     else if(type === "blockquote") {
-      let slice = liuDescToMd(content, { inBlockquote: true })
+      const slice = liuDescToMd(content, { inBlockquote: true })
       plainText += slice
     }
     else if(type === "horizontalRule") {
@@ -87,7 +87,7 @@ function liuDescToMd(
       plainText += slice
     }
     else if(type === "listItem") {
-      let slice = liuDescToMd(content)
+      const slice = liuDescToMd(content)
       if(opt?.orderNum) {
         plainText += `${opt.orderNum}. `
         opt.orderNum++
@@ -98,11 +98,11 @@ function liuDescToMd(
       plainText += slice
     }
     else if(type === "orderedList") {
-      let slice = liuDescToMd(content, { orderNum: attrs?.start ?? 1 })
+      const slice = liuDescToMd(content, { orderNum: attrs?.start ?? 1 })
       plainText += slice
     }
     else if(type === "bulletList") {
-      let slice = liuDescToMd(content, { inBulletList: true })
+      const slice = liuDescToMd(content, { inBulletList: true })
       plainText += slice
     }
     else if(type === "taskItem") {
@@ -111,7 +111,7 @@ function liuDescToMd(
       plainText += slice
     }
     else if(type === "taskList") {
-      let slice = liuDescToMd(content)
+      const slice = liuDescToMd(content)
       plainText += slice
     }
   }

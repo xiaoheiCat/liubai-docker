@@ -32,7 +32,7 @@ function getLimit(val: LiuLimit) {
     if(isPremium) return _env.PREMIUM_PIN_NUM
     return _env.FREE_PIN_NUM
   }
-  else if(val === "thread") {
+  if(val === "thread") {
     if(mode === "pure_local") return -1
     if(!isPremium) return _env.FREE_THREAD_NUM
   }

@@ -21,7 +21,7 @@ export async function getData(opt: GetDataOpt) {
   }
 
   let list: ContentLocalTable[] = []
-  let searchKey = "createdStamp"
+  const searchKey = "createdStamp"
 
 
   let q: ContentsCollection
@@ -31,7 +31,7 @@ export async function getData(opt: GetDataOpt) {
   }
   else {
     // II. 分页加载
-    let w = db.contents.where(searchKey)
+    const w = db.contents.where(searchKey)
     q = w.below(lastItemStamp)
   }
 

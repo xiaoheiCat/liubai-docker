@@ -6,9 +6,9 @@ import type { ContentLocalTable } from "~/types/types-table";
 import { getSpaceId, resToAtoms } from "./util";
 
 export async function searchSuggest(param: SearchOpt) {
-  let { excludeThreads = [], mode } = param
-  let onlyThread = mode === "select_thread"
-  let spaceId = getSpaceId()
+  const { excludeThreads = [], mode } = param
+  const onlyThread = mode === "select_thread"
+  const spaceId = getSpaceId()
 
   const filterFunc = (item: ContentLocalTable) => {
     if(onlyThread && item.infoType !== "THREAD") return false
@@ -20,8 +20,8 @@ export async function searchSuggest(param: SearchOpt) {
 
   let tmp = db.contents.orderBy("editedStamp").filter(filterFunc)
   tmp = tmp.reverse().limit(5)
-  let res = await tmp.toArray()
-  let list = resToAtoms("suggest", res)
+  const res = await tmp.toArray()
+  const list = resToAtoms("suggest", res)
 
   return list
 }

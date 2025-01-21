@@ -20,19 +20,19 @@ export async function findChildren(
   let list: ContentLocalTable[] = []
   if(lastItemStamp) {
     const now = time.getTime()
-    let w = ["replyToComment", "oState", "infoType", "createdStamp"]
-    let b1 = [parentId, "OK", "COMMENT", lastItemStamp]
-    let b2 = [parentId, "OK", "COMMENT", now]
-    let q = db.contents.where(w).between(b1, b2, false, true)
+    const w = ["replyToComment", "oState", "infoType", "createdStamp"]
+    const b1 = [parentId, "OK", "COMMENT", lastItemStamp]
+    const b2 = [parentId, "OK", "COMMENT", now]
+    const q = db.contents.where(w).between(b1, b2, false, true)
     list = await q.sortBy("createdStamp")
   }
   else {
-    let w: Partial<ContentLocalTable> = {
+    const w: Partial<ContentLocalTable> = {
       replyToComment: parentId,
       oState: "OK",
       infoType: "COMMENT",
     }
-    let q = db.contents.where(w)
+    const q = db.contents.where(w)
     list = await q.sortBy("createdStamp")
   }
 
@@ -89,14 +89,14 @@ export async function findHottest(
 export async function findParent(
   parentWeWant: string,
   grandparent?: string,
-  batchNum: number = 2,
+  batchNum = 2,
 ) {
 
-  let all_ids = []
+  const all_ids = []
   let ids = [parentWeWant]
   if(grandparent && grandparent !== parentWeWant) ids.push(grandparent)
 
-  let list: ContentLocalTable[] = []
+  const list: ContentLocalTable[] = []
 
   for(let i=0; i<batchNum; i++) {
     const res = await db.contents.where("_id").anyOf(ids).sortBy("createdStamp")

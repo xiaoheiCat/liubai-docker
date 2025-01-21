@@ -21,10 +21,10 @@ import cfg from "~/config"
 import ider from "~/utils/basic/ider"
 import liuUtil from "~/utils/liu-util"
 import localCache from "~/utils/system/local-cache"
-import { 
-  type LiuDownloadParcel, 
-  type SyncGet_ThreadList, 
-  type SyncGet_CheckContents,
+import type { 
+  LiuDownloadParcel, 
+  SyncGet_ThreadList, 
+  SyncGet_CheckContents,
 } from "~/types/cloud/sync-get/types"
 import { CloudMerger } from "~/utils/cloud/CloudMerger"
 import { CloudEventBus } from "~/utils/cloud/CloudEventBus"
@@ -162,7 +162,7 @@ async function toAddState(
 
 async function toRefresh(
   ctx: StatePageCtx,
-  snackbar: boolean = true
+  snackbar = true
 ) {
   const { kanban } = ctx
   const stateList = stateController.getStates()
@@ -291,7 +291,7 @@ function toGetColumns(
 
 async function toGetThreads(
   ctx: StatePageCtx,
-  cloud: boolean = true,
+  cloud = true,
 ) {
   const { kanban } = ctx
   for(let i=0; i<kanban.columns.length; i++) {
@@ -391,7 +391,7 @@ function transferStateListToColumns(
   const columns = stateList.map(v => {
     // 处理文字
     let text_key = ""
-    let text = v.text
+    const text = v.text
     if(!text) {
       if(v.id === "TODO") text_key = "thread_related.todo"
       else if(v.id === "FINISHED") text_key = "thread_related.finished"
@@ -403,7 +403,7 @@ function transferStateListToColumns(
       color = "--liu-state-1"
       if(v.id === "FINISHED") color = "--liu-state-2"
     }
-    let colorShow = liuUtil.colorToShow(color)
+    const colorShow = liuUtil.colorToShow(color)
 
     const obj: KanbanColumn = {
       id: v.id,

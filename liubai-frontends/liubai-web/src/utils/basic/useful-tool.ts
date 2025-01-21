@@ -1,5 +1,5 @@
 // 一些实用的小函数，不知道存放在哪，姑且都收集在这
-import { ValueType, type SimpleObject } from "./type-tool"
+import type { ValueType, SimpleObject } from "./type-tool"
 
 export interface FdBase {
   _id: string
@@ -94,7 +94,7 @@ function encodeBraces(str: string): EncodeBracesRes {
 
   let lastCharDeleted = false
   let s = url.search
-  let h = url.hash
+  const h = url.hash
   // 因为第一个字符肯定是 `?`，所以判断字符数是否大于 1
   if(s && s.length > 1) {
     
@@ -127,7 +127,7 @@ function encodeBraces(str: string): EncodeBracesRes {
     url.pathname = p
   }
 
-  let newStr = url.toString()
+  const newStr = url.toString()
   return { str: newStr, lastCharDeleted }
 }
 

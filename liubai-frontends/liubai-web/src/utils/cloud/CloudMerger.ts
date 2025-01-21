@@ -48,7 +48,7 @@ class CloudMerger {
       _this.tasks.push(task)
 
       // 2. wait for milli
-      let waitTimeout = setTimeout(() => {
+      const waitTimeout = setTimeout(() => {
         if(!task.timeout) return
         console.log("去触发超时.......")
         task.timeout = undefined

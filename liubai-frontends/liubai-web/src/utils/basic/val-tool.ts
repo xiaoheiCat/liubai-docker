@@ -1,7 +1,7 @@
 
 
-const waitMilli = (milli: number = 0): Promise<true> => {
-  let _t = (a: (a1: true) => void) => {
+const waitMilli = (milli = 0): Promise<true> => {
+  const _t = (a: (a1: true) => void) => {
     setTimeout(() => {
       a(true)
     }, milli)
@@ -14,7 +14,7 @@ const waitMilli = (milli: number = 0): Promise<true> => {
 // 不要使用 js runtime 的 structuredClone() 进行复制
 // 因为 reactive（Proxy）“响应性” 复制后依然存在，但理应不该存在
 const copyObject = <T = any>(obj: T): T => {
-  let type = typeof obj
+  const type = typeof obj
   if(type !== "object") return obj
 
   let obj2: T;
@@ -122,7 +122,7 @@ const getTextCharNum = (val: string) => {
 //获取小写字符串的数量
 const getLowerCaseNum = (text: string): number => {
   if(!text || text.length < 1) return 0
-  let list = text.split("")
+  const list = text.split("")
   let num = 0
   list.forEach(v => {
     if(v >= "a" && v <= "z") num++
@@ -138,7 +138,7 @@ const getValInMinAndMax = (val: number, min: number, max: number): number => {
 
 // 检查 a 是否包含于 b，即 a 的属性和值，是否 b 都有且一致（但 b 可以有 a 所没有的属性）
 const isAIncludedInB = (a: Record<string, any>, b: Record<string, any>): boolean => {
-  for(let key in a) {
+  for(const key in a) {
     if(a[key] !== b[key]) return false
   }
   return true
@@ -189,10 +189,10 @@ const isInDomain = (
  */
 const minusAndMinimumZero = (
   oldVal: number | undefined,
-  subtrahend: number = 1,
+  subtrahend = 1,
 ) => {
   if(!oldVal) return 0
-  let newVal = oldVal - subtrahend
+  const newVal = oldVal - subtrahend
   if(newVal < 0) return 0
   return newVal
 }
@@ -209,8 +209,8 @@ const compareVersion = (v1: string, v2: string) => {
     list2.push('0')
   }
   for (let i = 0; i < len; i++) {
-    const num1 = parseInt(list1[i])
-    const num2 = parseInt(list2[i])
+    const num1 = Number.parseInt(list1[i])
+    const num2 = Number.parseInt(list2[i])
     
     if(num1 > num2) return 1
     if(num1 < num2) return -1
@@ -229,7 +229,7 @@ const uniqueArray = (arr: string[]) => {
 const hasValue = <T>(
   val: any, 
   type: string,
-  checkLength: boolean = true,
+  checkLength = true,
 ): val is T => {
   if(val && typeof val === type) {
     if(checkLength && Array.isArray(val)) {

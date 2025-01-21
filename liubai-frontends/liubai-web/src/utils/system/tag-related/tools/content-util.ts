@@ -20,7 +20,7 @@ export async function updateContentForTagAcross(
   const list = await db.contents.where("tagIds").anyOf(children).distinct().toArray()
   
   const newList: ContentLocalTable[] = []
-  let tagChangeRequired = from_ids.length > 0
+  const tagChangeRequired = from_ids.length > 0
   for(let i=0; i<list.length; i++) {
     const v = list[i]
     let { tagIds = [] } = v
@@ -102,7 +102,7 @@ export async function updateContentForTagDeleted(
   const newList: ContentLocalTable[] = []
   for(let i=0; i<list.length; i++) {
     const v = list[i]
-    let { tagIds = [] } = v
+    const { tagIds = [] } = v
     let tagSearched: string[] = []
     for(let j=0; j<tagIds.length; j++) {
       const _tagId = tagIds[j]

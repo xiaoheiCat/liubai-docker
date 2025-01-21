@@ -1,5 +1,5 @@
 import { reactive, watch } from "vue"
-import { type OpData } from "./types"
+import type { OpData } from "./types"
 import { useRouteAndLiuRouter, type RouteAndLiuRouter } from "~/routes/liu-router"
 import localCache from "~/utils/system/local-cache"
 import { getClientKey } from "../../tools/common-tools"

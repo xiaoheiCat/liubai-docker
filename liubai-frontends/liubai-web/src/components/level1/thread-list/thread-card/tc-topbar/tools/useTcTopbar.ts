@@ -45,7 +45,7 @@ export function useTcTopbar(
     const name = t(`ai_character.${a}`)
     const company = t(`ai_provider.${a}`)
     if(!name || !company) return
-    let isTheSame = name === company
+    const isTheSame = name === company
     let content = ""
     if(isTheSame) {
       content = t("thread_related.created_by_ai2", { name })

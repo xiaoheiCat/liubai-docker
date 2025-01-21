@@ -1,7 +1,7 @@
 // 存放一些自定义指令
 // https://cn.vuejs.org/guide/reusability/custom-directives.html
 
-import { type DirectiveBinding } from "vue"
+import type { DirectiveBinding } from "vue"
 import valTool from "../basic/val-tool"
 
 const _toShow = async (el: HTMLElement, binding: DirectiveBinding) => {

@@ -14,7 +14,7 @@ import { storeToRefs } from "pinia";
 import { toUpdateSW } from "~/hooks/pwa/useServiceWorker";
 import { useIdle } from "~/hooks/useVueUse";
 import { useShowAddToHomeScreen } from "~/hooks/pwa/useA2HS";
-import { type SimpleFunc } from "~/utils/basic/type-tool";
+import type { SimpleFunc } from "~/utils/basic/type-tool";
 
 const SEC_90 = 90 * time.SECONED
 

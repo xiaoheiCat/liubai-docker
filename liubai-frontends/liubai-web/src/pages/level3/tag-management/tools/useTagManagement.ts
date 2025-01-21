@@ -1,5 +1,5 @@
 import { reactive, type Ref, watch } from "vue";
-import { type TmData } from "./types";
+import type { TmData } from "./types";
 import { storeToRefs } from "pinia";
 import { useRouteAndLiuRouter } from "~/routes/liu-router";
 import { useGlobalStateStore } from "~/hooks/stores/useGlobalStateStore";

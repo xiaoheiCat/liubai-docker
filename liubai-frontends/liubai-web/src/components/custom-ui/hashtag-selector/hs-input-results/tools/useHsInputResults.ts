@@ -227,7 +227,7 @@ function initOnInput(
     hsirData.nativeInputTxt = e.target.value
     hsirData.lastOnInputStamp = time.getLocalTime()
 
-    let val = hsirData.inputTxt.trim()
+    const val = hsirData.inputTxt.trim()
     if(val === lastInputTxt) return
     lastInputTxt = val
 
@@ -276,7 +276,7 @@ function handleAfterSearching(
 ) {
   const addedList = props.listAdded
   const newList: HsirAtom[] = results.map(v => {
-    let data = addedList.find(v1 => {
+    const data = addedList.find(v1 => {
       if(v1.text === v.text) return true
       if(v1.tagId && v1.tagId === v.tagId) return true
       return false
@@ -305,7 +305,7 @@ function handleAfterSearching(
 function reset(
   props: HsirProps,
   hsirData: HsirData,
-  clearInputTxt: boolean = false,
+  clearInputTxt = false,
 ) {
   if(clearInputTxt) {
     if(hsirData.inputTxt) {

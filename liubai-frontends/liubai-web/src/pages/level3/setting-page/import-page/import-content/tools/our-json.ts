@@ -49,7 +49,7 @@ export async function parseOurJson(
     if(d.infoType === "COMMENT" && d.user !== myCtx.userId) return
   }
 
-  let liuAssets = await parseAssets(dateStr, assets)
+  const liuAssets = await parseAssets(dateStr, assets)
   const imgsFiles = getImagesAndFiles(d, liuAssets)
   const ia2 = await getImportedAtom2(d, imgsFiles, myCtx)
   return ia2
@@ -64,10 +64,10 @@ async function parseAssets(
   const prefix = `${dateStr}/assets/`
   const preLen = prefix.length
 
-  let list: ImportedAsset[] = []
+  const list: ImportedAsset[] = []
   for(let i=0; i<assets.length; i++) {
     const v = assets[i]
-    let idx = v.name.indexOf(prefix)
+    const idx = v.name.indexOf(prefix)
     if(idx < 0) continue
     const name = v.name.substring(idx + preLen)
     const res = await v.async("arraybuffer")
@@ -139,8 +139,8 @@ async function getImportedAtom2(
     d.first_id = d._id
   }
 
-  let { images, files } = imgsFiles
-  let c: ContentLocalTable = { ...d, images, files, oState: "OK" }
+  const { images, files } = imgsFiles
+  const c: ContentLocalTable = { ...d, images, files, oState: "OK" }
 
   // 查找本地动态或评论是否存在
   const res = await db.contents.get(c._id)
@@ -151,7 +151,7 @@ async function getImportedAtom2(
     c.member = myCtx.memberId
     c.spaceId = myCtx.spaceId
     c.spaceType = myCtx.spaceType
-    let ia2 = await _getIa2(c, "new")
+    const ia2 = await _getIa2(c, "new")
     return ia2
   }
 
@@ -166,12 +166,12 @@ async function getImportedAtom2(
     c.member = res.member
     c.spaceId = res.spaceId
     c.spaceType = res.spaceType
-    let ia2 = await _getIa2(c, "update_required")
+    const ia2 = await _getIa2(c, "update_required")
     return ia2
   }
 
   // 无需更新
-  let ia2 = await _getIa2(res, "no_change")
+  const ia2 = await _getIa2(res, "no_change")
   return ia2
 }
 
@@ -190,7 +190,7 @@ async function _getIa2(
     [commentShow] = await equipComments([c])
   }
   
-  let ia2: ImportedAtom2 = {
+  const ia2: ImportedAtom2 = {
     id: c._id,
     status,
     threadShow,

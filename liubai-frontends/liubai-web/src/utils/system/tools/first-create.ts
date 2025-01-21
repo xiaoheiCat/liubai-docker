@@ -14,7 +14,7 @@ interface CreateData {
   member: MemberLocalTable
 }
 
-export async function firstCreate(tryNum: number = 1): Promise<CreateData | null> {
+export async function firstCreate(tryNum = 1): Promise<CreateData | null> {
   if(tryNum > 3) return null
 
   const user_local = ider.createUserId()

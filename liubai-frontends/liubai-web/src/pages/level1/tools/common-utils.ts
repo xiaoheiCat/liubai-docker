@@ -1,6 +1,6 @@
 import liuUtil from "~/utils/liu-util";
-import { type RouteAndLiuRouter } from "~/routes/liu-router"
-import { type Fetch_UserLoginNormal } from "./requests"
+import type { RouteAndLiuRouter } from "~/routes/liu-router"
+import type { Fetch_UserLoginNormal } from "./requests"
 import { useLoginStore } from "../login-page/tools/useLoginStore"
 import { showEmojiTip, showErrMsg } from "./show-msg"
 import loginer from "./loginer";

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type PropType } from 'vue';
+import type { PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { ThreadShow } from '~/types/types-content';
 import { useTcTopbar } from './tools/useTcTopbar';

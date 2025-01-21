@@ -27,7 +27,7 @@ function _sortList(
     let score = 0
     const txt2 = txt.toLowerCase()
     texts.forEach(v => {
-      let idx = txt2.indexOf(v.toLowerCase())
+      const idx = txt2.indexOf(v.toLowerCase())
       if(idx < 0) score += 100
       else score += idx
     })
@@ -40,7 +40,7 @@ function _sortList(
     const aScore = _getScore(aText)
     const bScore = _getScore(bText)
     if(aScore > bScore) return 1
-    else if(aScore < bScore) return -1
+    if(aScore < bScore) return -1
     return 0
   }
   list.sort(_compare)
@@ -148,11 +148,11 @@ function _searchInTagView(
     return false
   }
 
-  let newTexts = [...texts]
+  const newTexts = [...texts]
   newTexts.reverse()   // 反转
   // console.log("看一下 texts: ", texts)
   // console.log("看一下 newTexts: ", newTexts)
-  let newParents = [...parents]
+  const newParents = [...parents]
   newParents.reverse()
 
   const list = [tagView.text, ...newParents]

@@ -1,4 +1,4 @@
-import { ShallowRef, InjectionKey, provide, inject } from "vue"
+import { type ShallowRef, type InjectionKey, provide, inject } from "vue"
 import type { SnIndicatorData } from "./types"
 import { shallowRef } from "vue"
 

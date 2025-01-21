@@ -127,7 +127,7 @@ function setClassForTheme(
   // 1. toggle .theme-dark on body
   const t = supported_theme.value
   const body = document.querySelector("body")
-  const val = t === "dark" ? true : false
+  const val = t === "dark"
   body?.classList.toggle("theme-dark", val)
 
   // 2. 在 document 的根目录上: 当深色模式时，添加 .liu-dark，否则移除 .liu-dark

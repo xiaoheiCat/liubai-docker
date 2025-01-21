@@ -87,7 +87,7 @@ function onTapColor(newColor: string) {
 
 function onTapConfirm() {
   if(!reData.canSubmit) return
-  let obj: StateEditorRes = {
+  const obj: StateEditorRes = {
     action: "confirm",
     data: {
       text: reData.text,
@@ -116,7 +116,7 @@ function onToggleShowIndex(newV: boolean) {
 }
 
 function checkCanSubmuit() {
-  let oldV = reData.canSubmit
+  const oldV = reData.canSubmit
   let newV = false
   
   const trimText = reData.text.trim()

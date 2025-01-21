@@ -8,11 +8,11 @@ import type {
 } from "~/requests/req-types"
 import localCache from "~/utils/system/local-cache";
 import { createClientKey } from "./common-utils"
-import { type LiuRqReturn } from "~/requests/tools/types";
+import type { LiuRqReturn } from "~/requests/tools/types";
 
 function _getDefaultOpt() {
   const { theme, language } = localCache.getPreference()
-  let opt = {
+  const opt = {
     theme,
     language,
   }

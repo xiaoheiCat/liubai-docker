@@ -1,4 +1,4 @@
-import { type RouteAndLiuRouter } from "~/routes/liu-router"
+import type { RouteAndLiuRouter } from "~/routes/liu-router"
 import localCache from "~/utils/system/local-cache";
 
 export function redirectToLoginPage(

@@ -7,7 +7,7 @@ export async function updateDraftForTagAcross(
   whichTagChange: WhichTagChange,
 ) {
   const { children = [], to_ids = [], from_ids = [] } = whichTagChange
-  let tagChangeRequired = from_ids.length > 0
+  const tagChangeRequired = from_ids.length > 0
   if(!tagChangeRequired || children.length < 1) {
     console.log("没有发生合并，直接 return true 啦！")
     return true

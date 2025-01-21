@@ -111,7 +111,7 @@ async function handle_create(
   const { tagShows } = tagIdsToShows([tagId])
   if(tagShows.length < 1) return
   const { text } = tagShows[0]
-  let tmp = text + " / "
+  const tmp = text + " / "
   const res = await cui.showHashtagEditor({
     text: tmp,
     mode: "edit",
@@ -211,7 +211,7 @@ function _showErr(
   err?: string
 ) {
   if(!err) return
-  let title = t("tip.tip")
+  const title = t("tip.tip")
   let content = ""
   if(err === "01") {
     content = t("tag_related.level_limit", { level: "3" })

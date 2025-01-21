@@ -2,7 +2,7 @@
 // 当用户鼠标滑过 当前 comment-card 时
 // 才悬浮于右上角的工具栏
 
-import { type PropType } from 'vue';
+import type { PropType } from 'vue';
 import type { CommentCardLocation } from "../tools/types";
 import type { CcBubbleBarEmits } from "./tools/types";
 import type { CommentShow } from '~/types/types-content';

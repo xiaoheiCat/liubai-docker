@@ -1,6 +1,6 @@
 import time from "~/utils/basic/time";
 import valTool from "~/utils/basic/val-tool";
-import { type LiuTimeout } from "~/utils/basic/type-tool";
+import type { LiuTimeout } from "~/utils/basic/type-tool";
 import { onMounted } from "vue";
 import { useGlobalStateStore } from "../stores/useGlobalStateStore";
 import liuUtil from "~/utils/liu-util";

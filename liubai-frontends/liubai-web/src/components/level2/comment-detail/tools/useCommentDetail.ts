@@ -18,7 +18,7 @@ import {
 } from "~/utils/provide-keys";
 import type { SvProvideInject } from "~/types/components/types-scroll-view";
 import type { CommentShow, ThreadShow } from "~/types/types-content";
-import { type ValueComment } from "~/utils/other/comment-related"
+import type { ValueComment } from "~/utils/other/comment-related"
 import { useTemporaryStore } from "~/hooks/stores/useTemporaryStore";
 import liuEnv from "~/utils/liu-env";
 import type {
@@ -167,7 +167,7 @@ async function toLoadTargetComment(
 ) {
   const { cdData, emit } = ctx
   if(loadAgain) {
-    let res = await commentController.loadByComment(opt)
+    const res = await commentController.loadByComment(opt)
     c = res[0]
   }
 
@@ -190,7 +190,7 @@ async function toLoadTargetComment(
 /****************************** below comments *************************/
 async function preloadBelowList(
   ctx: CommentDetailCtx,
-  reload: boolean = false,
+  reload = false,
 ) {
   const { cdData } = ctx
   if(!reload && cdData.hasReachedBottom) {
@@ -327,7 +327,7 @@ async function toLoadChildrenOfBelow(
 /****************************** above comments *************************/
 async function preloadAboveList(
   ctx: CommentDetailCtx,
-  reload: boolean = false,
+  reload = false,
 ) {
   const { cdData } = ctx
   if(!reload && cdData.hasReachedTop) {

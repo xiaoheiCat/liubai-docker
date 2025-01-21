@@ -195,8 +195,8 @@ async function _modifySuperiorCommentNum(props: CeProps) {
 
 async function _addCommentNum(
   id: string,
-  levelOne: number = 1,
-  levelOneAndTwo: number = 1,
+  levelOne = 1,
+  levelOneAndTwo = 1,
 ) {
   const res = await localReq.getContent(id)
   if(!res) return false
@@ -212,7 +212,7 @@ async function _addCommentNum(
   let num2 = res.levelOneAndTwo ?? 0
   num1 += levelOne
   num2 += levelOneAndTwo
-  let obj: Partial<ContentLocalTable> = {
+  const obj: Partial<ContentLocalTable> = {
     levelOne: num1,
     levelOneAndTwo: num2,
     config: cfg,
@@ -263,7 +263,7 @@ async function _getCommentData(
 
   // 2. 处理 storageState
   const superior = await _getSuperior(props)
-  let storageState = superior?.storageState ?? "WAIT_UPLOAD"
+  const storageState = superior?.storageState ?? "WAIT_UPLOAD"
 
   // 3. 图片、文件
   const images = liuUtil.getRawList(ceCtx.images)
@@ -289,7 +289,7 @@ async function _getCommentData(
   // workspace insertedStamp createdStamp
   if(!props.commentId) {
     aComment.spaceId = superior?.spaceId ?? wStore.spaceId
-    let _spaceType = superior?.spaceType ?? wStore.spaceType
+    const _spaceType = superior?.spaceType ?? wStore.spaceType
     aComment.spaceType = _spaceType ? _spaceType : undefined
     aComment.createdStamp = now
     aComment.insertedStamp = now

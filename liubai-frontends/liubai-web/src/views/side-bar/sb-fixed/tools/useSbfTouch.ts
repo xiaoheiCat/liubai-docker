@@ -1,5 +1,5 @@
-import { SimpleFunc } from "~/utils/basic/type-tool"
-import { SbfData } from "./types"
+import type { SimpleFunc } from "~/utils/basic/type-tool"
+import type { SbfData } from "./types"
 import { useWindowSize } from "~/hooks/useVueUse"
 import valTool from "~/utils/basic/val-tool"
 import time from "~/utils/basic/time"
@@ -85,8 +85,8 @@ export function useSbfTouch(
     }
     
     const w = width.value
-    let diffPixel = startX - lastX
-    let percentage = diffPixel / w
+    const diffPixel = startX - lastX
+    const percentage = diffPixel / w
 
     if(diffPixel < 10) {
       toOpen()

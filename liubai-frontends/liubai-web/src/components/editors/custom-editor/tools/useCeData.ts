@@ -23,7 +23,7 @@ import type { OState_Draft, SpaceType } from "~/types/types-basic"
 import type { LiuTimeout } from "~/utils/basic/type-tool";
 import liuApi from "~/utils/liu-api";
 import { LocalToCloud } from "~/utils/cloud/LocalToCloud";
-import { type EcSelectionChangeData } from "../../editor-core/tools/types";
+import type { EcSelectionChangeData } from "../../editor-core/tools/types";
 import { useDebounceFn } from "~/hooks/useVueUse";
 import { deviceChaKey } from '~/utils/provide-keys';
 import { checkCanSubmit } from "./some-funcs";
@@ -287,7 +287,7 @@ function _isRequiredChange(ceData: CeData) {
 // 内文、图片、文件、tagIds 发生变化时，去保存
 function toAutoChange(
   ctx: CesCtx, 
-  instant: boolean = false,
+  instant = false,
 ) {
   if(_isRequiredChange(ctx.ceData)) {
     collectState(ctx, instant)
@@ -374,7 +374,7 @@ function toAiReadableChange(
 
 let lastSaveStamp = 0
 /****************** 收集信息、缓存 ***************/
-function collectState(ctx: CesCtx, instant: boolean = false) {
+function collectState(ctx: CesCtx, instant = false) {
   ctx.ceData.lastEditStamp = time.getTime()
   
   if(collectTimeout) clearTimeout(collectTimeout)
@@ -424,10 +424,10 @@ async function toSave(ctx: CesCtx) {
 
   // 响应式对象 转为普通对象
   liuDesc = liuUtil.toRawData(liuDesc)
-  let images = _getStoragedFiles(ceData)
-  let files = _getStoragedFiles<LiuFileStore>(ceData, "files")
-  let remindMe = liuUtil.toRawData(ceData.remindMe)
-  let tagIds = liuUtil.toRawData(ceData.tagIds)
+  const images = _getStoragedFiles(ceData)
+  const files = _getStoragedFiles<LiuFileStore>(ceData, "files")
+  const remindMe = liuUtil.toRawData(ceData.remindMe)
+  const tagIds = liuUtil.toRawData(ceData.tagIds)
 
   // checking out oState for local situation
   const ss = ceData.storageState

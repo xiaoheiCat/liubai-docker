@@ -229,10 +229,10 @@ const handle_file = async (
   const res = await toDownload(theFile.cloud_url as string)
   const ret = res.result
 
-  let hasEverUnknown = ret === "unknown"
-  let hasEverBadNetwork = ret === "bad_network"
-  let hasEverSuccess = ret === "success"
-  let hasEverKnownErr = ret === "known_err"
+  const hasEverUnknown = ret === "unknown"
+  const hasEverBadNetwork = ret === "bad_network"
+  const hasEverSuccess = ret === "success"
+  const hasEverKnownErr = ret === "known_err"
   const results: SyncResState[] = [ret]
   
   if(hasEverSuccess) {
@@ -279,7 +279,7 @@ const handle_member = async (
     return {}
   }
 
-  let u: Partial<MemberLocalTable> = {}
+  const u: Partial<MemberLocalTable> = {}
   let targetUpdated = false
 
   const res2 = await handle_images([avatar])
@@ -312,7 +312,7 @@ const handle_workspace = async (
     return {}
   }
 
-  let u: Partial<WorkspaceLocalTable> = {}
+  const u: Partial<WorkspaceLocalTable> = {}
   let targetUpdated = false
 
   const res2 = await handle_images([avatar])
@@ -342,7 +342,7 @@ const handle_content = async (
   if(!res) return {}
   const { images = [], files = [] } = res
 
-  let u: Partial<ContentLocalTable> = {}
+  const u: Partial<ContentLocalTable> = {}
   let targetUpdated = false
   const res0: HanTaskRes = {}
 
@@ -380,7 +380,7 @@ const handle_draft = async (
   if(!res) return {}
   const { images = [], files = [] } = res
 
-  let u: Partial<DraftLocalTable> = {}
+  const u: Partial<DraftLocalTable> = {}
   let targetUpdated = false
   const res0: HanTaskRes = {}
 

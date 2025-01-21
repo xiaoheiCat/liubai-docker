@@ -1,5 +1,5 @@
 
-import { type RouteRecordRaw } from "vue-router"
+import type { RouteRecordRaw } from "vue-router"
 
 const LeftSidebar = () => import("../views/side-bar/side-bar.vue")
 const BottomNaviBar = () => import("../views/bottom-navi-bar/bottom-navi-bar.vue")

@@ -1,5 +1,5 @@
 import type { PageState } from "~/types/types-atom";
-import { SyncOperateAPI } from "~/types/types-cloud";
+import type { SyncOperateAPI } from "~/types/types-cloud";
 
 export interface ApData {
   pageState: PageState

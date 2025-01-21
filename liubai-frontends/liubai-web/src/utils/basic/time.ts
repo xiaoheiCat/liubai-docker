@@ -71,7 +71,7 @@ const _canIReload = () => {
 // 设置时间差，由 CloudEventBus 调用
 const setDiff = (
   val: number,
-  fromWorker: boolean = false,
+  fromWorker = false,
 ) => {
   diff = val
   hasSetDiffEver = true
@@ -117,7 +117,7 @@ const getTime = () => {
 }
 
 // 返回当前时间戳的后四码
-const getLastCharOfStamp = (digit: number = 4) => {
+const getLastCharOfStamp = (digit = 4) => {
   const s = getTime()
   const s1 = String(s)
   const s2 = s1.substring(s1.length - digit)
@@ -136,7 +136,7 @@ const getDate = () => {
 
 // 返回当前时间的字符串
 const getLocalTimeStr = () => {
-  let t = getTime()
+  const t = getTime()
   const d = new Date(t)
   const mon = valTool.format0(d.getMonth()+1)
   const date = valTool.format0(d.getDate())
@@ -161,7 +161,7 @@ const getTimezone = () => {
 const isWithinMillis = (
   stamp: number,
   ms: number,
-  onlyLocal: boolean = false,
+  onlyLocal = false,
 ) => {
   const now = onlyLocal ? getLocalTime() : getTime()
   const diff = now - stamp

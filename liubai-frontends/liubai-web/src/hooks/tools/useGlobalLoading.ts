@@ -8,8 +8,8 @@ const DURATION_LOADING = 190
 export function useGlobalLoading() {
   const { router } = useRouteAndLiuRouter()
 
-  let s1: number = 0
-  let s2: number = 0
+  let s1 = 0
+  let s2 = 0
   let timeout: LiuTimeout
 
   const _beforeEach = async () => {

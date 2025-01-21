@@ -68,8 +68,8 @@ export const setRemind = async (
   if(!hasWhen) {
     const v = REMIND_LATER[idx]
     if(v === "other") {
-      let tmpStamp = newRemindStamp && newRemindStamp > now ? newRemindStamp : undefined
-      let tmpDate = tmpStamp ? new Date(tmpStamp) : undefined
+      const tmpStamp = newRemindStamp && newRemindStamp > now ? newRemindStamp : undefined
+      const tmpDate = tmpStamp ? new Date(tmpStamp) : undefined
       const res2 = await cui.showDatePicker({ date: tmpDate })
       if(!res2.confirm || !res2.date) return
       newRemindStamp = res2.date.getTime()

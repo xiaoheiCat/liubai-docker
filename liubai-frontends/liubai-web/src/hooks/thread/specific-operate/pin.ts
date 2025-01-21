@@ -4,7 +4,7 @@ import time from "~/utils/basic/time"
 import limit from "~/utils/limit"
 import cui from "~/components/custom-ui"
 import dbOp from "../db-op"
-import { type ThreadChangedOpt } from "~/types/types-atom"
+import type { ThreadChangedOpt } from "~/types/types-atom"
 import liuUtil from "~/utils/liu-util"
 
 //【重要】
@@ -22,7 +22,7 @@ export async function toPin(
   const newThread = liuUtil.copy.newData(oldThread)
 
   // 1. 修改状态
-  let newPin = !Boolean(oldThread.pinStamp)
+  const newPin = !Boolean(oldThread.pinStamp)
 
   // 2. 新的状态是置顶，去查看数目
   // 若已达最大值，提示用户 pin_maximum

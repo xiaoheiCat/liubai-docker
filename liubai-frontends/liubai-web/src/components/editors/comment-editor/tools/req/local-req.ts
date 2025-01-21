@@ -1,5 +1,5 @@
 import { db } from "~/utils/db"
-import { ContentLocalTable } from "~/types/types-table"
+import type { ContentLocalTable } from "~/types/types-table"
 
 async function addContent(data: ContentLocalTable) {
   const res = await db.contents.add(data)

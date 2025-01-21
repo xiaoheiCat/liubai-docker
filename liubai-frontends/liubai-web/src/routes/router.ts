@@ -59,7 +59,7 @@ router.beforeEach((to, from) => {
   // 则路由至 login 页
   if(backend && !hasLogin) {
     if(toInApp !== false && toName !== "login") {
-      let loginRoute: Record<string, any> = { name: "login" }
+      const loginRoute: Record<string, any> = { name: "login" }
       const goto = _getGoTo(to)
       if(goto) {
         loginRoute.query = { goto }

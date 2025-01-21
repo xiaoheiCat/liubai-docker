@@ -28,7 +28,7 @@ const _listenStorageChange = () => {
 
     if(!storageMap.has(key)) return
     if(!newValue) return
-    let newObj = valTool.strToObj(newValue)
+    const newObj = valTool.strToObj(newValue)
     if(!newObj.data || !newObj.stamp) return
     storageMap.set(key, newObj)
   })
@@ -38,7 +38,7 @@ const _listenStorageChange = () => {
 // 参考: https://blog.csdn.net/weixin_30632267/article/details/113366007
 const _handleSetItemErr = (err: any) => {
   if(!err || !err.code) return
-  let { code, name } = err
+  const { code, name } = err
   if(code === 22) {
     // localStorage 超出存储空间.........
   }
@@ -60,7 +60,7 @@ const getStorageSync = <T = any>(key: string): T | undefined | null => {
   const _key = TAG + key
 
   if(storageMap.has(_key)) {
-    let s1 = storageMap.get(_key) as StorageMapParam2
+    const s1 = storageMap.get(_key) as StorageMapParam2
     return valTool.copyObject(s1.data)
   }
 
@@ -74,7 +74,7 @@ const getStorageSync = <T = any>(key: string): T | undefined | null => {
   }
   
   if(valTool.isStringWithVal(s)) {
-    let obj = JSON.parse(s)
+    const obj = JSON.parse(s)
     storageMap.set(_key, obj)
     return valTool.copyObject(obj.data)
   }
@@ -100,7 +100,7 @@ const setStorageSync = (key: string, data: any): StorageRes => {
     return { isOk: false }
   }
   
-  let s = { data, stamp: Date.now() }
+  const s = { data, stamp: Date.now() }
   const _key = TAG + key
   storageMap.set(_key, s)
   try {

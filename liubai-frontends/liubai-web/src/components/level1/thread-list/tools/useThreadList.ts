@@ -27,7 +27,7 @@ import localCache from "~/utils/system/local-cache"
 import { useAwakeNum } from "~/hooks/useCommon"
 import { useNetworkStore } from "~/hooks/stores/useNetworkStore"
 import { handleCalendarList } from "./handle-calendar"
-import { type ThreadListViewType } from "~/types/types-view"
+import type { ThreadListViewType } from "~/types/types-view"
 import time from "~/utils/basic/time"
 import { preLoadCreateFirst, preLoadEditFirst } from "./pre-download"
 import cfg from "~/config"
@@ -40,10 +40,10 @@ export function useThreadList(
   props: TlProps,
   emits: TlEmits,
 ) {
-  let { viewType, tagId } = toRefs(props)
+  const { viewType, tagId } = toRefs(props)
 
   const wStore = useWorkspaceStore()
-  let spaceIdRef = storeToRefs(wStore).spaceId
+  const spaceIdRef = storeToRefs(wStore).spaceId
 
   // 获取命令 scroll-view 滚动到期望位置的控制器
   const svBottomUp = inject(svBottomUpKey)
@@ -235,8 +235,8 @@ function isViewType(ctx: TlContext, val: TlViewType) {
 // 找到后，把该行之后的数据全删除，再赋值云端来的数据进 list 里
 async function loadList(
   ctx: TlContext,
-  reload: boolean = false,
-  cloud: boolean = true,
+  reload = false,
+  cloud = true,
 ) {
 
   const spaceId = ctx.spaceIdRef.value
@@ -257,7 +257,7 @@ async function loadList(
   const oldList = tlData.list
   const oldLength = oldList.length
   const isInit = Boolean(reload || oldLength < 1)
-  let lastItemStamp = isInit ? undefined : tlData.lastItemStamp
+  const lastItemStamp = isInit ? undefined : tlData.lastItemStamp
 
   const cloudOpt: LoadCloudOpt = { 
     startIndex: isInit ? 0 : oldLength, 

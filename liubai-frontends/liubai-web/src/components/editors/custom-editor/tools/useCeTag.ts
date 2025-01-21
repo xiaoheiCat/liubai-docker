@@ -37,7 +37,7 @@ export function useCeTag(
   }
 
   const onAddHashTag = async (data: HashTagEditorRes) => {
-    let tagIds = ceData.tagIds
+    const tagIds = ceData.tagIds
     let id = data.tagId
     if(id) {
       addTagIdsToRecents([id])

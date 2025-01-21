@@ -104,7 +104,7 @@ function onTapDelete() {
 
 function onTapDetail() {
   if(!rr) return
-  let opt = { rr, replace: true }
+  const opt = { rr, replace: true }
   const { comment, thread } = cpData
 
   if(comment) {
@@ -233,7 +233,7 @@ function _makeItHot() {
     }, cfg.frame_duration_2)
   }
 
-  let idleID = window.requestIdleCallback((idleDeadline) => {
+  const idleID = window.requestIdleCallback((idleDeadline) => {
     const timeRemaining = idleDeadline.timeRemaining()
     const didTimeout = idleDeadline.didTimeout
     // console.log("didTimeout: ", didTimeout)

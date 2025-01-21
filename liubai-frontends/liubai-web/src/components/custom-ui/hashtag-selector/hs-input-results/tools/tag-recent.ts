@@ -38,7 +38,7 @@ export function getRecent(
       if(v2.text === v.text) return true
       return false
     })
-    let added = Boolean(theData)
+    const added = Boolean(theData)
     const obj: HsirAtom = { ...v, added }
     return obj
   })

@@ -18,9 +18,9 @@ export function resToAtoms(
   keyword?: string,
 ) {
   const now = time.getTime()
-  let list = res.map((v, i) => {
-    let atomId = `${prefix}_${now + i}`
-    let { title, desc } = _getTitleAndDesc(v, keyword)
+  const list = res.map((v, i) => {
+    const atomId = `${prefix}_${now + i}`
+    const { title, desc } = _getTitleAndDesc(v, keyword)
 
     // 处理图片
     let imgShow: ImageShow | undefined = undefined
@@ -38,7 +38,7 @@ export function resToAtoms(
       threadId = v._id
     }
 
-    let obj: ScContentAtom = {
+    const obj: ScContentAtom = {
       atomId,
       title,
       desc,
@@ -65,8 +65,8 @@ function _getTitleAndDesc(
   const fileName = _getFileName(v)
 
   if(!title) {
-    let tmpTitle = _getOneLine(content)
-    let tmpDesc = _getHighlight(content, fileName, keyword)
+    const tmpTitle = _getOneLine(content)
+    const tmpDesc = _getHighlight(content, fileName, keyword)
     
     if(tmpTitle) {
       title = tmpTitle
@@ -87,7 +87,7 @@ function _getTitleAndDesc(
 }
 
 function _getFileName(v: ContentLocalTable) {
-  let files = v.files
+  const files = v.files
   if(!files?.length) return ""
   const firFile = files[0]
   return firFile.name
@@ -178,7 +178,7 @@ function _trimBackward(text: string, keyword?: string) {
 
   let start = 16
   if(keyword) {
-    let idx = text.toLowerCase().indexOf(keyword)
+    const idx = text.toLowerCase().indexOf(keyword)
     if(idx >= 0) {
       start = idx + keyword.length
     }
@@ -193,7 +193,7 @@ function _trimBackward(text: string, keyword?: string) {
     if(num < 90) continue
     if(!POINTS.includes(char)) continue
 
-    let isEndPoint = i >= (text.length - 1)
+    const isEndPoint = i >= (text.length - 1)
     text = text.substring(0, i)
     text = text.trimEnd()
 

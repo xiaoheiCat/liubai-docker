@@ -1,4 +1,4 @@
-import { ShallowRef } from "vue";
+import type { ShallowRef } from "vue";
 import type { RouteAndLiuRouter } from "~/routes/liu-router";
 import type { ComposingData, PageState } from "~/types/types-atom";
 

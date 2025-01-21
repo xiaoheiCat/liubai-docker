@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { type TagView } from '~/types/types-atom';
-import { type PropType } from 'vue';
-import { LiuTagTreeStat } from '~/types';
+import type { TagView } from '~/types/types-atom';
+import type { PropType } from 'vue';
+import type { LiuTagTreeStat } from '~/types';
 import liuApi from '~/utils/liu-api';
 import LiuMenu from "~/components/common/liu-menu/liu-menu.vue";
-import { type MenuItem } from '~/components/common/liu-menu/tools/types';
+import type { MenuItem } from '~/components/common/liu-menu/tools/types';
 
 defineProps({
   node: {

@@ -9,7 +9,7 @@ import time from "../basic/time"
 
 function setAppTitle(opt: SetAppTitleOpt = {}) {
   let title = ""
-  let { val, val_key, val_opt } = opt
+  const { val, val_key, val_opt } = opt
 
   const t = i18n.global.t
   if(val) {

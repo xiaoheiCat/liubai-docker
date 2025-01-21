@@ -1,5 +1,5 @@
 import cui from "~/components/custom-ui";
-import { type LiuErrReturn } from "~/requests/tools/types";
+import type { LiuErrReturn } from "~/requests/tools/types";
 import liuApi from "~/utils/liu-api";
 import liuEnv from "~/utils/liu-env";
 
@@ -39,7 +39,7 @@ export function showDisableTip(thirdParty: string) {
 
 export async function showOtherTip(
   content_key: string,
-  reload: boolean = false
+  reload = false
 ) {
   await cui.showModal({
     title_key: "login.err_login",

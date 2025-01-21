@@ -15,7 +15,7 @@ export async function setShowCountdown(
 
   // 1. 修改数据
   const cCfg = newThread.config ?? {}
-  const newShowCountdown = cCfg.showCountdown === false ? true : false
+  const newShowCountdown = cCfg.showCountdown === false
   cCfg.showCountdown = newShowCountdown
   newThread.config = cCfg
 

@@ -47,7 +47,7 @@ export function useEcHashtag(
       lastProcessStamp = now
       return
     }
-    else if(key === "3") {
+    if(key === "3") {
       // console.log("this is three")
       lastThreeStamp = now
     }

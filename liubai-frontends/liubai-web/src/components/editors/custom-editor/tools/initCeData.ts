@@ -57,7 +57,7 @@ export function initCeData(
   
   // 不能用 shallowReactive 
   // 因为 images 属性必须监听内部数据的变化
-  let ceData = reactive<CeData>({
+  const ceData = reactive<CeData>({
     ...defaultData,
     threadEdited: threadIdRef.value,
     lastLockStamp: time.getTime(),
@@ -207,10 +207,10 @@ async function initDraft(
 async function initDraftWithThreadId(
   ctx: IcsContext,
   threadId: string,
-  loadCloud: boolean = true,
+  loadCloud = true,
 ) {
   let draft = await localReq.getDraftByThreadId(threadId)
-  let thread = await localReq.getContentById(threadId)
+  const thread = await localReq.getContentById(threadId)
   const dState = draft?.oState
   if(dState === "DELETED" || dState === "POSTED") {
     draft = null
@@ -222,8 +222,8 @@ async function initDraftWithThreadId(
   }
   ctx.emits("hasdata", threadId)
   
-  let e1 = draft?.editedStamp ?? 1
-  let e2 = thread?.editedStamp ?? 1
+  const e1 = draft?.editedStamp ?? 1
+  const e2 = thread?.editedStamp ?? 1
 
   // draft 编辑时间比较大的情况
   if(e1 > e2) {
@@ -243,7 +243,7 @@ async function initDraftWithThreadId(
 async function setDataFromDraft(
   ctx: IcsContext,
   draft: DraftLocalTable,
-  loadCloud: boolean = true,
+  loadCloud = true,
 ) {
   const { ceData } = ctx
 
@@ -326,7 +326,7 @@ async function initFromCloudThread(
     id: threadId,
   }
   const res = await CloudMerger.request(opt, { delay: 0 })
-  let thread = await localReq.getContentById(threadId)
+  const thread = await localReq.getContentById(threadId)
   if(!thread) {
     ctx.emits("nodata", threadId)
     return
@@ -386,8 +386,8 @@ async function initFromCloudDraft(
   // 3.1 if not_found
   if(firRes.status === "not_found") {
     if(local_draft) {
-      let threadId = local_draft.threadEdited
-      let localDraftId = ceData.draftId
+      const threadId = local_draft.threadEdited
+      const localDraftId = ceData.draftId
       if(localDraftId) {
         console.warn("Let me delete the stubborn draft!")
         localReq.deleteDraftById(localDraftId)
@@ -546,10 +546,10 @@ function setEditorContent(
 
   // 2. check if the text is different
   if(draftDescJSON) {
-    let text = transferUtil.tiptapToText(draftDescJSON).trim()
+    const text = transferUtil.tiptapToText(draftDescJSON).trim()
     if(text !== oldText) {
       hasSet = true
-      let json = { type: "doc", content: draftDescJSON }
+      const json = { type: "doc", content: draftDescJSON }
       editor.commands.setContent(json)
       ceData.editorContent = { text, json }
     }
@@ -590,7 +590,7 @@ async function resetFromCloud(
   if(local_draft && diff > SEC_30) {
     console.warn("reserve the current draft but change its id")
     // 保留当前输入框里的内容
-    let newId = ider.createDraftId()
+    const newId = ider.createDraftId()
     local_draft._id = newId
     local_draft.first_id = newId
     await localReq.setDraft(local_draft)
@@ -625,9 +625,9 @@ async function resetFromCloud(
 async function setDataFromThread(
   ctx: IcsContext,
   thread: ContentLocalTable,
-  loadCloud: boolean = true,
+  loadCloud = true,
 ) {
-  let { ceData } = ctx
+  const { ceData } = ctx
   const canSync = liuEnv.canISync()
   ceData.lastLockStamp = time.getTime()
   ceData.draftId = ""

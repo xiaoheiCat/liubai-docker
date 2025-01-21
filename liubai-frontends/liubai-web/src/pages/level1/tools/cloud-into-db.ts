@@ -22,7 +22,7 @@ export async function handleUser(
 
   // 2. create user if not exist
   if(!res1 || !res1._id) {
-    let res2 = await createUser(userId, d)
+    const res2 = await createUser(userId, d)
     return res2
   }
 

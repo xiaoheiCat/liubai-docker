@@ -1,7 +1,7 @@
 import { inject, reactive } from "vue";
 import type { LvcData } from "./types";
 import { deviceChaKey } from "~/utils/provide-keys";
-import { type KbListEmits } from "../../../tools/types"
+import type { KbListEmits } from "../../../tools/types"
 
 export function useLvColumn(emit: KbListEmits) {
 

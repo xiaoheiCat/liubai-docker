@@ -36,7 +36,7 @@ let closeTimeout: LiuTimeout
 const showLoading = (opt?: LoadingParam) => {
   loData.title = opt?.title ?? ""
   loData.title_key = opt?.title_key ?? ""
-  loData.mask = opt?.mask === false ? false : true
+  loData.mask = opt?.mask !== false
 
   if(loData.show) return
   if(closeTimeout) clearTimeout(closeTimeout)

@@ -1,5 +1,5 @@
 import type { ImageShow } from '~/types';
-import { SimpleFunc } from '~/utils/basic/type-tool';
+import type { SimpleFunc } from '~/utils/basic/type-tool';
 
 export interface PiParam {
   imgs: ImageShow[]

@@ -51,7 +51,7 @@ export function useThreadDetail(props: TdProps, emit: TdEmit) {
 let emitTimeout: LiuTimeout
 function emitThreadShow(
   ctx: TdCtx,
-  instantly: boolean = false,
+  instantly = false,
 ) {
   if(emitTimeout) clearTimeout(emitTimeout)
   const ms = instantly ? 0 : 150

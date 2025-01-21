@@ -3,7 +3,7 @@ import { pageStates } from "~/utils/atom";
 import liuApi from "~/utils/liu-api";
 import liuEnv from "~/utils/liu-env";
 import localCache from "~/utils/system/local-cache";
-import { type WbData } from "./types";
+import type { WbData } from "./types";
 import { 
   type RouteAndLiuRouter, 
   useRouteAndLiuRouter,

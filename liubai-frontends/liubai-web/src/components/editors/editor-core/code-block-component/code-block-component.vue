@@ -112,7 +112,7 @@ export default {
         return s2
       },
       set: (lang: CbcLang) => {
-        let language = showToSupported(lang)
+        const language = showToSupported(lang)
         props.updateAttributes({ language })
       }
     })

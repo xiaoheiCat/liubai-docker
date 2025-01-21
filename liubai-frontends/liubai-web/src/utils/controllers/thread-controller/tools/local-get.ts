@@ -98,13 +98,13 @@ async function getList(
     list = await q.sortBy("calendarStamp")
   }
   else if(isTodayFuture) {
-    let theStamp = lastItemStamp ?? (now - time.DAY)
+    const theStamp = lastItemStamp ?? (now - time.DAY)
     let tmp = db.contents.where("calendarStamp").above(theStamp)
     tmp = tmp.filter(filterFunc).limit(limit)
     list = await tmp.toArray()
   }
   else if(isPast) {
-    let theStamp = lastItemStamp ?? now
+    const theStamp = lastItemStamp ?? now
     let tmp = db.contents.where("calendarStamp").below(theStamp)
     tmp = tmp.reverse().filter(filterFunc).limit(limit)
     list = await tmp.toArray()
@@ -113,12 +113,12 @@ async function getList(
     // I. 加载特定 ids
     let tmp = db.contents.where("_id").anyOf(specific_ids)
     tmp = tmp.filter(filterFunc)
-    let tmpList = await tmp.toArray()
+    const tmpList = await tmp.toArray()
 
     // 排序成 ids 的顺序
     if(tmpList.length > 1) {
       specific_ids.forEach(id => {
-        let data = tmpList.find(v => v._id === id)
+        const data = tmpList.find(v => v._id === id)
         if(data) list.push(data)
       })
     }
@@ -139,7 +139,7 @@ async function getList(
   }
   else {
     // III. 分页加载
-    let w = db.contents.where(key)
+    const w = db.contents.where(key)
     let tmp = sort === "desc" ? w.below(lastItemStamp) : w.above(lastItemStamp)
     if(sort === "desc") tmp = tmp.reverse()
     tmp = tmp.filter(filterFunc).limit(limit)

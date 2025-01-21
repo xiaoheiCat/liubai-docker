@@ -2,7 +2,7 @@
 
 import { customAlphabet } from 'nanoid'
 
-function _createId(digits: number = 21) {
+function _createId(digits = 21) {
   const ABC = "123456789abcdefghijkmnopqrstuvwxyz"
   const nanoid = customAlphabet(ABC, digits)
   return nanoid()
@@ -59,7 +59,7 @@ const createCollectId = () => {
   return "c1" + _createId(20)
 }
 
-const createRandom = (digits: number = 7) => {
+const createRandom = (digits = 7) => {
   return _createId(digits)
 }
 

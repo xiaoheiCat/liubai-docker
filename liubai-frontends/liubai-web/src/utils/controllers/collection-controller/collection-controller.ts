@@ -10,7 +10,7 @@ import cfg from "~/config"
 import valTool from "~/utils/basic/val-tool"
 import { useSystemStore } from "~/hooks/stores/useSystemStore"
 import { useWindowSize } from "~/hooks/useVueUse"
-import { type PackThreadOpt } from "~/utils/show/tools/types"
+import type { PackThreadOpt } from "~/utils/show/tools/types"
 
 interface MyCollectionOpt {
   content_ids: string[]
@@ -73,7 +73,7 @@ export async function getThreadsByCollection(
   }
   else {
     // 分页加载
-    let w = db.collections.where("sortStamp")
+    const w = db.collections.where("sortStamp")
     let tmp = sort === "desc" ? w.below(lastItemStamp) :  w.above(lastItemStamp)
     if(sort === "desc") tmp = tmp.reverse()
     tmp = tmp.filter(filterFunc)
@@ -93,7 +93,7 @@ export async function getThreadsByCollection(
   if(!res2 || res2.length < 1) return []
 
   // 3. 去加载 作者
-  let member_ids: string[] = []
+  const member_ids: string[] = []
   res2.forEach(v => {
     if(v.member) {
       if(!member_ids.includes(v.member)) {
@@ -104,7 +104,7 @@ export async function getThreadsByCollection(
 
   const memberShows = await getMemberShows(member_ids)
 
-  let list: ThreadShow[] = []
+  const list: ThreadShow[] = []
   const sStore = useSystemStore()
   const { width } = useWindowSize()
   const packOpt: PackThreadOpt = {
@@ -120,13 +120,13 @@ export async function getThreadsByCollection(
     if(!v) continue
 
     const { member, user } = v
-    let _collections = [c]
+    const _collections = [c]
     let creator: MemberShow | undefined = undefined
     if(member) {
       creator = memberShows.find(v2 => v2._id === member)
     }
 
-    let obj = showThread.packThread(v, _collections, creator, packOpt)
+    const obj = showThread.packThread(v, _collections, creator, packOpt)
     list.push(obj)
   }
 

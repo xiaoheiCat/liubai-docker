@@ -1,5 +1,5 @@
 import { type Ref, shallowRef, watch, onBeforeUnmount } from 'vue';
-import { type LiuTimeout } from '~/utils/basic/type-tool';
+import type { LiuTimeout } from '~/utils/basic/type-tool';
 
 interface IOptions {
   light?: {

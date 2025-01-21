@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Swiper } from "swiper"
+import type { Swiper } from "swiper"
 import { Swiper as VueSwiper, SwiperSlide } from 'swiper/vue';
 import { ref, shallowRef } from 'vue';
 import { usePiContent } from "./tools/usePiContent";
@@ -25,7 +25,7 @@ const {
   onImgLoaded,
 } = usePiContent(props, emit)
     
-let _swiper = shallowRef<Swiper | null>(null)
+const _swiper = shallowRef<Swiper | null>(null)
 const leftArrow = ref(false)
 const rightArrow = ref(false)
 const cLen = coverLength.value

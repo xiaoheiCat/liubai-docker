@@ -2,14 +2,14 @@ import liuUtil from "~/utils/liu-util"
 import type { CommentStorageAtom, CommentStorageType } from "./types"
 import localReq from "./req/local-req"
 
-let list: CommentStorageAtom[] = []
+const list: CommentStorageAtom[] = []
 
 function toSave(
   atom: CommentStorageAtom,
   saveType: CommentStorageType = "content",
 ) {
   
-  let _atom = liuUtil.toRawData(atom)
+  const _atom = liuUtil.toRawData(atom)
   let hasFound = false
 
   const _setSpecificData = (v: CommentStorageAtom) => {

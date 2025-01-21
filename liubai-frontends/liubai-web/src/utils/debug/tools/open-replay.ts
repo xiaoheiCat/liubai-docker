@@ -1,7 +1,7 @@
-import { type LocalPreference } from "~/utils/system/tools/types";
+import type { LocalPreference } from "~/utils/system/tools/types";
 import liuEnv from "~/utils/liu-env";
 import type OpenReplayTracker from "@openreplay/tracker";
-import { type SomeProperties } from "./types";
+import type { SomeProperties } from "./types";
 
 let tracker: OpenReplayTracker | undefined
 
@@ -19,7 +19,7 @@ export async function initOpenReplay(
   localP: LocalPreference,
   opt: SomeProperties,
 ) {
-  let id = opt.email ?? localP.open_id
+  const id = opt.email ?? localP.open_id
   if(!id) return
 
   const _env = liuEnv.getEnv()

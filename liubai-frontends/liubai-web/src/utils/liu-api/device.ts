@@ -14,7 +14,7 @@ export interface BatteryManager extends EventTarget {
 const copyToClipboard = (text: string) => {
 
   // 方法2: 使用 navigator.clipboard
-  let _fun2 = async (a: ResolveReject, b: ResolveReject, text: string) => {
+  const _fun2 = async (a: ResolveReject, b: ResolveReject, text: string) => {
     let res = false
     if (navigator.clipboard?.writeText) {
       await navigator.clipboard.writeText(text)
@@ -25,7 +25,7 @@ const copyToClipboard = (text: string) => {
   }
 
   // 方法1: 创建 textarea 复制
-  let _fun1 = (a: ResolveReject, b: ResolveReject, text: string) => {
+  const _fun1 = (a: ResolveReject, b: ResolveReject, text: string) => {
     const element = document.createElement('textarea')
     document.body.appendChild(element)
     element.value = text
@@ -40,7 +40,7 @@ const copyToClipboard = (text: string) => {
   }
 
   // 判断使用哪个方法
-  let _t = (a: ResolveReject, b: ResolveReject) => {
+  const _t = (a: ResolveReject, b: ResolveReject) => {
     if (!text) {
       console.warn(`没有内容要剪贴.....`)
       a(false)
@@ -115,7 +115,7 @@ function getLanguageFromSystem(): SupportedLocale {
 
   const langs = navigator.languages
   for(let i=0; i<langs.length; i++) {
-    let aLang = langs[i]
+    const aLang = langs[i]
     if(isSupportedLocale(aLang)) return aLang
     const _aLang = aLang.toLowerCase()
     if(_aLang === "zh-tw") return "zh-Hant"

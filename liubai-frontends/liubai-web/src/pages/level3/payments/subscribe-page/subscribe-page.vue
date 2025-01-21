@@ -4,7 +4,7 @@ import ScrollView from "~/components/common/scroll-view/scroll-view.vue";
 import SubscribeContent from "./subscribe-content/subscribe-content.vue";
 import { useI18n } from "vue-i18n";
 import { ref } from "vue";
-import { type PageState } from "~/types/types-atom";
+import type { PageState } from "~/types/types-atom";
 
 const { t } = useI18n()
 

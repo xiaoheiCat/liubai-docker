@@ -22,7 +22,7 @@ export async function equipComments(
   const content_ids = contents.map(v => v._id)
   const collections = await collectionController.getMyCollectionByIds({ content_ids })
 
-  let list: CommentShow[] = []
+  const list: CommentShow[] = []
   for(let i=0; i<contents.length; i++) {
     const v = contents[i]
     const { member, user, _id, infoType } = v

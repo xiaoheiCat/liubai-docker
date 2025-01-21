@@ -9,7 +9,7 @@ import stateController from "~/utils/controllers/state-controller/state-controll
 import { whenThreadListUpdated } from "./handleKanbanSort"
 import { kanbanInnerChangeKey } from "~/utils/provide-keys"
 import time from "~/utils/basic/time";
-import { MenuItem } from "~/components/common/liu-menu/tools/types";
+import type { MenuItem } from "~/components/common/liu-menu/tools/types";
 import kanbanOperate from "./kanban-operate";
 import { useRouteAndLiuRouter } from "~/routes/liu-router";
 import liuUtil from "~/utils/liu-util";

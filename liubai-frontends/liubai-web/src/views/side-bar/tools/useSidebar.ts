@@ -20,7 +20,7 @@ import type { LiuTimeout } from "~/utils/basic/type-tool"
 import { useSbKeyboard } from "./useSbKeyboard"
 import type { SbData } from "./types";
 import { useImages } from "~/hooks/useImages"
-import { type CursorHorizontalResize } from "~/types/types-view";
+import type { CursorHorizontalResize } from "~/types/types-view";
 import { useWindowLoaded } from "~/hooks/useCommon";
 
 const LISTEN_DELAY = 450
@@ -93,7 +93,7 @@ async function toOpen(
 ) {
   const { width } = useWindowSize()
   const newV = width.value
-  let newState: Partial<LayoutType> = {
+  const newState: Partial<LayoutType> = {
     changeType: "window",
     clientWidth: newV,
   }
@@ -246,7 +246,7 @@ async function recalculate(
   if(newV === oldV) return
   lastWinResizeStamp = time.getLocalTime()
 
-  let newState: Partial<LayoutType> = {
+  const newState: Partial<LayoutType> = {
     changeType: "window",
     clientWidth: newV
   }
@@ -333,7 +333,7 @@ function initSidebar(
 
 
   const w = width.value
-  let newState: Partial<LayoutType> = {
+  const newState: Partial<LayoutType> = {
     changeType: "window",
     clientWidth: w
   }

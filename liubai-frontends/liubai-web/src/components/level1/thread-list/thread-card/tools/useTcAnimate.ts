@@ -1,5 +1,5 @@
 import { ref, watch } from "vue";
-import { TcProps } from "./types";
+import type { TcProps } from "./types";
 
 export function useTcAnimate(
   props: TcProps,

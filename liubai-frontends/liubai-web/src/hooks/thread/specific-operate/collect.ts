@@ -15,7 +15,7 @@ export const toCollect = async (
   const newThread = liuUtil.copy.newData(oldThread)
 
   // 1. 修改状态
-  let newFavorite = !Boolean(oldThread.myFavorite)
+  const newFavorite = !Boolean(oldThread.myFavorite)
   newThread.myFavorite = newFavorite
   newThread.myFavoriteStamp = time.getTime()
 

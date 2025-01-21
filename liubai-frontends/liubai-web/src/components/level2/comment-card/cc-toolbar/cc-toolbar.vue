@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // 目标评论的工具栏
-import { type PropType } from 'vue';
+import type { PropType } from 'vue';
 import type { CommentShow } from '~/types/types-content';
 import { useI18n } from "vue-i18n";
 import { useCcToolbar } from './tools/useCcToolbar';

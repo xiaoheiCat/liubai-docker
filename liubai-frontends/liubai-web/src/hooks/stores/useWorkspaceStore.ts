@@ -227,7 +227,7 @@ function getDefaultStates() {
 /** get default stateConfig */
 function getDefaultStateCfg() {
   const now = time.getTime()
-  let stateList = getDefaultStates()
+  const stateList = getDefaultStates()
   const obj: LiuStateConfig = {
     stateList,
     updatedStamp: now,

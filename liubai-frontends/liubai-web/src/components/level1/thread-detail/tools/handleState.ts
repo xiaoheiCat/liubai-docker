@@ -13,7 +13,7 @@ export async function handleSelectState(
   const oldThread = valTool.copyObject(thread)
 
   // 1. 执行公共逻辑
-  let { tipPromise, newStateShow } = await threadOperate.selectState(oldThread, d.memberId, d.userId)
+  const { tipPromise, newStateShow } = await threadOperate.selectState(oldThread, d.memberId, d.userId)
   if(!tipPromise) return
 
   // 2. 判断要不要撒花

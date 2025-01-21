@@ -168,15 +168,15 @@ async function _modifySuperiorCommentNum(
 
 async function _deleteCommentNum(
   id: string,
-  levelOne: number = 1,
-  levelOneAndTwo: number = 1,
+  levelOne = 1,
+  levelOneAndTwo = 1,
 ) {
   const res = await db.contents.get(id)
   if(!res) return false
 
-  let num1 = valTool.minusAndMinimumZero(res.levelOne, levelOne)
-  let num2 = valTool.minusAndMinimumZero(res.levelOneAndTwo, levelOneAndTwo)
-  let obj = {
+  const num1 = valTool.minusAndMinimumZero(res.levelOne, levelOne)
+  const num2 = valTool.minusAndMinimumZero(res.levelOneAndTwo, levelOneAndTwo)
+  const obj = {
     levelOne: num1,
     levelOneAndTwo: num2,
   }

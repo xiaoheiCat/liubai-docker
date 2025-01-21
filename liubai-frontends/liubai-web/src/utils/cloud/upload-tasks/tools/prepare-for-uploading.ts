@@ -82,7 +82,7 @@ async function getRawData(task: UploadTaskLocalTable) {
 function whenThreadPost(c: ContentLocalTable) {
   if(c.oState === "DELETED") return
 
-  let uploadThread: LiuUploadThread = {
+  const uploadThread: LiuUploadThread = {
     first_id: c.first_id,
     spaceId: c.spaceId,
     liuDesc: c.liuDesc,
@@ -116,7 +116,7 @@ function whenThreadPost(c: ContentLocalTable) {
 }
 
 function whenCommentPost(c: ContentLocalTable) {
-  let uploadComment: LiuUploadComment = {
+  const uploadComment: LiuUploadComment = {
     first_id: c.first_id,
     spaceId: c.spaceId,
 
@@ -137,7 +137,7 @@ function whenCommentPost(c: ContentLocalTable) {
 }
 
 function whenThreadEdit(c: ContentLocalTable) {
-  let uploadThread: LiuUploadThread = {
+  const uploadThread: LiuUploadThread = {
     id: c._id,
     first_id: c.first_id,
 
@@ -162,7 +162,7 @@ function whenThreadEdit(c: ContentLocalTable) {
 }
 
 function whenCommentEdit(c: ContentLocalTable) {
-  let uploadComment: LiuUploadComment = {
+  const uploadComment: LiuUploadComment = {
     id: c._id,
     first_id: c.first_id,
 

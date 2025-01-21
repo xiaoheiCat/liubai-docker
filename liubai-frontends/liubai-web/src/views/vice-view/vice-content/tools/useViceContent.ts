@@ -59,7 +59,7 @@ export function useViceContent(
       }
     }
     else if((vs === "iframe" || vs === "third") && id) {
-      let oUrlStr = vvLinkStore.getCurrentLink(route)
+      const oUrlStr = vvLinkStore.getCurrentLink(route)
       if(oUrlStr) {
         url = new URL(oUrlStr)
       }
@@ -267,13 +267,13 @@ function showView(
   vcData.currentState = state
   vcData.currentId = id
 
-  let parentMinPx = otherData?.isStreetVoice ? 500 : 0
+  const parentMinPx = otherData?.isStreetVoice ? 500 : 0
   ctx.emits("intendedminchange", parentMinPx)
 }
 
 function closeAllView(
   ctx: VcCtx,
-  clearly: boolean = false,    // 完全清除
+  clearly = false,    // 完全清除
 ) {
   const list = ctx.vcData.list
   

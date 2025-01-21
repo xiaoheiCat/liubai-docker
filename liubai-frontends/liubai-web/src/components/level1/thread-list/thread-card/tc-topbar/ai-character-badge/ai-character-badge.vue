@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
 import { type PropType, computed } from 'vue';
-import { type AiCharacter } from '~/types/types-atom';
+import type { AiCharacter } from '~/types/types-atom';
 
 const props = defineProps({
   aiCharacter: {

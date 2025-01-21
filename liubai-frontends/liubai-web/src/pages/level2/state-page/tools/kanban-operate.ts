@@ -29,11 +29,11 @@ async function editKanban(
   const TODO_TXT = t('thread_related.todo')
   const FINISHED_TXT = t('thread_related.finished')
 
-  let oldTxtKey = aCol.text_key
+  const oldTxtKey = aCol.text_key
   let oldText = aCol.text
-  let oldColor = liuUtil.colorToStorage(aCol.colorShow)
-  let oldShowIndex = aCol.showInIndex
-  let oldShowFireworks = Boolean(aCol.showFireworks)
+  const oldColor = liuUtil.colorToStorage(aCol.colorShow)
+  const oldShowIndex = aCol.showInIndex
+  const oldShowFireworks = Boolean(aCol.showFireworks)
   if(!oldText) {
     if(stateId === "TODO") oldText = TODO_TXT
     else if(stateId === "FINISHED") oldText = FINISHED_TXT
@@ -57,7 +57,7 @@ async function editKanban(
   noChange = noChange && showFireworks === oldShowFireworks
   if(noChange) return
 
-  let txtUpdated = text !== oldText
+  const txtUpdated = text !== oldText
 
   // 2. 检查是否有一样的状态名 再更新列表
   let hasSame = false

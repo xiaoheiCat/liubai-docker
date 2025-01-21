@@ -192,7 +192,7 @@ function listenToViewChange(
     }
   }
 
-  let isActivated = ref(false)
+  const isActivated = ref(false)
   onActivated(() => {
     lastToggleViewStamp.value = time.getTime()
     isActivated.value = true

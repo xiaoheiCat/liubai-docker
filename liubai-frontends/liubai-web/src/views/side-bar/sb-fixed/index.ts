@@ -85,7 +85,7 @@ function toOpen() {
     let newDuration = TRANSITION_DURATION
     // 如果没有过度时间，把过度时间加上
     if(sbfData.duration === "0") {
-      let percentage = 1 - sbfData.bgOpacity
+      const percentage = 1 - sbfData.bgOpacity
       newDuration = valTool.numToFix(TRANSITION_DURATION * percentage, 0) + 90
       if(newDuration > TRANSITION_DURATION) {
         newDuration = TRANSITION_DURATION
@@ -140,7 +140,7 @@ function toClose() {
 
   const foo1 = () => {
     let newDuration = TRANSITION_DURATION
-    let percentage = sbfData.bgOpacity
+    const percentage = sbfData.bgOpacity
     newDuration = valTool.numToFix(TRANSITION_DURATION * percentage, 0) + 90
     if(newDuration > TRANSITION_DURATION) {
       newDuration = TRANSITION_DURATION

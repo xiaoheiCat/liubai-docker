@@ -22,14 +22,14 @@ export function getEmbedData(
   const s = url.searchParams
 
   const { supported_theme: themeVal } = useSystemStore()
-  let tmp: string = ""
+  let tmp = ""
 
   // 适配 youtube /watch
   const yt = thirdLink.YOUTUBE_EMBED
   const yt0 = new URL(yt)
   const yt1 = new URL(thirdLink.YOUTUBE_WATCH)
   const ytRes: EmbedDataRes = { link: originUrl, otherData: { isYouTube: true } }
-  let isYouTube1 = valTool.isInDomain(h, yt1.hostname) && p === "/watch"
+  const isYouTube1 = valTool.isInDomain(h, yt1.hostname) && p === "/watch"
   if(isYouTube1) {
     const v = s.get("v")
     let sec = s.get("t")

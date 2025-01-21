@@ -1,4 +1,4 @@
-import { SmsStatus } from "~/types/types-view"
+import type { SmsStatus } from "~/types/types-view"
 import type { LoginByThirdParty } from "../../tools/types"
 
 export interface LpmData {

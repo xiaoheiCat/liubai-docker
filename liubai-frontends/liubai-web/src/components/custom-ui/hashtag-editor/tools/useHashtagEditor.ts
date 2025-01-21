@@ -355,7 +355,7 @@ function toListenKeyboard() {
   
     if(!liuUtil.canKeyUpDown()) return
     
-    let diff = key === "ArrowDown" ? 1 : -1
+    const diff = key === "ArrowDown" ? 1 : -1
     let tmpIdx = hteData.selectedIndex + diff
     if(tmpIdx >= len) tmpIdx = -1
     else if(tmpIdx < -1) tmpIdx = len - 1
@@ -373,7 +373,7 @@ function toListenKeyboard() {
     }
   }
 
-  let res = useKeyboard({
+  const res = useKeyboard({
     data: hteData,
     whenKeyDown,
     whenKeyUp,

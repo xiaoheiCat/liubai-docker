@@ -3,7 +3,7 @@ import thirdLink from "~/config/third-link"
 import cui from "~/components/custom-ui";
 import { fetchGoogleCredential } from "../../tools/requests";
 import { afterFetchingLogin } from "../../tools/common-utils";
-import { type RouteAndLiuRouter } from "~/routes/liu-router";
+import type { RouteAndLiuRouter } from "~/routes/liu-router";
 import { getClientKey } from "../../tools/common-tools";
 import time from "~/utils/basic/time";
 import liuApi from "~/utils/liu-api";

@@ -1,5 +1,5 @@
 import { useMyProfile } from "~/hooks/useCommon";
-import EditorCore from "../../editor-core/editor-core.vue"
+import type EditorCore from "../../editor-core/editor-core.vue"
 import { computed, provide, reactive, ref, shallowRef, toRef, watch } from "vue"
 import type { Ref, ShallowRef } from "vue"
 import type { TipTapEditor, EditorCoreContent } from "~/types/types-editor"
@@ -24,7 +24,7 @@ export function useCommentEditor(
   emit: CeEmit,
 ) {
 
-  let { located } = props
+  const { located } = props
 
   const placeholderKey = computed(() => {
     const r = props.replyToComment
@@ -166,7 +166,7 @@ function handleFileName(
   ctx: CeCtx,
   files: LiuFileStore[]
 ) {
-  let firFile = files[0]
+  const firFile = files[0]
   if(!firFile) {
     ctx.fileShowName = ""
     return
@@ -306,10 +306,10 @@ function checkCanSubmit(
   const fileLength = ctx.files.length  
   const text = ctx.editorContent?.text?.trim()
 
-  let newCanSubmit = Boolean(imgLength) || Boolean(text) || Boolean(fileLength)
+  const newCanSubmit = Boolean(imgLength) || Boolean(text) || Boolean(fileLength)
 
   if(props.commentId) {
-    let hasChanged = checkIfSomethingChanged(ctx)
+    const hasChanged = checkIfSomethingChanged(ctx)
     if(!hasChanged) {
       ctx.canSubmit = false
       return
@@ -345,10 +345,10 @@ function checkIfSomethingChanged(
 
 // 获取 minEditorHeight
 function initEditorHeight(props: CeProps) {
-  let { located } = props
+  const { located } = props
   const isCommentArea = located === "main-view" || located === "vice-view"
   const isPopup = located === "popup"
-  let tmpMin = isCommentArea ? 38 : 150
+  const tmpMin = isCommentArea ? 38 : 150
 
   const minEditorHeight = ref(tmpMin)
   

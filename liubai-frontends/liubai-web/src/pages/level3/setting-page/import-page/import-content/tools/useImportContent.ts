@@ -98,11 +98,11 @@ async function loadZip(f: File, ctx: IcCtx) {
   const regDate = /contents\/(\d{4}\-\d{2}\-\d{2}\s\d{2}_\d{2}_\d{2})\//
 
   let tmpAtom: ImportedAtom = {}
-  let atoms: ImportedAtom[] = []
+  const atoms: ImportedAtom[] = []
 
-  let sortedResults: LiuJSZip[] = []
+  const sortedResults: LiuJSZip[] = []
   results.forEach((relativePath, file) => {
-    let obj: LiuJSZip = {
+    const obj: LiuJSZip = {
       relativePath,
       file
     }
@@ -193,7 +193,7 @@ async function parseAtoms(
   console.time("start to parse")
   for(let i=0; i<atoms.length; i++) {
     const v = atoms[i]
-    let item = await parseOurJson(v, myCtx)
+    const item = await parseOurJson(v, myCtx)
     if(!item) continue
 
     // 去检查是否已经添加过了
