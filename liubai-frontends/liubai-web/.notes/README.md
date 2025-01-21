@@ -44,6 +44,8 @@ https://webkit.org/blog/12445/new-webkit-features-in-safari-15-4/#:~:text=takes%
 
 12. 如何在 `macOS` 上配置 `windsurf` 命令，实现类似于 `code .` 在 VS Code（换成 Windsurf）中打开当前文件夹的效果？输入一下命令，再输入本机密码即可: `sudo ln -s /Applications/Windsurf.app/Contents/Resources/app/bin/windsurf /usr/local/bin/windsurf`
 
+13. 使用 `pnpm biome-lint` 去进行 `src/` 文件夹下的代码检查，并自动修改不合规范的文件。
+
 
 ## 彻底解决 pnpm 网络请求超时的问题
 
