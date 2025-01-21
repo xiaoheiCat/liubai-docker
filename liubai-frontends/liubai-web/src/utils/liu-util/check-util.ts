@@ -70,7 +70,7 @@ function canUpload(
 }
 
 function isJustAppSetup(
-  duration: number = 3000,
+  duration = 3000,
 ) {
   const now = time.getTime()
   const stamp = time.getAppSetupStamp()

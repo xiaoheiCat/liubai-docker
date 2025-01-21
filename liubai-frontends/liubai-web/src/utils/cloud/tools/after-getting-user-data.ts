@@ -20,7 +20,7 @@ import type { LiuSpaceAndMember } from "~/types/types-cloud";
 import { CloudFiler } from "../CloudFiler";
 import liuConsole from "~/utils/debug/liu-console";
 import usefulTool from "~/utils/basic/useful-tool";
-import { type SimpleObject } from "~/utils/basic/type-tool";
+import type { SimpleObject } from "~/utils/basic/type-tool";
 
 interface AgudOpt {
   isRefresh?: boolean   // `false` is default

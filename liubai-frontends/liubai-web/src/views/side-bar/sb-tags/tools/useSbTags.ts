@@ -1,5 +1,5 @@
 import { reactive, ref, watch, type Ref } from "vue";
-import { Draggable } from "@he-tree/vue";
+import type { Draggable } from "@he-tree/vue";
 import type { TagView } from "~/types/types-atom";
 import { storeToRefs } from "pinia";
 import { getCurrentSpaceTagList, useTagsTree } from "~/utils/system/tag-related";
@@ -135,7 +135,7 @@ async function getLatestSpaceTag(
   tagNodes: Ref<TagView[]>,
   oldTagNodes: Ref<TagView[]>,
 ) {
-  let list = getCurrentSpaceTagList()
+  const list = getCurrentSpaceTagList()
   const list2 = valTool.copyObject(list)
   const { tree } = filterTag(list2)
   if(sbtData.everMoved) {

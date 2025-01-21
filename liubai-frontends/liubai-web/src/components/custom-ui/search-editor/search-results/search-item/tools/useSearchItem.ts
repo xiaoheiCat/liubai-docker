@@ -1,7 +1,7 @@
 import { computed, inject } from "vue";
 import type { SiProps } from "./types";
 import { searchFuncsKey } from "../../../tools/types";
-import { LiuTimeout } from "~/utils/basic/type-tool";
+import type { LiuTimeout } from "~/utils/basic/type-tool";
 import liuApi from "~/utils/liu-api";
 
 export function useSearchItem(props: SiProps) {

@@ -107,7 +107,7 @@ export interface AwakeNumProps {
 // 当页面 activate 或 syncNum + 1 时，让 awakeNum + 1
 // 注意：若页面没有 activate，即使 syncNum + 1，awakeNum 也不会 + 1
 export function useAwakeNum(
-  ms: number = 3000,
+  ms = 3000,
   props?: AwakeNumProps,
 ) {
   const awakeNum = ref(0)

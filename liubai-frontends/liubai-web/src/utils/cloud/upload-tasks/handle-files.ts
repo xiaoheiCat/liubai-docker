@@ -51,8 +51,8 @@ async function _storageContent(
 
   // 2. put cloud_url into the file
   const { images, files } = content
-  let foundInImages = _seekFileInStores(file_id, cloud_url, images)
-  let foundInFiles = _seekFileInStores(file_id, cloud_url, files)
+  const foundInImages = _seekFileInStores(file_id, cloud_url, images)
+  const foundInFiles = _seekFileInStores(file_id, cloud_url, files)
   if(!foundInImages && !foundInFiles) {
     return false
   }
@@ -109,8 +109,8 @@ async function _storageDraft(
 
   // 2. put cloud_url into the file
   const { images, files } = draft
-  let foundInImages = _seekFileInStores(file_id, cloud_url, images)
-  let foundInFiles = _seekFileInStores(file_id, cloud_url, files)
+  const foundInImages = _seekFileInStores(file_id, cloud_url, images)
+  const foundInFiles = _seekFileInStores(file_id, cloud_url, files)
   if(!foundInImages && !foundInFiles) {
     return false
   }
@@ -158,8 +158,8 @@ async function _deleteFileFromContent(
 
   // 2. to seek and delete from images or files
   const { images, files } = content
-  let foundInImages = _toSeekAndDelete(file_id, images)
-  let foundInFiles = _toSeekAndDelete(file_id, files)
+  const foundInImages = _toSeekAndDelete(file_id, images)
+  const foundInFiles = _toSeekAndDelete(file_id, files)
   if(!foundInImages && !foundInFiles) {
     return false
   }
@@ -186,8 +186,8 @@ async function _deleteFileFromDraft(
 
   // 2. to seek and delete from images or files
   const { images, files } = draft
-  let foundInImages = _toSeekAndDelete(file_id, images)
-  let foundInFiles = _toSeekAndDelete(file_id, files)
+  const foundInImages = _toSeekAndDelete(file_id, images)
+  const foundInFiles = _toSeekAndDelete(file_id, files)
   if(!foundInImages && !foundInFiles) {
     return false
   }
@@ -343,7 +343,7 @@ function packFiles(
   id_key: "contentId" | "memberId",
 ) {
 
-  let need_to_upload: LiuFileAndImage[] = []
+  const need_to_upload: LiuFileAndImage[] = []
   file_stores.forEach(v => {
     if(v.cloud_url) return
     if(v.arrayBuffer) {
@@ -483,7 +483,7 @@ export async function handleFiles(tasks: UploadTaskLocalTable[]) {
     })
   })
 
-  let needUploadFile = contentIds.length > 0 || memberIds.length > 0
+  const needUploadFile = contentIds.length > 0 || memberIds.length > 0
   if(!needUploadFile) {
     return true
   }

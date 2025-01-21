@@ -1,7 +1,7 @@
 // 主视图 宽度控制器
 
 import { inject, provide, ref, type Ref, watch } from "vue"
-import { useLayoutStore, LayoutStore } from "../../useLayoutStore"
+import { useLayoutStore, type LayoutStore } from "../../useLayoutStore"
 import { useWindowSize } from "~/hooks/useVueUse"
 import cfg from "~/config"
 import { 
@@ -72,13 +72,13 @@ function initMainView(
     // 若中间区域小于临界值，重新计算右侧宽度，使得中间的卡片能露出多一点
     // 而不是全被 vice-view 遮住
     if(tmpCenter < criticalValue) {
-      let rc = getRightAndCenterPx(clientWidth, leftPx.value, vvRef.value)
+      const rc = getRightAndCenterPx(clientWidth, leftPx.value, vvRef.value)
       rightPx.value = rc.right
       centerPx.value = rc.center
       return
     }
 
-    let cr = getCalibratedCenterAndRight(tmpCenter, vvRef.value)
+    const cr = getCalibratedCenterAndRight(tmpCenter, vvRef.value)
     rightPx.value = cr.right
     centerPx.value = cr.center
   })
@@ -90,21 +90,21 @@ function initMainView(
     const criticalValue = liuUtil.getMainViewCriticalValue(width.value, centerRight)
 
     if(tmpCenter < criticalValue) {
-      let rc = getRightAndCenterPx(width.value, leftPx.value, newV)
+      const rc = getRightAndCenterPx(width.value, leftPx.value, newV)
       rightPx.value = rc.right
       centerPx.value = rc.center
       return
     }
     
-    let cr = getCalibratedCenterAndRight(tmpCenter, newV)
+    const cr = getCalibratedCenterAndRight(tmpCenter, newV)
     rightPx.value = cr.right
     centerPx.value = cr.center
   })
 }
 
 function getCalibratedCenterAndRight(tmpCenter: number, tmpRight: number) {
-  let px1 = tmpCenter + cfg.viceview_spacing
-  let px2 = tmpRight - cfg.viceview_spacing
+  const px1 = tmpCenter + cfg.viceview_spacing
+  const px2 = tmpRight - cfg.viceview_spacing
   if(px2 <= 0) {
     return { center: tmpCenter, right: tmpRight }
   }
@@ -116,7 +116,7 @@ function getRightAndCenterPx(
   topLeftPx: number,
   topRightPx: number,
 ) {
-  let originCenter = screenPx - topLeftPx
+  const originCenter = screenPx - topLeftPx
   let tmpCenter = originCenter
   if(tmpCenter <= 800 || topRightPx < 1) {
     return { right: 0, center: originCenter }

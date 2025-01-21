@@ -9,7 +9,7 @@ import type { LiuNodeType, LiuMarkAtom, LiuMarks } from "~/types/types-atom"
  */
 export function listToText(
   list: TipTapJSONContent[],
-  plainText: string = "",
+  plainText = "",
   moreText?: boolean,
   parentType?: string,
 ): string {
@@ -39,7 +39,7 @@ export function listToText(
       if(type === "codeBlock") plainText += "\n"
     }
 
-    let addes: LiuNodeType[] = [
+    const addes: LiuNodeType[] = [
       "heading",
       "paragraph",
       "taskList",
@@ -75,7 +75,7 @@ function _addLinkToPlainText(
 // 是检测到 type === "codeBlock" 或 "paragraph" 来增加行数的
 export function getRowNum(
   list: TipTapJSONContent[],
-  rowNum: number = 0,
+  rowNum = 0,
 ) {
 
   for(let i=0; i<list.length; i++) {

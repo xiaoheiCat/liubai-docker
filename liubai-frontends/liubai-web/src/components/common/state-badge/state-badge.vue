@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
-import { computed, PropType } from 'vue';
+import { computed, type PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useSystemStore } from '~/hooks/stores/useSystemStore';
-import { type StateShow } from '~/types/types-content';
+import type { StateShow } from '~/types/types-content';
 
 const props = defineProps({
   stateShow: {

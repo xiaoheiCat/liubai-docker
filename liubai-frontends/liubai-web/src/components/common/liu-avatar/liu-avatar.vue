@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, PropType } from 'vue';
+import { computed, type PropType } from 'vue';
 import type { MemberShow } from "~/types/types-content"
 
 const props = defineProps({

@@ -48,8 +48,8 @@ export function useWhenAndRemind(props: TcaProps) {
   })
 
   const whenStr = computed(() => {
-    let nowLocale = locale.value
-    let whenStampVal = whenStamp.value
+    const nowLocale = locale.value
+    const whenStampVal = whenStamp.value
     if(!whenStampVal) return ""
     const hourVal = hour.value
     return liuUtil.showBasicTime(whenStampVal, nowLocale as SupportedLocale, hourVal)
@@ -115,7 +115,7 @@ function handleCountdown(
     let delay = diff < HOUR ? SEC : MIN
     // 校准 timer
     if(delay === SEC) {
-      let tmp = diff % SEC
+      const tmp = diff % SEC
       if(tmp < 500) delay += tmp
       else delay = tmp
     }
@@ -196,7 +196,7 @@ function handleRemind(
     let delay = diff < HOUR ? SEC : MIN
     // 校准 timer
     if(delay === SEC) {
-      let tmp = diff % SEC
+      const tmp = diff % SEC
       if(tmp < 500) delay += tmp
       else delay = tmp
     }

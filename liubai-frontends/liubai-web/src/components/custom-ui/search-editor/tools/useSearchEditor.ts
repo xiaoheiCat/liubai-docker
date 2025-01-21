@@ -52,7 +52,7 @@ export function initSearchEditor() {
   listenRouteChange()
   listenInputChange()
 
-  let opt = {
+  const opt = {
     whenOpen: showSearchEditor,
     seData,
     tranMs: TRANSITION_DURATION,
@@ -80,7 +80,7 @@ export function initSearchEditor() {
 
 
 export function showSearchEditor(param: SearchEditorParam) {
-  let initTxt = param.initText ?? ""
+  const initTxt = param.initText ?? ""
   seData.mode = param.type
   if(initTxt || param.type === "select_thread") {
     setInputTxt(initTxt)
@@ -177,7 +177,7 @@ function listenInputChange() {
     seData.innerList = []
 
     // 1. 携带 mode 去获取建议
-    let opt1 = {
+    const opt1 = {
       mode: seData.mode,
       excludeThreads: seData.excludeThreads,
     }
@@ -193,11 +193,11 @@ function listenInputChange() {
   }
 
   const toSearch = async () => {
-    let text = seData.trimTxt
+    const text = seData.trimTxt
     if(!text) return
 
     // 1. 先弹出 third 列表
-    let opt1 = {
+    const opt1 = {
       text,
       mode: seData.mode,
       excludeThreads: seData.excludeThreads,
@@ -216,7 +216,7 @@ function listenInputChange() {
   }
 
   const whenInputChange = (newV: string) => {
-    let txt = newV.trim()
+    const txt = newV.trim()
     if(!txt) {
       if(timeout) clearTimeout(timeout)
       whenEmpty()
@@ -258,7 +258,7 @@ function toResolve(res: SearchEditorRes) {
 
 function toSetIndicator() {
   let tmp = ""
-  let txt = seData.trimTxt
+  const txt = seData.trimTxt
   if(txt) {
     const list1 = seData.innerList
     const list2 = seData.thirdList
@@ -349,7 +349,7 @@ function toCancel() {
 }
 
 function toConfirm() {
-  let res = getConfirmRes()
+  const res = getConfirmRes()
   if(!res) return
 
   let hasClosed = false
@@ -370,18 +370,18 @@ function toRedirectAndSave(res: SearchEditorRes) {
   const text = seData.trimTxt
   const a = res.atomId as ThirdPartyType
   
-  let opt = { rr, replace: true }
+  const opt = { rr, replace: true }
 
   if(a === "bing") {
-    let res = liuUtil.open.openBing(text, opt)
+    const res = liuUtil.open.openBing(text, opt)
     if(res === "inner") hasClosed = true
   }
   else if(a === "xhs") {
-    let res = liuUtil.open.openXhs(text, opt)
+    const res = liuUtil.open.openXhs(text, opt)
     if(res === "inner") hasClosed = true
   }
   else if(a === "github") {
-    let res = liuUtil.open.openGithub(text, opt)
+    const res = liuUtil.open.openGithub(text, opt)
     if(res === "inner") hasClosed = true
   }
   else if(res.commentId && res.threadId) {
@@ -396,20 +396,20 @@ function toRedirectAndSave(res: SearchEditorRes) {
 }
 
 function getConfirmRes() {
-  let res: SearchEditorRes = {
+  const res: SearchEditorRes = {
     action: "confirm",
   }
-  let { indicator, mode } = seData
-  let hasTxt = Boolean(seData.trimTxt)
+  const { indicator, mode } = seData
+  const hasTxt = Boolean(seData.trimTxt)
 
   if(hasTxt) {
-    let tmp1 = seData.innerList.find(v => v.atomId === indicator)
+    const tmp1 = seData.innerList.find(v => v.atomId === indicator)
     if(tmp1) {
       res.commentId = tmp1.commentId
       res.threadId = tmp1.threadId
       return res
     }
-    let tmp2 = seData.thirdList.find(v => v.atomId === indicator)
+    const tmp2 = seData.thirdList.find(v => v.atomId === indicator)
     if(tmp2) {
       res.atomId = tmp2.atomId
       return res
@@ -420,13 +420,13 @@ function getConfirmRes() {
     }
   }
   else {
-    let tmp3 = seData.suggestList.find(v => v.atomId === indicator)
+    const tmp3 = seData.suggestList.find(v => v.atomId === indicator)
     if(tmp3) {
       res.commentId = tmp3.commentId
       res.threadId = tmp3.threadId
       return res
     }
-    let tmp4 = seData.recentList.find(v => v.atomId === indicator)
+    const tmp4 = seData.recentList.find(v => v.atomId === indicator)
     if(tmp4) {
       setInputTxt(tmp4.title)
       return null
@@ -446,7 +446,7 @@ async function onTapClearInput() {
   seData.innerList = []
 
   // 1. 携带 mode 去获取建议
-  let opt1 = {
+  const opt1 = {
     mode: seData.mode,
     excludeThreads: seData.excludeThreads,
   }

@@ -1,5 +1,5 @@
 
-import { type SyncGet_ContentList } from "~/types/cloud/sync-get/types"
+import type { SyncGet_ContentList } from "~/types/cloud/sync-get/types"
 import time from "~/utils/basic/time"
 import valTool from "~/utils/basic/val-tool"
 import { CloudMerger } from "~/utils/cloud/CloudMerger"

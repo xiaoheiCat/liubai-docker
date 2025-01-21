@@ -1,6 +1,6 @@
 import { ref, watch, type Ref } from "vue";
 import { useRouteAndLiuRouter } from "~/routes/liu-router";
-import { SimpleFunc } from "~/utils/basic/type-tool";
+import type { SimpleFunc } from "~/utils/basic/type-tool";
 import valTool from "~/utils/basic/val-tool";
 import liuUtil from "~/utils/liu-util";
 

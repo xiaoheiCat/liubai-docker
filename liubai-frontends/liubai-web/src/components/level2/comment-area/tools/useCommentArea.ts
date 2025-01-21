@@ -55,7 +55,7 @@ export function useCommentArea(
 
   // 监听 props 的 threadId 改变
   watch(() => props.threadId, (newV) => {
-    let reload = newV !== caData.threadId
+    const reload = newV !== caData.threadId
     if(reload) caData.comments = []
     // console.log("newV: ", newV)
     // console.log("caData.threadId: ", caData.threadId)

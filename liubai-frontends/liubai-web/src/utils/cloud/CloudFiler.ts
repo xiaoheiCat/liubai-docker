@@ -5,7 +5,7 @@ import type {
   FileShow, 
   ImageShow,
 } from "~/types";
-import { type LiuTable } from "~/types/types-atom"
+import type { LiuTable } from "~/types/types-atom"
 import { watch } from "vue";
 import type { LiuTimeout } from "../basic/type-tool";
 import type {
@@ -89,7 +89,7 @@ class CloudFiler {
 
   /** 批量将任务存到 IndexedDB 中 */
   private static putTasksIntoIndexedDB() {
-    let list = this.tmp_tasks
+    const list = this.tmp_tasks
     let len = list.length
     if(len < 1) return
     if(this.checkWorker) {

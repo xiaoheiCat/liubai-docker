@@ -40,8 +40,8 @@ export async function selectState(
   // 注: thread 的操作分两步是因为 getStateShow 依赖 wStore 的变化
 
   // 2. 操作 thread.stateId
-  let newStateId = res.stateId
-  let newStateStamp = newStateId ? time.getTime() : undefined
+  const newStateId = res.stateId
+  const newStateStamp = newStateId ? time.getTime() : undefined
   if(res.action === "confirm" && newStateId) {
     newThread.stateId = newStateId
     newThread.stateStamp = newStateStamp
@@ -77,11 +77,11 @@ export async function selectState(
 
   // 8. 显示 snack-bar
   const t = i18n.global.t
-  let snackParam: SnackbarParam = {
+  const snackParam: SnackbarParam = {
     action_key: "tip.undo"
   }
   if(newStateId && tmpStateShow) {
-    let dot_color = mapStateColor("dot_color", tmpStateShow.colorShow)
+    const dot_color = mapStateColor("dot_color", tmpStateShow.colorShow)
     snackParam.dot_color = dot_color
     if(tmpStateShow.text) {
       snackParam.text = t("thread_related.switch_to") + tmpStateShow.text

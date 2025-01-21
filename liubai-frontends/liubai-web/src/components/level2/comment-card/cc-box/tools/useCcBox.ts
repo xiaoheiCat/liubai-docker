@@ -1,6 +1,6 @@
 import { shallowRef, ref, onMounted } from "vue"
 import type { TipTapEditor } from "~/types/types-editor"
-import EditorCore from "~/components/editors/editor-core/editor-core.vue"
+import type EditorCore from "~/components/editors/editor-core/editor-core.vue"
 import type { CcBoxProps } from "./types"
 import { CloudFiler } from "~/utils/cloud/CloudFiler"
 

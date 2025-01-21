@@ -15,7 +15,7 @@ function trimPemContents(
   str: string,
   direction: 1 | -1,      // 1: 由前往后; -1 由后往前
 ) {
-  let initNum = direction === 1 ? 0 : (str.length - 1)
+  const initNum = direction === 1 ? 0 : (str.length - 1)
 
   for(let i=initNum; i < str.length && i >= 0; i += direction) {
     const v = str[i]

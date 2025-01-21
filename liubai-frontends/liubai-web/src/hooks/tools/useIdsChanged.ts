@@ -13,8 +13,8 @@ export function useIdsChanged() {
   const backend = liuEnv.hasBackend()
   if(!backend) return
 
-  let all_threads: SyncStoreItem[] = []
-  let all_comments: SyncStoreItem[] = []
+  const all_threads: SyncStoreItem[] = []
+  const all_comments: SyncStoreItem[] = []
 
   const rr = useRouteAndLiuRouter()
 

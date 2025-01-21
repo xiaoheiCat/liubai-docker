@@ -262,7 +262,7 @@ let toggleTimeout2: LiuTimeout
 function _changeTempHidden(
   ctx: NaviAutoCtx,
   newTempHidden: boolean,
-  instantly: boolean = false,
+  instantly = false,
 ) {
   if(toggleTimeout2) {
     clearTimeout(toggleTimeout2)

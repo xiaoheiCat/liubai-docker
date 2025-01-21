@@ -42,7 +42,7 @@ export function useCcToolbar(
 
 
   let timeout: LiuTimeout
-  const setExpandMore = (newV: boolean, delay: number = 60) => {
+  const setExpandMore = (newV: boolean, delay = 60) => {
     if(timeout) clearTimeout(timeout)
     timeout = setTimeout(() => {
       timeout = undefined

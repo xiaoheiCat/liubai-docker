@@ -60,7 +60,7 @@ function listenRouteChange() {
 
 
 export async function showStateSelector(param: StateSelectorParam) {
-  let tmpList = getList()
+  const tmpList = getList()
   initList(tmpList, param.stateIdSelected)
 
   openIt(rr, queryKey)
@@ -138,7 +138,7 @@ function getList() {
   const tmpList: SsItem[] = stateList.map(v => {
     // 处理文字
     let text_key = ""
-    let text = v.text
+    const text = v.text
     if(!text) {
       if(v.id === "TODO") text_key = "thread_related.todo"
       else if(v.id === "FINISHED") text_key = "thread_related.finished"
@@ -150,7 +150,7 @@ function getList() {
       color = "--liu-state-1"
       if(v.id === "FINISHED") color = "--liu-state-2"
     }
-    let colorShow = liuUtil.colorToShow(color)
+    const colorShow = liuUtil.colorToShow(color)
 
     return {
       id: v.id,
@@ -164,7 +164,7 @@ function getList() {
 }
 
 function getDefaultList() {
-  let tmpList: SsItem[] = [
+  const tmpList: SsItem[] = [
     {
       id: "TODO",
       text_key: "thread_related.todo",

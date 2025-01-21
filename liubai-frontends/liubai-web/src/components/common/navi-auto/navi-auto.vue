@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useNaviAuto } from "./tools/useNaviAuto"
-import { type NaviAutoEmits, type NaviAutoProps } from "./tools/types"
+import type { NaviAutoEmits, NaviAutoProps } from "./tools/types"
 import cfg from "~/config"
 import { useI18n } from "vue-i18n"
 

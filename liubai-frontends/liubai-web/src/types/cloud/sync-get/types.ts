@@ -10,7 +10,7 @@ import type {
   LiuRemindMe,
 } from "../../types-atom"
 import type { ThreadListViewType } from "~/types/types-view"
-import { 
+import type { 
   OState, 
   OState_2, 
   OState_3, 

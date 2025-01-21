@@ -40,7 +40,7 @@ function _handleLinkPreview(
   const title = linkJson.title
   let url = linkJson.url
   if(!title || !url) return false
-  let b = usefulTool.encodeBraces(url)
+  const b = usefulTool.encodeBraces(url)
   if(b.str !== url) {
     url = b.str
   }

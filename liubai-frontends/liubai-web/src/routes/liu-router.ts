@@ -3,9 +3,9 @@ import {
   useRouter as useVueRouter, 
   useRoute as useVueRoute,
   isNavigationFailure, 
-  Router as VueRouter, 
-  RouteLocationRaw,
-  NavigationFailure,
+  type Router as VueRouter, 
+  type RouteLocationRaw,
+  type NavigationFailure,
   type RouteLocationNormalized,
   type RouteLocationNormalizedLoaded,
   useLink,
@@ -54,7 +54,7 @@ class LiuRouter {
 
   async replace(to: RouteLocationRaw) {
     routeChangeTmpData = { operation: "replace", delta: 0 }
-    let res = await this.router.replace(to)
+    const res = await this.router.replace(to)
     return res
   }
 
@@ -68,14 +68,14 @@ class LiuRouter {
       console.warn("当前的 route.name 不是 string 类型，无法执行 replaceWithNewQuery")
       return
     }
-    let newRoute: RouteLocationRaw = { name, params, query: newQuery }
-    let res = await this.replace(newRoute)
+    const newRoute: RouteLocationRaw = { name, params, query: newQuery }
+    const res = await this.replace(newRoute)
     return res
   }
 
   async push(to: RouteLocationRaw) {
     routeChangeTmpData = { operation: "push", delta: 1 }
-    let res = await this.router.push(to)
+    const res = await this.router.push(to)
     return res
   }
 
@@ -83,7 +83,7 @@ class LiuRouter {
   async pushCurrentWithNewQuery(
     route: RouteLocationNormalizedLoaded,
     query: Record<string, string>,
-    reserveTags: boolean = true,
+    reserveTags = true,
   ) {
     const { name, params, query: oldQuery } = route
     const newQuery = { ...query }
@@ -99,7 +99,7 @@ class LiuRouter {
       newQuery.tags = tags
     }
 
-    let res = await this.push({ name, query: newQuery, params })
+    const res = await this.push({ name, query: newQuery, params })
     return res
   }
 
@@ -107,7 +107,7 @@ class LiuRouter {
   async pushNewPageWithOldQuery(
     route: RouteLocationNormalizedLoaded,
     to: RouteLocationRaw,
-    trimQuery: boolean = false
+    trimQuery = false
   ): Promise<NavigationFailure | void | undefined | false> {
     const tmpRoute = this.router.resolve(to)
 
@@ -129,7 +129,7 @@ class LiuRouter {
       return false
     }
 
-    let res = await this.push(newRoute)
+    const res = await this.push(newRoute)
     return res
   }
 
@@ -146,9 +146,9 @@ class LiuRouter {
 
     let q = valTool.copyObject(route.query)
     q = Object.assign(q, newQuery)
-    let newRoute: RouteLocationRaw = { name, params, query: q }
+    const newRoute: RouteLocationRaw = { name, params, query: q }
     
-    let res = await this.push(newRoute)
+    const res = await this.push(newRoute)
     return res
   }
 
@@ -179,8 +179,8 @@ class LiuRouter {
 
   // 获取路由堆栈
   public getStack(): RouteItem[] {
-    let list = stack.map(v => {
-      let v2 = Object.assign({}, v)
+    const list = stack.map(v => {
+      const v2 = Object.assign({}, v)
       return v2
     })
     return list
@@ -202,7 +202,7 @@ class LiuRouter {
   }
 
   public naviBack() {
-    let list = this.getStack()
+    const list = this.getStack()
     if(list.length > 1) {
       this.back()
       return
@@ -358,7 +358,7 @@ const _popStacks = (num: number) => {
 const _judgeInitiativeJump = (
   to: RouteLocationNormalized,
 ) => {
-  let { operation, delta = 0 } = routeChangeTmpData
+  const { operation, delta = 0 } = routeChangeTmpData
 
   // console.log("_judgeInitiativeJump 111:")
   // console.log(operation)
@@ -472,7 +472,7 @@ const initLiuRouter = (): RouteAndRouter => {
   const vueRouter = useVueRouter()
   const vueRoute = useVueRoute()
 
-  let cancelAfterEach = vueRouter.afterEach((to, from, failure) => {
+  const cancelAfterEach = vueRouter.afterEach((to, from, failure) => {
     // console.log("########  监听到路由已发生变化  ########")
     if(isNavigationFailure(failure)) return
 

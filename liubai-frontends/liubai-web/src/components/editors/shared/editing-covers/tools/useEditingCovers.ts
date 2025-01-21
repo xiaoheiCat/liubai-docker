@@ -17,7 +17,7 @@ export function useEditingCovers(props: EditingCoversProps) {
   const sortList = ref<ImageShow[]>([])
   const viewTranNames = getViewTranNames(sortList)
 
-  let lastTwoTriggerList: number[] = []
+  const lastTwoTriggerList: number[] = []
   const whenPropChange = () => {
     
     if(isItFrequently(lastTwoTriggerList)) {

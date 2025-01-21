@@ -7,7 +7,7 @@ import { useRouteAndLiuRouter } from "~/routes/liu-router"
 import valTool from "~/utils/basic/val-tool"
 import { composingDataKey } from "~/utils/provide-keys"
 import APIs from "~/requests/APIs"
-import { SyncOperateAPI } from "~/types/types-cloud"
+import type { SyncOperateAPI } from "~/types/types-cloud"
 import liuReq from "~/requests/liu-req"
 
 export function useComposeContent() {

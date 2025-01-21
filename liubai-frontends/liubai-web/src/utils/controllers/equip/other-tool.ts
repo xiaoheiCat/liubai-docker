@@ -12,8 +12,8 @@ export async function getMemberShows(member_ids: string[]) {
 export function getUserAndMemberIdsFromContents(
   contents: ContentLocalTable[]
 ) {
-  let user_ids: string[] = []
-  let member_ids: string[] = []
+  const user_ids: string[] = []
+  const member_ids: string[] = []
   contents.forEach(v => {
     if(v.member) {
       if(!member_ids.includes(v.member)) {

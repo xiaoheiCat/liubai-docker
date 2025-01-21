@@ -22,7 +22,7 @@ interface TagMovedInTreeRes {
  */
 export function filterTag(
   tree: TagView[],
-  hasChange: boolean = false,
+  hasChange = false,
 ) {
 
   for(let i=0; i<tree.length; i++) {
@@ -69,15 +69,15 @@ export async function tagMovedInTree(
   if(!res.tagId) return { moved: true }
 
   const { t } = i18n.global
-  let newNewTree = res.newNewTree
+  const newNewTree = res.newNewTree
 
   // 是跨级移动，并且发现已有一样的 tag，那么这时要去询问一下用户确定吗
   if(res.changeType === "across" && res.isMerged) {
-    let newTagShow = findTagShowById(res.tagId, newTree)
-    let oldTagShow = findTagShowById(res.tagId, oldTree)
+    const newTagShow = findTagShowById(res.tagId, newTree)
+    const oldTagShow = findTagShowById(res.tagId, oldTree)
     if(!newTagShow || !oldTagShow) return { moved: false }
-    let tag1 = oldTagShow.text
-    let tag2 = newTagShow.text
+    const tag1 = oldTagShow.text
+    const tag2 = newTagShow.text
     const res2 = await cui.showModal({
       title: t("tip.tag_merge_title"),
       content: t("tip.tag_merge_content", { tag1, tag2 })

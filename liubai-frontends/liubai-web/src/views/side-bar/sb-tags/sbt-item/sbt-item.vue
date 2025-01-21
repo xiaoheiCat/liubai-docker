@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { type PropType } from "vue";
+import type { PropType } from "vue";
 import LiuMenu from "~/components/common/liu-menu/liu-menu.vue"
-import { type MenuItem } from "~/components/common/liu-menu/tools/types";
+import type { MenuItem } from "~/components/common/liu-menu/tools/types";
 import liuApi from '~/utils/liu-api';
 
 defineProps({

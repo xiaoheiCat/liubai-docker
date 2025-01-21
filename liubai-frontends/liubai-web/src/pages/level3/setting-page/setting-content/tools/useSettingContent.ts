@@ -15,7 +15,7 @@ import localCache from "~/utils/system/local-cache"
 import liuApi from "~/utils/liu-api"
 import { CloudEventBus } from "~/utils/cloud/CloudEventBus"
 import middleBridge from "~/utils/middle-bridge"
-import { type MemberShow } from "~/types/types-content"
+import type { MemberShow } from "~/types/types-content"
 import { useGlobalStateStore } from "~/hooks/stores/useGlobalStateStore"
 import { 
   getSWRegistration, 

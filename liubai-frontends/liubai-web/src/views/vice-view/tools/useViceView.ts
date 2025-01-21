@@ -163,7 +163,7 @@ function initResizing(
 
   const collectState = () => {
     if(vvData.openType !== "opened") return
-    let newV = vvData.viceViewPx
+    const newV = vvData.viceViewPx
     vvData.shadow = judgeIfShadow(vvData)
     emits("widthchange", newV)
   }
@@ -319,7 +319,7 @@ async function recalculatePx(
 
 // 此处逻辑必须与 useMainView "监听右边侧边栏的改变" 一致
 function judgeIfShadow(vvData: VvData) {
-  let { sidebarWidth, clientWidth } = layoutStore
+  const { sidebarWidth, clientWidth } = layoutStore
 
   const realSidebarPx = liuUtil.calibrateSidebarWidth(sidebarWidth)
   const tmpCenter = clientWidth - realSidebarPx - vvData.viceViewPx

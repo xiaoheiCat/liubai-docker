@@ -10,8 +10,8 @@ let isWeChat = false;
 let isAlipay = false;
 let isDingTalk = false;
 let isFeishu = false;
-let isQuark = false;
-let isUCBrowser = false;
+const isQuark = false;
+const isUCBrowser = false;
 let isLine = false;
 let isIOS = false;
 let isIPadOS = false;
@@ -167,7 +167,7 @@ export const getCharacteristic = (): GetChaRes => {
     isMac = false
   }
 
-  let res = _returnData()
+  const res = _returnData()
   return res
 }
 

@@ -37,7 +37,7 @@ export function useBwBubbleMenu(
 
   const rr = useRouteAndLiuRouter()
 
-  const _toCloseTippy = async (idx: number, instantly: boolean = false) => {
+  const _toCloseTippy = async (idx: number, instantly = false) => {
     selectedIndex.value = idx
     if(!instantly) {
       await valTool.waitMilli(500)

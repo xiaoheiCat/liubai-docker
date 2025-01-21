@@ -48,7 +48,7 @@ async function request<
   opt?: LiuRqOpt,
 ) {
   const b = await _getBody(body)
-  let init: RequestInit = {
+  const init: RequestInit = {
     method: opt?.method ?? "POST",
     headers: {
       "Content-Type": "application/json"
@@ -95,7 +95,7 @@ async function request<
     return { code: `B0001` }
   }
 
-  let res2 = await res.json() as LiuRqReturn<T>
+  const res2 = await res.json() as LiuRqReturn<T>
 
   if(res2.data && client_key) {
     const newData = await handleAfterFetching(res2.data, client_key)

@@ -24,7 +24,7 @@ export function useKanbanThreads(
     const oldV = showAddBox.value
     if(len > 0 && !oldV) return
     if(len < 1 && oldV) return
-    let newV = !oldV
+    const newV = !oldV
     if(timeout) clearTimeout(timeout)
     timeout = setTimeout(() => {
       timeout = undefined

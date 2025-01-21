@@ -33,7 +33,7 @@ function _openByIframe(
   f: LiuFileStore,
   rr: RouteAndLiuRouter,
 ) {
-  let [url] = liuUtil.createURLsFromStore([f])
+  const [url] = liuUtil.createURLsFromStore([f])
   if(!url) return
   const vvFileStore = useVvFileStore()
   const vfile = vvFileStore.addData(url, "pdf")
@@ -44,7 +44,7 @@ function _openByIframe(
 
 /** 使用 a 标签来下载 */
 function _downloadByA(f: LiuFileStore) {
-  let [url] = liuUtil.createURLsFromStore([f])
+  const [url] = liuUtil.createURLsFromStore([f])
   if(!url) return
 
   const a = document.createElement("a")
@@ -61,7 +61,7 @@ function _downloadByA(f: LiuFileStore) {
  *   因为这样用户在新的分页时，会无法另存成新的文件
  */
 function _downloadByWindow(f: LiuFileStore) {
-  let [url] = liuUtil.createURLsFromStore([f])
+  const [url] = liuUtil.createURLsFromStore([f])
   if(!url) return
   window.open(url, f.name)
 }

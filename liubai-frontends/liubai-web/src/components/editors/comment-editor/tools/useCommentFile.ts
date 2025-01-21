@@ -20,7 +20,7 @@ export function useCommentFile(
   
   const covers = ref<ImageShow[]>([])
   
-  let located = props.located
+  const located = props.located
   if(located === "main-view") {
     // 监听从 main-view 里掉落的文件
     listenFilesFromMainView(ctx)

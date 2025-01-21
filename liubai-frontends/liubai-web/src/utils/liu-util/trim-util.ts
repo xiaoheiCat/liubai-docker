@@ -11,9 +11,9 @@ import valTool from "../basic/val-tool"
  */
 function trimFileName(
   fileName: string,
-  breakpoint: number = 22,
+  breakpoint = 22,
 ) {
-  let len = fileName.length
+  const len = fileName.length
   if(len < breakpoint) return fileName
   let res = fileName.substring(0, 12) + "......"
   res += fileName.substring(len - 7)

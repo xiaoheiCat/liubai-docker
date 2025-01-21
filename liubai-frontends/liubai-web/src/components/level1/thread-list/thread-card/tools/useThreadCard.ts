@@ -1,5 +1,5 @@
 import { computed, onMounted, ref, shallowRef, watch } from 'vue';
-import EditorCore from "~/components/editors/editor-core/editor-core.vue"
+import type EditorCore from "~/components/editors/editor-core/editor-core.vue"
 import type { TipTapEditor } from "~/types/types-editor"
 import type { TcEmits, TcProps } from "./types"
 import liuApi from '~/utils/liu-api';
@@ -40,7 +40,7 @@ export function useThreadCard(
   })
 
   const { threadData, displayType } = props
-  let isBriefing = ref(Boolean(threadData.briefing))
+  const isBriefing = ref(Boolean(threadData.briefing))
   if(displayType === "detail") isBriefing.value = false
 
   const onTapBriefing = (e: MouseEvent) => {

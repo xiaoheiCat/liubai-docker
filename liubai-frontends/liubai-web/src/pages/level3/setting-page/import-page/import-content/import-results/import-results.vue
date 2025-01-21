@@ -22,7 +22,7 @@ defineEmits<{
 
 const maxNum = ref(3)
 const onTapShowMore = () => {
-  let oldNum = maxNum.value
+  const oldNum = maxNum.value
   maxNum.value = oldNum + 10
 }
 

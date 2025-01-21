@@ -53,7 +53,7 @@ export function findTagShowById(
       parents.push(v.text)
       const tmp = findTagShowById(id, v.children, parents, v.icon ?? parentIcon)
       if(tmp) return tmp
-      else parents.pop()
+      parents.pop()
     }
   }
 
@@ -85,7 +85,7 @@ export function findTagViewById(
  */
 export function getTagViewLevel(
   tagViews: TagView[],
-  current: number = 1,
+  current = 1,
 ): number {
   let bigOne = current
   for(let i=0; i<tagViews.length; i++) {
@@ -133,7 +133,7 @@ export function addTagToTagList(
       v.updatedStamp = now
     }
     if(texts.length > 0) {
-      let tmpList = v.children ?? []
+      const tmpList = v.children ?? []
       const data = addTagToTagList(texts, tmpList, icon, originTag)
       v.children = data.tagList
       tagId = data.tagId
@@ -227,7 +227,7 @@ export function findWhichTagChange(
   for(let i=0; i<newChildren.length; i++) {
     const v1 = newChildren[i]
     const v2 = oldChildren[i + offset]
-    let { tagId, text } = v1
+    const { tagId, text } = v1
     if(v1.oState !== "OK") continue
     if(v1.tagId === v2?.tagId) {
       if(v1.children) {
@@ -271,8 +271,8 @@ function tagAddedHere(
   tagView: TagView,
 ): WhichTagChange {
 
-  let parents1 = findParentOfTag(tagId, [], newTree)
-  let parents2 = findParentOfTag(tagId, [], oldTree)
+  const parents1 = findParentOfTag(tagId, [], newTree)
+  const parents2 = findParentOfTag(tagId, [], oldTree)
 
   // 平移的情况
   if(usefulTool.isSameSimpleList(parents1, parents2)) {
@@ -284,20 +284,20 @@ function tagAddedHere(
 
   
   // 跨级的情况
-  let res: WhichTagChange = {
+  const res: WhichTagChange = {
     changeType: "across",
     tagId,
     children: getChildrenAndMeIds(tagView)
   }
-  let lowerText = text.toLowerCase()
+  const lowerText = text.toLowerCase()
   
   for(let i=0; i<oldChildren.length; i++) {
     const v = oldChildren[i]
     if(v.oState !== "OK") continue
-    let lowerText2 = v.text.toLowerCase()
+    const lowerText2 = v.text.toLowerCase()
     if(lowerText === lowerText2) {
       res.isMerged = true
-      let { newChild, to_ids, from_ids } = getMergedChildTree(tagView, v)
+      const { newChild, to_ids, from_ids } = getMergedChildTree(tagView, v)
       res.to_ids = to_ids
       res.from_ids = from_ids
       res.newNewTree = generateNewTreeForMerge(newTree, newChild, tagId)
@@ -335,9 +335,9 @@ export function getMergedChildTree(
   fromChild: TagView, 
   toChild: TagView
 ) {
-  let newChild = valTool.copyObject(toChild)
-  let from_ids = [fromChild.tagId]
-  let to_ids = [toChild.tagId]
+  const newChild = valTool.copyObject(toChild)
+  const from_ids = [fromChild.tagId]
+  const to_ids = [toChild.tagId]
 
   const _handle = (
     from_children: TagView[],
@@ -347,7 +347,7 @@ export function getMergedChildTree(
     // 先过滤 to_children 里，可能有 fromChild
     to_children = to_children.filter(v => v.tagId !== fromChild.tagId)
 
-    let to_texts = to_children.map(v => {
+    const to_texts = to_children.map(v => {
       return v.text.toLowerCase()
     })
     const now = time.getTime()
@@ -381,7 +381,7 @@ export function getMergedChildTree(
   }
 
   if(fromChild.children) {
-    let tmp_children = newChild.children ?? []
+    const tmp_children = newChild.children ?? []
     newChild.children = _handle(fromChild.children, tmp_children)
   }
   

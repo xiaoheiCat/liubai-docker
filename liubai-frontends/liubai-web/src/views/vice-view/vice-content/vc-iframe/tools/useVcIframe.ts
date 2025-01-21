@@ -85,7 +85,7 @@ function getStyles(
     if(!src) return
 
     const WHITE_BG = `#fff`
-    let url = _getUrl(src)
+    const url = _getUrl(src)
     if(!url) return
 
     const h = url.hostname

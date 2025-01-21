@@ -12,7 +12,7 @@ import {
 } from "./other-tool"
 import { useSystemStore } from "~/hooks/stores/useSystemStore";
 import { useWindowSize } from "~/hooks/useVueUse";
-import { type PackThreadOpt } from "~/utils/show/tools/types";
+import type { PackThreadOpt } from "~/utils/show/tools/types";
 
 export async function equipThreads(
   contents: ContentLocalTable[]
@@ -28,7 +28,7 @@ export async function equipThreads(
   const content_ids = contents.map(v => v._id)
   const collections = await collectionController.getMyCollectionByIds({ content_ids })
 
-  let list: ThreadShow[] = []
+  const list: ThreadShow[] = []
   const sStore = useSystemStore()
   const { width } = useWindowSize()
   const packOpt: PackThreadOpt = {
@@ -49,7 +49,7 @@ export async function equipThreads(
       creator = memberShows.find(v2 => v2._id === member)
     }
 
-    let obj = showThread.packThread(v, _collections, creator, packOpt)
+    const obj = showThread.packThread(v, _collections, creator, packOpt)
     
     list.push(obj)
   }

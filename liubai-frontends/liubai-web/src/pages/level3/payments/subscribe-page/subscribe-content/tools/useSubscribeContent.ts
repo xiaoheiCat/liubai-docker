@@ -1,6 +1,6 @@
 import APIs from "~/requests/APIs"
 import liuReq from "~/requests/liu-req"
-import { type ScData } from "./types"
+import type { ScData } from "./types"
 import { reactive, watch } from "vue"
 import liuEnv from "~/utils/liu-env"
 import time from "~/utils/basic/time"

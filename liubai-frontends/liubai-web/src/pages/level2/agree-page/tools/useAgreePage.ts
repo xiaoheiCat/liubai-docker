@@ -6,7 +6,7 @@ import {
   useRouteAndLiuRouter,
 } from "~/routes/liu-router"
 import valTool from "~/utils/basic/val-tool"
-import { SyncOperateAPI } from "~/types/types-cloud"
+import type { SyncOperateAPI } from "~/types/types-cloud"
 import liuReq from "~/requests/liu-req"
 import APIs from "~/requests/APIs"
 import { 

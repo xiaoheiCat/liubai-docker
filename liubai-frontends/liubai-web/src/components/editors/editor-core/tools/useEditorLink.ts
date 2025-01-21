@@ -134,7 +134,7 @@ function isUrlScheme(dataLink: string) {
   if(dataLink.startsWith("http")) return false
   const matches = dataLink.matchAll(reg_exp.url_scheme)
   const dLen = dataLink.length
-  for(let match of matches) {
+  for(const match of matches) {
     const mTxt = match[0]
     const mLen = mTxt.length
     if(mLen === dLen) return true
@@ -223,7 +223,7 @@ function initEditorLink(
 
   const resetLinks = (
     parentEl: HTMLElement,
-    onlyRemove: boolean = false,
+    onlyRemove = false,
   ) => {
     const nodes = parentEl.querySelectorAll<HTMLElement>("a.liu-link")
 

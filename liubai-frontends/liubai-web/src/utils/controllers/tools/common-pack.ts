@@ -74,7 +74,7 @@ function getStateShow(
 
   // 处理文字
   let text_key = ""
-  let text = stateData.text
+  const text = stateData.text
   if(!text) {
     if(stateId === "TODO") text_key = "thread_related.todo"
     else if(stateId === "FINISHED") text_key = "thread_related.finished"
@@ -90,7 +90,7 @@ function getStateShow(
   if(!color) return
   if(color.includes("--liu-state")) color = `var(${color})`
 
-  let obj: StateShow = {
+  const obj: StateShow = {
     text,
     text_key,
     colorShow: color,

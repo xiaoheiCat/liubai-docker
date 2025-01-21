@@ -56,7 +56,7 @@ function listenChange(
   }
 
   const _calc = () => {
-    let h = _getMaxHeight()
+    const h = _getMaxHeight()
     maxEditorHeight.value = h
     if(sidebarStatus.value === "fullscreen") {
       minEditorHeight.value = h

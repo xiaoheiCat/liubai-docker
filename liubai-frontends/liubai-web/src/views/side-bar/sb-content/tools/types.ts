@@ -1,4 +1,4 @@
-import { type PropType } from 'vue';
+import type { PropType } from 'vue';
 
 export interface SbProps {
   show: boolean

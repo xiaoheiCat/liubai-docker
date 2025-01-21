@@ -5,7 +5,7 @@ import liuUtil from "~/utils/liu-util"
 function saveContentToCloud(
   thread: ThreadShow,
   stamp: number,
-  isUndo: boolean = false,
+  isUndo = false,
 ) {
   const ss = thread.storageState
   const isLocal = liuUtil.check.isLocalContent(ss)

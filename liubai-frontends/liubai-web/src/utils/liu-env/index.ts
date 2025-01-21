@@ -1,7 +1,7 @@
 // liu-env 请不要 import 任何 /src 内的文件
 // 因为它会在非常非常早期被初始化
 // 若引入其他东西，可能触发 Unaught ReferenceError
-import { type LiuSystemEnv } from "./types"
+import type { LiuSystemEnv } from "./types"
 
 let _env: LiuSystemEnv | undefined
 

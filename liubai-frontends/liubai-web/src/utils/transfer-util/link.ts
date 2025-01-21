@@ -45,7 +45,7 @@ function _parseTextsForLink(
 
     // 解析 @xxx@aaa.bbb
     const regSocialLink = reg_exp.social_link
-    let list0 = _innerParse(text, regSocialLink, "social_link")
+    const list0 = _innerParse(text, regSocialLink, "social_link")
     if(list0) {
       content.splice(i, 1, ...list0)
       i--
@@ -86,7 +86,6 @@ function _parseTextsForLink(
     if(list4) {
       content.splice(i, 1, ...list4)
       i--
-      continue
     }
 
   }
@@ -106,7 +105,7 @@ function _encodeBraces(text: string) {
   const matches = text.matchAll(reg_exp.exact_url)
 
   let result = ""
-  for(let match of matches) {
+  for(const match of matches) {
     const startIdx = match.index
     if(startIdx === undefined) continue
 
@@ -150,10 +149,10 @@ function _innerParse(
 ): TipTapJSONContent[] | undefined {
 
   const matches = text.matchAll(reg)
-  let tmpList: TipTapJSONContent[] = []
+  const tmpList: TipTapJSONContent[] = []
   let tmpEndIdx = 0
 
-  for(let match of matches) {
+  for(const match of matches) {
     let mTxt = match[0]
     let mLen = mTxt.length
     let startIdx = match.index
@@ -278,9 +277,9 @@ function _handleURL(text: string) {
  * @param text 长这样 "@xxx@aa.com"
  */
 function _handleSocialLink(text: string) {
-  let tmpList = text.split("@")
-  let username = tmpList[1]
-  let domain = tmpList[2]
+  const tmpList = text.split("@")
+  const username = tmpList[1]
+  const domain = tmpList[2]
 
   if(!username || !domain) {
     return ""
@@ -348,7 +347,7 @@ function _checkUrl_2(href: string) {
 
 function _howManyLowerCase(text: string) {
   if(!text || text.length < 1) return 0
-  let list = text.split("")
+  const list = text.split("")
   let num = 0
   list.forEach(v => {
     if(v >= "a" && v <= "z") num++
@@ -364,7 +363,7 @@ export function depriveLink(
   const newList = valTool.copyObject(list)
   for(let i=0; i<newList.length; i++) {
     const v = newList[i]
-    let { type, content, marks, text } = v
+    const { type, content, marks, text } = v
     const canDeepTypes = [
       "paragraph", 
       "orderedList", 

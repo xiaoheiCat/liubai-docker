@@ -68,14 +68,14 @@ async function toAddTryTimes(
     return { keepGoing: false }
   }
 
-  let newTryTimes = tryTimes
+  const newTryTimes = tryTimes
   return { keepGoing: true, newTryTimes }
 }
 
 async function changeProgressType(
   taskId: string, 
   progressType: UploadTaskProgressType,
-  addTryTimes: boolean = false,
+  addTryTimes = false,
 ) {
   let tryTimes = 0
   if(addTryTimes) {
@@ -104,7 +104,7 @@ async function bulkChangeProgressType(
   taskIds: string[],
   progressType: UploadTaskProgressType,
 ) {
-  let list: BulkUpdateAtom_UploadTask[] = []
+  const list: BulkUpdateAtom_UploadTask[] = []
   if(taskIds.length < 1) return
   const now = time.getTime()
   for(let i=0; i<taskIds.length; i++) {

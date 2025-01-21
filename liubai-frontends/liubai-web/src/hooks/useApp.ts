@@ -13,7 +13,7 @@ import { listenLoaded, listenWxJSBridgeReady } from "./tools/listen-loaded"
 import { initServiceWorker } from "./pwa/useServiceWorker"
 import { initListenError } from "./tools/initListenError";
 import { initAnalytics } from "./tools/initAnalytics";
-import { type LocalOnceData } from "~/utils/system/tools/types";
+import type { LocalOnceData } from "~/utils/system/tools/types";
 import { useScreenOrientation } from "./useVueUse";
 import time from "~/utils/basic/time";
 import { initAwake } from "./tools/initAwake";

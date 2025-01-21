@@ -16,9 +16,9 @@ import { POPUP_KEYS } from "~/config/atom"
 
 // 将 --liu 转为 #.....
 export function colorToShow(val: string) {
-  let idx1 = val.indexOf("var(")
+  const idx1 = val.indexOf("var(")
   if(idx1 === 0) return val
-  let idx2 = val.indexOf("--liu")
+  const idx2 = val.indexOf("--liu")
   if(idx2 === 0) {
     return `var(${val})`
   }
@@ -27,7 +27,7 @@ export function colorToShow(val: string) {
 
 // 将 `var(CSS变量)` 变量转为 CSS 变量
 export function colorToStorage(val: string) {
-  let idx1 = val.indexOf("var(")
+  const idx1 = val.indexOf("var(")
   if(idx1 === 0) {
     return val.substring(4, val.length - 1)
   }
@@ -62,7 +62,7 @@ export function getDefaultRouteQuery(
 /** 是否该打开侧边栏 vice-view */
 export function needToOpenViceView(query: LocationQuery) {
   if(!query) return false
-  let { cid, vlink, cid2, vfile } = query
+  const { cid, vlink, cid2, vfile } = query
   if(cid || cid2) return true
 
   if(valTool.isStringWithVal(vlink)) {
@@ -78,7 +78,7 @@ export function needToOpenViceView(query: LocationQuery) {
   }
 
   const { iframe_keys } = cfg
-  for(let key of iframe_keys) {
+  for(const key of iframe_keys) {
     if(query[key]) {
       return true
     }
@@ -223,7 +223,7 @@ export function isInAPopUp(
 /**
  * 等待一个帧数周期
  */
-export async function waitAFrame(more: boolean = false) {
+export async function waitAFrame(more = false) {
   const duration = more ? cfg.frame_duration_2 : cfg.frame_duration
   await valTool.waitMilli(duration)
 }

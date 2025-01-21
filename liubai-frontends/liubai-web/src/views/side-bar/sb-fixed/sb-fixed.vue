@@ -3,7 +3,7 @@ import { initFixedSideBar } from "./index"
 import SbContent from '../sb-content/sb-content.vue';
 import SbTags from '../sb-tags/sb-tags.vue';
 import { useSbfTouch } from "./tools/useSbfTouch";
-import { type SbfProps } from "./tools/types"
+import type { SbfProps } from "./tools/types"
 
 defineProps<SbfProps>()
 

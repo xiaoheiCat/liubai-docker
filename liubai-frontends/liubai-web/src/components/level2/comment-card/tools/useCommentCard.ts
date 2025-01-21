@@ -108,7 +108,7 @@ function toCommentDetail(
   rr: RouteAndLiuRouter,
 ) {
   const cid2 = props.cs._id
-  let opt = { rr }
+  const opt = { rr }
   liuUtil.open.openComment(cid2, opt)
 }
 

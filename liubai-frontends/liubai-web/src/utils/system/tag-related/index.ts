@@ -39,7 +39,7 @@ import {
 } from "./tools/draft-util"
 import valTool from "~/utils/basic/val-tool";
 import { toSetTagList } from "./tools/some-foos"
-import { type LiuTagTreeStat } from "~/types";
+import type { LiuTagTreeStat } from "~/types";
 
 // 返回当前工作区的 tags
 export function getCurrentSpaceTagList(): TagView[] {
@@ -94,7 +94,7 @@ export function findTagId(val: string) {
   if(!tagList || tagList.length < 1) return ""
 
   val = formatTagText(val)
-  let tagNames = val.split("/")
+  const tagNames = val.split("/")
   let newTagList = valTool.copyObject(tagList)
 
   let tagId = ""
@@ -103,7 +103,7 @@ export function findTagId(val: string) {
     const name = tagNames[i]
     const idx = findIndexInThisTagList(name, newTagList)
     if(idx < 0) return ""
-    let tagView = newTagList[idx]
+    const tagView = newTagList[idx]
     tagId = tagView.tagId
     newTagList = tagView.children ?? []
   }
@@ -172,7 +172,7 @@ export async function addATag(opt: AddATagParam): Promise<AddATagRes> {
   const wStore = useWorkspaceStore()
   const workspace = wStore.currentSpace
   if(!workspace) return { isOk: false, errMsg: "no workspace locally" }
-  let tagList = workspace.tagList ?? []
+  const tagList = workspace.tagList ?? []
   const texts = opt.text.split("/")
   const data = addTagToTagList(texts, tagList, opt.icon)
   const newTagId = data.tagId
@@ -292,7 +292,7 @@ export async function mergeTag(
   const wStore = useWorkspaceStore()
   const workspace = wStore.currentSpace
   if(!workspace) return { isOk: false, errMsg: "no workspace locally" }
-  let tagList = workspace.tagList ?? []
+  const tagList = workspace.tagList ?? []
   const toTagView = findTagViewById(toId, tagList)
   if(!toTagView) return { isOk: false, errMsg: "no toTagView" }
 

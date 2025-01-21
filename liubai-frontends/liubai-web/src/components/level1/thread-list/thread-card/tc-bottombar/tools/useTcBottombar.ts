@@ -87,7 +87,7 @@ function handlePinFloatState(
   // 当前在 状态栏 更多里
   if(viewType === "STATE") {
     // 1. 添加 附上去
-    let stateObj: TcbMenuItem = {
+    const stateObj: TcbMenuItem = {
       text_key: "common.float_up",
       operation: "float_up",
       iconName: "float_up_600"
@@ -100,7 +100,7 @@ function handlePinFloatState(
   }
 
   // 动态添加置顶/取消置顶
-  let pinObj: TcbMenuItem = {
+  const pinObj: TcbMenuItem = {
     text_key: "common.pin",
     operation: "pin",
     iconName: "pin"
@@ -124,7 +124,7 @@ function handleCountdown(
   const diff = whenStamp - now
   if(diff < 1000) return
 
-  let hourglassObj: TcbMenuItem = {
+  const hourglassObj: TcbMenuItem = {
     text_key: "common.close_countdown",
     operation: "hourglass",
     iconName: "hourglass_disabled_400"

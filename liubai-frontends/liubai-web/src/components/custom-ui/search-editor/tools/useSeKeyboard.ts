@@ -36,7 +36,7 @@ export function useSeKeyboard(param: SeKeyboardParam) {
     if(key !== "ArrowDown" && key !== "ArrowUp") return
     if(!liuUtil.canKeyUpDown()) return
   
-    let diff: 1 | -1 = key === "ArrowDown" ? 1 : -1
+    const diff: 1 | -1 = key === "ArrowDown" ? 1 : -1
     handleKeyDown(seData, diff, e)
   }
 

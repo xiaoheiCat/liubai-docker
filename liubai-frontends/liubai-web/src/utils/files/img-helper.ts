@@ -215,7 +215,7 @@ async function getMetaDataFromFiles(
     }
 
     const _read = (a: WidthHeightResolver) => {
-      let reader = new FileReader()
+      const reader = new FileReader()
       reader.readAsDataURL(file)
       reader.onload = (e: ProgressEvent<FileReader>) => {
 
@@ -245,7 +245,7 @@ async function getMetaDataFromFiles(
   ) => {
     const w = data.width
     const h = data.height
-    let h2w = w && h ? (h / w).toFixed(2) : undefined
+    const h2w = w && h ? (h / w).toFixed(2) : undefined
     let arrayBuffer: ArrayBuffer
     try {
       arrayBuffer = await data.file.arrayBuffer()
@@ -290,7 +290,7 @@ function _resizeDimensions(img: HTMLImageElement) {
 }
 
 function imageStoreToShow(val: LiuImageStore): ImageShow {
-  let [src] = liuUtil.createURLsFromStore([val])
+  const [src] = liuUtil.createURLsFromStore([val])
   const obj: ImageShow = {
     src,
     id: val.id,

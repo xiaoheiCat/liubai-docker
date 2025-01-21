@@ -73,7 +73,7 @@ function whenKanbanStateUpdated(
 ) {
   const thread = tdData.threadShow
   if(!thread) return
-  let stateId = thread.stateId
+  const stateId = thread.stateId
   if(stateId !== ksc.stateId) return
 
   const { whyChange } = ksc

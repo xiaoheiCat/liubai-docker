@@ -370,7 +370,7 @@ function createDraft(
   const { images } = CloudFiler.updateImages(d.images)
   const { files } = CloudFiler.updateFiles(d.files)
 
-  let storageState = getDraftStorageState(d)
+  const storageState = getDraftStorageState(d)
   const c: DraftLocalTable = {
     _id: d._id,
     ...b,

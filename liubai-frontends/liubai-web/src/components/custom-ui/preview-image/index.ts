@@ -12,7 +12,7 @@ import { openIt, closeIt, handleCustomUiQueryErr } from "../tools/useCuiTool"
 import { toListenEscKeyUp, cancelListenEscKeyUp } from "../tools/listen-keyup"
 import { transitionHelper } from "~/utils/other/transition-related"
 import { getSpecificCSSRule } from "~/utils/other/css-related"
-import { Swiper } from "swiper"
+import type { Swiper } from "swiper"
 import type { LiuTimeout } from "~/utils/basic/type-tool"
 import cfg from "~/config"
 

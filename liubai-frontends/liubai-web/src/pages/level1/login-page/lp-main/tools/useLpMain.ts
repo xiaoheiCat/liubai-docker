@@ -78,7 +78,7 @@ export function useLpMain(
     calculateIndicator()
   })
 
-  const _doubleCheck = async (ms: number = 500) => {
+  const _doubleCheck = async (ms = 500) => {
     calculateIndicator()
     await valTool.waitMilli(ms)
     calculateIndicator()

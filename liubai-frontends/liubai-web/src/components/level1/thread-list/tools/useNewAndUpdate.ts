@@ -126,7 +126,6 @@ function handleKanbanStateChange(
       if(inIndex && ksc.stateShow?.showInIndex === false) {
         list.splice(i, 1)
         i--
-        continue
       }
     }
 

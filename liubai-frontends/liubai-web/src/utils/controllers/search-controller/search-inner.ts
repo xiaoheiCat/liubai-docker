@@ -19,7 +19,7 @@ export async function searchInner(param: SearchOpt) {
   const { text, excludeThreads = [], mode } = param
   if(!text) return []
 
-  let spaceId = getSpaceId()
+  const spaceId = getSpaceId()
   
   const texts = text.split(" ").filter(v => Boolean(v))
   const regexs = texts.map(v => {
@@ -35,7 +35,7 @@ export async function searchInner(param: SearchOpt) {
 
   const onlyThread = mode === "select_thread"
 
-  let list: ScoreAndContent[] = []
+  const list: ScoreAndContent[] = []
   const filterFunc = (item: ContentLocalTable) => {
     if(item.oState !== "OK") return false
     if(spaceId !== item.spaceId) return false
@@ -57,7 +57,7 @@ export async function searchInner(param: SearchOpt) {
       let count4 = 0  // Check if in first line
       let count5 = 0  // Check if in first line and in first 30 chars
       if(count2) {
-        let lines = search_other.split("\n")
+        const lines = search_other.split("\n")
         if(lines.length > 3) {
           lines.splice(3, lines.length - 3)
         }
@@ -84,7 +84,7 @@ export async function searchInner(param: SearchOpt) {
 
   let tmp = db.contents.orderBy("editedStamp").filter(filterFunc)
   tmp = tmp.reverse().limit(10)
-  let res = await tmp.toArray()
+  const res = await tmp.toArray()
 
   list.sort((a, b) => {
     if(a.score > b.score) return -1

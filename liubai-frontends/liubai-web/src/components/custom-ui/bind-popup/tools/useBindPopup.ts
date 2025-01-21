@@ -1,4 +1,4 @@
-import { reactive, ShallowRef, toRef, useTemplateRef, watch } from "vue"
+import { reactive, type ShallowRef, toRef, useTemplateRef, watch } from "vue"
 import type { 
   BpData, 
   BpParam, 
@@ -44,7 +44,7 @@ export function initBindPopup() {
   const secondInputVal = toRef(bpData, "secondInputVal")
 
   watch(firstInputVal, (newV) => {
-    let trimVal = newV.trim()
+    const trimVal = newV.trim()
     if(trimVal !== newV) {
       firstInputVal.value = trimVal
       return
@@ -56,7 +56,7 @@ export function initBindPopup() {
     delete bpData.firstErr
   })
   watch(secondInputVal, (newV) => {
-    let trimVal = newV.trim()
+    const trimVal = newV.trim()
     if(trimVal !== newV) {
       secondInputVal.value = trimVal
       return

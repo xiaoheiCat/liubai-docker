@@ -20,7 +20,7 @@ function packThread(
   opt: PackThreadOpt,
 ) {
 
-  let v = content
+  const v = content
   const { 
     member, 
     _id, 
@@ -61,7 +61,7 @@ function packThread(
   let tags: TagShow[] = []
   let stateShow: StateShow | undefined = undefined
   // 判断当前工作区与当前动态是否匹配，若匹配则可展示标签和状态
-  let canTag = spaceId === opt.wStore.spaceId
+  const canTag = spaceId === opt.wStore.spaceId
   // 如果动态所属的工作区与当前工作区匹配
   if(canTag) {
     const tagData = v.tagIds ? tagIdsToShows(v.tagIds) : undefined

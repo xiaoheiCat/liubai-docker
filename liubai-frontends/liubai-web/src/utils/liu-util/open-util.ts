@@ -57,7 +57,7 @@ function openDetailWithViceView(cid: string, opt: RrOpt) {
 
 function openDetailWithDetailPage(contentId: string, opt: RrOpt) {
   const { route, router } = opt.rr
-  let newPage = { name: "detail", params: { contentId } }
+  const newPage = { name: "detail", params: { contentId } }
   if(opt.replace) router.replace(newPage)
   else router.pushNewPageWithOldQuery(route, newPage)
 }
@@ -76,7 +76,7 @@ function openCommentWithViceView(cid2: string, opt: RrOpt) {
 
 function openCommentWithDetailPage(cid2: string, opt: RrOpt) {
   const { route, router } = opt.rr
-  let newPage = { name: "comment", params: { commentId: cid2 } }
+  const newPage = { name: "comment", params: { commentId: cid2 } }
   if(opt.replace) router.replace(newPage)
   else router.pushNewPageWithOldQuery(route, newPage)
 }
@@ -97,7 +97,7 @@ function openOutSearch(
 function openBing(
   keyword: string, 
   opt: RrOpt, 
-  forceVv: boolean = false
+  forceVv = false
 ): InnerOrOutter {
   const { route, router } = opt.rr
   const w = toWhatDetail(opt)
@@ -134,7 +134,7 @@ function getFeloSearchLink(keyword: string) {
 function openXhs(
   keyword: string, 
   opt: RrOpt,
-  forceVv: boolean = false,
+  forceVv = false,
 ): InnerOrOutter {
   openExternalXhs(keyword)
   return "outter"
@@ -161,7 +161,7 @@ function openExternalXhs(keyword: string) {
 function openGithub(
   keyword: string, 
   opt: RrOpt,
-  forceVv: boolean = false,
+  forceVv = false,
 ): InnerOrOutter {
   openExternalGithub(keyword)
   return "outter"
@@ -182,7 +182,7 @@ function openExternalGithub(keyword: string) {
 function openLink(
   url: string, 
   opt: RrOpt,
-  forceVv: boolean = false,
+  forceVv = false,
 ) {
   const w = toWhatDetail(opt)
   if(!forceVv && w !== "vice-view") {

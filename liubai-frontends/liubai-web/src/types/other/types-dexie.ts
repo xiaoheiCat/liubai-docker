@@ -1,4 +1,4 @@
-import { UpdateSpec } from "dexie"
+import type { UpdateSpec } from "dexie"
 
 // the atom of bulkUpdate(),
 // where T is Table

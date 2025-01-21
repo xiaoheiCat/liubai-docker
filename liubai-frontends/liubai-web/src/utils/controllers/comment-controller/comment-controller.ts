@@ -29,18 +29,18 @@ async function loadByThread(opt: LoadByThreadOpt) {
   let list: ContentLocalTable[] = []
   if(lastItemStamp) {
     const now = time.getTime()
-    let w = ["parentThread", "oState", "createdStamp"]
-    let b1 = [targetThread, "OK", lastItemStamp]
-    let b2 = [targetThread, "OK", now]
-    let q = db.contents.where(w).between(b1, b2, false, true).filter(filterFunc)
+    const w = ["parentThread", "oState", "createdStamp"]
+    const b1 = [targetThread, "OK", lastItemStamp]
+    const b2 = [targetThread, "OK", now]
+    const q = db.contents.where(w).between(b1, b2, false, true).filter(filterFunc)
     list = await q.sortBy("createdStamp")
   }
   else {
-    let w = {
+    const w = {
       parentThread: targetThread,
       oState: "OK",
     }
-    let q = db.contents.where(w).filter(filterFunc)
+    const q = db.contents.where(w).filter(filterFunc)
     list = await q.sortBy("createdStamp")
   }
 

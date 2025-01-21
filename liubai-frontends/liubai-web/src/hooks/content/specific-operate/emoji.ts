@@ -176,7 +176,7 @@ function notifyOtherThreads(
 function updateEmojiData(
   emojiData: EmojiData,
   encodeStr: string,
-  delta: number = 1,
+  delta = 1,
 ) {
   emojiData.total += delta
   if(emojiData.total < 0) emojiData.total = 0

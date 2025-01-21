@@ -14,7 +14,7 @@ export function handleKeyDown(
   e: KeyboardEvent,
 ) {
 
-  let { trimTxt, indicator, suggestList, recentList, innerList, thirdList } = seData
+  const { trimTxt, indicator, suggestList, recentList, innerList, thirdList } = seData
 
   let newIndicator = ""
   if(trimTxt) {
@@ -44,13 +44,13 @@ function findIndicator(
   currentList: SearchItemBase[],
   sequence: Array<SearchItemBase[]>,  // currentList 之后不包含本地的其他列表的列表
 ) {
-  let idx = currentList.findIndex(v => v.atomId === indicator)
+  const idx = currentList.findIndex(v => v.atomId === indicator)
   if(idx < 0) return ""
 
   const curLen = currentList.length
 
   let newIndicator = ""
-  let newIdx = idx + diff
+  const newIdx = idx + diff
 
   // 如果超出位数
   if(newIdx >= curLen) {

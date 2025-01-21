@@ -18,7 +18,7 @@ function getMagicNum(opt: PackThreadOpt) {
   if(width < 200) width = 200
   else if(width > 500) width = 500
 
-  let size = fontSize === "L" ? 20 : 18
+  const size = fontSize === "L" ? 20 : 18
 
   let num = Math.floor(width / size) * 3
 
@@ -40,7 +40,7 @@ export function getBriefing(
   opt: PackThreadOpt,
 ): TipTapJSONContent | undefined {
   if(!liuDesc || liuDesc.length < 1) return
-  let newLiuDesc = valTool.copyObject(liuDesc)
+  const newLiuDesc = valTool.copyObject(liuDesc)
   const magicNum = getMagicNum(opt)
   _magicNum = magicNum
 
@@ -61,9 +61,9 @@ export function getBriefing(
       const { type, content } = v
       const isCodeBlock = type === "codeBlock"
       if(content && content.length) {
-        let tmpText = listToText(content)
+        const tmpText = listToText(content)
         charNum += valTool.getTextCharNum(tmpText)
-        let tmpRow = getRowNum([v])
+        const tmpRow = getRowNum([v])
         rowNum += tmpRow
       }
       if(charNum > (magicNum * 2 + TOLERANT_NUM * 2)) {
@@ -98,9 +98,9 @@ export function getBriefing(
     const v = newLiuDesc[i]
     const { content } = v
     if(content?.length) {
-      let tmpText = listToText(content)
+      const tmpText = listToText(content)
       charNum += valTool.getTextCharNum(tmpText)
-      let tmpRow = getRowNum([v])
+      const tmpRow = getRowNum([v])
       rowNum += tmpRow
     }
 
@@ -135,7 +135,7 @@ export function getBriefing(
 // 在该节点的尾巴添加 ...
 function _addPoint3x(node: LiuContent) {
   const newNode = valTool.copyObject(node)
-  let { type, content } = newNode
+  const { type, content } = newNode
   if(type === "paragraph" && content) {
     content.push({ type: "text", text: "......" })
     newNode.content = content
@@ -161,7 +161,7 @@ function _getBreakPoint(
 ) {
   const { type, content } = node
   if(!content) return node
-  let newNode = valTool.copyObject(node)
+  const newNode = valTool.copyObject(node)
 
   if(type === "blockquote") {
     newNode.content = _handleBlockQuote(content, prevRowNum, prevCharNum)
@@ -228,7 +228,7 @@ function _handleBlockQuote(
     }
     prevRowNum += 1
 
-    let tmp = _handleParagraph(content, charNum)
+    const tmp = _handleParagraph(content, charNum)
     charNum = tmp.charNum
     v.content = tmp.content
 
@@ -267,7 +267,7 @@ function _handleList(
       continue
     }
 
-    let firNode = content[0]
+    const firNode = content[0]
     // 理想情况下: type2 === 'paragraph'
     const { type: type2, content: content2 } = firNode
     if(type2 !== "paragraph" || !content2?.length) {
@@ -277,7 +277,7 @@ function _handleList(
 
     prevRowNum += 1
 
-    let tmp = _handleParagraph(content2, charNum)
+    const tmp = _handleParagraph(content2, charNum)
     charNum = tmp.charNum
     content[0].content = tmp.content
 
@@ -328,15 +328,15 @@ function _handleParagraph(
       continue
     }
 
-    let tmpNum = charNum + valTool.getTextCharNum(text)
-    let diff_0 = tmpNum - (_magicNum * 2)
+    const tmpNum = charNum + valTool.getTextCharNum(text)
+    const diff_0 = tmpNum - (_magicNum * 2)
     if(diff_0 <= 0) {
       charNum = tmpNum
       newTextList.push(v)
       continue
     }
 
-    let diff_1 = (_magicNum * 2) - charNum
+    const diff_1 = (_magicNum * 2) - charNum
 
     // 希望不要断点在单词内，开始往前找合适的断点，最多查找 10 个字符
     let targetText = _getTargetText(text, diff_1)

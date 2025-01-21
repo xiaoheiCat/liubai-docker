@@ -61,7 +61,7 @@ async function whenRouteChange(
   if(inApp === false) return
 
   // 从路由的 params 里寻找 spaceId
-  let spaceId = newV.params.workspaceId
+  const spaceId = newV.params.workspaceId
   if(spaceId) {
     if(typeCheck.isString(spaceId)) {
       handleCollaborativeSpace(store, spaceId)

@@ -5,17 +5,17 @@ import time from "~/utils/basic/time";
 import { db } from "~/utils/db";
 import type { ContentConfig } from "~/types/other/types-custom"
 import { LocalToCloud } from "~/utils/cloud/LocalToCloud";
-import { type LiuUploadTask } from "~/types/types-atom";
+import type { LiuUploadTask } from "~/types/types-atom";
 import liuUtil from "~/utils/liu-util";
 
 async function collect(
   thread: ThreadShow, 
   memberId: string, 
   userId: string,
-  isUndo: boolean = false,
+  isUndo = false,
 ) {
-  let newFavorite = thread.myFavorite
-  let stamp = thread.myFavoriteStamp
+  const newFavorite = thread.myFavorite
+  const stamp = thread.myFavoriteStamp
   
   // 操作 collection
   const g1: Partial<CollectionLocalTable> = {
@@ -94,7 +94,7 @@ async function pin(
   thread: ThreadShow, 
   memberId: string, 
   userId: string,
-  isUndo: boolean = false,
+  isUndo = false,
 ) {
   const id = thread._id
   const oldCfg = await getOldCfg(id)
@@ -123,7 +123,7 @@ async function editWhenRemind(
   thread: ThreadShow, 
   memberId: string, 
   userId: string,
-  isUndo: boolean = false,
+  isUndo = false,
 ) {
   const id = thread._id
   const oldCfg = await getOldCfg(id)
@@ -211,7 +211,7 @@ async function deleteForever(
 async function setShowCountdown(
   id: string,
   newShowCountdown: boolean,
-  isUndo: boolean = false,
+  isUndo = false,
 ) {
   const oldCfg = await getOldCfg(id)
 

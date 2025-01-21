@@ -3,7 +3,7 @@ import { watch } from 'vue';
 import liuConsole from "~/utils/debug/liu-console";
 import localCache from "~/utils/system/local-cache";
 import time from "~/utils/basic/time";
-import { type SimplePromise } from '~/utils/basic/type-tool';
+import type { SimplePromise } from '~/utils/basic/type-tool';
 import { useGlobalStateStore } from '../stores/useGlobalStateStore';
 import cui from '~/components/custom-ui';
 import { db } from '~/utils/db';

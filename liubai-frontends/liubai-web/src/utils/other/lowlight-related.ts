@@ -28,7 +28,7 @@ export function showProgrammingLanguages() {
   const list: string[] = []
 
   tmpList.forEach(v => {
-    let v2 = supportedToShow(v)
+    const v2 = supportedToShow(v)
     list.push(v2)
   })
 
@@ -117,7 +117,7 @@ export function supportedToShow(v: string | null) {
   }
 
   const { lowlight } = initLowlight()
-  let supported = lowlight.registered(v2)
+  const supported = lowlight.registered(v2)
   if(!supported) {
     console.warn("找到一个不支持的语言: ")
     console.log(v)

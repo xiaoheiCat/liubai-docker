@@ -3,7 +3,7 @@
 export function setStorageSafely(
   key: string,
   val: string,
-  printErr: boolean = true,
+  printErr = true,
 ) {
   try {
     localStorage.setItem(key, val)
@@ -17,7 +17,7 @@ export function setStorageSafely(
 
 export function getStorageSafely(
   key: string,
-  printErr: boolean = true,
+  printErr = true,
 ) {
   try {
     return localStorage.getItem(key)
