@@ -3,8 +3,7 @@ import { useSystemStore } from "~/hooks/stores/useSystemStore";
 import { useGlobalStateStore } from "~/hooks/stores/useGlobalStateStore";
 import { useWorkspaceStore } from "~/hooks/stores/useWorkspaceStore";
 import type { 
-  Res_UserSettings_Enter, 
-  Res_UserSettings_Latest,
+  UserSettingsAPI,
 } from "~/requests/req-types";
 import type { 
   MemberLocalTable, 
@@ -27,7 +26,7 @@ interface AgudOpt {
 }
 
 export async function afterGettingUserData(
-  d: Res_UserSettings_Enter | Res_UserSettings_Latest,
+  d: UserSettingsAPI.Res_Enter | UserSettingsAPI.Res_Latest,
   rr: RouteAndLiuRouter,
   opt?: AgudOpt,
 ) {
@@ -62,7 +61,7 @@ export async function afterGettingUserData(
 
 async function handleUser(
   userId: string,
-  d: Res_UserSettings_Enter | Res_UserSettings_Latest,
+  d: UserSettingsAPI.Res_Enter | UserSettingsAPI.Res_Latest,
   opt?: AgudOpt,
 ) {
 

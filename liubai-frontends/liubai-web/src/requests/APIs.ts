@@ -22,4 +22,5 @@ export default {
   PAYMENT_ORDER: d + `payment-order`,
   SERVICE_POLY: d + `service-poly`,
   BIND_DATA: d + `user-settings`,
+  AUTHORIZE: d + `authorize`,
 }

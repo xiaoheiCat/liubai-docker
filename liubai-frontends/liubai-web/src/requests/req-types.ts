@@ -1,5 +1,5 @@
 // 存放所有接口返回的 data 类型
-import type { LocalTheme } from "~/types/types-atom"
+import type { LiuAppType, LocalTheme } from "~/types/types-atom"
 import type { LocalLocale } from "~/types/types-locale"
 import type { 
   OState_Order,
@@ -80,30 +80,42 @@ export interface Res_UserLoginNormal {
 
 /************************ 用户信息 (包含会员信息) ********************/
 
-export interface Res_UserSettings_Enter {
-  email?: string
-  github_id?: number
-  open_id?: string
-  theme: LocalTheme
-  language: LocalLocale
-  spaceMemberList: LiuSpaceAndMember[]
-  subscription?: UserSubscription
-  phone_pixelated?: string     // like 187******56
+export namespace UserSettingsAPI {
 
-  /** wechat data */
-  wx_gzh_openid?: string
-  wx_gzh_nickname?: string
+  export interface Res_Enter {
+    email?: string
+    github_id?: number
+    open_id?: string
+    theme: LocalTheme
+    language: LocalLocale
+    spaceMemberList: LiuSpaceAndMember[]
+    subscription?: UserSubscription
+    phone_pixelated?: string     // like 187******56
+    
+    /** wechat data */
+    wx_gzh_openid?: string
+    wx_gzh_nickname?: string
+  
+    /** wecom data for qynb, which is for company internal use */
+    ww_qynb_external_userid?: string
+  
+    new_serial?: string
+    new_token?: string
+  }
 
-  new_serial?: string
-  new_token?: string
+  export type Res_Latest = Omit<Res_Enter, "new_serial" | "new_token">
+
+  export interface Res_Membership {
+    subscription?: UserSubscription
+  }
+
+  export interface Res_AuthGetInfo {
+    operateType: "auth-get-info"
+    appType: LiuAppType
+  }
+
 }
 
-export type Res_UserSettings_Latest = 
-  Omit<Res_UserSettings_Enter, "new_serial" | "new_token">
-
-export interface Res_UserSettings_Membership {
-  subscription?: UserSubscription
-}
 
 /************************ About Subscription ********************/
 

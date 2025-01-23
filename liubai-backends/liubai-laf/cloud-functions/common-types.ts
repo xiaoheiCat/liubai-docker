@@ -1896,32 +1896,41 @@ export interface Res_UserLoginNormal {
   multi_credential_id?: string
 }
 
-export interface Res_UserSettings_Enter {
-  email?: string
-  open_id?: string
-  github_id?: number
-  theme: LocalTheme
-  language: LocalLocale
-  spaceMemberList: LiuSpaceAndMember[]
-  subscription?: UserSubscription
-  phone_pixelated?: string     // like 187******56
+/****************** user-login api ***************/
+export namespace UserSettingsAPI {
+
+  export interface Res_Enter {
+    email?: string
+    open_id?: string
+    github_id?: number
+    theme: LocalTheme
+    language: LocalLocale
+    spaceMemberList: LiuSpaceAndMember[]
+    subscription?: UserSubscription
+    phone_pixelated?: string     // like 187******56
+    
+    /** wechat data */
+    wx_gzh_openid?: string
+    wx_gzh_nickname?: string
   
-  /** wechat data */
-  wx_gzh_openid?: string
-  wx_gzh_nickname?: string
+    /** wecom data for qynb, which is for company internal use */
+    ww_qynb_external_userid?: string
+  
+    new_serial?: string
+    new_token?: string
+  }
 
-  /** wecom data for qynb, which is for company internal use */
-  ww_qynb_external_userid?: string
+  export type Res_Latest = Omit<Res_Enter, "new_serial" | "new_token">
 
-  new_serial?: string
-  new_token?: string
-}
+  export interface Res_Membership {
+    subscription?: UserSubscription
+  }
 
-export type Res_UserSettings_Latest = 
-  Omit<Res_UserSettings_Enter, "new_serial" | "new_token">
+  export interface Res_AuthGetInfo {
+    operateType: "auth-get-info"
+    appType: LiuAppType
+  }
 
-export interface Res_UserSettings_Membership {
-  subscription?: UserSubscription
 }
 
 export interface Res_SubPlan_Info {

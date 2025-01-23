@@ -23,11 +23,9 @@ import {
   type MongoFilter,
   type Table_User, 
   type LiuRqReturn,
-  type Res_UserSettings_Enter,
-  type Res_UserSettings_Latest,
-  type Res_UserSettings_Membership,
   type VerifyTokenRes_B,
   type Table_Token,
+  type UserSettingsAPI,
   Sch_LocalTheme,
   Sch_LocalLocale,
   type LiuErrReturn,
@@ -559,7 +557,7 @@ async function handle_set(
 */
 async function handle_membership(
   vRes: VerifyTokenRes_B,
-): Promise<LiuRqReturn<Res_UserSettings_Membership>> {
+): Promise<LiuRqReturn<UserSettingsAPI.Res_Membership>> {
   // 1. get latest user data
   const res1 = await getLatestUser(vRes)
   if(!res1.pass) return res1.err
@@ -639,7 +637,7 @@ async function getStripeCustomerPortal(
 async function handle_enter(
   ctx: FunctionContext,
   vRes: VerifyTokenRes_B,
-): Promise<LiuRqReturn<Res_UserSettings_Enter>> {
+): Promise<LiuRqReturn<UserSettingsAPI.Res_Enter>> {
   // 0. get some params
   const user = vRes.userData
   const userAgent = ctx.headers?.['user-agent']
@@ -689,10 +687,10 @@ async function handle_latest(
   const res1 = await getUserSettings(user)
   const data = res1.data
   if(res1.code !== "0000" || !data) {
-    return res1 as LiuRqReturn<Res_UserSettings_Latest>
+    return res1 as LiuRqReturn<UserSettingsAPI.Res_Latest>
   }
-  const newData: Res_UserSettings_Latest = { ...data }
-  const newRes: LiuRqReturn<Res_UserSettings_Latest> = {
+  const newData: UserSettingsAPI.Res_Latest = { ...data }
+  const newRes: LiuRqReturn<UserSettingsAPI.Res_Latest> = {
     code: "0000",
     data: newData
   }
@@ -795,7 +793,7 @@ async function afterHandleWechatBind(
  */
 async function getUserSettings(
   user: Table_User,
-): Promise<LiuRqReturn<Res_UserSettings_Enter>> {
+): Promise<LiuRqReturn<UserSettingsAPI.Res_Enter>> {
   const [ui] = await getUserInfos([user])
   if(!ui) {
     return { code: "E4004", errMsg: "it cannot find an userinfo" }
@@ -818,7 +816,7 @@ async function getUserSettings(
     wx_gzh_nickname = undefined
   }
 
-  const data: Res_UserSettings_Enter = {
+  const data: UserSettingsAPI.Res_Enter = {
     email,
     open_id,
     github_id,
