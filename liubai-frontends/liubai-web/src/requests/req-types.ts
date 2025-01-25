@@ -112,6 +112,13 @@ export namespace UserSettingsAPI {
   export interface Res_AuthGetInfo {
     operateType: "auth-get-info"
     appType: LiuAppType
+    serial: string
+  }
+
+  export interface Res_AuthAgree {
+    operateType: "auth-agree"
+    code: string
+    redirectUri: string
   }
 
 }

@@ -1932,6 +1932,12 @@ export namespace UserSettingsAPI {
     serial: string
   }
 
+  export interface Res_AuthAgree {
+    operateType: "auth-agree"
+    code: string
+    redirectUri: string
+  }
+
 }
 
 export interface Res_SubPlan_Info {

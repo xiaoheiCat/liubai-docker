@@ -34,12 +34,13 @@ import {
   type Table_Credential,
   type Partial_Id,
   type LiuTencentSMSParam,
+  type LiuAppType,
 } from '@/common-types'
 import { getNowStamp, DAY, MINUTE, getBasicStampWhileAdding } from "@/common-time"
 import * as vbot from "valibot"
 import { getCurrentLocale } from '@/common-i18n'
 import { handle_avatar, addVerifyNum } from '@/user-login'
-import { createSmsCode } from '@/common-ids'
+import { createAuthCode, createSmsCode } from '@/common-ids'
 import { LiuTencentSMS } from '@/service-send'
 
 const db = cloud.database()
@@ -56,7 +57,6 @@ export async function main(ctx: FunctionContext) {
     res = await handle_logout(ctx, body)
     return res
   }
-
 
   const stamp1 = getNowStamp()
   const entering = oT === "enter"
@@ -95,7 +95,7 @@ export async function main(ctx: FunctionContext) {
     res = await auth_get_info(vRes, body)
   }
   else if(oT === "auth-agree") {
-
+    res = await auth_agree(vRes, body)
   }
 
   // const stamp2 = getNowStamp()
@@ -105,56 +105,140 @@ export async function main(ctx: FunctionContext) {
   return res
 }
 
+
+async function auth_agree(
+  vRes: VerifyTokenRes_B,
+  body: Record<string, any>,
+) {
+  // 1. get credential data
+  const res1 = await getSharedDataForAuth(body)
+  if(!res1.pass) return res1.err
+  const data1 = res1.data
+
+  // 2. create code
+  const code = createAuthCode()
+  const userId = vRes.userData._id
+
+  // 3. update credential
+  const w3: Partial<Table_Credential> = {
+    credential_2: code,
+    userId,
+    updatedStamp: getNowStamp(),
+  }
+  const cCol = db.collection("Credential")
+  const res3 = await cCol.doc(data1._id).update(w3)
+  console.log("res3 in auth_agree: ")
+  console.log(res3)
+
+  // 4. construct response
+  const data4: UserSettingsAPI.Res_AuthAgree = {
+    operateType: "auth-agree",
+    code,
+    redirectUri: data1.redirect_uri as string,
+  }
+  return { code: "0000", data: data4 }
+}
+
+
 async function auth_get_info(
   vRes: VerifyTokenRes_B,
   body: Record<string, any>,
 ): Promise<LiuRqReturn<UserSettingsAPI.Res_AuthGetInfo>> {
+  // 1. get credential data
+  const res1 = await getSharedDataForAuth(body)
+  if(!res1.pass) return res1.err
+  const data1 = res1.data
+
+  // 2. construct response
+  const data6: UserSettingsAPI.Res_AuthGetInfo = {
+    operateType: "auth-get-info",
+    appType: data1.app_type as LiuAppType,
+    serial: data1._id,
+  }
+  return { code: "0000", data: data6 }
+}
+
+async function getSharedDataForAuth(
+  body: Record<string, any>,
+): Promise<DataPass<Table_Credential>> {
   // 1. get param
+  const oT = body.operateType
+  const serial = body.serial
   const credential = body.credential
   if(!valTool.isStringWithVal(credential)) {
-    return { code: "E4000", errMsg: "credential is required" }
+    return {
+      pass: false,
+      err: { code: "E4000", errMsg: "credential is required" }
+    }
   }
 
   // 2. query
+  let data2: Table_Credential | null = null
   const cCol = db.collection("Credential")
-  const w2: Partial<Table_Credential> = {
-    credential,
-    infoType: "auth-code",
+
+  // 2.1 query with serial
+  if(oT === "auth-agree") {
+    if(!valTool.isStringWithVal(serial)) {
+      return { 
+        pass: false,
+        err: { code: "E4000", errMsg: "serial is required" }
+      }
+    }
+    const res2_1 = await cCol.doc(serial).get<Table_Credential>()
+    data2 = res2_1.data
+    if(data2?.credential !== credential) {
+      return {
+        pass: false,
+        err: { code: "E4003", errMsg: "credential does not match" }
+      }
+    }
   }
-  const res2 = await cCol.where(w2).getOne<Table_Credential>()
-  const data2 = res2.data
+  else {
+    const w2: Partial<Table_Credential> = {
+      credential,
+      infoType: "auth-code",
+    }
+    const res2 = await cCol.where(w2).getOne<Table_Credential>()
+    data2 = res2.data
+  }
+
   if(!data2) {
-    return { code: "E4004", errMsg: "credential not found" }
+    return {
+      pass: false,
+      err: { code: "E4004", errMsg: "credential not found" }
+    }
   }
 
   // 3. check out expiration
   const now3 = getNowStamp()
   const stamp3 = data2.expireStamp
   if(stamp3 <= now3) {
-    return { code: "E4006", errMsg: "credential has expired" }
+    return {
+      pass: false,
+      err: { code: "E4006", errMsg: "credential has expired" }
+    }
   }
 
-  // 5. check out other params
+  // 4. check out other params
   const appType = data2.app_type
   if(!appType) {
-    return { code: "E5001", errMsg: "appType is undefined" }
+    return {
+      pass: false,
+      err: { code: "E5001", errMsg: "appType is undefined" }
+    }
+  }
+  const redirect_uri = data2.redirect_uri
+  if(!redirect_uri) {
+    return {
+      pass: false,
+      err: { code: "E5001", errMsg: "redirect_uri is undefined" }
+    }
   }
 
-  // 6. construct response
-  const data6: UserSettingsAPI.Res_AuthGetInfo = {
-    operateType: "auth-get-info",
-    appType,
-    serial: data2._id,
+  return {
+    pass: true,
+    data: data2,
   }
-  return { code: "0000", data: data6 }
-}
-
-
-async function auth_agree(
-  vRes: VerifyTokenRes_B,
-  body: Record<string, any>,
-) {
-  
 }
 
 
