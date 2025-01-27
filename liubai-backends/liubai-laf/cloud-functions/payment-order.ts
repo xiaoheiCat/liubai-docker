@@ -671,10 +671,6 @@ async function wxpayOrderByJsapi(
   const res4 = await liuFetch<Res_Wxpay_Jsapi>(WXPAY_JSAPI_ORDER, { headers, method: "POST" }, body)
   const { code, data: data4 } = res4
 
-  console.log("data4: ")
-  console.log(data4)
-  console.log(data4?.json)
-
   if(code !== "0000" || !data4 || !data4.json) {
     console.warn("fail to invoke wxpay jsapi")
     console.log(res4)

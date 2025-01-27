@@ -12,6 +12,7 @@ import type {
   Table_User,
   UserThirdData,
   UserWeChatGzh,
+  Wx_Gzh_Auth_Change,
   Wx_Gzh_Click,
   Wx_Gzh_Image,
   Wx_Gzh_Link,
@@ -55,6 +56,7 @@ import { WxGzhSender } from "@/service-send";
 import { get_into_ai } from "@/ai-entrance";
 
 const db = cloud.database()
+const _ = db.command
 let wechat_access_token = ""
 
 /***************************** constants **************************/
@@ -121,11 +123,72 @@ export async function main(ctx: FunctionContext) {
     else if(Event === "CLICK") {
       handle_click(msgObj)
     }
+    else if(Event === "user_authorization_revoke") {
+      user_authorization_revoke(msgObj)
+    }
   }
   
   // respond with empty string, and then wechat will not retry
   return ""
 }
+
+async function user_authorization_revoke(
+  msgObj: Wx_Gzh_Auth_Change,
+) {
+  const wx_gzh_openid = msgObj.OpenID
+
+  // 0. define functions where we update user and cache
+  const uCol = db.collection("User")
+  const _updateUser = async (user: Table_User) => {
+    // 0.1 check if updating is required
+    const wx_gzh = user.thirdData?.wx_gzh
+    if(!wx_gzh) return
+
+    let needUpdate = false
+    if(wx_gzh.headimgurl) {
+      needUpdate = true
+      delete wx_gzh.headimgurl
+    }
+    if(wx_gzh.nickname) {
+      needUpdate = true
+      delete wx_gzh.nickname
+    }
+    if(!needUpdate) return true
+
+    // 0.2 update user
+    const userId = user._id
+    const now = getNowStamp()
+    const u3 = {
+      "thirdData.wx_gzh": _.set(wx_gzh),
+      "updatedStamp": now,
+    }
+    const res3 = await uCol.doc(userId).update(u3)
+
+    // 0.3 update cache
+    const thirdData = user.thirdData ?? {}
+    thirdData.wx_gzh = wx_gzh
+    user.thirdData = thirdData
+    user.updatedStamp = now
+    updateUserInCache(userId, user)
+  }
+
+  // 1. get the user
+  const q1 = uCol.where({ wx_gzh_openid }).orderBy("insertedStamp", "desc")
+  const res1 = await q1.get<Table_User>()
+  const list1 = res1.data
+  const len1 = list1.length
+  if(len1 < 1) return
+
+  // 2. to update
+  for(let i = 0; i < len1; i++) {
+    const user = list1[i]
+    if(i > (MAX_ACCOUNTS_TO_BIND - 1)) break
+    await _updateUser(user)
+  }
+
+  return true
+}
+
 
 async function handle_click(
   msgObj: Wx_Gzh_Click,
