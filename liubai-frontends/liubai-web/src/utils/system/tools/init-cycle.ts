@@ -4,9 +4,9 @@
 // 1. 将 DELETED 的 contents 都给删除
 // 2. 将超过 30 天且为 REMOVED 的 contents 调整为 DELETED
 // 3.1 将 uploadTask 中，progressType 为 syncing 并且 
-//     updatedStamp 早于 5mins 的 task 改为 waiting
-// 3.2 将 uploadTask 中，progressType 为 syncing 并且
-//     updatedStamp 早于 30mins 的 task 改为 waiting
+//     updatedStamp 早于 3mins 的 task 改为 waiting
+// 3.2 将 uploadTask 中，progressType 为 file_uploading 并且
+//     updatedStamp 早于 20mins 的 task 改为 waiting
 
 // 删除完后，不需要用 useThreadShowStore 通知各组件
 // 因为各组件都不应显示出过期并且已删除的数据
@@ -21,8 +21,8 @@ import type {
 import { useSystemStore } from "~/hooks/stores/useSystemStore";
 import type { OState_Draft } from "~/types/types-basic";
 
-const MIN_5 = time.MINUTE * 5
-const MIN_30 = time.MINUTE * 30
+const MIN_3 = time.MINUTE * 3
+const MIN_20 = time.MINUTE * 20
 
 export function initCycle() {
 
@@ -125,12 +125,12 @@ async function handleSyncingUploadTasks() {
 
     const diff = now - updatedStamp
     if(progressType === "file_uploading") {
-      if(diff > MIN_30) {
+      if(diff > MIN_20) {
         task_ids.push(_id)
       }
     }
     else if(progressType === "syncing") {
-      if(diff > MIN_5) {
+      if(diff > MIN_3) {
         task_ids.push(_id)
       }
     }
