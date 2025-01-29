@@ -15,7 +15,7 @@ import APIs from "~/requests/APIs";
 import liuReq from "~/requests/liu-req";
 import type { 
   Res_OC_GetWeChat, 
-  Res_UserLoginInit,
+  UserLoginAPI,
 } from "~/requests/req-types";
 import { showErrMsg } from "../../tools/show-msg";
 import type { DataPass, LiuErrReturn } from "~/requests/tools/types";
@@ -278,7 +278,7 @@ async function handleWithoutCode(
     checkBoundWhenLogged(wbData, memberId)
   }
   else {
-    //【未登录】去获取登录时所需的数据 Res_UserLoginInit
+    //【未登录】去获取登录时所需的数据 UserLoginAPI.Res_Init
     getLoginDataWhenLoggout(wbData)
   }
 }
@@ -382,10 +382,13 @@ async function fetchBound(
 }
 
 
-async function fetchLoginData(): Promise<DataPass<Res_UserLoginInit>> {
+async function fetchLoginData(): Promise<DataPass<UserLoginAPI.Res_Init>> {
   // 1. fetch
   const url = APIs.LOGIN
-  const res = await liuReq.request<Res_UserLoginInit>(url, { operateType: "init" })
+  const res = await liuReq.request<UserLoginAPI.Res_Init>(
+    url, 
+    { operateType: "init" }
+  )
 
   // 2. handle error
   const code = res?.code

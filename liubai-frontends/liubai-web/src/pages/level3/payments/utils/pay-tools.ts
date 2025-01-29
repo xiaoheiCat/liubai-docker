@@ -2,7 +2,7 @@ import thirdLink from "~/config/third-link";
 import APIs from "~/requests/APIs";
 import liuReq from "~/requests/liu-req";
 import type { 
-  Res_UserLoginInit,
+  UserLoginAPI,
   Res_UL_WxGzhBase,
   Res_PO_WxpayJsapi,
   Res_PO_AlipayWap,
@@ -26,11 +26,13 @@ import { db } from "~/utils/db";
 import liuApi from "~/utils/liu-api";
 import type { RouteAndLiuRouter } from "~/routes/liu-router";
 
-let initData: Res_UserLoginInit | undefined
+let initData: UserLoginAPI.Res_Init | undefined
 
 export async function getLoginInitData() {
   const url = APIs.LOGIN
-  const res = await liuReq.request<Res_UserLoginInit>(url, { operateType: "init" })
+  const res = await liuReq.request<UserLoginAPI.Res_Init>(
+    url, { operateType: "init" }
+  )
   if(res.code === "0000" && res.data) {
     initData = res.data
   }

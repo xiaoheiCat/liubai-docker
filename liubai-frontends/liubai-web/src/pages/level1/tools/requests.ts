@@ -3,8 +3,8 @@ import liuReq from "~/requests/liu-req"
 import type { 
   Res_UL_WxGzhScan, 
   Res_UL_ScanCheck,
-  Res_UserLoginInit, 
   Res_UserLoginNormal,
+  UserLoginAPI,
 } from "~/requests/req-types"
 import localCache from "~/utils/system/local-cache";
 import { createClientKey } from "./common-utils"
@@ -21,7 +21,9 @@ function _getDefaultOpt() {
 
 export async function fetchInitLogin() {
   const url = APIs.LOGIN
-  const res = await liuReq.request<Res_UserLoginInit>(url, { operateType: "init" })
+  const res = await liuReq.request<UserLoginAPI.Res_Init>(
+    url, { operateType: "init" }
+  )
 
   const pk = res?.data?.publicKey
   if(pk) {

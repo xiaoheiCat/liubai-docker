@@ -25,14 +25,6 @@ export interface Res_HelloWorld {
 
 /************************ 登录相关 ********************/
 
-export interface Res_UserLoginInit {
-  publicKey?: string
-  githubOAuthClientId?: string
-  googleOAuthClientId?: string
-  wxGzhAppid?: string
-  state?: string
-}
-
 export interface Res_ULN_User extends LiuSpaceAndMember {
   userId: string
   createdStamp: number
@@ -77,6 +69,19 @@ export interface Res_UserLoginNormal {
   multi_credential?: string
   multi_credential_id?: string
 }
+
+export namespace UserLoginAPI {
+  
+  export interface Res_Init {
+    publicKey?: string
+    githubOAuthClientId?: string
+    googleOAuthClientId?: string
+    wxGzhAppid?: string
+    state?: string
+  }
+
+}
+
 
 /************************ 用户信息 (包含会员信息) ********************/
 

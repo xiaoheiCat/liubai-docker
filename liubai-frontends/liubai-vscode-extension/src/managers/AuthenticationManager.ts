@@ -17,7 +17,7 @@ import {
   showProgressWithStop, 
   showWarning,
 } from '~/utils/show-msg';
-import { createClientKey } from "./tools/common-tools"
+import { createClientKey, getNicknameFromSpaceMemberList } from "./tools/common-tools"
 import type { LiuTimeout, SimpleFunc } from '~/utils/basic/type-tool';
 import { Logger } from '~/utils/Logger';
 
@@ -369,8 +369,30 @@ export class AuthenticationManager {
       console.log(spaceMemberList)
       return
     }
-    
 
+    // 6. storage login data into secrets
+    const nickname = getNicknameFromSpaceMemberList(spaceMemberList)
+    const data6: LiuAuthStatus = {
+      token,
+      serial: serial_id,
+      client_key,
+      updated_stamp: time.getTime(),
+      nickname,
+    }
+    const val6 = valTool.objToStr(data6)
+    await this._context.secrets.store(LOGIN_DATA_KEY, val6)
+
+    // 7. show success
+    let title7 = i18n.t("login.has_signed_in")
+    if(nickname) {
+      title7 = i18n.t("login.logged_in", { nickname })
+    }
+		const confirmTxt = i18n.t("common.record_1")
+		const cancelTxt = i18n.t("common.cancel")
+    const res7 = await vscode.window.showInformationMessage(title7, confirmTxt, cancelTxt)
+    if(res7 === confirmTxt) {
+      console.log("let's start to record!")
+    }
 
   }
 

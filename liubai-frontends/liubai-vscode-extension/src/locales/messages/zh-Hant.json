@@ -8,6 +8,8 @@
   "login.cannot_open_ide": "若認證後，瀏覽器無法打開當前 IDE, 你可以手動填入認證碼。",
   "login.input_auth_code": "填入認證碼",
   "login.logging": "登入中...",
+  "login.logged_in": "Hi {nickname}, 歡迎你！",
+  "common.record_1": "去記錄",
   "common.cancel": "取消",
   "common.env_unsupported": "當前環境不支援執行本擴充套件",
   "tip.err_1": "出現未知的錯誤，請稍後再試 (狀態碼: {code})",

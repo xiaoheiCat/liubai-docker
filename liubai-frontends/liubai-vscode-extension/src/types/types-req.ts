@@ -43,3 +43,18 @@ export namespace UserLoginAPI {
   }
 
 }
+
+/****************** user-settings api ***************/
+export namespace UserSettingsAPI {
+  export interface Res_Enter {
+    email?: string
+    github_id?: number
+    open_id?: string
+    spaceMemberList: LiuSpaceAndMember[]
+  
+    new_serial?: string
+    new_token?: string
+  }
+
+  export type Res_Latest = Omit<Res_Enter, "new_serial" | "new_token">
+}

@@ -1,5 +1,5 @@
 import type { PageState } from "~/types/types-atom";
-import type { Res_UserLoginInit } from "~/requests/req-types";
+import type { UserLoginAPI } from "~/requests/req-types";
 
 // logout: 微信一键登录
 // waiting: 绑定微信（已登录）
@@ -12,7 +12,7 @@ export interface WbData {
   pageState: PageState
   oAuthCode: string
   status?: WbStatus
-  loginData?: Res_UserLoginInit
+  loginData?: UserLoginAPI.Res_Init
   agreeRule: boolean
   agreeShakingNum: number
 }

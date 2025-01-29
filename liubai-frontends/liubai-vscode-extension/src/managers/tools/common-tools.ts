@@ -1,3 +1,4 @@
+import type { LiuSpaceAndMember } from "~/types/types-cloud"
 import liuUtil from "~/utils/liu-util"
 
 
@@ -19,4 +20,11 @@ export async function createClientKey(
   }
   const cipher = await liuUtil.crypto.encryptWithRSA(pk, client_key)
   return { aesKey, cipher }
+}
+
+export function getNicknameFromSpaceMemberList(
+  spaceMemberList: LiuSpaceAndMember[]
+) {
+  const personalMember = spaceMemberList.find(v => v.spaceType === "ME")
+  return personalMember?.member_name
 }
