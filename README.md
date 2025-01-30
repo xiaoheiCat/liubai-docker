@@ -13,6 +13,11 @@
 
 <br>
 
+> [!IMPORTANT]  
+> 我们没有发布任何虚拟代币！
+> 
+> We never release any virtual tokens!
+
 ## 已实现 🥂
 
 ✅ 原子化附着: 文本、图片、多级标签、状态、文件
