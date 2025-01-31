@@ -660,6 +660,9 @@
   "authorize": {
     "title_1": "连接至 {app}",
     "desc_1": "你即将授权 Liubai for {app} 获取和写入你的留白记事",
-    "authorize": "授权"
+    "authorize": "授权",
+    "opening_title": "正在打开 {app} ",
+    "opening_tip_1": "正在尝试打开 {app} ...",
+    "opening_tip_2": "若无反应，你可以在 {app} 上手动输入授权码 {code}"
   }
 }

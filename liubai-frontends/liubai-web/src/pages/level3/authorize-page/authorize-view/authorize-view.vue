@@ -5,11 +5,15 @@ import { appMap } from '../tools/app-map';
 import { useI18n } from 'vue-i18n';
 import { useSystemStore } from '~/hooks/stores/useSystemStore';
 import { storeToRefs } from 'pinia';
+import { useAuthorizeView } from './tools/useAuthorizeView';
 
-defineProps({
+const props = defineProps({
   appType: {
     type: String as PropType<LiuAppType>,
     required: true,
+  },
+  code: {
+    type: String,
   }
 })
 defineEmits(["agree"])
@@ -19,22 +23,28 @@ const { t } = useI18n()
 const systemStore = useSystemStore()
 const { supported_theme: theme } = storeToRefs(systemStore)
 
+const { showCode } = useAuthorizeView(props)
 
 </script>
 <template>
 
   <div class="liu-mc-box">
 
-    <!-- logos and check -->
+    <!-- logos and check (or arrow) -->
     <div class="av-logos">
       <div class="av-logo-box">
         <div class="av-our-logo-bg"></div>
       </div>
 
       <div class="av-connector">
-        <div class="av-dash"></div>
+        <div class="av-dash" :class="{ 'av-dash_moving': code }"></div>
+
         <div class="av-check-circle">
-          <svg-icon class="av-check-svg" 
+          <svg-icon v-if="code" class="av-arrow-svg" 
+            name="arrow-back"
+            color="var(--bg-color)"
+          ></svg-icon>
+          <svg-icon v-else class="av-check-svg" 
             name="check"
             color="var(--bg-color)"
           ></svg-icon>
@@ -84,12 +94,19 @@ const { supported_theme: theme } = storeToRefs(systemStore)
     </div>
 
     <!-- title -->
-    <div class="liu-no-user-select av-title">
+    <div v-if="code" class="liu-no-user-select av-title">
+      <span>{{ t('authorize.opening_title', { app: appMap[appType] }) }}</span>
+    </div>
+    <div v-else class="liu-no-user-select av-title">
       <span>{{ t('authorize.title_1', { app: appMap[appType] }) }}</span>
     </div>
 
     <!-- description -->
-    <div class="av-desc">
+    <div v-if="code" class="av-desc">
+      <span v-if="showCode" class="liu-selection">{{ t('authorize.opening_tip_2', { app: appMap[appType], code }) }}</span>
+      <span v-else class="liu-selection">{{ t('authorize.opening_tip_1', { app: appMap[appType] }) }}</span>
+    </div>
+    <div v-else class="av-desc">
       <span class="liu-selection">{{ t('authorize.desc_1', { app: appMap[appType] }) }}</span>
     </div>
 
@@ -145,12 +162,25 @@ const { supported_theme: theme } = storeToRefs(systemStore)
   align-items: center;
 }
 
+@keyframes moveRight {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 16px 0;
+  }
+}
+
 .av-dash {
   width: 100%;
   height: 2px;
   background-image: linear-gradient(to right, var(--main-note) 50%, transparent 50%);
   background-size: 8px 100%;
   background-repeat: repeat-x;
+}
+
+.av-dash_moving {
+  animation: moveRight 1s linear infinite;
 }
 
 .av-check-circle {
@@ -170,6 +200,12 @@ const { supported_theme: theme } = storeToRefs(systemStore)
 .av-check-svg {
   width: 20px;
   height: 20px;
+}
+
+.av-arrow-svg {
+  width: 20px;
+  height: 20px;
+  transform: rotate(180deg);
 }
 
 .av-logo-box_windsurf {
@@ -223,7 +259,7 @@ const { supported_theme: theme } = storeToRefs(systemStore)
 
 
 /** for mobile */
-@media screen and (max-width: 450px) {
+@media screen and (max-width: 490px) {
 
   .av-logo-box {
     width: 80px;

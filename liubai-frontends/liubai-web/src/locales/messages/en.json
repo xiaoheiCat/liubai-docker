@@ -660,6 +660,9 @@
   "authorize": {
     "title_1": "Connect to {app}",
     "desc_1": "You are authorizing Liubai for {app} to read and write your Liubai",
-    "authorize": "Authorize"
+    "authorize": "Authorize",
+    "opening_title": "Opening {app} ",
+    "opening_tip_1": "It's redirecting to {app} ...",
+    "opening_tip_2": "Enter the code {code} in {app} if no response"
   }
 }

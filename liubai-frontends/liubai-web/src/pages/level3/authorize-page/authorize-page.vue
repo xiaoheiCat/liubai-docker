@@ -16,6 +16,7 @@ const { apData } = useAuthoizePage()
       
       <AuthorizeView v-if="apData.appType"
         :app-type="apData.appType"
+        :code="apData.code"
       ></AuthorizeView>
       
 

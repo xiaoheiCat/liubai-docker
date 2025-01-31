@@ -660,6 +660,9 @@
   "authorize": {
     "title_1": "連結至 {app}",
     "desc_1": "你即將授權 Liubai for {app} 讀取和寫入你的留白記事",
-    "authorize": "授權"
+    "authorize": "授權",
+    "opening_title": "正在開啟 {app} ",
+    "opening_tip_1": "正在嘗試開啟 {app} ...",
+    "opening_tip_2": "若沒有響應，你可以在 {app} 上輸入認證碼 {code} 完成驗證"
   }
 }
