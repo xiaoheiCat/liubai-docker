@@ -60,4 +60,9 @@ function getAuthInfo(
   // 1. fetch 
   const url1 = APIs.AUTHORIZE
 
+  setTimeout(() => {
+    apData.appType = "windsurf"
+    apData.pageState = pageStates.OK
+  }, 1000)
+
 }

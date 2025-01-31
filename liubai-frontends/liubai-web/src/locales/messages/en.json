@@ -656,5 +656,10 @@
     "err_4": "It might not be an email address",
     "err_5": "The number in your region has not been opened yet",
     "compliance": "According to the local law, you have to bind your phone number before proceeding."
+  },
+  "authorize": {
+    "title_1": "Connect to {app}",
+    "desc_1": "You are authorizing Liubai for {app} to read and write your Liubai",
+    "authorize": "Authorize"
   }
 }
