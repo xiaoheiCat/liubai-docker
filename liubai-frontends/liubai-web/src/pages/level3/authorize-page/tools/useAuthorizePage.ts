@@ -8,6 +8,9 @@ import {
 } from "~/routes/liu-router";
 import valTool from "~/utils/basic/val-tool";
 import APIs from "~/requests/APIs";
+import liuReq from "~/requests/liu-req";
+import type { UserSettingsAPI } from "~/requests/req-types";
+import { showErrMsg } from "~/pages/level1/tools/show-msg";
 
 
 export function useAuthoizePage() {
@@ -49,7 +52,7 @@ function initAuthorizePage(
 }
 
 
-function getAuthInfo(
+async function getAuthInfo(
   apData: ApData,
   state: string,
   credential: string,
@@ -59,10 +62,31 @@ function getAuthInfo(
 
   // 1. fetch 
   const url1 = APIs.AUTHORIZE
+  const opt1 = {
+    operateType: "auth-get-info",
+    credential,
+  }
+  const res1 = await liuReq.request<UserSettingsAPI.Res_AuthGetInfo>(url1, opt1)
+  const { code, data } = res1
 
-  setTimeout(() => {
-    apData.appType = "project-idx"
-    apData.pageState = pageStates.OK
-  }, 1000)
+  console.log("see code: ", code)
 
+  // 2. handle result after fetching
+  if(code === "E4003") {
+    apData.pageState = pageStates.NO_AUTH
+    return
+  }
+  if(code === "E4004") {
+    apData.pageState = pageStates.NO_DATA
+    return
+  }
+  if(!data) {
+    apData.pageState = pageStates.NETWORK_ERR
+    showErrMsg("other", res1)
+    return
+  }
+
+  apData.appType = data.appType
+  apData.serial = data.serial
+  apData.pageState = pageStates.OK
 }

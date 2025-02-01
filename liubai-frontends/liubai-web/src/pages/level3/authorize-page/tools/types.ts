@@ -8,5 +8,6 @@ export interface ApData {
   state: string
   credential: string
   appType?: LiuAppType
+  serial?: string
   code?: string
 }
