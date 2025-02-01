@@ -7,6 +7,7 @@ import { useSystemStore } from '~/hooks/stores/useSystemStore';
 import { storeToRefs } from 'pinia';
 import { useAuthorizeView } from './tools/useAuthorizeView';
 import type { AuthorizeViewEmit } from "./tools/types";
+import AvatarName from "./avatar-name/avatar-name.vue"
 
 const props = defineProps({
   appType: {
@@ -26,7 +27,9 @@ const { supported_theme: theme } = storeToRefs(systemStore)
 
 const { 
   avData,
+  myProfile,
   onTapAgree,
+  onTapCancel,
 } = useAuthorizeView(props, emit)
 
 </script>
@@ -114,6 +117,34 @@ const {
       <span class="liu-selection">{{ t('authorize.desc_1', { app: appMap[appType] }) }}</span>
     </div>
 
+    <!-- buttons -->
+    <div v-if="!code" class="av-btn-container">
+
+      <!-- avatar + nickname for mobile -->
+      <div v-if="myProfile" class="av-mobile-profile">
+        <AvatarName :profile="myProfile"></AvatarName>
+      </div>
+
+      <!-- authorize -->
+      <custom-btn class="av-btn av-ok-btn" @click="onTapAgree"
+        :is-loading="avData.fetchingAgree"
+        :disabled="avData.fetchingAgree"
+      >
+        <span>{{ t('authorize.authorize') }}</span>
+      </custom-btn>
+
+      <!-- cancel -->
+      <custom-btn class="av-btn" @click="onTapCancel" type="pure">
+        <span>{{ t('common.cancel') }}</span>
+      </custom-btn>
+
+    </div>
+
+    <!-- avatar + nickname for desktop -->
+    <div v-if="myProfile && !code" class="av-desktop-profile">
+      <AvatarName :profile="myProfile"></AvatarName>
+    </div>
+
 
   </div>
 
@@ -126,8 +157,8 @@ const {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .av-logos {
@@ -253,7 +284,7 @@ const {
 }
 
 .av-desc {
-  margin-block-end: min(10%, 50px);
+  margin-block-end: min(20%, 100px);
   text-align: center;
   text-wrap: pretty;
   font-size: var(--desc-font);
@@ -261,10 +292,48 @@ const {
   max-width: 750px;
 }
 
+.av-mobile-profile {
+  display: block;
+  position: relative;
+  width: 100%;
+  margin-block-end: 20px;
+}
+
+.av-desktop-profile {
+  display: none;
+  position: relative;
+}
+
+.av-btn-container {
+  width: 100%;
+  margin-block-end: 30px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.av-btn {
+  max-width: var(--btn-max);
+}
+
+.av-ok-btn {
+  font-weight: 700;
+  margin-block-end: 12px;
+}
+
+@media screen and (max-width: 390px) {
+  .av-title {
+    font-size: var(--title-font);
+  }
+
+  .av-desc {
+    font-size: var(--inline-code-font);
+  }
+}
 
 /** for mobile */
 @media screen and (max-width: 490px) {
-
   .av-logo-box {
     width: 80px;
     height: 80px;
@@ -272,6 +341,34 @@ const {
 
   .av-connector {
     width: 100px;
+  }
+}
+
+/** for desktop */
+@media screen and (min-width: 590px) {
+
+  .av-mobile-profile {
+    display: none;
+  }
+
+  .av-desktop-profile {
+    display: block;
+    width: 100%;
+    margin-block-end: 20px;
+  }
+
+  .av-btn-container {
+    flex-direction: row-reverse;
+    justify-content: space-around;
+  }
+
+  .av-btn {
+    width: 40%;
+    max-width: 300px;
+  }
+
+  .av-ok-btn {
+    margin-block-end: 0;
   }
 }
 

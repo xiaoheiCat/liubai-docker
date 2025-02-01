@@ -9,6 +9,9 @@ const props = defineProps({
   borderRadius: {
     type: String,
     default: "50%",
+  },
+  fontSize: {
+    type: String,
   }
 })
 
@@ -25,11 +28,12 @@ const char = computed(() => {
   return ""
 })
 
-// 如果头像里的文字非英文，需要缩小
-const smallRequired = computed(() => {
+const charSize = computed(() => {
+  if(props.fontSize) return props.fontSize
+
   const c = char.value
-  if(c >= "A" && c <= "Z") return false
-  return true
+  if(c >= "A" && c <= "Z") return "25px"
+  return "22px"
 })
 
 const hasAvatar = computed(() => {
@@ -52,7 +56,7 @@ const hasAvatar = computed(() => {
     ></liu-img>
 
     <span class="la-span" v-else>{{ char }}</span>
-  
+
   </div>
 
 
@@ -86,7 +90,7 @@ const hasAvatar = computed(() => {
   }
 
   .la-span {
-    font-size: v-bind("smallRequired ? '22px' : '25px'");
+    font-size: v-bind("charSize");
     color: var(--avatar-color);
     position: relative;
     font-weight: 500;

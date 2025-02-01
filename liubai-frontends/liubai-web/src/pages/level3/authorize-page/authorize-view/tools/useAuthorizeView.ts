@@ -5,12 +5,16 @@ import type {
   AuthorizeViewData,
 } from "./types";
 import type { LiuTimeout } from "~/utils/basic/type-tool";
+import { useMyProfile } from "~/hooks/useCommon";
+import { useRouteAndLiuRouter } from "~/routes/liu-router";
 
 
 export function useAuthorizeView(
   props: AuthorizeViewProps,
   emit: AuthorizeViewEmit,
 ) {
+  const rr = useRouteAndLiuRouter()
+  const { myProfile } = useMyProfile()
   const avData = reactive<AuthorizeViewData>({
     showCode: false,
     fetchingAgree: false,
@@ -45,11 +49,17 @@ export function useAuthorizeView(
     emit("agree")
     setTimeout(() => {
       avData.fetchingAgree = false
-    }, 5000)
+    }, 6000)
+  }
+
+  const onTapCancel = () => {
+    rr.router.goHome()
   }
 
   return {
     avData,
+    myProfile,
     onTapAgree,
+    onTapCancel,
   }
 }
