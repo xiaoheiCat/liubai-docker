@@ -18,6 +18,22 @@ import { i18nFill } from "@/common-i18n"
 
 /***************************** Bots ***************************/
 export const aiBots: AiBot[] = [
+
+  /** chat using third-party */
+  {
+    name: "DeepSeek R1",
+    character: "ds-reasoner",
+    provider: "deepseek",
+    secondaryProvider: "siliconflow",
+    model: "deepseek-ai/DeepSeek-R1",
+    abilities: ["chat", "reasoning"],
+    alias: ["R1", "r1"],
+    maxWindowTokenK: 64,
+    metaData: {
+      thinkingInContent: true,
+    }
+  },
+
   /** chat using official providers */
   {
     name: "百小应",

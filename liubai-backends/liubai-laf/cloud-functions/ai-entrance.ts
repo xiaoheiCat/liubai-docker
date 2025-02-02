@@ -3508,7 +3508,13 @@ export class Palette {
 }
 
 
-class AiHelper {
+interface ThinkTagContent {
+  content: string;
+  startIndex: number;
+  endIndex: number;
+}
+
+export class AiHelper {
 
   // try to remove `tool` prompt when the previous prompt is not assistant
   // try to interleave the user/assistant messages in the message sequence for
@@ -4305,6 +4311,23 @@ class AiHelper {
     const _env = process.env
     return _env.LIU_WX_GZ_TYPE ?? "subscription_account"
   }
+
+  static extractThinkContentWithMeta(text: string): ThinkTagContent[] {
+    const regex = /<think>([\s\S]*?)<\/think>/g;
+    const results: ThinkTagContent[] = []
+    
+    let match: RegExpExecArray | null
+    while ((match = regex.exec(text)) !== null) {
+      results.push({
+        content: match[1],
+        startIndex: match.index,
+        endIndex: match.index + match[0].length
+      })
+    }
+    
+    return results
+  }
+  
 
 }
 

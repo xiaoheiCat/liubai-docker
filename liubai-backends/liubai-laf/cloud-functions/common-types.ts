@@ -657,6 +657,7 @@ export interface AiUsage {
 export interface AiBotMetaData {
   onlyOneSystemRoleMsg?: boolean
   zhipuWebSearch?: boolean     // false is default
+  thinkingInContent?: boolean  // <think>......</think>\n\nAnd then this is real content
 }
 
 export interface AiBot {
