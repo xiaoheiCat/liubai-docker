@@ -164,6 +164,7 @@ declare global {
       /** Characters */
       LIU_WXGZH_KF_BAIXIAOYING?: string      // kf_account of baixiaoying
       LIU_WXGZH_KF_DEEPSEEK?: string         // kf_account of deepseek
+      LIU_WXGZH_KF_DS_REASONER?: string      // kf_account of ds-reasoner
       LIU_WXGZH_KF_HAILUO?: string           // kf_account of hailuo
       LIU_WXGZH_KF_KIMI?: string             // kf_account of kimi
       LIU_WXGZH_KF_WANZHI?: string           // kf_account of wanzhi

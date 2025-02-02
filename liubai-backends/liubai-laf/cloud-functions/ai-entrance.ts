@@ -43,6 +43,7 @@ import {
   Ns_Zhipu,
   Ns_SiliconFlow,
   Ns_Stepfun,
+  type DsReasonerMessage,
 } from "@/common-types"
 import OpenAI from "openai"
 import { 
@@ -165,6 +166,7 @@ type AiRunResults = Array<AiRunSuccess | undefined>
 interface AiHelperAssistantMsgParam {
   roomId: string
   text?: string
+  reasoning_content?: string
   model: string
   character: AiCharacter
   usage?: AiUsage
@@ -343,6 +345,11 @@ function mapBots(
     const bot1 = new BotDeepSeek(user)
     const pro1 = bot1.run(aiParam)
     promises.push(pro1)
+  }
+  else if(c === "ds-reasoner") {
+    const botDsR = new BotDsReasoner(user)
+    const proDsR = botDsR.run(aiParam)
+    promises.push(proDsR)
   }
   else if(c === "hailuo") {
     const botMinimax = new BotMiniMax(user)
@@ -1365,8 +1372,11 @@ class BaseBot {
     const c = bot.character
 
     // 1. get text
-    const txt6 = AiHelper.getTextFromLLM(chatCompletion, bot)
-    if(!txt6) return
+    const txt1 = AiHelper.getTextFromLLM(chatCompletion, bot)
+    if(!txt1) return
+
+    // 1.2 get reasoning_content
+    const txt1_2 = AiHelper.getReasoningContent(chatCompletion)
 
     // 2. reply to user
     const finishReason = AiHelper.getFinishReason(chatCompletion)
@@ -1374,21 +1384,22 @@ class BaseBot {
     if(finishReason === "length" && gzhType === "service_account") {
       TellUser.menu(
         aiParam.entry, 
-        txt6, 
+        txt1, 
         [{ operation: "continue", character: c }],
         "",
         c,
       )
     }
     else {
-      TellUser.text(aiParam.entry, txt6, bot)
+      TellUser.text(aiParam.entry, txt1, bot)
     }
     
     // 3. add assistant chat
     const apiEndpoint = AiHelper.getApiEndpointFromBot(bot)
-    const param9: AiHelperAssistantMsgParam = {
+    const param3: AiHelperAssistantMsgParam = {
       roomId,
-      text: txt6,
+      text: txt1,
+      reasoning_content: txt1_2,
       model: bot.model,
       character: c,
       usage: chatCompletion.usage,
@@ -1396,7 +1407,7 @@ class BaseBot {
       baseUrl: apiEndpoint?.baseURL,
       finish_reason: AiHelper.getFinishReason(chatCompletion),
     }
-    const assistantChatId = await AiHelper.addAssistantMsg(param9)
+    const assistantChatId = await AiHelper.addAssistantMsg(param3)
     if(!assistantChatId) return
 
     return assistantChatId
@@ -1575,6 +1586,50 @@ class BotDeepSeek extends BaseBot {
     return res6
   }
 
+}
+
+class BotDsReasoner extends BaseBot {
+
+  constructor(user?: Table_User) {
+    super("ds-reasoner", user)
+  }
+
+  async run(aiParam: AiRunParam): Promise<AiRunSuccess | undefined> {
+    // 1. pre run
+    const res1 = this.preRun(aiParam)
+    if(!res1) return
+    const { prompts, totalToken, bot, chats, tools } = res1
+
+    // 2. get other params
+    const model = bot.model
+
+    // 3. handle other things
+    if(aiParam.isContinueCommand) {
+      prompts.push({ role: "user", content: "Continue / 继续" })
+    }
+
+    // 4. calculate maxTokens
+    const maxToken = AiHelper.getMaxToken(totalToken, chats[0], bot)
+
+    // 5. to chat
+    const chatParam: OaiCreateParam = {
+      messages: prompts,
+      max_tokens: maxToken,
+      model,
+      tools,
+    }
+    const chatCompletion = await this.chat(chatParam, bot)
+    
+    // 6. post run
+    const postParam: PostRunParam = {
+      aiParam,
+      chatParam,
+      chatCompletion,
+      bot,
+    }
+    const res6 = await this.postRun(postParam)
+    return res6
+  }
 }
 
 class BotMiniMax extends BaseBot {
@@ -3604,6 +3659,7 @@ class AiHelper {
       roomId: param.roomId,
       infoType: param.funcName ? "tool_use" : "assistant",
       text: param.text,
+      reasoning_content: param.reasoning_content,
       model: param.model,
       character: param.character,
       usage: param.usage,
@@ -3763,6 +3819,12 @@ class AiHelper {
       }
       return false
     }
+    else if(c === "ds-reasoner") {
+      if(_env.LIU_DEEPSEEK_API_KEY && _env.LIU_DEEPSEEK_BASE_URL) {
+        return true
+      }
+      return false
+    }
     else if(c === "hailuo") {
       if(_env.LIU_MINIMAX_API_KEY && _env.LIU_MINIMAX_BASE_URL) {
         return true
@@ -3876,7 +3938,7 @@ class AiHelper {
       return
     }
 
-    let message = choices[0].message
+    const message = choices[0].message
     if(!message) {
       console.warn("no message in getTextFromLLM")
       console.log(choices)
@@ -3895,6 +3957,18 @@ class AiHelper {
     }
 
     return text.trim()
+  }
+
+  static getReasoningContent(
+    res: OaiChatCompletion,
+  ) {
+    const choices = res?.choices
+    if(!choices || choices.length < 1) return
+
+    const message = choices[0].message as DsReasonerMessage
+    if(!message) return
+
+    return message.reasoning_content
   }
 
   static getFinishReason(
@@ -4725,6 +4799,9 @@ class TellUser {
     }
     else if(c === "deepseek") {
       return _env.LIU_WXGZH_KF_DEEPSEEK
+    }
+    else if(c === "ds-reasoner") {
+      return _env.LIU_WXGZH_KF_DS_REASONER
     }
     else if(c === "hailuo") {
       return _env.LIU_WXGZH_KF_HAILUO

@@ -614,7 +614,7 @@ export type AiSecondaryProvider = "siliconflow"
 
 // AiCharacter 不跟供应商绑定，它是角色，只不过现在各个供应商都有自己的 To C 角色罢了
 export type AiCharacter = "baixiaoying" | "deepseek" | "hailuo" | "kimi" | "yuewen" | 
-  "wanzhi" | "zhipu"
+  "wanzhi" | "zhipu" | "ds-reasoner"
 
 export type AiInfoType = "user" | "assistant" | "summary" | "clear" | 
   "action" | "background" | "tool_use"
@@ -627,11 +627,13 @@ export type AiInfoType = "user" | "assistant" | "summary" | "clear" |
 // tool_use: 使用工具
 
 
-export type AiAbility = "chat" | "text_to_image" | "image_to_text" | "tool_use" | "input_audio"
+export type AiAbility = "chat" | "text_to_image" | "image_to_text" | "tool_use" | 
+  "input_audio" | "reasoning"
 // chat: interact with plain-text
 // text_to_image: user inputs text and LLM return image
 // image_to_text: user inputs image and LLM return text
 // input_audio: user inputs audio and LLM can understand
+// reasoning: Reasoning Models
 
 export type AiMsgType = "text" | "image" | "voice"
 
@@ -706,6 +708,12 @@ export type OaiChatCompletion = OpenAI.Chat.ChatCompletion
 export type OaiMessage = OpenAI.Chat.ChatCompletionMessage
 export type OaiToolCall = OpenAI.Chat.ChatCompletionMessageToolCall
 export type OaiChoice = OpenAI.Chat.ChatCompletion.Choice
+export interface DsReasonerMessage {
+  role: "assistant"
+  content: string
+  reasoning_content?: string
+}
+
 
 /******** ai tool-use *********/
 
@@ -1661,6 +1669,7 @@ export interface Table_AiChat extends BaseTable {
   funcJson?: Record<string, any>    // we have to filter from LLM response
   tool_calls?: OaiToolCall[]
   finish_reason?: AiFinishReason
+  reasoning_content?: string        // from reasoning models like DeepSeek R1
 
   // about web-search
   webSearchProvider?: LiuAi.SearchProvider

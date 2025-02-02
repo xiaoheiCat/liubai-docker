@@ -32,12 +32,21 @@ export const aiBots: AiBot[] = [
     }
   },
   {
-    name: "DeepSeek",
+    name: "DeepSeek V3",
     character: "deepseek",
     provider: "deepseek",
     model: "deepseek-chat",
     abilities: ["chat", "tool_use"],
-    alias: ["深度求索"],
+    alias: ["深度求索", "ds", "v3", "deepseek"],
+    maxWindowTokenK: 64,
+  },
+  {
+    name: "DeepSeek R1",
+    character: "ds-reasoner",
+    provider: "deepseek",
+    model: "deepseek-reasoner",
+    abilities: ["chat", "reasoning"],
+    alias: ["R1", "r1"],
     maxWindowTokenK: 64,
   },
   {
@@ -70,15 +79,6 @@ export const aiBots: AiBot[] = [
     alias: ["阶跃星辰", "stepfun", "阶跃"],
     maxWindowTokenK: 8,
   },
-  // {
-  //   name: "万知",
-  //   character: "wanzhi",
-  //   provider: "zero-one",
-  //   model: "yi-large-fc",
-  //   abilities: ["chat", "tool_use"],
-  //   alias: ["零一万物", "01.ai", "01", "零一"],
-  //   maxWindowTokenK: 32,
-  // },
   {
     name: "万知",
     character: "wanzhi",
@@ -172,12 +172,6 @@ const system_wx_entry = `
 
 const system_example = `
 下面使用 <user> 标签表示人们发来的消息，<assistant> 标签表示你的回复
-<user>
-你好
-</user>
-<assistant>
-Hi, 我是 deepseek，有什么需要帮助
-</assistant>
 
 <user>
 😥
@@ -266,6 +260,29 @@ ${system_last_request}
 
 const wx_deepseek_system_1 = `
 你叫 DeepSeek，是由深度求索公司开发的人工智能助手。
+你将协同应用“留白记事”，为人们提供信息检索、内容整理、待办创建、查看最近的日程等服务，帮助每个人都成为超级个体！
+
+【留白记事介绍】
+${system_intro}
+
+【当前环境】
+${system_wx_env}
+
+【常用入口、捷径、网址】
+${system_wx_entry}
+
+【问答示例】
+${system_example}
+
+【你的设定】
+${system_settings}
+
+【最后的请求】
+${system_last_request}
+`
+
+const wx_ds_reasoner_system_1 = `
+你叫 DeepSeek R1，是由深度求索公司开发的人工智能助手。
 你将协同应用“留白记事”，为人们提供信息检索、内容整理、待办创建、查看最近的日程等服务，帮助每个人都成为超级个体！
 
 【留白记事介绍】
@@ -409,6 +426,9 @@ const wx_gzh_prompts = {
   },
   "deepseek": {
     "system_1": wx_deepseek_system_1
+  },
+  "ds-reasoner": {
+    "system_1": wx_ds_reasoner_system_1
   },
   "hailuo": {
     "system_1": wx_hailuo_system_1
