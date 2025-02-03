@@ -20,7 +20,7 @@
     "biome-lint": "biome lint src/ --write"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "dependencies": {
     "@bugfender/sdk": "^2.3.0",

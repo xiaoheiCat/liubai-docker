@@ -867,18 +867,18 @@ class BaseBot {
     PromptsChecker.run(params.messages, bot)
 
     // print last 5 prompts
-    const lastNum = 100
-    const msgLength = params.messages.length
-    console.log(`last ${lastNum} prompts: `)
-    if(msgLength > lastNum) {
-      const messages2 = params.messages.slice(msgLength - lastNum)
-      const printMsg = valTool.objToStr({ messages: messages2 })
-      console.log(printMsg)
-    }
-    else {
-      const printMsg = valTool.objToStr({ messages: params.messages })
-      console.log(printMsg)
-    }
+    // const lastNum = 5
+    // const msgLength = params.messages.length
+    // console.log(`last ${lastNum} prompts: `)
+    // if(msgLength > lastNum) {
+    //   const messages2 = params.messages.slice(msgLength - lastNum)
+    //   const printMsg = valTool.objToStr({ messages: messages2 })
+    //   console.log(printMsg)
+    // }
+    // else {
+    //   const printMsg = valTool.objToStr({ messages: params.messages })
+    //   console.log(printMsg)
+    // }
     
 
     const llm = new BaseLLM(apiData.apiKey, apiData.baseURL)
