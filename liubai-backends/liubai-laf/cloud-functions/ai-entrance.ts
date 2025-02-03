@@ -1398,20 +1398,9 @@ class BaseBot {
     } = AiHelper.getContentFromLLM(chatCompletion, bot)
     if(!txt1_1) return
 
-    // 2. reply to user
-    const finishReason = AiHelper.getFinishReason(chatCompletion)
-    const gzhType = AiHelper.getGzhType()
-    if(finishReason === "length" && gzhType === "service_account") {
-      TellUser.menu(
-        aiParam.entry, 
-        txt1_1, 
-        [{ operation: "continue", character: c }],
-        "",
-        c,
-      )
-    }
-    else {
-      TellUser.text(aiParam.entry, txt1_1, bot)
+    // 2. reply to user without reasoning_content
+    if(!txt1_2) {
+      this._replyToUser(chatCompletion, aiParam, bot, txt1_1)
     }
     
     // 3. add assistant chat
@@ -1428,9 +1417,49 @@ class BaseBot {
       finish_reason: AiHelper.getFinishReason(chatCompletion),
     }
     const assistantChatId = await AiHelper.addAssistantMsg(param3)
-    if(!assistantChatId) return
+
+    // 4. reply to user with reasoning_content
+    if(txt1_2) {
+      this._replyToUser(chatCompletion, aiParam, bot, txt1_1, assistantChatId)
+    }
+
 
     return assistantChatId
+  }
+
+  private _replyToUser(
+    chatCompletion: OaiChatCompletion,
+    aiParam: AiRunParam,
+    bot: AiBot,
+    txt1_1: string,
+    assistantChatId?: string,
+  ) {
+    const c = bot.character
+    const finishReason = AiHelper.getFinishReason(chatCompletion)
+    const gzhType = AiHelper.getGzhType()
+
+    let text = txt1_1
+    if(assistantChatId) {
+      const user = aiParam.entry.user
+      const { t } = useI18n(aiLang, { user })
+      const domain = getLiuDoman()
+      const link = `${domain}/CoT?chatId=${assistantChatId}`
+      const view_thinking = `<a href='${link}'>${t("view_thinking")}</a>`
+      text += `\n\n` + view_thinking
+    }
+
+    if(finishReason === "length" && gzhType === "service_account") {
+      TellUser.menu(
+        aiParam.entry, 
+        text, 
+        [{ operation: "continue", character: c }],
+        "",
+        c,
+      )
+    }
+    else {
+      TellUser.text(aiParam.entry, text, bot)
+    }
   }
 
   private _handleLength(message: OaiMessage) {
@@ -2445,7 +2474,6 @@ class ToolHandler {
   private _getAgreeAndEditLinks(assistantChatId: string) {
     const domain = getLiuDoman()
 
-    // WIP: compose page
     const agreeLink = `${domain}/agree?chatId=${assistantChatId}`
     const editLink = `${domain}/compose?chatId=${assistantChatId}`
 

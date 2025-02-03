@@ -380,6 +380,7 @@ export const aiLang: LangAtom = {
     "bot_read_note": "{bot}查看了最近的笔记",
     "bot_read_finished": "{bot}查看了最近完成的事项",
     "bot_read_event": "{bot}查看了最近添加的事件",
+    "view_thinking": "查看思考过程",
   },
   "zh-Hant": {
     "privacy_title": "🔓 隱私提示:",
@@ -482,6 +483,7 @@ export const aiLang: LangAtom = {
     "bot_read_note": "{bot}檢視了最近的筆記",
     "bot_read_finished": "{bot}檢視了最近完成的事項",
     "bot_read_event": "{bot}檢視了最近新增的事件",
+    "view_thinking": "檢視思考過程",
   },
   "en": {
     "privacy_title": "🔓 Privacy:",
@@ -584,6 +586,7 @@ export const aiLang: LangAtom = {
     "bot_read_note": "{bot} read latest notes",
     "bot_read_finished": "{bot} read latest finished tasks",
     "bot_read_event": "{bot} read latest added events",
+    "view_thinking": "Dive into Thinking",
   }
 }
 

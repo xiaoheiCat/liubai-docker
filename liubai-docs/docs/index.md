@@ -32,6 +32,6 @@ features:
       dark: /liu-assets/person_celebrate_dark_theme.svg
       light: /liu-assets/person_celebrate_light_theme.svg
     title: "AI 加持"
-    details: "在微信里，任意使用 7 家大模型，协助打理你的生活。"
+    details: "在微信里，任意使用 7 家大模型（包含 DeepSeek R1），协助打理你的生活。"
 ---
 
