@@ -603,18 +603,26 @@ class AiDirective {
 
   private static async toAddBot(entry: AiEntry, bot: AiBot) {
     const user = entry.user
-    const { t } = useI18n(aiLang, { user })
 
     // 1. get the user's ai room
-    const room = await AiHelper.getMyAiRoom(entry)
+    const room = await AiHelper.getMyAiRoom(entry, bot)
     if(!room) return
     const { characters } = room
 
     // 2. find the bot in the room
     const theBot = characters.find(v => v === bot.character)
     if(theBot) {
-      const msg2 = t("already_exist", { botName: bot.name })
-      TellUser.text(entry, msg2)
+      const roomCreatedStamp = room.insertedStamp
+      const diff2 = getNowStamp() - roomCreatedStamp
+      if(diff2 < 2000) {
+        // this room just added
+        this._sayHello(entry, bot)
+      }
+      else {
+        const { t } = useI18n(aiLang, { user })
+        const msg2_2 = t("already_exist", { botName: bot.name })
+        TellUser.text(entry, msg2_2)
+      }
       return
     }
 
@@ -634,14 +642,23 @@ class AiDirective {
     const res4 = await rCol.doc(room._id).update(u4)
 
     // 5. send a message to user
+    this._sayHello(entry, bot)
+    LogHelper.add([bot.character], user)
+    return true
+  }
+
+  private static _sayHello(
+    entry: AiEntry,
+    bot: AiBot,
+  ) {
     const msgList = ["called_1", "called_2", "called_3", "called_4"]
     const r = Math.floor(Math.random() * msgList.length)
     const msgKey = msgList[r]
-    const msg5 = t(msgKey, { botName: bot.name })
-    TellUser.text(entry, msg5, bot)
-    LogHelper.add([bot.character], user)
 
-    return true
+    const user = entry.user
+    const { t } = useI18n(aiLang, { user })
+    const msg = t(msgKey, { botName: bot.name })
+    TellUser.text(entry, msg, bot)
   }
 
   private static isKickBot(text: string) {
@@ -3649,6 +3666,7 @@ class AiHelper {
 
   static async getMyAiRoom(
     entry: AiEntry,
+    botUserWannaAdd?: AiBot,
   ) {
     // 1. get room
     const userId = entry.user._id
@@ -3657,11 +3675,20 @@ class AiHelper {
     const room = res1.data
     if(room) return room
   
-    // 2. create room
+    // 2.1 get available characters
     const b2 = getBasicStampWhileAdding()
     const characters = this.fillCharacters()
-    console.log("init characters: ")
-    console.log(characters)
+
+    // 2.2 try to add bot user wants
+    if(botUserWannaAdd) {
+      const c2_2 = botUserWannaAdd.character
+      const canAdd = this.isCharacterAvailable(botUserWannaAdd.character)
+      if(canAdd && !characters.includes(c2_2)) {
+        characters.splice(0, 1, c2_2)
+      }
+    }
+
+    // 3. to create
     const room2: Partial_Id<Table_AiRoom> = {
       ...b2,
       owner: userId,
