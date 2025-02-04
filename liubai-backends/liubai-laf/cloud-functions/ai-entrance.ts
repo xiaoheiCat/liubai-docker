@@ -215,6 +215,7 @@ interface TurnChatsIntoPromptOpt {
 interface BaseLLMChatOpt {
   maxTryTimes?: number
   user?: Table_User
+  timeoutSec?: number
 }
 
 /********************* empty function ****************/
@@ -738,6 +739,8 @@ class AiDirective {
 
 /**************************** Bots ***************************/
 
+type BaseChatResolver = (res: OaiChatCompletion | undefined) => void
+
 class BaseLLM {
   protected _client: OpenAI | undefined
   protected _baseUrl: string | undefined
@@ -754,7 +757,38 @@ class BaseLLM {
 
   private _tryTimes = 0
 
-  public async chat(
+  public chat(
+    params: OpenAI.Chat.ChatCompletionCreateParams,
+    opt?: BaseLLMChatOpt,
+  ): Promise<OaiChatCompletion | undefined> {
+    const _this = this
+    const timeoutSec = opt?.timeoutSec ?? 59
+    let hasReturn = false
+
+    const _wait = async (a: BaseChatResolver) => {
+      // 1. set timeout
+      let timeout = setTimeout(() => {
+        if(hasReturn) return
+        console.warn("custom timeout occurs!")
+        hasReturn = true
+        a(undefined)
+      }, timeoutSec * 1000)
+
+      // 2. to chat
+      const res = await _this._chat(params, opt)
+
+      // 3. decide to continue
+      if(hasReturn) return
+      hasReturn = true
+      clearTimeout(timeout)
+
+      a(res)
+    }
+
+    return new Promise(_wait)
+  }
+
+  private async _chat(
     params: OpenAI.Chat.ChatCompletionCreateParams,
     opt?: BaseLLMChatOpt,
   ): Promise<OaiChatCompletion | undefined> {
@@ -763,12 +797,9 @@ class BaseLLM {
     if(!client) return
 
     _this._tryTimes++
-    const timeout = _this._tryTimes > 1 ? 15000 : 30000
 
     try {
-      const chatCompletion = await client.chat.completions.create(params, {
-        timeout,
-      })
+      const chatCompletion = await client.chat.completions.create(params)
       _this._tryTimes = 0
       _this._log(chatCompletion as any, opt)
       return chatCompletion as OaiChatCompletion
