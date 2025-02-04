@@ -107,6 +107,12 @@ const MIN_3 = MINUTE * 3
 const HOUR_12 = HOUR * 12
 const INDEX_TO_PRESERVE_IMAGES = 12     // the images which appears in the first INDEX_TO_PRESERVE_IMAGES will be preserved rather than compressed to text like [image]
 
+// characters which take a rest will not be filled whle users launch a new chat
+const charactersTakingARest: AiCharacter[] = [
+  "ds-reasoner",
+  "deepseek",
+]
+
 /************************** types ************************/
 
 interface AiCard {
@@ -565,6 +571,7 @@ class AiDirective {
     // 4. get non-used characters
     let addedList = await AiHelper.getNonUsedCharacters(roomId)
     addedList = addedList.filter(v => !Boolean(oldCharacters.includes(v)))
+    addedList = addedList.filter(v => !Boolean(charactersTakingARest.includes(v)))
     const reservedNum = newCharacters.length < 1 ? 4 : 3
     if(addedList.length > reservedNum) {
       addedList.splice(reservedNum, addedList.length - reservedNum)
@@ -904,18 +911,18 @@ class BaseBot {
     PromptsChecker.run(params.messages, bot)
 
     // print last 5 prompts
-    const lastNum = 100
-    const msgLength = params.messages.length
-    console.log(`last ${lastNum} prompts: `)
-    if(msgLength > lastNum) {
-      const messages2 = params.messages.slice(msgLength - lastNum)
-      const printMsg = valTool.objToStr({ messages: messages2 })
-      console.log(printMsg)
-    }
-    else {
-      const printMsg = valTool.objToStr({ messages: params.messages })
-      console.log(printMsg)
-    }
+    // const lastNum = 100
+    // const msgLength = params.messages.length
+    // console.log(`last ${lastNum} prompts: `)
+    // if(msgLength > lastNum) {
+    //   const messages2 = params.messages.slice(msgLength - lastNum)
+    //   const printMsg = valTool.objToStr({ messages: messages2 })
+    //   console.log(printMsg)
+    // }
+    // else {
+    //   const printMsg = valTool.objToStr({ messages: params.messages })
+    //   console.log(printMsg)
+    // }
     
 
     const llm = new BaseLLM(
@@ -1448,11 +1455,12 @@ class BaseBot {
     const c = bot.character
 
     // 1. get content & reasoning_content
-    const {
+    let {
       content: txt1_1,
       reasoning_content: txt1_2,
     } = AiHelper.getContentFromLLM(chatCompletion, bot)
     if(!txt1_1) return
+    txt1_1 = this._clipContent(txt1_1)
 
     // 2. reply to user without reasoning_content
     if(!txt1_2) {
@@ -1481,6 +1489,30 @@ class BaseBot {
 
 
     return assistantChatId
+  }
+
+  private _clipContent(text: string) {
+    const MAX_REPLIED_WORDS = 600
+    const MAX_CHARS = MAX_REPLIED_WORDS * 2
+    if(text.length < MAX_REPLIED_WORDS) return text
+    const list = text.split("\n")
+    let newText = ""
+    let charNum = 0
+
+    for(let i=0; i<list.length; i++) {
+      const row = list[i]
+      newText += `${row}\n`
+      const theNum = valTool.getTextCharNum(row)
+      charNum += theNum
+      if(charNum > MAX_CHARS) {
+        console.warn("clip the content because it exceeds the limit")
+        console.log(list[i + 1])
+        break
+      }
+    }
+
+    newText = newText.trim()
+    return newText
   }
 
   private _replyToUser(
@@ -3814,13 +3846,32 @@ class AiHelper {
     if(all_characters.length <= MAX_CHARACTERS) {
       return all_characters
     }
+    const copied_characters = [...all_characters].splice(0, MAX_CHARACTERS)
 
+    let tryTimes = 0
     const my_characters: AiCharacter[] = []
     for(let i=0; i<MAX_CHARACTERS; i++) {
+      // 1. to avoid dead loop
+      tryTimes++
+      if(tryTimes > 10) break
+
+      // 2. get a random character
       const r = Math.floor(Math.random() * all_characters.length)
       const c = all_characters[r]
+
+      // 3. to skip a bot taking a rest
+      if(charactersTakingARest.includes(c)) {
+        i--
+        continue
+      }
+
       my_characters.push(c)
       all_characters.splice(r, 1)
+    }
+
+    // return copied characters if my_characters is empty
+    if(my_characters.length < 1) {
+      return copied_characters
     }
 
     return my_characters
@@ -4068,6 +4119,10 @@ class AiHelper {
     aiParam: AiRunParam,
     bot?: AiBot,
   ) {
+    if(bot && this.isReasoningBot(bot)) {
+      return true
+    }
+
     const { room, chatId, isContinueCommand } = aiParam
     const roomId = room._id
     const col = db.collection("AiChat")
@@ -4281,10 +4336,10 @@ class AiHelper {
         content = content.substring(thinkContent.endIndex).trim()
         reasoning_content = thinkContent.content
 
-        console.warn("new content: ")
-        console.log(content)
-        console.warn("reasoning_content: ")
-        console.log(reasoning_content)
+        // console.warn("new content: ")
+        // console.log(content)
+        // console.warn("reasoning_content: ")
+        // console.log(reasoning_content)
       }
     }
     if(reasoning_content) {
@@ -4338,6 +4393,10 @@ class AiHelper {
     for(let i=0; i<availableCharacters.length; i++) {
       const v = availableCharacters[i]
       if(characters.includes(v)) {
+        availableCharacters.splice(i, 1)
+        i--
+      }
+      else if(charactersTakingARest.includes(v)) {
         availableCharacters.splice(i, 1)
         i--
       }
