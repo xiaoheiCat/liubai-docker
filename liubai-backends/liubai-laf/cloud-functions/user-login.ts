@@ -1239,8 +1239,6 @@ async function handle_wx_gzh_oauth(
   if(!data8) {
     return { code: "E5004", errMsg: "there is no data8 from wx gzh" }
   }
-  console.log("let me see data8:::")
-  console.log(data8)
 
   // 9. set thirdData as new data (data8)
   wx_gzh.subscribe = data8.subscribe

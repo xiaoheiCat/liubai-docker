@@ -29,9 +29,29 @@ export const aiBots: AiBot[] = [
     abilities: ["chat", "reasoning"],
     alias: ["R1", "r1"],
     maxWindowTokenK: 64,
+    priority: 10,
     metaData: {
       thinkingInContent: true,
       onlyOneSystemRoleMsg: true,
+    }
+  },
+  {
+    name: "DeepSeek R1",
+    character: "ds-reasoner",
+    provider: "deepseek",
+    secondaryProvider: "gitee-ai",
+    model: "DeepSeek-R1-Distill-Qwen-32B",
+    abilities: ["chat", "reasoning"],
+    alias: ["R1", "r1"],
+    maxWindowTokenK: 64,
+    priority: 17,
+    metaData: {
+      thinkingInContent: true,
+      onlyOneSystemRoleMsg: true,
+      defaultHeaders: {
+        "X-Failover-Enabled": "true",
+        "X-Package": "1917",    // 1910: 不指定算力提供商    1492: 沐曦    1917: 无问芯穹    
+      },
     }
   },
 
@@ -44,6 +64,7 @@ export const aiBots: AiBot[] = [
     abilities: ["chat", "tool_use"],
     alias: ["百川", "百川AI"],
     maxWindowTokenK: 32,
+    priority: 10,
     metaData: {
       onlyOneSystemRoleMsg: true,
     }
@@ -55,6 +76,7 @@ export const aiBots: AiBot[] = [
     model: "deepseek-chat",
     abilities: ["chat", "tool_use"],
     alias: ["深度求索", "ds", "v3", "deepseek"],
+    priority: 10,
     maxWindowTokenK: 64,
   },
   {
@@ -65,6 +87,7 @@ export const aiBots: AiBot[] = [
     abilities: ["chat", "reasoning"],
     alias: ["R1", "r1"],
     maxWindowTokenK: 64,
+    priority: 5,
     metaData: {
       onlyOneSystemRoleMsg: true,
     }
@@ -77,6 +100,7 @@ export const aiBots: AiBot[] = [
     abilities: ["chat", "tool_use", "image_to_text", "input_audio"],
     alias: ["MM智能助理", "海螺AI"],
     maxWindowTokenK: 1000,
+    priority: 10,
     metaData: {
       onlyOneSystemRoleMsg: true,
     }
@@ -89,6 +113,7 @@ export const aiBots: AiBot[] = [
     abilities: ["chat", "tool_use"],
     alias: ["Moonshot", "月之暗面"],
     maxWindowTokenK: 8,
+    priority: 10,
   },
   {
     name: "跃问",
@@ -98,6 +123,7 @@ export const aiBots: AiBot[] = [
     abilities: ["chat"],
     alias: ["阶跃星辰", "stepfun", "阶跃"],
     maxWindowTokenK: 8,
+    priority: 10,
   },
   {
     name: "万知",
@@ -107,6 +133,7 @@ export const aiBots: AiBot[] = [
     abilities: ["chat"],
     alias: ["零一万物", "01.ai", "01", "零一"],
     maxWindowTokenK: 16,
+    priority: 10,
   },
   {
     name: "智谱",
@@ -116,6 +143,7 @@ export const aiBots: AiBot[] = [
     abilities: ["chat", "tool_use"],
     alias: ["智谱AI", "智谱清言", "ChatGLM"],
     maxWindowTokenK: 128,
+    priority: 10,
     metaData: {
       zhipuWebSearch: true,
     }
@@ -130,6 +158,7 @@ export const aiBots: AiBot[] = [
     abilities: ["chat", "tool_use", "image_to_text"],
     alias: ["Moonshot", "月之暗面"],
     maxWindowTokenK: 8,
+    priority: 10,
   },
   {
     name: "跃问",
@@ -139,6 +168,7 @@ export const aiBots: AiBot[] = [
     abilities: ["chat", "image_to_text"],
     alias: ["阶跃星辰", "stepfun", "阶跃"],
     maxWindowTokenK: 32,
+    priority: 10,
   },
   {
     name: "万知",
@@ -148,6 +178,7 @@ export const aiBots: AiBot[] = [
     abilities: ["chat", "image_to_text"],
     alias: ["零一万物", "01.ai", "01", "零一"],
     maxWindowTokenK: 16,
+    priority: 10,
   },
   {
     name: "智谱",
@@ -157,6 +188,7 @@ export const aiBots: AiBot[] = [
     abilities: ["chat", "tool_use", "image_to_text"],
     alias: ["智谱AI", "智谱清言", "ChatGLM"],
     maxWindowTokenK: 8,
+    priority: 10,
     metaData: {
       zhipuWebSearch: true,
     }

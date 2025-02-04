@@ -980,6 +980,12 @@ export class MarkdownParser {
 
 
   static mdToText(md: string) {
+    // Convert headings to plain text
+    md = md.replace(/^#{1,6}\s+(.+)$/gm, '$1');
+
+    // Covert bold/strong text with \n into plain-text
+    md = md.replace(/\n\*\*([^*\n]+)\*\*\n/g, '\n$1\n');
+
     // Convert bold/strong text (**** or **) to Chinese quotes 「」
     // but skip if already has quotes
     const _handleBold = (match:string, content: any, offset: any) => {
@@ -1001,9 +1007,6 @@ export class MarkdownParser {
     md = md.replace(/^(\s*)[-*+][\s]+(.+)$/gm, (match, spaces, content) => {
       return `${spaces || ' '}• ${content}`
     });
-    
-    // Convert headings to plain text
-    md = md.replace(/^#{1,6}\s+(.+)$/gm, '$1');
 
     // trim “* - \n” in the beginning and ending
     md = this._trimText(md)

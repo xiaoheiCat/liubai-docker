@@ -744,10 +744,14 @@ type BaseChatResolver = (res: OaiChatCompletion | undefined) => void
 class BaseLLM {
   protected _client: OpenAI | undefined
   protected _baseUrl: string | undefined
-  constructor(apiKey?: string, baseURL?: string) {
+  constructor(
+    apiKey?: string, 
+    baseURL?: string,
+    defaultHeaders?: Record<string, string>,
+  ) {
     this._baseUrl = baseURL
     try {
-      this._client = new OpenAI({ apiKey, baseURL })
+      this._client = new OpenAI({ apiKey, baseURL, defaultHeaders })
     }
     catch(err) {
       console.warn("BaseLLM constructor gets client error: ")
@@ -797,9 +801,10 @@ class BaseLLM {
     if(!client) return
 
     _this._tryTimes++
+    const copiedParams = valTool.copyObject(params)
 
     try {
-      const chatCompletion = await client.chat.completions.create(params)
+      const chatCompletion = await client.chat.completions.create(copiedParams)
       _this._tryTimes = 0
       _this._log(chatCompletion as any, opt)
       return chatCompletion as OaiChatCompletion
@@ -808,7 +813,7 @@ class BaseLLM {
       console.warn("BaseLLM chat error: ")
       console.log(err)
       console.log(`current baseURL: `, client.baseURL)
-      console.log(`current model: `, params.model)
+      console.log(`current model: `, copiedParams.model)
 
       let isRateLimit = false
       const errType = typeof err
@@ -841,7 +846,7 @@ class BaseLLM {
       if(_this._tryTimes < maxTryTimes && isRateLimit) {
         console.log("getting to try again!")
         await valTool.waitMilli(1000)
-        const triedRes = await _this.chat(params, opt)
+        const triedRes = await _this.chat(copiedParams, opt)
         return triedRes
       }
     }
@@ -881,7 +886,8 @@ class BaseBot {
     user?: Table_User,
   ) {
     this._character = c
-    this._bots = aiBots.filter(v => v.character === c)
+    const bots = aiBots.filter(v => v.character === c)
+    this._bots = bots.sort((a, b) => b.priority - a.priority)
     this._fromUser = user
   }
 
@@ -898,21 +904,25 @@ class BaseBot {
     PromptsChecker.run(params.messages, bot)
 
     // print last 5 prompts
-    // const lastNum = 100
-    // const msgLength = params.messages.length
-    // console.log(`last ${lastNum} prompts: `)
-    // if(msgLength > lastNum) {
-    //   const messages2 = params.messages.slice(msgLength - lastNum)
-    //   const printMsg = valTool.objToStr({ messages: messages2 })
-    //   console.log(printMsg)
-    // }
-    // else {
-    //   const printMsg = valTool.objToStr({ messages: params.messages })
-    //   console.log(printMsg)
-    // }
+    const lastNum = 100
+    const msgLength = params.messages.length
+    console.log(`last ${lastNum} prompts: `)
+    if(msgLength > lastNum) {
+      const messages2 = params.messages.slice(msgLength - lastNum)
+      const printMsg = valTool.objToStr({ messages: messages2 })
+      console.log(printMsg)
+    }
+    else {
+      const printMsg = valTool.objToStr({ messages: params.messages })
+      console.log(printMsg)
+    }
     
 
-    const llm = new BaseLLM(apiData.apiKey, apiData.baseURL)
+    const llm = new BaseLLM(
+      apiData.apiKey, 
+      apiData.baseURL,
+      apiData.defaultHeaders,
+    )
     const t1 = getNowStamp()
     const res = await llm.chat(params, { user: this._fromUser })
     const t2 = getNowStamp()
@@ -1013,16 +1023,8 @@ class BaseBot {
     })
     const prompts = chatIntoPrompter.run(chats)
 
-    // 4. handle current date & time 
-    // then add system prompt
-    const { 
-      date: current_date, 
-      time: current_time,
-    } = LiuDateUtil.getDateAndTime(getNowStamp(), user.timezone)
-
-    const current_provider = AiHelper.getProviderName(bot) ?? "Unknown"
-    const { p } = aiI18nChannel({ entry, bot })
-    const system_1 = p("system_1", { current_date, current_time, current_provider })
+    // 4. get system prompt
+    const system_1 = this.getFirstSystemPrompt(entry, bot)
 
     // console.warn("see system_1: ")
     // console.log(system_1)
@@ -1604,6 +1606,25 @@ class BaseBot {
     }
   }
 
+  protected getFirstSystemPrompt(
+    entry: AiEntry,
+    bot: AiBot,
+  ) {
+    const user = entry.user
+    const { 
+      date: current_date, 
+      time: current_time,
+    } = LiuDateUtil.getDateAndTime(getNowStamp(), user.timezone)
+    const current_provider = AiHelper.getProviderName(bot) ?? "Unknown"
+    const { p } = aiI18nChannel({ entry, bot })
+    const system_1 = p("system_1", { 
+      current_date, 
+      current_time, 
+      current_provider,
+    })
+    return system_1
+  }
+
 }
 
 class BotBaichuan extends BaseBot {
@@ -1701,10 +1722,11 @@ class BotDsReasoner extends BaseBot {
     // 1. pre run
     const res1 = this.preRun(aiParam)
     if(!res1) return
-    const { prompts, totalToken, bot, chats, tools } = res1
+    const { prompts, totalToken, chats, tools } = res1
 
     // 2. get other params
-    const model = bot.model
+    let bot = res1.bot
+    let model = bot.model
 
     // 3. handle other things
     if(aiParam.isContinueCommand) {
@@ -1721,7 +1743,14 @@ class BotDsReasoner extends BaseBot {
       model,
       tools,
     }
-    const chatCompletion = await this.chat(chatParam, bot)
+    let chatCompletion = await this.chat(chatParam, bot)
+
+    // 5.2 try again if needed
+    if(!chatCompletion && this._bots.length > 1) {
+      const { newChatCompletion, newBot } = await this._tryAgain(aiParam, chatParam)
+      chatCompletion = newChatCompletion
+      bot = newBot
+    }
     
     // 6. post run
     const postParam: PostRunParam = {
@@ -1733,6 +1762,33 @@ class BotDsReasoner extends BaseBot {
     const res6 = await this.postRun(postParam)
     return res6
   }
+
+
+  private async _tryAgain(
+    param: AiRunParam,
+    chatParam: OaiCreateParam,
+  ) {
+    console.warn("try again for ds-reasoner!")
+    // 0. get params
+    const entry = param.entry
+
+    // 1. switch model
+    const secondBot = this._bots[1]
+    chatParam.model = secondBot.model
+
+    // 2. change system prompt
+    const firstMsg = chatParam.messages?.[0]
+    if(firstMsg.role === "system") {
+      const newSystemContent = this.getFirstSystemPrompt(entry, secondBot)
+      firstMsg.content = newSystemContent
+    }
+
+    const chatCompletion = await this.chat(chatParam, secondBot)
+    return { newChatCompletion: chatCompletion, newBot: secondBot }
+  }
+
+
+
 }
 
 class BotMiniMax extends BaseBot {
@@ -3677,7 +3733,7 @@ class PromptsChecker {
   // clip prompts to avoid Request timed out
   private static _constraintPromptsNum(
     prompts: OaiPrompt[],
-    maxNum = 10,    // including system prompt
+    maxNum = 8,    // including system prompt
   ) {
     if(prompts.length <= maxNum) return
 
@@ -3777,11 +3833,16 @@ class AiHelper {
 
     let apiKey: string | undefined
     let baseURL: string | undefined
+    let defaultHeaders = bot.metaData?.defaultHeaders
 
     // If secondaryProvider exists, use it first
     if(p2 === "siliconflow") {
       apiKey = _env.LIU_SILICONFLOW_API_KEY
       baseURL = _env.LIU_SILICONFLOW_BASE_URL
+    }
+    else if(p2 === "gitee-ai") {
+      apiKey = _env.LIU_GITEE_AI_API_KEY
+      baseURL = _env.LIU_GITEE_AI_BASE_URL
     }
     else if(p === "baichuan") {
       apiKey = _env.LIU_BAICHUAN_API_KEY
@@ -3813,7 +3874,7 @@ class AiHelper {
     }
     
     if(apiKey && baseURL) {
-      return { apiKey, baseURL }
+      return { apiKey, baseURL, defaultHeaders }
     }
   }
 
@@ -4213,7 +4274,7 @@ class AiHelper {
 
     // extract <think>......</think>
     const hasThinkTag = bot?.metaData?.thinkingInContent
-    if(hasThinkTag) {
+    if(hasThinkTag && !reasoning_content) {
       const thinkContents = this.extractThinkContent(content)
       if(thinkContents.length > 0) {
         const thinkContent = thinkContents[0]
@@ -4498,6 +4559,7 @@ class AiHelper {
   static getProviderName(bot: AiBot) {
     const { secondaryProvider, provider } = bot
     if(secondaryProvider === "siliconflow") return "北京硅基流动"
+    if(secondaryProvider === "gitee-ai") return "Gitee AI"
     if(provider === "baichuan") return "北京百川智能"
     if(provider === "deepseek") return "杭州深度求索"
     if(provider === "minimax") return "上海稀宇科技"
