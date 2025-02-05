@@ -610,7 +610,7 @@ export type DownloadUploadRes = DownloadUploadRes_1 | DownloadUploadRes_2
 export type AiProvider = "baichuan" | "deepseek" | "minimax" | "moonshot" | "stepfun" | 
   "zero-one" | "zhipu"
 
-export type AiSecondaryProvider = "siliconflow"
+export type AiSecondaryProvider = "siliconflow" | "gitee-ai"
 
 // AiCharacter 不跟供应商绑定，它是角色，只不过现在各个供应商都有自己的 To C 角色罢了
 export type AiCharacter = "baixiaoying" | "deepseek" | "hailuo" | "kimi" | "yuewen" | 
@@ -645,6 +645,7 @@ export type AiFinishReason = "stop" | "length"
 export interface AiApiEndpoint {
   apiKey: string
   baseURL: string
+  defaultHeaders?: Record<string, string>
 }
 
 export interface AiUsage {
@@ -658,6 +659,8 @@ export interface AiBotMetaData {
   onlyOneSystemRoleMsg?: boolean
   zhipuWebSearch?: boolean     // false is default
   thinkingInContent?: boolean  // <think>......</think>\n\nAnd then this is real content
+  defaultHeaders?: Record<string, string>  // optional, it is in option of constructor 
+                                           // of new OpenAI() 
 }
 
 export interface AiBot {
@@ -669,6 +672,7 @@ export interface AiBot {
   abilities: AiAbility[]
   alias: string[]
   maxWindowTokenK: number  // 8 means 8k, 128 means 128k
+  priority: number         // more bigger means higher priority
 
   // other meta data
   metaData?: AiBotMetaData

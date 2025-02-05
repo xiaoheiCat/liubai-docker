@@ -14,9 +14,9 @@
 <br>
 
 > [!IMPORTANT]  
-> 我们没有发布任何虚拟代币！
+> 我们支持 DeepSeek R1，并且实现了多个厂商的超时调度。
 > 
-> We never release any virtual tokens!
+> 但即使如此，算力资源依然非常紧张。
 
 ## 已实现 🥂
 
