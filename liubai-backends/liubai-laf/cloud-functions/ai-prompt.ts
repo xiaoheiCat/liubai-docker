@@ -29,7 +29,7 @@ export const aiBots: AiBot[] = [
     abilities: ["chat", "reasoning"],
     alias: ["R1", "r1"],
     maxWindowTokenK: 64,
-    priority: 10,
+    priority: 19,
     metaData: {
       thinkingInContent: true,
       onlyOneSystemRoleMsg: true,
@@ -50,7 +50,7 @@ export const aiBots: AiBot[] = [
       onlyOneSystemRoleMsg: true,
       defaultHeaders: {
         "X-Failover-Enabled": "true",
-        "X-Package": "1917",    // 1910: 不指定算力提供商    1492: 沐曦    1917: 无问芯穹    
+        "X-Package": "1910",    // 1910: 不指定算力提供商    1492: 沐曦    1917: 无问芯穹    
       },
     }
   },
