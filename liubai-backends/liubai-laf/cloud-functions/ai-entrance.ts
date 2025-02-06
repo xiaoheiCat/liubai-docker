@@ -2566,8 +2566,9 @@ class AiCompressor {
     if(usage?.completion_tokens) {
       totalToken += usage.completion_tokens
     }
-    const sortStamp = chats[idx6]?.sortStamp ?? getNowStamp()
-    const newSortStamp = sortStamp - 10
+    const clipChat = chats[idx6]
+    const sortStamp = clipChat?.sortStamp ?? getNowStamp()
+    const newSortStamp = sortStamp + 10
 
     // 7. storage the summary
     const b7 = getBasicStampWhileAdding()
