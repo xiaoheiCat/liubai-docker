@@ -497,10 +497,12 @@ async function handle_scan_check(
     return { code: "0000", data: resData }
   }
   if(verifyNum && verifyNum > 100) {
-    console.warn("checking too much in handle_scan_check......")
-    console.log(verifyNum)
-    console.log("the credential data: ")
-    console.log(fir1)
+    console.warn("Excessive credential checks detected", {
+      "function": "handle_scan_check",
+      "verifyNum": verifyNum,
+      "credential_data": fir1,
+    })
+
     return { code: "E4003", errMsg: "checking too much" }
   }
 

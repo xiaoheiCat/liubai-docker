@@ -23,6 +23,7 @@ import {
 } from "@/common-util"
 
 const db = cloud.database()
+const _ = db.command
 
 /*************** some constants **********************/
 const SEC_5 = 5 * SECONED
@@ -431,11 +432,10 @@ async function getUserByStripeSubscriptionId(
 /** update user data */
 async function updateUserInDB(
   userId: string,
-  data: Partial<Table_User>,
+  data: Record<string, any>,
 ) {
-  const col_user = db.collection("User")
-  const q = col_user.where({ _id: userId })
-  const res = await q.update(data)
+  const uCol = db.collection("User")
+  const res = await uCol.doc(userId).update(data)
   return res
 }
 
@@ -459,7 +459,7 @@ async function handle_subscription_updated(
     return { code: "E5001", errMsg: "there is no subscription in the user" }
   }
 
-  // 2. try to update user.subscription
+  // 2. update user.subscription
   const s1 = s.createdStamp
   const now = getNowStamp()
   const diff_1 = now - s1
@@ -480,9 +480,11 @@ async function handle_subscription_updated(
     updatedStamp: now,
     subscription: newUserSub,
   }
-  const res2 = await updateUserInDB(user._id, u2)
-  console.log("handle_subscription_updated 更新结果: ")
-  console.log(res2)
+
+  // 3. update user
+  const u3 = { ...u2, subscription: _.set(newUserSub) }
+  const res3 = await updateUserInDB(user._id, u3)
+  console.warn("handle_subscription_updated res3: ", res3)
 
   user = { ...user, ...u2 }
   updateUserInCache(user._id, user)
@@ -652,7 +654,8 @@ async function handle_session_completed(
     quota,
     updatedStamp: getNowStamp(),
   }
-  const res6 = await updateUserInDB(userId, uUser)
+  const u6 = { ...uUser, subscription: _.set(newUserSub) }
+  const res6 = await updateUserInDB(userId, u6)
   console.log("handle_session_completed 更新 user 的结果........")
   console.log(res6)
 

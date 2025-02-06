@@ -3406,7 +3406,9 @@ export class WebSearch {
     md += `【搜索结果】：\n\n`
 
     // 4. add results
-    for(const r of results) {
+    const maxLength = Math.min(results.length, 10)
+    for(let i=0; i<maxLength; i++) {
+      const r = results[i]
       md += `#### ${r.title}\n`
       md += `【链接】：${r.link}\n`
       md += `【来源】：${r.media}\n`
