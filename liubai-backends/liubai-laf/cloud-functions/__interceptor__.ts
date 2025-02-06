@@ -166,7 +166,7 @@ function preCheck(
   }
 
   // 4. 定时系统，暂时通过
-  if(funcName.startsWith("clock-")) {
+  if(funcName.startsWith("clock-") || funcName === "ai-system-two") {
     if(xLafTriggerToken) return "Y"
     if(isDebugging) return "Y"
     return "N"
