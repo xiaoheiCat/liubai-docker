@@ -3921,6 +3921,10 @@ class AiHelper {
       apiKey = _env.LIU_GITEE_AI_API_KEY
       baseURL = _env.LIU_GITEE_AI_BASE_URL
     }
+    else if(p2 === "qiniu") {
+      apiKey = _env.LIU_QINIU_LLM_API_KEY
+      baseURL = _env.LIU_QINIU_LLM_BASE_URL
+    }
     else if(p === "baichuan") {
       apiKey = _env.LIU_BAICHUAN_API_KEY
       baseURL = _env.LIU_BAICHUAN_BASE_URL
@@ -4649,6 +4653,7 @@ class AiHelper {
     const { secondaryProvider, provider } = bot
     if(secondaryProvider === "siliconflow") return "北京硅基流动"
     if(secondaryProvider === "gitee-ai") return "Gitee AI"
+    if(secondaryProvider === "qiniu") return "七牛云"
     if(provider === "baichuan") return "北京百川智能"
     if(provider === "deepseek") return "杭州深度求索"
     if(provider === "minimax") return "上海稀宇科技"

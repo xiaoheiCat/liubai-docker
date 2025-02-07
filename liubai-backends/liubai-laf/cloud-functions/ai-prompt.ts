@@ -24,6 +24,21 @@ export const aiBots: AiBot[] = [
     name: "DeepSeek R1",
     character: "ds-reasoner",
     provider: "deepseek",
+    secondaryProvider: "qiniu",
+    model: "deepseek-r1",
+    abilities: ["chat", "reasoning"],
+    alias: ["R1", "r1"],
+    maxWindowTokenK: 64,
+    priority: 23,
+    metaData: {
+      thinkingInContent: true,
+      onlyOneSystemRoleMsg: true,
+    }
+  },
+  {
+    name: "DeepSeek R1",
+    character: "ds-reasoner",
+    provider: "deepseek",
     secondaryProvider: "siliconflow",
     model: "deepseek-ai/DeepSeek-R1",
     abilities: ["chat", "reasoning"],
