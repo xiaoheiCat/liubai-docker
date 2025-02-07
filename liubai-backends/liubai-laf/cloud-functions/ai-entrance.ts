@@ -923,6 +923,7 @@ class BaseBot {
   protected async chat(
     params: OpenAI.Chat.ChatCompletionCreateParams,
     bot: AiBot,
+    opt?: BaseLLMChatOpt,
   ) {
     const apiData = AiHelper.getApiEndpointFromBot(bot)
     if(!apiData) {
@@ -953,7 +954,7 @@ class BaseBot {
       apiData.defaultHeaders,
     )
     const t1 = getNowStamp()
-    const res = await llm.chat(params, { user: this._fromUser })
+    const res = await llm.chat(params, { user: this._fromUser, ...opt })
     const t2 = getNowStamp()
     const cost = t2 - t1
 
@@ -1680,6 +1681,33 @@ class BaseBot {
     return system_1
   }
 
+  protected async tryAgain(
+    param: AiRunParam,
+    chatParam: OaiCreateParam,
+  ) {
+    // 0. get params
+    const entry = param.entry
+
+    // 1. switch model
+    const secondBot = this._bots[1]
+    if(!secondBot) {
+      return
+    }
+    chatParam.model = secondBot.model
+    const p = secondBot.secondaryProvider ?? secondBot.provider
+    console.warn(`try again using ${secondBot.model} on ${p}`)
+
+    // 2. change system prompt
+    const firstMsg = chatParam.messages?.[0]
+    if(firstMsg.role === "system") {
+      const newSystemContent = this.getFirstSystemPrompt(entry, secondBot)
+      firstMsg.content = newSystemContent
+    }
+
+    const chatCompletion = await this.chat(chatParam, secondBot)
+    return { newChatCompletion: chatCompletion, newBot: secondBot }
+  }
+
 }
 
 class BotBaichuan extends BaseBot {
@@ -1732,10 +1760,11 @@ class BotDeepSeek extends BaseBot {
     // 1. pre run
     const res1 = this.preRun(aiParam)
     if(!res1) return
-    const { prompts, totalToken, bot, chats, tools } = res1
+    const { prompts, totalToken, chats, tools } = res1
 
     // 2. get other params
-    const model = bot.model
+    let bot = res1.bot
+    let model = bot.model
 
     // 3. handle other things
     if(aiParam.isContinueCommand) {
@@ -1752,7 +1781,16 @@ class BotDeepSeek extends BaseBot {
       model,
       tools,
     }
-    const chatCompletion = await this.chat(chatParam, bot)
+    let chatCompletion = await this.chat(chatParam, bot, { timeoutSec: 50 })
+
+    // 5.2 try again if needed
+    if(!chatCompletion) {
+      const res5_2 = await this.tryAgain(aiParam, chatParam)
+      if(res5_2) {
+        chatCompletion = res5_2.newChatCompletion
+        bot = res5_2.newBot
+      }
+    }
     
     // 6. post run
     const postParam: PostRunParam = {
@@ -1801,10 +1839,12 @@ class BotDsReasoner extends BaseBot {
     let chatCompletion = await this.chat(chatParam, bot)
 
     // 5.2 try again if needed
-    if(!chatCompletion && this._bots.length > 1) {
-      const { newChatCompletion, newBot } = await this._tryAgain(aiParam, chatParam)
-      chatCompletion = newChatCompletion
-      bot = newBot
+    if(!chatCompletion) {
+      const res5_2 = await this.tryAgain(aiParam, chatParam)
+      if(res5_2) {
+        chatCompletion = res5_2.newChatCompletion
+        bot = res5_2.newBot
+      }
     }
     
     // 6. post run
@@ -1817,32 +1857,6 @@ class BotDsReasoner extends BaseBot {
     const res6 = await this.postRun(postParam)
     return res6
   }
-
-
-  private async _tryAgain(
-    param: AiRunParam,
-    chatParam: OaiCreateParam,
-  ) {
-    console.warn("try again for ds-reasoner!")
-    // 0. get params
-    const entry = param.entry
-
-    // 1. switch model
-    const secondBot = this._bots[1]
-    chatParam.model = secondBot.model
-
-    // 2. change system prompt
-    const firstMsg = chatParam.messages?.[0]
-    if(firstMsg.role === "system") {
-      const newSystemContent = this.getFirstSystemPrompt(entry, secondBot)
-      firstMsg.content = newSystemContent
-    }
-
-    const chatCompletion = await this.chat(chatParam, secondBot)
-    return { newChatCompletion: chatCompletion, newBot: secondBot }
-  }
-
-
 
 }
 
@@ -3921,6 +3935,14 @@ class AiHelper {
       apiKey = _env.LIU_GITEE_AI_API_KEY
       baseURL = _env.LIU_GITEE_AI_BASE_URL
     }
+    else if(p2 === "qiniu") {
+      apiKey = _env.LIU_QINIU_LLM_API_KEY
+      baseURL = _env.LIU_QINIU_LLM_BASE_URL
+    }
+    else if(p2 === "tencent-lkeap") {
+      apiKey = _env.LIU_TENCENT_LKEAP_API_KEY
+      baseURL = _env.LIU_TENCENT_LKEAP_BASE_URL
+    }
     else if(p === "baichuan") {
       apiKey = _env.LIU_BAICHUAN_API_KEY
       baseURL = _env.LIU_BAICHUAN_BASE_URL
@@ -4649,6 +4671,8 @@ class AiHelper {
     const { secondaryProvider, provider } = bot
     if(secondaryProvider === "siliconflow") return "北京硅基流动"
     if(secondaryProvider === "gitee-ai") return "Gitee AI"
+    if(secondaryProvider === "qiniu") return "七牛云"
+    if(secondaryProvider === "tencent-lkeap") return "腾讯云"
     if(provider === "baichuan") return "北京百川智能"
     if(provider === "deepseek") return "杭州深度求索"
     if(provider === "minimax") return "上海稀宇科技"

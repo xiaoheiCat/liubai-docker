@@ -19,7 +19,21 @@ import { i18nFill } from "@/common-i18n"
 /***************************** Bots ***************************/
 export const aiBots: AiBot[] = [
 
-  /** chat using third-party */
+  /** R1 */
+  {
+    name: "DeepSeek R1",
+    character: "ds-reasoner",
+    provider: "deepseek",
+    secondaryProvider: "tencent-lkeap",
+    model: "deepseek-r1",
+    abilities: ["chat", "reasoning"],
+    alias: ["R1", "r1"],
+    maxWindowTokenK: 64,
+    priority: 29,
+    metaData: {
+      onlyOneSystemRoleMsg: true,
+    }
+  },
   {
     name: "DeepSeek R1",
     character: "ds-reasoner",
@@ -53,6 +67,57 @@ export const aiBots: AiBot[] = [
       },
     }
   },
+  {
+    name: "DeepSeek R1",
+    character: "ds-reasoner",
+    provider: "deepseek",
+    secondaryProvider: "qiniu",
+    model: "deepseek-r1",
+    abilities: ["chat", "reasoning"],
+    alias: ["R1", "r1"],
+    maxWindowTokenK: 64,
+    priority: 15,
+    metaData: {
+      thinkingInContent: true,
+      onlyOneSystemRoleMsg: true,
+    }
+  },
+  {
+    name: "DeepSeek R1",
+    character: "ds-reasoner",
+    provider: "deepseek",
+    model: "deepseek-reasoner",
+    abilities: ["chat", "reasoning"],
+    alias: ["R1", "r1"],
+    maxWindowTokenK: 64,
+    priority: 5,
+    metaData: {
+      onlyOneSystemRoleMsg: true,
+    }
+  },
+
+  /** V3 */
+  {
+    name: "DeepSeek V3",
+    character: "deepseek",
+    provider: "deepseek",
+    secondaryProvider: "tencent-lkeap",
+    model: "deepseek-v3",
+    abilities: ["chat", "tool_use"],
+    alias: ["深度求索", "ds", "v3", "deepseek"],
+    priority: 10,
+    maxWindowTokenK: 64,
+  },
+  {
+    name: "DeepSeek V3",
+    character: "deepseek",
+    provider: "deepseek",
+    model: "deepseek-chat",
+    abilities: ["chat", "tool_use"],
+    alias: ["深度求索", "ds", "v3", "deepseek"],
+    priority: 5,
+    maxWindowTokenK: 64,
+  },
 
   /** chat using official providers */
   {
@@ -64,29 +129,6 @@ export const aiBots: AiBot[] = [
     alias: ["百川", "百川AI", "百川智能"],
     maxWindowTokenK: 32,
     priority: 10,
-    metaData: {
-      onlyOneSystemRoleMsg: true,
-    }
-  },
-  {
-    name: "DeepSeek V3",
-    character: "deepseek",
-    provider: "deepseek",
-    model: "deepseek-chat",
-    abilities: ["chat", "tool_use"],
-    alias: ["深度求索", "ds", "v3", "deepseek"],
-    priority: 10,
-    maxWindowTokenK: 64,
-  },
-  {
-    name: "DeepSeek R1",
-    character: "ds-reasoner",
-    provider: "deepseek",
-    model: "deepseek-reasoner",
-    abilities: ["chat", "reasoning"],
-    alias: ["R1", "r1"],
-    maxWindowTokenK: 64,
-    priority: 5,
     metaData: {
       onlyOneSystemRoleMsg: true,
     }
