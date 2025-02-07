@@ -850,7 +850,7 @@ class BaseLLM {
 
       if(typeof errMsg === "string") {
         // for baichuan
-        if(isRateLimit) {
+        if(!isRateLimit) {
           isRateLimit = errMsg.includes("Rate limit reached for requests")
         }
 
@@ -867,6 +867,10 @@ class BaseLLM {
         // fallback
         if(!isRateLimit) {
           isRateLimit = errMsg.includes("RateLimitError: 429")
+        }
+
+        if(errMsg.includes("undefined message role")) {
+          LogHelper.printLastItems(params.messages)
         }
         
       }
@@ -934,19 +938,7 @@ class BaseBot {
     PromptsChecker.run(params.messages, bot)
 
     // print last 5 prompts
-    // const lastNum = 100
-    // const msgLength = params.messages.length
-    // console.log(`last ${lastNum} prompts: `)
-    // if(msgLength > lastNum) {
-    //   const messages2 = params.messages.slice(msgLength - lastNum)
-    //   const printMsg = valTool.objToStr({ messages: messages2 })
-    //   console.log(printMsg)
-    // }
-    // else {
-    //   const printMsg = valTool.objToStr({ messages: params.messages })
-    //   console.log(printMsg)
-    // }
-    
+    // LogHelper.printLastItems(params.messages)
 
     const llm = new BaseLLM(
       apiData.apiKey, 
@@ -5834,6 +5826,23 @@ class LogHelper {
     log = { ...b1, ...log }
     const logCol = db.collection("LogAi")
     logCol.add(log)
+  }
+
+  static printLastItems(
+    messages: Array<Record<string, any>>,
+    lastNum = 5,
+  ) {
+    const msgLength = messages.length
+    console.log(`print last ${lastNum} prompts: `)
+    if(msgLength > lastNum) {
+      const messages2 = messages.slice(msgLength - lastNum)
+      const printMsg = valTool.objToStr({ messages: messages2 })
+      console.log(printMsg)
+    }
+    else {
+      const printMsg = valTool.objToStr({ messages })
+      console.log(printMsg)
+    }
   }
 
 }
