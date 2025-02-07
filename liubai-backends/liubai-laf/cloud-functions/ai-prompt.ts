@@ -29,7 +29,7 @@ export const aiBots: AiBot[] = [
     abilities: ["chat", "reasoning"],
     alias: ["R1", "r1"],
     maxWindowTokenK: 64,
-    priority: 29,
+    priority: 9,
     metaData: {
       onlyOneSystemRoleMsg: true,
     }
@@ -76,7 +76,7 @@ export const aiBots: AiBot[] = [
     abilities: ["chat", "reasoning"],
     alias: ["R1", "r1"],
     maxWindowTokenK: 64,
-    priority: 15,
+    priority: 9,
     metaData: {
       thinkingInContent: true,
       onlyOneSystemRoleMsg: true,
@@ -90,7 +90,7 @@ export const aiBots: AiBot[] = [
     abilities: ["chat", "reasoning"],
     alias: ["R1", "r1"],
     maxWindowTokenK: 64,
-    priority: 5,
+    priority: 15,
     metaData: {
       onlyOneSystemRoleMsg: true,
     }
