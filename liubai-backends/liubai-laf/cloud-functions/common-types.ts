@@ -211,6 +211,7 @@ export const liuIDETypes = [
   "gitpod.io",
   "stackblitz.com",
   "project-idx",
+  "cloud-studio"
 ] as const
 export type LiuIDEType = typeof liuIDETypes[number]
 export const Sch_LiuIDEType = vbot.picklist(liuIDETypes)

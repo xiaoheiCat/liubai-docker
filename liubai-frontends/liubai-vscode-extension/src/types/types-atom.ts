@@ -33,7 +33,9 @@ export const liuIDETypes = [
   "vscode.dev",
   "gitpod.io",
   "stackblitz.com",
-  "project-idx"
+  "project-idx",
+  "cloud-studio",         // it might be from ide.cloud.tencent.com or cloudstudio.net
+                          // which are both products of Tencent
 ] as const
 
 export type LiuIDEType = typeof liuIDETypes[number]
