@@ -3064,12 +3064,9 @@ export class AiToolUtil {
       const v = list[i]
       const obj: LiuContent = {
         type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: v,
-          }
-        ]
+      }
+      if(v) {
+        obj.content = [{ type: "text", text: v }]
       }
       liuDesc.push(obj)
     }
