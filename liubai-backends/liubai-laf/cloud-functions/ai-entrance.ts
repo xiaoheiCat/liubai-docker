@@ -685,6 +685,7 @@ class AiDirective {
       "我要", "我要", "I want", "i want",
       "添加", "新增", "Add", "add",
       "呼叫", "Call", "call",
+      "@",
     ]
     const botMatched = this._getCommandedBot(prefix, text)
     if(botMatched) return botMatched
