@@ -813,7 +813,7 @@ class BaseLLM {
       // 1. set timeout
       let timeout = setTimeout(() => {
         if(hasReturn) return
-        console.warn("custom timeout occurs!")
+        console.log("custom timeout occurs!")
         hasReturn = true
         a(undefined)
       }, timeoutSec * 1000)
@@ -852,8 +852,6 @@ class BaseLLM {
     catch(err) {
       console.warn("BaseLLM chat error: ")
       console.log(err)
-      console.log(`current baseURL: `, client.baseURL)
-      console.log(`current model: `, copiedParams.model)
 
       let isRateLimit = false
       const errType = typeof err
@@ -940,17 +938,19 @@ class BaseBot {
     bot: AiBot,
     opt?: BaseLLMChatOpt,
   ) {
+    const character = this._character
     const apiData = AiHelper.getApiEndpointFromBot(bot)
     if(!apiData) {
-      console.warn(`no api data for ${this._character}`)
+      console.warn(`no api data for ${character}`)
       console.log(bot)
       return
     }
     PromptsChecker.run(params.messages, bot)
+    const theService = `${params.model} on ${apiData.baseURL}`
 
     // print last 5 prompts
     // LogHelper.printLastItems(params.messages)
-    // console.log(`Let's ask ${bot.character} on ${apiData.baseURL}`)
+    // console.log(`Let's ask ${theService}`)
 
     const llm = new BaseLLM(
       apiData.apiKey, 
@@ -961,11 +961,10 @@ class BaseBot {
     const res = await llm.chat(params, { user: this._fromUser, ...opt })
     const t2 = getNowStamp()
     const cost = t2 - t1
-
-    const c = this._character
-    console.log(`${c} chat cost: ${cost}ms`)
+    
+    console.log(`${theService} cost: ${cost}ms`)
     if(!res) {
-      console.warn(`${c} chat got an error`)
+      console.warn(`${theService} got an error`)
     }
 
     return res
@@ -1485,16 +1484,16 @@ class BaseBot {
 
     // 1. get content & reasoning_content
     let {
-      content: txt1_1,
-      reasoning_content: txt1_2,
+      content: txt_a,
+      reasoning_content: txt_b,
     } = AiHelper.getContentFromLLM(chatCompletion, bot)
 
-    if(!txt1_1 && !txt1_2) return
-    let textToUser = txt1_1
-    let showCoT = Boolean(txt1_2 && txt1_2)
+    if(!txt_a && !txt_b) return
+    let textToUser = txt_a
+    let showCoT = Boolean(txt_a && txt_b)
     if(!textToUser) {
       const { t } = useI18n(aiLang, { user })
-      textToUser = t("thinking", { text: txt1_2 ?? "" })
+      textToUser = t("thinking", { text: txt_b ?? "" })
     }
     textToUser = this._clipContent(textToUser, chatCompletion)
 
@@ -1513,8 +1512,8 @@ class BaseBot {
     const apiEndpoint = AiHelper.getApiEndpointFromBot(bot)
     const param3: AiHelperAssistantMsgParam = {
       roomId,
-      text: txt1_1,
-      reasoning_content: txt1_2,
+      text: txt_a,
+      reasoning_content: txt_b,
       model: bot.model,
       character: c,
       usage: chatCompletion.usage,
@@ -4354,7 +4353,8 @@ class AiHelper {
     if(maxTokens > MAX_WX_TOKEN) maxTokens = MAX_WX_TOKEN
 
     // 3. for reasoning model with thinkingInContent
-    if(bot.metaData?.thinkingInContent) {
+    const isReasoning = this.isReasoningBot(bot)
+    if(isReasoning) {
       if(maxTokens < MIN_REASONING_TOKENS) {
         maxTokens = MIN_REASONING_TOKENS
       }
@@ -4362,6 +4362,8 @@ class AiHelper {
 
     // 4. set maxTokens to restToken if exceed
     if(maxTokens > restToken) maxTokens = restToken
+
+    console.log("maxTokens: ", maxTokens)
 
     return maxTokens
   }
@@ -4393,6 +4395,7 @@ class AiHelper {
     res: OaiChatCompletion,
     bot?: AiBot,
   ) {
+    // 1. check out params
     const choices = res?.choices
     if(!choices || choices.length < 1) {
       console.warn("no choices in getContentFromLLM")
@@ -4413,6 +4416,7 @@ class AiHelper {
       return {}
     }
 
+    // 2. get original content & reasoning_content
     let content = message.content ?? ""
     let reasoning_content = message.reasoning_content ?? ""
     if(!content) {
@@ -4423,39 +4427,74 @@ class AiHelper {
       this.setFinishReasonToLength(res)
     }
 
-    // remove "?" in the beginning for zhipu
+    // 3. remove "?" in the beginning for zhipu
     if(bot?.character === "zhipu") {
       let err1 = content.startsWith("？")
       if(err1) content = content.substring(1)
     }
 
-    // extract <think>......</think>
+    
+    // 4. handle reasoning_content if needed
     let isReasoning = Boolean(bot && this.isReasoningBot(bot))
     if(!reasoning_content && isReasoning) {
-      const thinkContents = this.extractThinkContent(content)
-      if(thinkContents.length > 0) {
-        // extracted!
-        const thinkContent = thinkContents[0]
-        content = content.substring(thinkContent.endIndex).trim()
-        reasoning_content = thinkContent.content
-      }
-      else {
-        // otherwise
-        if(content.startsWith("<think>")) {
-          reasoning_content = content.substring(7)
-          content = ""
-          this.setFinishReasonToLength(res)
-        }
-      }
+      const res4 = this._handleContentForReasoning(
+        res,
+        bot as AiBot,
+        content,
+        reasoning_content,
+      )
+      content = res4.content
+      reasoning_content = res4.reasoning_content
     }
 
-    // finally trim
+    // 5. finally trim
     content = content.trim()
     reasoning_content = reasoning_content.trim()
 
-    console.warn("let me see content and reasoning_content: ")
-    console.log("reasoning_content: ", reasoning_content)
-    console.log("content: ", content)
+    // console.warn("let me see content and reasoning_content: ")
+    // console.log("reasoning_content: ", reasoning_content)
+    // console.log("content: ", content)
+
+    return { content, reasoning_content }
+  }
+
+  private static _handleContentForReasoning(
+    res: OaiChatCompletion,
+    bot: AiBot,
+    content: string,
+    reasoning_content: string,
+  ) {
+
+    // 1. extract <think>......</think>
+    const thinkContents = this.extractThinkContent(content)
+    if(thinkContents.length > 0) {
+      const thinkContent = thinkContents[0]
+      content = content.substring(thinkContent.endIndex)
+      reasoning_content = thinkContent.content
+      return { content, reasoning_content }
+    }
+    
+    // 2. starts with <think>
+    if(content.startsWith("<think>")) {
+      reasoning_content = content.substring(7)
+      content = ""
+      this.setFinishReasonToLength(res)
+      return { content, reasoning_content }
+    }
+    
+    // 3. starts with "好的，" /  "嗯，" / "好，"
+    const thinkingInContent = bot.metaData?.thinkingInContent
+    const finishReason = this.getFinishReason(res)
+    const mightHaveReasoningContent = Boolean(finishReason === "length" && !thinkingInContent)
+    if(mightHaveReasoningContent) {
+      const alrightList = ["Alright, ", "好的，", "嗯，", "好，"]
+      const res3 = alrightList.some(x => content.startsWith(x))
+      console.log("Alright: ", res3)
+      if(res3) {
+        reasoning_content = content
+        content = ""
+      }
+    }
 
     return { content, reasoning_content }
   }
