@@ -968,6 +968,13 @@ class BaseBot {
       console.warn(`${theService} got an error`)
     }
 
+    const firstChoice = res?.choices?.[0]
+    if(!firstChoice) {
+      console.warn(`${theService} no choice! see chatCompletion: `)
+      console.log(res)
+      return
+    }
+
     return res
   }
 
@@ -1214,9 +1221,6 @@ class BaseBot {
 
     return aiLogs
   }
-
-  
-
 
   private _getRestTokensAndPrompts(
     postParam: PostRunParam,
@@ -1625,8 +1629,6 @@ class BaseBot {
 
     let firstChoice = chatCompletion?.choices?.[0]
     if(!firstChoice) {
-      console.warn(`${c} no choice! see chatCompletion: `)
-      console.log(chatCompletion)
       return
     }
     let { finish_reason, message } = firstChoice

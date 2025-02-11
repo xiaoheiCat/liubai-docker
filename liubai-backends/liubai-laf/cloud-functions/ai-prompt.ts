@@ -29,7 +29,7 @@ export const aiBots: AiBot[] = [
     abilities: ["chat", "reasoning"],
     alias: ["R1", "r1", "ds r1", "deep seek r1"],
     maxWindowTokenK: 64,
-    priority: 25,
+    priority: 31,
     metaData: {
       onlyOneSystemRoleMsg: true,
     }
@@ -105,7 +105,7 @@ export const aiBots: AiBot[] = [
     model: "deepseek-v3",
     abilities: ["chat"],
     alias: ["深度求索", "ds", "v3", "deepseek", "deep seek"],
-    priority: 17,
+    priority: 19,
     maxWindowTokenK: 64,
   },
   {
@@ -114,9 +114,9 @@ export const aiBots: AiBot[] = [
     provider: "deepseek",
     secondaryProvider: "tencent-lkeap",
     model: "deepseek-v3",
-    abilities: ["chat", "tool_use"],
+    abilities: ["chat"],
     alias: ["深度求索", "ds", "v3", "deepseek", "deep seek"],
-    priority: 19,
+    priority: 15,
     maxWindowTokenK: 64,
   },
   {
@@ -126,7 +126,7 @@ export const aiBots: AiBot[] = [
     model: "deepseek-chat",
     abilities: ["chat", "tool_use"],
     alias: ["深度求索", "ds", "v3", "deepseek", "deep seek"],
-    priority: 15,
+    priority: 17,
     maxWindowTokenK: 64,
   },
 
