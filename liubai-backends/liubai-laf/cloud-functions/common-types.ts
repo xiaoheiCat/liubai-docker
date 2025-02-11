@@ -1371,9 +1371,10 @@ export interface Table_AllowList extends BaseTable {
 
 /** 屏蔽表: 目前用于屏蔽特定 ip */
 export interface Table_BlockList extends BaseTable {
-  type: "ip"
+  type: "ip" | "wx_gzh_openid"
   isOn: BaseIsOn
   value: string
+  duration?: "one_month"
 }
 
 /** 内容表: 动态 + 评论 */

@@ -213,6 +213,7 @@
     "err_8": "There is no email address through the current login way.",
     "err_9": "Fail to send the email. Contact the developer please.",
     "err_10": "Please enter 11 digits of phone number",
+    "err_11": "The third-party account is not permitted for logging into Liubai",
     "get_permission": "You have not been in the allowed list. Follow our WeChat \"留白记事\" to get the permission!",
     "bound": "Succeed to Bind",
     "logged": "Succeed to Login",
@@ -432,7 +433,9 @@
     "modify": "Modify",
     "rebind": "Re-link",
     "unbind_tip_1": "Are you sure to unlink {name}? This operation may result in the loss of your account.",
-    "unbind_2": "Yes, Unlink"
+    "unbind_tip_2": "You cannot connect this WeChat's account to Liubai one month after unlinking. Are you sure to unlink?",
+    "unbind_2": "Yes, Unlink",
+    "unbind_success": "Success to Unlink"
   },
   "export": {
     "markdown": "Export as markdown files",

@@ -10,11 +10,12 @@ const {
   onTapWeChat,
   onTapEmail,
   onMenuItemForPhone,
+  onMenuItemForWeChat,
 } = useAccountsContent()
 
 const { t } = useI18n()
 
-const menus1: MenuItem[] = [{ text_key: "setting.rebind" }]
+const menus1: MenuItem[] = [{ text_key: "setting.rebind" }, { text_key: "setting.unbind" }]
 const menus2: MenuItem[] = [{ text_key: "setting.modify" }, { text_key: "setting.unbind" }]
 
 </script>
@@ -43,7 +44,7 @@ const menus2: MenuItem[] = [{ text_key: "setting.modify" }, { text_key: "setting
 
     <!-- WeChat -->
     <LiuMenu :menu="menus1" v-if="acData.wx_gzh_openid" min-width-str="90px"
-      @tapitem="onTapWeChat"
+      @tapitem="onMenuItemForWeChat"
     >
       <div class="liu-no-user-select liu-hover ac-item">
         <AcItem wechat-logo

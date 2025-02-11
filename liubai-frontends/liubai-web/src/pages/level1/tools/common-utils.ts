@@ -66,6 +66,13 @@ export async function afterFetchingLogin(
     return false
   }
 
+  // 3.1 you can not use the third-party account to login
+  if(code === "U0012") {
+    await showEmojiTip("login.err_11", "🙅")
+    redirectToLoginPage(rr)
+    return false
+  }
+
   // 4. 其他异常，弹提示；提示完回到 login 页
   if(code !== "0000" || !data) {
     await showErrMsg("login", res)

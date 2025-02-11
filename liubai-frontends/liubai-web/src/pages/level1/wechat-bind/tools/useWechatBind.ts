@@ -17,7 +17,7 @@ import type {
   Res_OC_GetWeChat, 
   Res_UserLoginInit,
 } from "~/requests/req-types";
-import { showErrMsg } from "../../tools/show-msg";
+import { showEmojiTip, showErrMsg } from "../../tools/show-msg";
 import type { DataPass, LiuErrReturn } from "~/requests/tools/types";
 import { createClientKey } from "../../tools/common-utils";
 import { getClientKey, redirectToLoginPage } from "../../tools/common-tools";
@@ -244,6 +244,15 @@ async function loginWithWeChat(
   // 3. handle error
   const code3 = res2.code
   const data3 = res2.data
+
+  // 3.1 you cannot login with wechat
+  if(code3 === "U0012") {
+    await showEmojiTip("login.err_11", "🙅")
+    redirectToLoginPage(rr)
+    return
+  }
+
+  // 3.2 other error
   if(code3 !== "0000" || !data3) {
     showErrMsg("login", res2)
     handleErr(wbData, res2)

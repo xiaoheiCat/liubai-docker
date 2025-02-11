@@ -37,6 +37,7 @@ import type {
   LiuTencentSMSParam,
   DataPass,
   PhoneData,
+  Table_BlockList,
 } from "@/common-types"
 import { clientMaximum } from "@/common-types"
 import { 
@@ -1215,6 +1216,21 @@ async function handle_wx_gzh_oauth(
     console.warn("the user is a snapshot user")
     console.log(res3)
     return { code: "U0007", errMsg: "the user is a snapshot user" }
+  }
+
+  // 4.2 check out if the wx_gzh_openid is in BlockList
+  const bCol = db.collection("BlockList")
+  const w4_2: Partial<Table_BlockList> = {
+    type: "wx_gzh_openid",
+    value: wx_gzh_openid,
+    isOn: "Y",
+  }
+  const res4_2 = await bCol.where(w4_2).getOne<Table_BlockList>()
+  const data4_2 = res4_2?.data
+  if(data4_2) {
+    console.warn("wx_gzh_openid is in BlockList")
+    console.log(data4_2)
+    return { code: "U0012", errMsg: "wx_gzh_openid is in BlockList" }
   }
 
   // 5. get user info

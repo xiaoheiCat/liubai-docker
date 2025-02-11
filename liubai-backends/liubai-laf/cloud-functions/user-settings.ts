@@ -36,6 +36,7 @@ import {
   type Table_Credential,
   type Partial_Id,
   type LiuTencentSMSParam,
+  type Table_BlockList,
 } from '@/common-types'
 import { getNowStamp, DAY, MINUTE, getBasicStampWhileAdding } from "@/common-time"
 import * as vbot from "valibot"
@@ -93,6 +94,9 @@ export async function main(ctx: FunctionContext) {
   else if(oT === "unbind-email") {
     res = await handle_unbind(vRes, "email")
   }
+  else if(oT === "unbind-wx_gzh") {
+    res = await handle_unbind(vRes, "wx_gzh")
+  }
 
   // const stamp2 = getNowStamp()
   // const diffS = stamp2 - stamp1
@@ -103,7 +107,7 @@ export async function main(ctx: FunctionContext) {
 
 async function handle_unbind(
   vRes: VerifyTokenRes_B,
-  unbindType: "phone" | "email",
+  unbindType: "phone" | "email" | "wx_gzh",
 ) {
   // 1. get the user
   const userId = vRes.userData._id
@@ -116,18 +120,28 @@ async function handle_unbind(
   
   // 2. set undefined
   const u: Record<string, any> = {}
+  let wx_gzh_openid = user.wx_gzh_openid
   if(unbindType === "phone") {
     if(!user.phone) return { code: "0001" }
     u.phone = _.remove()
   }
-  if(unbindType === "email") {
+  else if(unbindType === "email") {
     if(!user.email) return { code: "0001" }
     u.email = _.remove()
+  }
+  else if(unbindType === "wx_gzh") {
+    if(!wx_gzh_openid) return { code: "0001" }
+    u.wx_gzh_openid = _.remove()
   }
 
   // 3. update
   const res3 = await col_user.doc(userId).update(u)
   updateUserInCache(userId)
+
+  // 4. for wx_gzh
+  if(unbindType === "wx_gzh" && wx_gzh_openid) {
+    addWxGzhOpenidToBlockList(wx_gzh_openid)
+  }
   
   return { code: "0000" }
 }
@@ -412,6 +426,22 @@ async function handle_wechat_bind(
   if(hasBound) {
     return { code: "US002", errMsg: "wx_gzh_openid has been bound" }
   }
+
+  // 6.2 check out if the wx_gzh_openid is in BlockList
+  const bCol = db.collection("BlockList")
+  const w6_2: Partial<Table_BlockList> = {
+    type: "wx_gzh_openid",
+    value: wx_gzh_openid,
+    isOn: "Y",
+  }
+  const res6_2 = await bCol.where(w6_2).getOne<Table_BlockList>()
+  const data6_2 = res6_2?.data
+  if(data6_2) {
+    console.warn("wx_gzh_openid is in BlockList")
+    console.log(data6_2)
+    return { code: "US005", errMsg: "wx_gzh_openid is in BlockList" }
+  }
+
 
   // 7. get current user
   const userId = vRes.userData._id
@@ -847,6 +877,37 @@ async function getLatestUser(
     return { pass: false, err: { code: "E4004", errMsg: "user not found" } }
   }
   return { pass: true, data: user }
+}
+
+async function addWxGzhOpenidToBlockList(
+  wx_gzh_openid: string,
+) {
+  // 1. get old instance
+  const bCol = db.collection("BlockList")
+  const w1: Partial<Table_BlockList> = {
+    type: "wx_gzh_openid",
+    value: wx_gzh_openid,
+    duration: "one_month",
+  }
+  const res1 = await bCol.where(w1).getOne<Table_BlockList>()
+  const blockItem = res1.data
+
+  // 2. delete the instance if exists
+  if(blockItem) {
+    await bCol.doc(blockItem._id).remove()
+  }
+
+  // 3. add a new instance
+  const b3 = getBasicStampWhileAdding()
+  const w3: Partial_Id<Table_BlockList> = {
+    ...b3,
+    type: "wx_gzh_openid",
+    isOn: "Y",
+    value: wx_gzh_openid,
+    duration: "one_month",
+  }
+  const res3 = await bCol.add(w3)
+  return { code: "0000" }
 }
 
 function pixelatePhone(phone?: string) {
