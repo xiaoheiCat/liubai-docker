@@ -7,15 +7,6 @@
 1. 在当前页面，点击屏幕右侧的“提问箱”按钮，直接提问。
 2. 使用[客服通道](https://work.weixin.qq.com/kfid/kfcfb6f3959d36f6a0f)与我们联系。
 
-## 重要
-
-### 1. 请问 LIUBAI 的虚拟货币是你们官方创建的项目吗？ {#it-is-not-us}
-
-> [!IMPORTANT]
-> 我们没有发布任何虚拟代币！
->
-> We never release any virtual tokens!
-
 ## 关于三个助手 {#three-assistants}
 
 以下若没有特别标注，`次数` = `轮数` = `一轮会话`。
@@ -126,7 +117,14 @@
 
 ## 搞抽象 {#abstraction}
 
-### 1. 为什么有手机备忘录，还要用留白记事？
+### 1. 请问 LIUBAI 的虚拟货币是你们官方创建的项目吗？ {#it-is-not-us}
+
+> [!IMPORTANT]
+> 我们没有发布任何虚拟代币！
+>
+> We never release any virtual tokens!
+
+### 2. 为什么有手机备忘录，还要用留白记事？ {#why-use-liubai}
 
 > 为什么有肯德基，还要吃麦当劳？
 > 

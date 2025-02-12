@@ -99,7 +99,7 @@ const MAX_WORDS = 3000
 // see https://platform.openai.com/docs/guides/reasoning#allocating-space-for-reasoning
 const MIN_REASONING_TOKENS = 1024
 
-const MAX_TIMES_FREE = 20
+const MAX_TIMES_FREE = 10
 const MAX_TIMES_MEMBERSHIP = 200
 
 const SEC_15 = SECONED * 15
@@ -5163,11 +5163,8 @@ class UserHelper {
       membershipTimes: MAX_TIMES_MEMBERSHIP,
       link: paymentLink,
     })
-    const csLink = _env.LIU_CUSTOMER_SERVICE
-    if(csLink) {
-      msg += "\n\n"
-      msg += t("deploy_tip", { link: csLink })
-    }
+    msg += "\n\n"
+    msg += t("see_question_box")
 
     // 3. tell user
     TellUser.text(entry, msg)
