@@ -1647,7 +1647,7 @@ class BaseBot {
       tool_calls = message.tool_calls
     }
 
-    console.log(`${c} finish reason: ${finish_reason}`)
+    // console.log(`${c} finish reason: ${finish_reason}`)
     // console.log(`usage: `)
     // console.log(chatCompletion.usage)
     
@@ -1661,8 +1661,8 @@ class BaseBot {
       }
     }
 
-    console.log(`${c} can reply! see message: `)
-    console.log(chatCompletion.choices[0].message)
+    // console.log(`${c} can reply! see message: `)
+    // console.log(chatCompletion.choices[0].message)
 
     // 3. tool calls
     let aiLogs: AiRunLog[] | undefined
@@ -2245,7 +2245,7 @@ class AiController {
     // 1.2 decide how long to wait
     const seconds = this._waitForSeconds(aiParam, newCharacters)
     if(seconds > 0) {
-      console.log(`start to wait ${seconds} seconds`)
+      // console.log(`start to wait ${seconds} seconds`)
       await valTool.waitMilli(seconds * SECONED)
       const res1_2 = await AiHelper.canReply(aiParam)
       if(!res1_2) {
@@ -2874,8 +2874,8 @@ class ToolHandler {
   }
 
   async web_search(funcJson: Record<string, any>) {
-    console.warn("web_search by ourselves!")
-    console.log(funcJson)
+    // console.warn("web_search by ourselves!")
+    // console.log(funcJson)
 
     // 1. get q
     const q = funcJson.q

@@ -82,7 +82,7 @@ export async function main(ctx: FunctionContext) {
     return res
   }
 
-  console.log(msgObj)
+  // console.log(msgObj)
 
   const { MsgType, FromUserName } = msgObj
   if(!FromUserName) {
@@ -494,6 +494,8 @@ async function login_with_wechat_gzh(
   userInfo?: Wx_Res_GzhUserInfo,
   opt?: OperationOpt,
 ) {
+  console.log("login_with_wechat_gzh......")
+
   // 1. get credential
   const cCol = db.collection("Credential")
   const w1: Partial<Table_Credential> = {
@@ -506,14 +508,27 @@ async function login_with_wechat_gzh(
   if(!data1) return false
   const cId = data1._id
   const meta_data = data1.meta_data ?? {}
+  const {
+    x_liu_device,
+    x_liu_language
+  } = meta_data
 
   // 1.1 optionally send welcome_message
   if(opt?.isFromSubscribeEvent) {
-    send_welcome(wx_gzh_openid, userInfo, meta_data.x_liu_language)
+    send_welcome(wx_gzh_openid, userInfo, x_liu_language)
   }
 
   // 2. define some functions
-  // 2.1 set credential_2
+  // 2.1 send "go back to our app" if needed
+  const _sendGoBackToOurApp = () => {
+    const deviceStr = x_liu_device ?? ""
+    let isMobile = deviceStr.includes("Mobile")
+    if(!isMobile) isMobile = deviceStr.startsWith("iOS")
+    if(!isMobile) return
+    send_logging(wx_gzh_openid, userInfo, x_liu_language)
+  }
+
+  // 2.2 set credential_2
   const _setCredential2 = async () => {
     const cred_2 = createCredential2()
     meta_data.wx_gzh_openid = wx_gzh_openid
@@ -522,7 +537,8 @@ async function login_with_wechat_gzh(
       meta_data,
       updatedStamp: getNowStamp(),
     }
-    const res2 = await cCol.doc(cId).update(w2)
+    await cCol.doc(cId).update(w2)
+    _sendGoBackToOurApp()
   }
 
   // 3. get user by wx_gzh_openid
@@ -708,6 +724,22 @@ async function send_welcome(
   await sendText(wx_gzh_openid, text)
 
   return true
+}
+
+async function send_logging(
+  wx_gzh_openid: string,
+  userInfo?: Wx_Res_GzhUserInfo,
+  x_liu_language?: string,
+) {
+  // 1. get language
+  const lang = x_liu_language ?? userInfo?.language
+
+  // 2. i18n
+  const { t } = useI18n(wechatLang, { lang })
+  const text = t("go_back_to_app")
+  
+  // 3. reply user with text
+  await sendText(wx_gzh_openid, text)
 }
 
 async function send_login_guide(

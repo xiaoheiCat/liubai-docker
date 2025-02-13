@@ -199,6 +199,7 @@
     "email_verification_tip": "驗證代號已被發送至 {email}\n 請記得檢查你的垃圾郵件。",
     "verification_code": "驗證代號",
     "choosing_account": "選擇帳號",
+    "ready_to_login": "準備登入",
     "logging": "正在登入..",
     "logging2": "登入中..",
     "cannot_login_via": "目前暫不支援「使用 {thirdParty} 登入」，請使用其他登入方式。",
