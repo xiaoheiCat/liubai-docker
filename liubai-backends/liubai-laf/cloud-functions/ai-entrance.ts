@@ -803,7 +803,7 @@ class BaseLLM {
   private _tryTimes = 0
 
   public chat(
-    params: OpenAI.Chat.ChatCompletionCreateParams,
+    params: OaiCreateParam,
     opt?: BaseLLMChatOpt,
   ): Promise<OaiChatCompletion | undefined> {
     const _this = this
@@ -834,7 +834,7 @@ class BaseLLM {
   }
 
   private async _chat(
-    params: OpenAI.Chat.ChatCompletionCreateParams,
+    params: OaiCreateParam,
     opt?: BaseLLMChatOpt,
   ): Promise<OaiChatCompletion | undefined> {
     const _this = this
@@ -935,7 +935,7 @@ class BaseBot {
   }
 
   protected async chat(
-    params: OpenAI.Chat.ChatCompletionCreateParams,
+    params: OaiCreateParam,
     bot: AiBot,
     opt?: BaseLLMChatOpt,
   ) {
@@ -1763,7 +1763,7 @@ class BotBaichuan extends BaseBot {
     const maxToken = AiHelper.getMaxToken(totalToken, chats[0], bot)
 
     // 5. to chat
-    const chatParam: OpenAI.Chat.ChatCompletionCreateParams = {
+    const chatParam: OaiCreateParam = {
       messages: prompts,
       max_tokens: maxToken,
       model,
@@ -1808,7 +1808,7 @@ class BotDeepSeek extends BaseBot {
     const maxToken = AiHelper.getMaxToken(totalToken, chats[0], bot)
 
     // 5. to chat
-    const chatParam: OpenAI.Chat.ChatCompletionCreateParams = {
+    const chatParam: OaiCreateParam = {
       messages: prompts,
       max_tokens: maxToken,
       model,
@@ -1868,6 +1868,7 @@ class BotDsReasoner extends BaseBot {
       max_tokens: maxToken,
       model,
       tools,
+      temperature: 0.6,  // reference: https://github.com/deepseek-ai/DeepSeek-R1/pull/399/files
     }
     let chatCompletion = await this.chat(chatParam, bot)
 
@@ -2017,7 +2018,7 @@ class BotMoonshot extends BaseBot {
     const maxToken = AiHelper.getMaxToken(totalToken, chats[0], bot)
 
     // 5. to chat
-    const chatParam: OpenAI.Chat.ChatCompletionCreateParams = {
+    const chatParam: OaiCreateParam = {
       messages: prompts,
       max_tokens: maxToken,
       model,
@@ -2059,7 +2060,7 @@ class BotStepfun extends BaseBot {
     const maxToken = AiHelper.getMaxToken(totalToken, chats[0], bot)
 
     // 5. to chat
-    const chatParam: OpenAI.Chat.ChatCompletionCreateParams = {
+    const chatParam: OaiCreateParam = {
       messages: prompts,
       max_tokens: maxToken,
       model,
@@ -2104,7 +2105,7 @@ class BotYi extends BaseBot {
     const maxToken = AiHelper.getMaxToken(totalToken, chats[0], bot)
 
     // 5. to chat
-    const chatParam: OpenAI.Chat.ChatCompletionCreateParams = {
+    const chatParam: OaiCreateParam = {
       messages: prompts,
       max_tokens: maxToken,
       model,
@@ -2161,7 +2162,7 @@ class BotZhipu extends BaseBot {
     const maxToken = AiHelper.getMaxToken(totalToken, chats[0], bot)
 
     // 5. to chat
-    const chatParam: OpenAI.Chat.ChatCompletionCreateParams = {
+    const chatParam: OaiCreateParam = {
       messages: prompts,
       max_tokens: maxToken,
       model,
@@ -2587,7 +2588,7 @@ class AiCompressor {
 
     // 4. construct the arg to send to LLM
     const llm = new BaseLLM(_env.LIU_SUMMARY_API_KEY, _env.LIU_SUMMARY_BASE_URL)
-    const arg4: OpenAI.Chat.ChatCompletionCreateParams = {
+    const arg4: OaiCreateParam = {
       messages: prompts,
       model: _env.LIU_SUMMARY_MODEL ?? "",
     }
