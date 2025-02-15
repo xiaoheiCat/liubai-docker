@@ -113,10 +113,10 @@ export const aiBots: AiBot[] = [
     character: "deepseek",
     provider: "deepseek",
     secondaryProvider: "siliconflow",
-    model: "deepseek-ai/DeepSeek-V3",
+    model: "Pro/deepseek-ai/DeepSeek-V3",
     abilities: ["chat", "tool_use"],
     alias: ["深度求索", "ds", "v3", "deepseek", "deep seek"],
-    priority: 5,
+    priority: 35,
     maxWindowTokenK: 64,
   },
   {
@@ -127,7 +127,7 @@ export const aiBots: AiBot[] = [
     model: "deepseek-v3",
     abilities: ["chat"],
     alias: ["深度求索", "ds", "v3", "deepseek", "deep seek"],
-    priority: 15,
+    priority: 25,
     maxWindowTokenK: 64,
   },
   {

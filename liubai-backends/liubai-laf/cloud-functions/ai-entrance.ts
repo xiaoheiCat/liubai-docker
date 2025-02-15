@@ -970,8 +970,8 @@ class BaseBot {
 
     const firstChoice = res?.choices?.[0]
     if(!firstChoice) {
-      console.warn(`${theService} no choice! see chatCompletion: `)
-      console.log(res)
+      // console.warn(`${theService} no choice! see chatCompletion: `)
+      // console.log(res)
       return
     }
 
