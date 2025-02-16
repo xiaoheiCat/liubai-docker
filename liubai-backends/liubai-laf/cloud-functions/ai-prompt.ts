@@ -278,6 +278,7 @@ const system_wx_env = `
 `.trim()
 
 const system_wx_entry = `
+如何使用、玩法介绍: {LIU_DOCS_DOMAIN}/guide/three-assistants
 联系客服、联系开发者: {LIU_CUSTOMER_SERVICE}
 我的日程: {LIU_DOMAIN}/schedule
 我的收藏: {LIU_DOMAIN}/favorite
