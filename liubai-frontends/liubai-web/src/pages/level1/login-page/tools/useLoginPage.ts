@@ -676,6 +676,7 @@ async function whenTapWeChat(
   if(!enc_client_key) return
 
   // 4. login via scan-login
+  cui.showLoading({ title_key: "login.ready_to_login" })
   const res4 = await fetchScanLogin(credential, credential_2, enc_client_key)
   // console.log("fetchScanLogin res4: ")
   // console.log(res4)
@@ -688,6 +689,9 @@ async function whenTapWeChat(
   if(res5) {
     cui.showLoading({ title_key: "login.logging2" })
     lpData.lastLogged = time.getTime()
+  }
+  else {
+    cui.hideLoading()
   }
 }
 

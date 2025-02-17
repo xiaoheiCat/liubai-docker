@@ -102,10 +102,10 @@ export const aiBots: AiBot[] = [
     character: "deepseek",
     provider: "deepseek",
     secondaryProvider: "qiniu",
-    model: "deepseek-v3",
+    model: "deepseek-v3?search",
     abilities: ["chat"],
     alias: ["深度求索", "ds", "v3", "deepseek", "deep seek"],
-    priority: 9,
+    priority: 19,
     maxWindowTokenK: 64,
   },
   {
@@ -113,10 +113,10 @@ export const aiBots: AiBot[] = [
     character: "deepseek",
     provider: "deepseek",
     secondaryProvider: "siliconflow",
-    model: "deepseek-ai/DeepSeek-V3",
+    model: "Pro/deepseek-ai/DeepSeek-V3",
     abilities: ["chat", "tool_use"],
     alias: ["深度求索", "ds", "v3", "deepseek", "deep seek"],
-    priority: 19,
+    priority: 35,
     maxWindowTokenK: 64,
   },
   {
@@ -127,7 +127,7 @@ export const aiBots: AiBot[] = [
     model: "deepseek-v3",
     abilities: ["chat"],
     alias: ["深度求索", "ds", "v3", "deepseek", "deep seek"],
-    priority: 15,
+    priority: 25,
     maxWindowTokenK: 64,
   },
   {
@@ -137,7 +137,7 @@ export const aiBots: AiBot[] = [
     model: "deepseek-chat",
     abilities: ["chat", "tool_use"],
     alias: ["深度求索", "ds", "v3", "deepseek", "deep seek"],
-    priority: 17,
+    priority: 7,
     maxWindowTokenK: 64,
   },
 
@@ -278,6 +278,7 @@ const system_wx_env = `
 `.trim()
 
 const system_wx_entry = `
+如何使用、玩法介绍: {LIU_DOCS_DOMAIN}/guide/three-assistants
 联系客服、联系开发者: {LIU_CUSTOMER_SERVICE}
 我的日程: {LIU_DOMAIN}/schedule
 我的收藏: {LIU_DOMAIN}/favorite

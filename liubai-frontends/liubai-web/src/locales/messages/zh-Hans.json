@@ -199,6 +199,7 @@
     "email_verification_tip": "已发送验证码至 {email}\n 请记得检查你的垃圾邮件。",
     "verification_code": "验证码",
     "choosing_account": "选择帐号",
+    "ready_to_login": "准备登录",
     "logging": "正在登录..",
     "logging2": "登录中..",
     "cannot_login_via": "当前暂不支持「使用 {thirdParty} 登录」，请使用其他登录方式。",

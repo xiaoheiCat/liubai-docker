@@ -730,7 +730,7 @@ class BaseLLM {
   private _tryTimes = 0
 
   public chat(
-    params: OpenAI.Chat.ChatCompletionCreateParams,
+    params: OaiCreateParam,
     opt?: BaseLLMChatOpt,
   ): Promise<OaiChatCompletion | undefined> {
     const _this = this
@@ -761,7 +761,7 @@ class BaseLLM {
   }
 
   private async _chat(
-    params: OpenAI.Chat.ChatCompletionCreateParams,
+    params: OaiCreateParam,
     opt?: BaseLLMChatOpt,
   ): Promise<OaiChatCompletion | undefined> {
     const _this = this
@@ -862,7 +862,7 @@ class BaseBot {
   }
 
   protected async chat(
-    params: OpenAI.Chat.ChatCompletionCreateParams,
+    params: OaiCreateParam,
     bot: AiBot,
     opt?: BaseLLMChatOpt,
   ) {
@@ -897,8 +897,8 @@ class BaseBot {
 
     const firstChoice = res?.choices?.[0]
     if(!firstChoice) {
-      console.warn(`${theService} no choice! see chatCompletion: `)
-      console.log(res)
+      // console.warn(`${theService} no choice! see chatCompletion: `)
+      // console.log(res)
       return
     }
 
@@ -1590,7 +1590,7 @@ class BaseBot {
       tool_calls = message.tool_calls
     }
 
-    console.log(`${c} finish reason: ${finish_reason}`)
+    // console.log(`${c} finish reason: ${finish_reason}`)
     // console.log(`usage: `)
     // console.log(chatCompletion.usage)
     
@@ -1604,8 +1604,8 @@ class BaseBot {
       }
     }
 
-    console.log(`${c} can reply! see message: `)
-    console.log(chatCompletion.choices[0].message)
+    // console.log(`${c} can reply! see message: `)
+    // console.log(chatCompletion.choices[0].message)
 
     // 3. tool calls
     let aiLogs: LiuAi.RunLog[] | undefined
@@ -1706,7 +1706,7 @@ class BotBaichuan extends BaseBot {
     const maxToken = AiHelper.getMaxToken(totalToken, chats[0], bot)
 
     // 5. to chat
-    const chatParam: OpenAI.Chat.ChatCompletionCreateParams = {
+    const chatParam: OaiCreateParam = {
       messages: prompts,
       max_tokens: maxToken,
       model,
@@ -1751,7 +1751,7 @@ class BotDeepSeek extends BaseBot {
     const maxToken = AiHelper.getMaxToken(totalToken, chats[0], bot)
 
     // 5. to chat
-    const chatParam: OpenAI.Chat.ChatCompletionCreateParams = {
+    const chatParam: OaiCreateParam = {
       messages: prompts,
       max_tokens: maxToken,
       model,
@@ -1811,6 +1811,7 @@ class BotDsReasoner extends BaseBot {
       max_tokens: maxToken,
       model,
       tools,
+      temperature: 0.6,  // reference: https://github.com/deepseek-ai/DeepSeek-R1/pull/399/files
     }
     let chatCompletion = await this.chat(chatParam, bot)
 
@@ -1961,7 +1962,7 @@ class BotMoonshot extends BaseBot {
     const maxToken = AiHelper.getMaxToken(totalToken, chats[0], bot)
 
     // 5. to chat
-    const chatParam: OpenAI.Chat.ChatCompletionCreateParams = {
+    const chatParam: OaiCreateParam = {
       messages: prompts,
       max_tokens: maxToken,
       model,
@@ -2003,7 +2004,7 @@ class BotStepfun extends BaseBot {
     const maxToken = AiHelper.getMaxToken(totalToken, chats[0], bot)
 
     // 5. to chat
-    const chatParam: OpenAI.Chat.ChatCompletionCreateParams = {
+    const chatParam: OaiCreateParam = {
       messages: prompts,
       max_tokens: maxToken,
       model,
@@ -2048,7 +2049,7 @@ class BotYi extends BaseBot {
     const maxToken = AiHelper.getMaxToken(totalToken, chats[0], bot)
 
     // 5. to chat
-    const chatParam: OpenAI.Chat.ChatCompletionCreateParams = {
+    const chatParam: OaiCreateParam = {
       messages: prompts,
       max_tokens: maxToken,
       model,
@@ -2105,7 +2106,7 @@ class BotZhipu extends BaseBot {
     const maxToken = AiHelper.getMaxToken(totalToken, chats[0], bot)
 
     // 5. to chat
-    const chatParam: OpenAI.Chat.ChatCompletionCreateParams = {
+    const chatParam: OaiCreateParam = {
       messages: prompts,
       max_tokens: maxToken,
       model,
@@ -2189,7 +2190,7 @@ class AiController {
     // 1.2 decide how long to wait
     const seconds = this._waitForSeconds(aiParam, newCharacters)
     if(seconds > 0) {
-      console.log(`start to wait ${seconds} seconds`)
+      // console.log(`start to wait ${seconds} seconds`)
       await valTool.waitMilli(seconds * SECONED)
       const res1_2 = await AiHelper.canReply(aiParam)
       if(!res1_2) {
@@ -2531,7 +2532,7 @@ class AiCompressor {
 
     // 4. construct the arg to send to LLM
     const llm = new BaseLLM(_env.LIU_SUMMARY_API_KEY, _env.LIU_SUMMARY_BASE_URL)
-    const arg4: OpenAI.Chat.ChatCompletionCreateParams = {
+    const arg4: OaiCreateParam = {
       messages: prompts,
       model: _env.LIU_SUMMARY_MODEL ?? "",
     }
@@ -2818,8 +2819,8 @@ class ToolHandler {
   }
 
   async web_search(funcJson: Record<string, any>) {
-    console.warn("web_search by ourselves!")
-    console.log(funcJson)
+    // console.warn("web_search by ourselves!")
+    // console.log(funcJson)
 
     // 1. get q
     const q = funcJson.q

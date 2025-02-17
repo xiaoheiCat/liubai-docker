@@ -5,7 +5,7 @@ import type {
   QpResolver,
   QpResult,
 } from "./types"
-import type { LiuTimeout } from "~/utils/basic/type-tool";
+import type { LiuTimeout, SimpleFunc } from "~/utils/basic/type-tool";
 import cfg from "~/config";
 import { useWorkspaceStore } from "~/hooks/stores/useWorkspaceStore";
 import APIs from "~/requests/APIs";
@@ -24,7 +24,13 @@ import {
 import { useRouteAndLiuRouter, type RouteAndLiuRouter } from "~/routes/liu-router";
 import { openIt, closeIt, handleCustomUiQueryErr } from "../../tools/useCuiTool"
 import { fetchOrder } from "~/requests/shared";
-import { useThrottleFn } from "~/hooks/useVueUse";
+import { 
+  useDebounceFn,
+  useDocumentVisibility, 
+  useIdle, 
+  usePageLeave, 
+  useThrottleFn,
+} from "~/hooks/useVueUse";
 
 const SEC_3 = time.SECONED * 3
 const SEC_4 = time.SECONED * 4
@@ -202,6 +208,8 @@ async function fetch_wx_gzh_scan() {
   pollTimeout = setTimeout(() => {
     checkData(cred)
   }, SEC_4)
+
+  startToListenToViewport(cred)
 }
 
 async function fetch_bind_wechat(
@@ -232,6 +240,8 @@ async function fetch_bind_wechat(
   pollTimeout = setTimeout(() => {
     checkData(cred)
   }, SEC_6)
+
+  startToListenToViewport(cred)
 }
 
 
@@ -261,6 +271,8 @@ async function fetch_bind_wecom(
   pollTimeout = setTimeout(() => {
     checkData(cred)
   }, SEC_6)
+
+  startToListenToViewport(cred)
 }
 
 async function fetch_check_wecom(
@@ -285,6 +297,7 @@ async function fetch_check_wecom(
     return
   }
   
+  if(pollTimeout) clearTimeout(pollTimeout)
   pollTimeout = setTimeout(() => {
     checkData(credential)
   }, SEC_4)
@@ -319,6 +332,7 @@ async function fetch_scan_check(
     }
   }
 
+  if(pollTimeout) clearTimeout(pollTimeout)
   pollTimeout = setTimeout(() => {
     checkData(credential)
   }, SEC_3)
@@ -347,15 +361,19 @@ async function fetch_check_wechat(
     return
   }
   
+  if(pollTimeout) clearTimeout(pollTimeout)
   pollTimeout = setTimeout(() => {
     checkData(credential)
   }, SEC_4)
 }
 
-
+let lastCheckingData = 0
 async function checkData(
   credential: string,
 ) {
+  // 0. if too frequent, skip
+  if(time.isWithinMillis(lastCheckingData, 1000, true)) return
+  lastCheckingData = time.getLocalTime()
 
   // 1. can we check out data?
   if(!qpData.enable) return
@@ -397,6 +415,7 @@ function _over(
   }
   _resolve && _resolve(res)
   closeIt(rr, queryKey)
+  endToListenToViewport()
 }
 
 let toggleTimeout: LiuTimeout
@@ -420,4 +439,55 @@ async function _toClose() {
   toggleTimeout = setTimeout(() => {
     qpData.enable = false
   }, TRANSITION_DURATION)
+}
+
+let viewportStop: SimpleFunc | undefined
+
+function startToListenToViewport(
+  cred: string,
+) {
+  // 1. end the previous listening
+  endToListenToViewport()
+
+  // 2. get required data
+  const visibility = useDocumentVisibility()
+  const hasLeftPage = usePageLeave()
+  const { idle } = useIdle(15 * 1000)
+
+  // 3. define a throttle function to check the changes
+  const _check = useDebounceFn((
+    [oldV1, oldV2, oldV3]: [DocumentVisibilityState, boolean, boolean],
+  ) => {
+    const newV1 = visibility.value
+    if(newV1 === "visible" && oldV1 === "hidden") {
+      checkData(cred)
+      return
+    }
+
+    const newV2 = hasLeftPage.value
+    if(!newV2 && oldV2) {
+      checkData(cred)
+      return
+    }
+
+    const newV3 = idle.value
+    if(!newV3 && oldV3) {
+      checkData(cred)
+      return
+    }
+  }, 1000)
+
+  // 4. start to listen
+  viewportStop = watch([visibility, hasLeftPage, idle], (
+    [newV1, newV2, newV3],
+    [oldV1, oldV2, oldV3],
+  ) => {
+    _check([oldV1, oldV2, oldV3])
+  })
+}
+
+function endToListenToViewport() {
+  if(!viewportStop) return
+  viewportStop()
+  viewportStop = undefined
 }

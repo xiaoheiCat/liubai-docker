@@ -421,7 +421,11 @@ async function handle_scan_login(
   // 7.1 login with wx_gzh_openid
   if(infoType === "wx-gzh-scan" && wx_gzh_openid) {
     const opt7_1 = { client_key }
+
+    const t7_1 = getNowStamp()
     const res7_1 = await tryToSignInWithWxGzhOpenId(ctx, body, wx_gzh_openid, opt7_1)
+    const t7_2 = getNowStamp()
+    console.warn(`user-login tryToSignInWithWxGzhOpenId takes ${t7_2 - t7_1}ms`)
     
     if(res7_1) {
       const lang = res7_1.data?.language
@@ -486,6 +490,8 @@ async function handle_scan_check(
 
     return { code: "E4003", errMsg: "checking too much" }
   }
+
+  // console.log(`see credential in scan_check: `, fir1)
 
   // 3. check if credential_2 exists
   const credential_2 = fir1.credential_2
@@ -561,6 +567,7 @@ async function handle_wx_gzh_scan(
       qr_code: qr_code_4,
       x_liu_theme: body["x_liu_theme"],
       x_liu_language: body["x_liu_language"],
+      x_liu_device: body["x_liu_device"],
     }
   }
   const cCol = db.collection("Credential")
