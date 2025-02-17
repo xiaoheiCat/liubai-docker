@@ -176,6 +176,29 @@ const system_prompt = `
 }
 \`\`\`
 
+### 链接解析
+
+\`\`\`json
+{
+  type: "function",
+  function: {
+    name: "parse_link",
+    description: "解析链接。给定一个 http 链接，返回它的标题、摘要、内文......",
+    parameters: {
+      type: "object",
+      properties: {
+        link: {
+          type: "string",
+          description: "要解析的链接，http 开头",
+        },
+      },
+      required: ["link"],
+      additionalProperties: false,
+    }
+  }
+},
+\`\`\`
+
 ### 画图
 
 \`\`\`json

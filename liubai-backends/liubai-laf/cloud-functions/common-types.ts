@@ -645,19 +645,6 @@ export type AiCommandByHuman = "kick" | "add" | "clear_history"
 
 export type AiFinishReason = "stop" | "length"
 
-export interface AiApiEndpoint {
-  apiKey: string
-  baseURL: string
-  defaultHeaders?: Record<string, string>
-}
-
-export interface AiUsage {
-  cached_tokens?: number
-  completion_tokens: number
-  prompt_tokens: number
-  total_tokens: number
-}
-
 export interface AiBotMetaData {
   onlyOneSystemRoleMsg?: boolean
   zhipuWebSearch?: boolean     // false is default
@@ -1672,7 +1659,7 @@ export interface Table_AiChat extends BaseTable {
   // about LLM
   model?: string           // like "gpt-4o"
   character?: AiCharacter
-  usage?: AiUsage
+  usage?: LiuAi.Usage
   requestId?: string
   baseUrl?: string
   funcName?: string        // like "add_todo" | "web_search"
@@ -3438,7 +3425,7 @@ export namespace LiuAi {
     reasoning_content?: string
     model: string
     character: AiCharacter
-    usage?: AiUsage
+    usage?: LiuAi.Usage
     requestId?: string
     baseUrl?: string
     funcName?: string
@@ -3462,6 +3449,12 @@ export namespace LiuAi {
   export interface MenuItem {
     operation: AiCommandByHuman
     character?: AiCharacter
+  }
+
+  export interface BaseLLMChatOpt {
+    maxTryTimes?: number
+    user?: Table_User
+    timeoutSec?: number
   }
 
 }
