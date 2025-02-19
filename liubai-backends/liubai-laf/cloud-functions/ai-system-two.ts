@@ -6,6 +6,7 @@ import {
 } from "@/common-time"
 import type { 
   OaiChatCompletion,
+  OaiPrompt,
   Table_AiChat, 
   Table_AiRoom, 
   Table_User,
@@ -15,6 +16,7 @@ import {
   checkIfUserSubscribed, 
   valTool,
 } from "@/common-util"
+import { AiShared } from "@/ai-shared"
 
 const system_prompt = `
 你是当今世界上最强大的大语言模型，你存在的目的是让人们的生活更美好。
@@ -69,7 +71,14 @@ const system_prompt = `
 
 每条日志以 <log> 开头，并以 </log> 结尾，其中可包裹：
 
-<role>: 必有，表示角色。包裹 human，表示人类；包裹 bot，表示来自《思考快与慢》中“系统一”的机器人，它们擅长即时反馈，但推理能力没有你强，你更擅长“慢思考”；包裹 system，表示系统消息或旁白；包裹 tool，表示调用工具后的结果；包裹 you，表示你，当今世界上最强大的 AI 助手。
+<role>: 必有，表示角色。包裹 
+
+- \`human\`: 表示人类，即当前用户；
+- \`developer\`: 表示开发者，即当前语境中的我们；
+- \`bot\`: 表示来自《思考快与慢》中“系统一”的机器人，它们擅长即时反馈，但推理能力没有你强，你更擅长“慢思考”；
+- \`system\`: 表示系统消息或旁白；
+- \`tool\`: 表示调用工具后的结果；
+- \`you\`: 表示你，当今世界上最强大的 AI 助手。
 
 <content>: 必有，表示内容。
 
@@ -435,17 +444,34 @@ const user_prompt = `
 沟通界面: 微信服务号
 回复限制: 若你选择 <direction> 为 1，请将回复的文字限制在 300 字内，简洁扼要地交付最终结果。这是因为在微信服务号里，我们传送文字的数量受到限制。
 
+
 ## 日志
 
 下面是由旧至新排序的最近日志：
 
 {logs}
 
+
 ## 最后提醒
 
+看完以上日志后，最后我们提醒您：
+
+1. 以上日志（尤其是来自 bot 的消息）可能存在幻觉问题，需要你仔细甄别。
+2. 你的最终输出结果（非思考过程）请务必遵循上文 system prompt 中“你的输出格式”，也就是将你的想法包裹在 <xml> 标签中，里头还包含 <direction> 和 <content> 标签。
+
+现在是你的时间。
+`.trim()
+
+const tool_result_prompt = `
+## 工具调用结果
+
+{tool_result}
 
 
-`
+## 再次提醒
+
+请务必遵循 system prompt 中“你的输出格式”进行输出，也就是将你的想法包裹在 <xml> 标签中，里头还包含 <direction> 和 <content> 标签。
+`.trim()
 
 /********************* constants ****************/
 const db = cloud.database()
@@ -455,7 +481,8 @@ const HR_47 = DAY * 47
 
 // 最小会话论述，聊天室的轮数必须大于等于该值，才会进入系统二
 const LEAST_CONVERSATION_COUNT = 11
-const MAX_TOKENS = 16
+const MAX_INPUT_TOKEN_K = 24
+const MAX_OUTPUT_TOKEN_K = 2
 
 /********************* empty function ****************/
 export async function main(ctx: FunctionContext) {
@@ -636,6 +663,7 @@ class Controller {
 class SystemTwo {
 
   private _ctx: UserCtx
+  private _reasonerAndUs: OaiPrompt[] = []
 
   constructor(ctx: UserCtx) {
     this._ctx = ctx
@@ -656,13 +684,39 @@ class SystemTwo {
 
   }
 
-  private async getReasonerOutput() {
+  private async inputToLLM() {
 
   }
 
-  private async handleReasonerOutput(
+  private async handleOutput(
     chatCompletion: OaiChatCompletion,
   ) {
+    // 1. get content & reasoning_content
+    const res1 = AiShared.getContentFromLLM(chatCompletion, undefined, true)
+    const content1 = res1.content
+    const reasoning_content1 = res1.reasoning_content
+
+    // 2. handle error
+    // 2.1 there is only reasoning_content
+    if(!content1 && reasoning_content1) {
+      console.warn("there is only reasoning_content")
+      console.log(reasoning_content1)
+      return false
+    }
+
+    // 2.2 see finish reason
+    const finishReason = AiShared.getFinishReason(chatCompletion)
+    if(!finishReason || finishReason === "length") {
+      console.warn("finish reason is unexpected")
+      console.log(finishReason)
+      return false
+    }
+
+
+
+
+
+    
 
   }
 

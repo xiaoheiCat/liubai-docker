@@ -351,6 +351,7 @@ export class AiShared {
   static getContentFromLLM(
     res: OaiChatCompletion,
     bot?: AiBot,
+    isReasoning?: boolean,
   ) {
     // 1. check out params
     const choices = res?.choices
@@ -392,7 +393,9 @@ export class AiShared {
 
     
     // 4. handle reasoning_content if needed
-    let isReasoning = Boolean(bot && AiShared.isReasoningBot(bot))
+    if(typeof isReasoning === "undefined") {
+      isReasoning = Boolean(bot && AiShared.isReasoningBot(bot))
+    }
     if(!reasoning_content && isReasoning) {
       const res4 = AiShared.handleContentForReasoning(
         res,
