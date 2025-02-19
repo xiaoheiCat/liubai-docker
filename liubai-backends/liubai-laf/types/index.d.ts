@@ -173,6 +173,11 @@ declare global {
       LIU_IMG2TXT_API_KEY?: string
       LIU_IMG2TXT_MODEL?: string
 
+      /** System 2 */
+      LIU_SYSTEM2_BASE_URL?: string
+      LIU_SYSTEM2_API_KEY?: string
+      LIU_SYSTEM2_MODEL?: string
+
       /** Characters */
       LIU_WXGZH_KF_BAIXIAOYING?: string      // kf_account of baixiaoying
       LIU_WXGZH_KF_DEEPSEEK?: string         // kf_account of deepseek

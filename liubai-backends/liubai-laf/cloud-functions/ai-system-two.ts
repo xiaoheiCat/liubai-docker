@@ -1,16 +1,24 @@
-import { DAY, getNowStamp, isWithinMillis } from "@/common-time"
+import { 
+  getNowStamp, 
+  isWithinMillis, 
+  MINUTE,
+  DAY,
+} from "@/common-time"
 import type { 
   Table_AiChat, 
   Table_AiRoom, 
   Table_User,
 } from "./common-types"
 import cloud from "@lafjs/cloud"
-import { checkIfUserSubscribed } from "@/common-util"
+import { 
+  checkIfUserSubscribed, 
+  valTool,
+} from "@/common-util"
 
 const system_prompt = `
 你是当今世界上最强大的大语言模型，你存在的目的是让人们的生活更美好。
 
-下面我们会定义你的输出格式，用于告知我们你的决定；定义一系列日志格式，让你知晓你、用户和其他机器人之间的动作和谈话内容；定义一个工具箱，供你操作工具。
+下面我们会定义你的输出格式，用于告知我们你的决定；定义一系列日志格式，让你知晓“你、人类和其他机器人”之间的动作和谈话内容；定义一个工具箱，供你操作工具。
 
 当你理解以下这些规则后，由你来决定：接下来你要做什么。
 
@@ -490,8 +498,11 @@ class Controller {
         ctx.chats = chats
 
         // 4.2 start to run for the user
+        const system2 = new SystemTwo(ctx)
+        system2.run()
 
-
+        await valTool.waitMilli(1000)
+        num++
       }
 
 
@@ -599,4 +610,40 @@ class Controller {
 
 
 }
+
+class SystemTwo {
+
+  private _ctx: UserCtx
+
+  constructor(ctx: UserCtx) {
+    this._ctx = ctx
+  }
+
+
+  async run() {
+    // 1. throw needSystem2Stamp to one hour later
+    this.mapToOneHourLater()
+
+    // 2. 
+
+  }
+
+  private async mapToOneHourLater() {
+    const room = this._ctx.room
+    const roomId = room._id
+    const now1 = getNowStamp()
+    const randomMinute = Math.ceil(Math.random() * 30)
+    const needSystem2Stamp = randomMinute * MINUTE + now1
+    const rCol = db.collection("AiRoom") 
+    const u1: Partial<Table_AiRoom> = {
+      updatedStamp: now1,
+      needSystem2Stamp,
+    }
+    await rCol.doc(roomId).update(u1)
+  }
+  
+
+
+}
+
 

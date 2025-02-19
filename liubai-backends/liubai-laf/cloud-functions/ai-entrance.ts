@@ -4446,9 +4446,7 @@ class Image2Text {
         content: [
           {
             type: "image_url",
-            image_url: {
-              url,
-            }
+            image_url: { url }
           }
         ]
       }
@@ -4458,7 +4456,7 @@ class Image2Text {
     const llm = new BaseLLM(apiKey, baseUrl)
     const res = await llm.chat({ messages, model })
     if(!res) {
-      console.warn("iamge to text failed!")
+      console.warn("image to text failed!")
       return
     }
 
