@@ -59,6 +59,7 @@ import {
   liuReq,
   decryptEncData,
   getSummary,
+  ValueTransform,
 } from "@/common-util"
 import { WxGzhSender } from "@/service-send"
 import { 
@@ -2770,6 +2771,12 @@ class ToolHandler {
   }
 
   async add_calendar(funcJson: Record<string, any>) {
+    // 0. normalize for bots which are not so smart
+    const check0_1 = ValueTransform.str2Num(funcJson.earlyMinute)
+    if(check0_1.pass) funcJson.earlyMinute = check0_1.data
+    const check0_2 = ValueTransform.str2Num(funcJson.laterHour)
+    if(check0_2.pass) funcJson.laterHour = check0_2.data
+
     // 1. check out param
     const waitingData = AiToolUtil.turnJsonToWaitingData("add_calendar", funcJson)
     if(!waitingData) {
