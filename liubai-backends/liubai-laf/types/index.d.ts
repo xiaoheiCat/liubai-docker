@@ -187,6 +187,7 @@ declare global {
       LIU_WXGZH_KF_WANZHI?: string           // kf_account of wanzhi
       LIU_WXGZH_KF_YUEWEN?: string           // kf_account of yuewen
       LIU_WXGZH_KF_ZHIPU?: string            // kf_account of zhipu
+      LIU_WXGZH_KF_SYSTEM2?: string          // kf_account of system2
 
       /** Statistic */
       LIU_NOCODB_BASEURL?: string            // like https://app.nocodb.com

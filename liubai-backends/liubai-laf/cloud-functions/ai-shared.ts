@@ -498,8 +498,7 @@ export class TellUser {
   static async text(
     entry: AiEntry, 
     text: string,
-    from?: AiBot,
-    fromCharacter?: AiCharacter
+    opt?: LiuAi.TellUserOpt,
   ) {
     const { wx_gzh_openid } = entry
 
@@ -515,7 +514,7 @@ export class TellUser {
         msgtype: "text",
         text: { content: text },
       }
-      this._fillWxGzhKf(obj1, from, fromCharacter)
+      this._fillWxGzhKf(obj1, opt)
       const res1 = await this._sendToWxGzh(wx_gzh_openid, obj1)
       return res1
     }
@@ -525,8 +524,7 @@ export class TellUser {
   static async image(
     entry: AiEntry,
     imageUrl: string,
-    from?: AiBot,
-    fromCharacter?: AiCharacter,
+    opt?: LiuAi.TellUserOpt,
   ) {
     const { wx_gzh_openid } = entry
 
@@ -540,7 +538,7 @@ export class TellUser {
         msgtype: "image",
         image: { media_id },
       }
-      this._fillWxGzhKf(obj2, from, fromCharacter)
+      this._fillWxGzhKf(obj2, opt)
       const res2 = await this._sendToWxGzh(wx_gzh_openid, obj2)
       return res2
     }
@@ -613,7 +611,7 @@ export class TellUser {
           tail_content: suffixMessage,
         }
       }
-      this._fillWxGzhKf(obj2, undefined, fromCharacter)
+      this._fillWxGzhKf(obj2, { fromCharacter })
       const res2 = await this._sendToWxGzh(wx_gzh_openid, obj2)
       return res2
     }
@@ -634,45 +632,45 @@ export class TellUser {
 
   private static _fillWxGzhKf(
     obj: Wx_Gzh_Send_Msg,
-    bot?: AiBot,
-    character?: AiCharacter,
+    opt?: LiuAi.TellUserOpt,
   ) {
-    const kf_account = this._getWxGzhKfAccount(bot, character)
+    const kf_account = this._getWxGzhKfAccount(opt)
     if(kf_account) {
       obj.customservice = { kf_account }
     }
   }
 
   private static _getWxGzhKfAccount(
-    bot?: AiBot,
-    character?: AiCharacter,
+    opt?: LiuAi.TellUserOpt,
   ) {
-    let c = bot?.character ?? character
-    if(!c) return
+    let c = opt?.fromBot?.character ?? opt?.fromCharacter
 
     const _env = process.env
+    if(opt?.fromSystem2) {
+      return _env.LIU_WXGZH_KF_SYSTEM2
+    }
     if(c === "baixiaoying") {
       return _env.LIU_WXGZH_KF_BAIXIAOYING
     }
-    else if(c === "deepseek") {
+    if(c === "deepseek") {
       return _env.LIU_WXGZH_KF_DEEPSEEK
     }
-    else if(c === "ds-reasoner") {
+    if(c === "ds-reasoner") {
       return _env.LIU_WXGZH_KF_DS_REASONER
     }
-    else if(c === "hailuo") {
+    if(c === "hailuo") {
       return _env.LIU_WXGZH_KF_HAILUO
     }
-    else if(c === "kimi") {
+    if(c === "kimi") {
       return _env.LIU_WXGZH_KF_KIMI
     }
-    else if(c === "wanzhi") {
+    if(c === "wanzhi") {
       return _env.LIU_WXGZH_KF_WANZHI
     }
-    else if(c === "yuewen") {
+    if(c === "yuewen") {
       return _env.LIU_WXGZH_KF_YUEWEN
     }
-    else if(c === "zhipu") {
+    if(c === "zhipu") {
       return _env.LIU_WXGZH_KF_ZHIPU
     }
   }

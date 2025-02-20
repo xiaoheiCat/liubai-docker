@@ -587,7 +587,7 @@ class AiDirective {
     const user = entry.user
     const { t } = useI18n(aiLang, { user })
     const msg = t(msgKey, { botName: bot.name })
-    TellUser.text(entry, msg, bot)
+    TellUser.text(entry, msg, { fromBot: bot })
   }
 
   private static isKickBot(text: string) {
@@ -762,7 +762,7 @@ class BaseBot {
         if(!newChats) {
           const { t } = useI18n(aiLang, { user: param.entry.user })
           const msg3 = t("cannot_read_images")
-          TellUser.text(param.entry, msg3, undefined, _this._character)
+          TellUser.text(param.entry, msg3, { fromCharacter: _this._character })
           return
         }
 
@@ -1389,7 +1389,7 @@ class BaseBot {
       )
     }
     else {
-      TellUser.text(entry, text, bot)
+      TellUser.text(entry, text, { fromBot: bot })
     }
   }
 
@@ -2762,7 +2762,7 @@ class ToolHandler {
 
     // 5. reply image
     const { entry } = this._aiParam
-    await TellUser.image(entry, res3.url, this._bot)
+    await TellUser.image(entry, res3.url, { fromBot: this._bot })
 
     return res3
   }

@@ -3468,6 +3468,12 @@ export namespace LiuAi {
     createdStamp: number
   }
 
+  export interface TellUserOpt {
+    fromBot?: AiBot
+    fromCharacter?: AiCharacter
+    fromSystem2?: boolean
+  }
+
 }
 
 
