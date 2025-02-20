@@ -3482,6 +3482,8 @@ export namespace LiuAi {
     content?: string
   }
 
+  export type Sys2Role = "human" | "developer" | "bot" | "system" | "tool" | "you"
+
 }
 
 

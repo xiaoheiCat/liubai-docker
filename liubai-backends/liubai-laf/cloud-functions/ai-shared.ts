@@ -27,6 +27,9 @@ import {
   type AiToolGetScheduleParam,
   type SortWay,
   type AiToolGetCardType,
+  type T_I18N,
+  type OaiToolPrompt,
+  type OaiToolCall,
 } from "@/common-types"
 import { WxGzhSender } from "@/service-send"
 import { 
@@ -514,6 +517,100 @@ export class AiShared {
       return
     }
     return chatId
+  }
+
+
+  static getToolMessage(
+    tool_call_id: string,
+    t: T_I18N,
+    v: Table_AiChat,
+  ) {
+    const { funcName, contentId } = v
+
+    let toolMsg: OaiToolPrompt | undefined
+    if (funcName === "add_note") {
+      if (contentId) {
+        toolMsg = { role: "tool", content: t("added_note"), tool_call_id }
+      }
+      else {
+        toolMsg = { role: "tool", content: t("not_agree_yet"), tool_call_id }
+      }
+    }
+    else if (funcName === "add_todo") {
+      if (contentId) {
+        toolMsg = { role: "tool", content: t("added_todo"), tool_call_id }
+      }
+      else {
+        toolMsg = { role: "tool", content: t("not_agree_yet"), tool_call_id }
+      }
+    }
+    else if (funcName === "add_calendar") {
+      if (contentId) {
+        toolMsg = { role: "tool", content: t("added_calendar"), tool_call_id }
+      }
+      else {
+        toolMsg = { role: "tool", content: t("not_agree_yet"), tool_call_id }
+      }
+    }
+    else if(funcName === "web_search") {
+      if(v.text && v.webSearchData && v.webSearchProvider) {
+        toolMsg = { role: "tool", content: v.text, tool_call_id }
+      }
+      else {
+        toolMsg = { role: "tool", content: t("fail_to_search"), tool_call_id }
+      }
+    }
+    else if(funcName === "parse_link") {
+      if(v.text) {
+        toolMsg = { role: "tool", content: v.text, tool_call_id }
+      }
+      else {
+        toolMsg = { role: "tool", content: t("fail_to_parse_link"), tool_call_id }
+      }
+    }
+    else if(funcName === "draw_picture") {
+      if(v.text && v.drawPictureUrl) {
+        toolMsg = { 
+          role: "tool", 
+          content: `[Finish to draw]`, 
+          tool_call_id,
+        }
+      }
+      else {
+        toolMsg = {
+          role: "tool",
+          content: "[Fail to draw]",
+          tool_call_id,
+        }
+      }
+    }
+    else if(funcName === "get_cards") {
+      if(v.text) {
+        toolMsg = {
+          role: "tool",
+          content: v.text,
+          tool_call_id,
+        }
+      }
+    }
+    else if(funcName === "get_schedule") {
+      if(v.text) {
+        toolMsg = {
+          role: "tool",
+          content: v.text,
+          tool_call_id,
+        }
+      }
+    }
+
+    return toolMsg
+  }
+
+  static getAssistantMsgWithTool(
+    tool_calls: OaiToolCall[],
+    v: Table_AiChat,
+  ) {
+
   }
 
 

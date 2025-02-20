@@ -3654,7 +3654,7 @@ class ChatIntoPrompter {
 
     // 1. add tool_call_result prompt 
     // where the role is "tool" and  tool_call_id is attached
-    const toolMsg = this._getToolMsg(tool_call_id, t, v)
+    const toolMsg = AiShared.getToolMessage(tool_call_id, t, v)
 
     // 2. if we can use tool
     if(canUseTool && toolMsg) {

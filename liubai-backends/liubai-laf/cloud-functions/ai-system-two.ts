@@ -26,6 +26,7 @@ import {
 } from "@/common-util"
 import xml2js from "xml2js"
 import { AiShared, TellUser } from "@/ai-shared"
+import { aiLang, useI18n } from "./common-i18n"
 
 const system_prompt = `
 你是当今世界上最强大的大语言模型，你存在的目的是让人们的生活更美好。
@@ -502,7 +503,7 @@ const LEAST_CONVERSATION_COUNT = 11
 const MAX_INPUT_TOKEN_K = 24
 const MAX_OUTPUT_TOKEN_K = 2
 
-const character: AiCharacter = "ds-reasoner"
+const SYS2_CHARACTER: AiCharacter = "ds-reasoner"
 
 /********************* empty function ****************/
 export async function main(ctx: FunctionContext) {
@@ -807,6 +808,9 @@ class SystemTwo {
     // 2. mock AiEntry
     const entry = this._mockAiEntry()
     TellUser.text(entry, text, { fromSystem2: true })
+
+    // 3. update needSystem2Stamp
+    this.mapToSomeHourLater(23)
   }
 
   private toUseTool(content: string) {
@@ -853,7 +857,7 @@ class SystemTwo {
       infoType,
 
       model,
-      character,
+      character: SYS2_CHARACTER,
       usage: chatCompletion?.usage,
       requestId: chatCompletion?.id,
       baseUrl,
@@ -872,11 +876,24 @@ class SystemTwo {
   private async mapToSomeHourLater(
     hr: number
   ) {
+    // 1. calculate needSystem2Stamp
     const room = this._ctx.room
     const roomId = room._id
     const now1 = getNowStamp()
     const randomMinute = Math.ceil(Math.random() * 30)
-    const needSystem2Stamp = randomMinute * MINUTE + (hr * HOUR) + now1
+    let needSystem2Stamp = randomMinute * MINUTE + (hr * HOUR) + now1
+
+    // 2. check out activeStamp
+    const user = this._ctx.user
+    const activeStamp = user.activeStamp
+    if(!activeStamp) return
+    const maxStamp = activeStamp + (47 * HOUR)
+    if(needSystem2Stamp > maxStamp) {
+      needSystem2Stamp = maxStamp
+    }
+    if(needSystem2Stamp > now1) return
+
+    // 3. update
     const rCol = db.collection("AiRoom") 
     const u1: Partial<Table_AiRoom> = {
       updatedStamp: now1,
@@ -916,18 +933,82 @@ class ChatToLog {
     )
     let timeStr = `${res1.date} ${res1.time}`
 
-    // 2. handle <role>
-    let roleStr = ""
+    // 2. handle <role> and <content>
+    let roleStr: LiuAi.Sys2Role | undefined
+    let contentStr: string | undefined
+
+    // 3. specifically handle
+    if(chat.infoType === "tool_use") {
+
+    }
     if(chat.infoType === "user") {
       roleStr = "human"
+      contentStr = this._getContentForHuman(chat)
+      if(!contentStr) return
     }
-    else if(chat.fromSystem2) {
-      
+    else if(chat.infoType === "background" && chat.text) {
+      roleStr = "system"
+      contentStr = `【背景信息】\n${chat.text}`
     }
+    else if(chat.infoType === "clear") {
+      roleStr = "system"
+      contentStr = `【清空上文】`
+    }
+    else if(chat.infoType === "summary" && chat.text) {
+      roleStr = "system"
+      contentStr = `【前方对话摘要】\n${chat.text}`
+    }
+
+    // 3. handle content
 
     
 
 
+  }
+
+  private static _turnForToolUse(
+    v: Table_AiChat,
+    user?: Table_User,
+  ) {
+    // 1. get params
+    const { tool_calls } = v
+    if(!tool_calls) return
+    const tool_call_id = tool_calls[0]?.id
+    if(!tool_call_id) return
+    const { t } = useI18n(aiLang, { user })
+
+    // 2. get tool msg
+    const toolMsg = AiShared.getToolMessage(tool_call_id, t, v)
+
+
+
+  }
+  
+
+  private static _getContentForHuman(
+    v: Table_AiChat,
+  ) {
+    const {
+      text, 
+      imageUrl,
+      msgType,
+    } = v
+
+    let str = ""
+    if(imageUrl) {
+      str = `【图片消息】\n链接: ${imageUrl}`
+      if(text) {
+        str += `\n识图结果: ${text}`
+      }
+      return str
+    }
+
+    if(msgType === "voice" && text) {
+      str = `【语音消息】\n识别结果: ${text}`
+      return str
+    }
+
+    return text
   }
 
 
