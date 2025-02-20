@@ -476,6 +476,32 @@ export class AiShared {
     return token
   }
 
+  static calculatePromptToken(
+    prompt: OaiPrompt,
+  ) {
+    const content = prompt.content
+    if(!content) return 0
+    if(typeof content === "string") {
+      return AiShared.calculateTextToken(content)
+    }
+
+    let token = 0
+    for(let i=0; i<content.length; i++) {
+      const v = content[i]
+      if(v.type === "text") {
+        token += AiShared.calculateTextToken(v.text)
+      }
+      else if(v.type === "image_url") {
+        token += 600
+      }
+      else if(v.type === "input_audio") {
+        token += 1000
+      }
+    }
+
+    return token
+  }
+
   static async addChat(data: Partial_Id<Table_AiChat>) {
     const col = db.collection("AiChat")
     const res1 = await col.add(data)

@@ -21,6 +21,7 @@ import type {
 import cloud from "@lafjs/cloud"
 import { 
   checkIfUserSubscribed, 
+  LiuDateUtil, 
   valTool,
 } from "@/common-util"
 import xml2js from "xml2js"
@@ -180,6 +181,7 @@ const system_prompt = `
 <log>
   <role>you</role>
   <direction>4</direction>
+  <content>都很好，无需进一步操作</content>
   <time>2025-02-06 15:55:31</time>
 </log>
 
@@ -481,6 +483,14 @@ const tool_result_prompt = `
 请务必遵循 system prompt 中“你的输出格式”进行输出，也就是将你的想法包裹在 <xml> 标签中，里头还包含 <direction> 和 <content> 标签。
 `.trim()
 
+const basic_log_tmpl = `
+<log>
+  <role>{role}</role>
+  <content>{content}</content>
+  <time>{time}</time>
+</log>
+`
+
 /********************* constants ****************/
 const db = cloud.database()
 const _ = db.command
@@ -691,12 +701,34 @@ class SystemTwo {
     let runTimes = 0
     while(runTimes < maxTimes) {
       runTimes++
+      await this.inputToLLM()
 
     }
 
   }
 
   private async inputToLLM() {
+    // 1. get params
+    const chats = this._ctx.chats
+    const reasonerAndUs = this._reasonerAndUs
+
+    // 2. get token we have
+    let tokenWeHave = AiShared.calculateTextToken(system_prompt)
+    tokenWeHave += AiShared.calculateTextToken(user_prompt)
+    for(let i=0; i<reasonerAndUs.length; i++) {
+      const v = reasonerAndUs[i]
+      tokenWeHave += AiShared.calculatePromptToken(v)
+    }
+
+    // 3. add logs
+    let system2Logs: string[] = []
+    for(let i=0; i<chats.length; i++) {
+      const v = chats[i]
+      
+
+    }
+  
+
 
   }
 
@@ -866,9 +898,35 @@ class SystemTwo {
   
 }
 
-class ChatToMessage {
 
-  static run() {
+
+
+
+
+class ChatToLog {
+
+  static run(
+    chat: Table_AiChat,
+    user?: Table_User,
+  ) {
+    // 1. handle <time>
+    const res1 = LiuDateUtil.getDateAndTime(
+      chat.sortStamp,
+      user?.timezone,
+    )
+    let timeStr = `${res1.date} ${res1.time}`
+
+    // 2. handle <role>
+    let roleStr = ""
+    if(chat.infoType === "user") {
+      roleStr = "human"
+    }
+    else if(chat.fromSystem2) {
+      
+    }
+
+    
+
 
   }
 
