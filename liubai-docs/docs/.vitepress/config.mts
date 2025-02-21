@@ -30,7 +30,7 @@ export default defineConfig({
           items: [
             { text: "简介", link: "/guide/what-is-liubai" },
             { text: "社区", link: "/guide/community" },
-            { text: "AI", link: "/guide/three-assistants" }
+            { text: "AI 说明书", link: "/guide/three-assistants" }
           ]
         },
         {

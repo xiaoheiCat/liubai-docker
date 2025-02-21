@@ -330,7 +330,7 @@ export const aiLang: LangAtom = {
     "already_exist": "{botName}已在群聊中",
     "already_left": "{botName}并不在群聊内",
     "continue_bot": "继续{botName}",
-    "there_are_3": "聊天室已有 3 个助手",
+    "there_are_3": "聊天室已有 3 个助手，请先踢掉再召唤。",
     "nobody_here": "当前群聊内没有任何助手",
     "do_not_use_tool": "【请根据以上搜索结果，直接给出你的回复，勿再使用工具调用】",
     "do_not_use_tool_2": "【请根据以上获取结果，直接给出你的回复，不要使用工具调用】",
@@ -437,9 +437,9 @@ export const aiLang: LangAtom = {
     "status_5": "會員每月享有: {maxTimes}輪",
     "no_member": "沒有其他助手",
     "already_exist": "{botName}已在群聊中",
-    "already_left": "{botName}並不在群聊内",
+    "already_left": "{botName}並不在群聊內",
     "continue_bot": "繼續{botName}",
-    "there_are_3": "聊天室已有 3 个助手",
+    "there_are_3": "聊天室已有 3 个助手，請先踢掉再召喚。",
     "nobody_here": "當前群組內沒有任何助手",
     "do_not_use_tool": "【請根據以上搜尋結果，直接給出你的回覆，勿再使用工具調用】",
     "do_not_use_tool_2": "【請根據以上檢索結果，請直接給出你的回覆，不要使用工具調用】",
@@ -504,7 +504,7 @@ export const aiLang: LangAtom = {
     "privacy_title": "🔓 Privacy:",
     "working_log_title": "📜 Working Logs:",
     "operation_title": "🕹️ Operations:",
-    "generative_ai_warning": "⚠️ AI can make mistakes. Please double-check it.",
+    "generative_ai_warning": "⚠️ AI might make mistakes. Please double-check it.",
     "kick": "Remove ",
     "add": "Add ",
     "clear_context": "Clear context",
@@ -548,7 +548,7 @@ export const aiLang: LangAtom = {
     "already_exist": "{botName} has already joined in the group chat",
     "already_left": "{botName} is not in the group chat",
     "continue_bot": "Continue {botName}",
-    "there_are_3": "There are 3 assistants in the group chat.",
+    "there_are_3": "There are 3 assistants in the group chat. Please kick one first.",
     "nobody_here": "There is no assistant here.",
     "do_not_use_tool": "[Reply me directly with the above search results please, and do not use tools again]",
     "do_not_use_tool_2": "[Reply me directly with the above results please, and do not use tools again]",
@@ -619,7 +619,15 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
     {
       msgtype: "text",
       text: {
-        content: `🪧 指路牌
+        content: `【指路牌🪧】
+
+🤖 <a href='{LIU_DOCS_DOMAIN}/guide/three-assistants'>AI使用说明书</a>
+
+📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">开发者的小红书</a>
+
+🌐 <a href="https://github.com/yenche123/liubai">开源地址</a>
+
+📦 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">提问箱</a>
 
 📨 <a href="{LIU_DOMAIN}/">收件箱</a>
 
@@ -628,12 +636,6 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
 ⭐ <a href="{LIU_DOMAIN}/favorite">我的收藏</a>
 
 📂 <a href="{LIU_DOMAIN}/state">我的看板</a>
-
-📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">开发者的小红书</a>
-
-🌐 <a href="https://github.com/yenche123/liubai">开源地址</a>
-
-📦 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">提问箱</a>
 `,
       }
     }
@@ -668,7 +670,15 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
     {
       msgtype: "text",
       text: {
-        content: `🪧 指路牌
+        content: `【指路牌🪧】
+
+🤖 <a href='{LIU_DOCS_DOMAIN}/guide/three-assistants'>AI使用說明書</a>
+
+📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">開發者的小紅書</a>
+
+🌐 <a href="https://github.com/yenche123/liubai">開源網址</a>
+
+📦 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">提問箱</a>
 
 📨 <a href="{LIU_DOMAIN}/">收件匣</a>
 
@@ -677,12 +687,6 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
 ⭐ <a href="{LIU_DOMAIN}/favorite">我的收藏</a>
 
 📂 <a href="{LIU_DOMAIN}/state">我的看板</a>
-
-📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">開發者的小紅書</a>
-
-🌐 <a href="https://github.com/yenche123/liubai">開源網址</a>
-
-📦 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">提問箱</a>
 `,
       }
     }
@@ -717,7 +721,15 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
     {
       msgtype: "text",
       text: {
-        content: `🪧 Guidebook
+        content: `[Guidebook 🪧]
+
+🤖 <a href='{LIU_DOCS_DOMAIN}/guide/three-assistants'>AI Instructions</a>
+
+📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">Follow me on RED</a>
+
+🌐 <a href="https://github.com/yenche123/liubai">Open Source</a>
+
+📦 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">AMA</a>
 
 📨 <a href="{LIU_DOMAIN}/">My Inbox</a>
 
@@ -726,12 +738,6 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
 ⭐ <a href="{LIU_DOMAIN}/favorite">My Favorite</a>
 
 📂 <a href="{LIU_DOMAIN}/state">My Board</a>
-
-📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">Follow me on RED</a>
-
-🌐 <a href="https://github.com/yenche123/liubai">Open Source</a>
-
-📦 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">AMA</a>
 `,
       }
     }

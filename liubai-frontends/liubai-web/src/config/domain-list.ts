@@ -127,7 +127,7 @@ export const domainAllowed = [
   "podquest.app",
   "pod.link",
   "embeds.audioboom.com",
-
+  "xiaohuolufm.com",
 ]
 
 export const mastodonDomains = [

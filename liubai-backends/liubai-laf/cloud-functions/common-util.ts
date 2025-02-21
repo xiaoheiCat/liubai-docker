@@ -313,7 +313,8 @@ const isAllNumber = (val: string, digit?: number) => {
   return res
 }
 
-const isStringAsNumber = (str: string) => {
+const isStringAsNumber = (str: any) => {
+  if(typeof str !== "string") return false
   str = str.trim()
   if(!str) return false
   const num = Number(str)
@@ -356,6 +357,23 @@ export const valTool = {
   isStringAsNumber,
   getTextCharNum,
   getPromise,
+}
+
+export class ValueTransform {
+
+  static str2Num(x: any): DataPass<number> {
+    if(!valTool.isStringAsNumber(x)) {
+      return {
+        pass: false,
+        err: { code: "" }
+      }
+    }
+    return {
+      pass: true,
+      data: Number(x),
+    }
+  }
+
 }
 
 
