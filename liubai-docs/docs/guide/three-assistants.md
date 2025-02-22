@@ -28,6 +28,7 @@
 - DeepSeek ([V3](https://api-docs.deepseek.com/zh-cn/news/news1226) 和 [R1](https://api-docs.deepseek.com/zh-cn/news/news250120))
 - 海螺 (来自 [MiniMax](https://minimaxi.com/))
 - Kimi（来自[月之暗面](https://www.moonshot.cn/)）
+- 通义千问（来自[阿里巴巴](https://tongyi.aliyun.com/welcome)）
 - 万知（来自[零一万物](https://www.01.ai/cn)）
 - 跃问（来自[阶跃星辰](https://www.stepfun.com/)）
 - 智谱（来自[智谱华章](https://bigmodel.cn/)）
@@ -49,6 +50,8 @@
 `召唤海螺`: 使用来自 MiniMax 的 AI 大模型。
 
 `召唤kimi`: 使用来自月之暗面的 AI 大模型。
+
+`召唤通义千问`: 使用来自阿里巴巴的 AI 大模型。此指令等效于 `召唤通义` / `召唤TY` / `召唤千问` / `召唤Qwen`。
 
 `召唤万知`: 使用来自零一万物的 AI 大模型。
 
