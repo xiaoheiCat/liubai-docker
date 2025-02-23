@@ -13,6 +13,7 @@ import type {
   LiuAi,
   OaiChatCompletion,
   OaiPrompt,
+  OaiToolCall,
   Partial_Id,
   Table_AiChat, 
   Table_AiRoom, 
@@ -25,7 +26,7 @@ import {
   valTool,
 } from "@/common-util"
 import xml2js from "xml2js"
-import { AiShared, BaseLLM, TellUser } from "@/ai-shared"
+import { AiShared, BaseLLM, TellUser, ToolShared } from "@/ai-shared"
 import { aiLang, i18nFill, useI18n } from "@/common-i18n"
 
 
@@ -1025,6 +1026,56 @@ class SystemTwo {
   
 }
 
+class ToolHandler2 {
+
+  private _room: Table_AiRoom
+  private _user: Table_User
+  private _tool_calls: OaiToolCall[]
+  private _toolShared: ToolShared
+  private _chatCompletion?: OaiChatCompletion
+
+  constructor(
+    ctx: UserCtx,
+    tool_calls: OaiToolCall[],
+    chatCompletion?: OaiChatCompletion,
+  ) {
+    this._room = ctx.room
+    this._user = ctx.user
+    this._tool_calls = tool_calls
+    this._toolShared = new ToolShared(ctx.user, { fromSystem2: true })
+    this._chatCompletion = chatCompletion
+  }
+
+  private async _addMsgToChat(
+    param: Partial<Table_AiChat>,
+  ) {
+    const apiData = System2Util.getApiData()
+    const b1 = getBasicStampWhileAdding()
+    const chatCompletion = this._chatCompletion
+    const roomId = this._room._id
+    const newChat: Partial_Id<Table_AiChat> = {
+      ...b1,
+      sortStamp: b1.insertedStamp,
+      infoType: "tool_use",
+      roomId,
+      model: apiData.model,
+      usage: chatCompletion?.usage,
+      requestId: chatCompletion?.id,
+      baseUrl: apiData.baseUrl,
+      tool_calls: this._tool_calls,
+      onlyInSystem2: true,
+      fromSystem2: true,
+      ...param,
+    }
+    const chatId = await AiShared.addChat(newChat)
+    return chatId
+  }
+
+
+
+
+
+}
 
 class ChatToLog {
 
