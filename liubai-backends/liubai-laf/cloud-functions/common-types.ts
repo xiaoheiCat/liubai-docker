@@ -3478,6 +3478,7 @@ export namespace LiuAi {
   export interface Sys2Output {
     direction?: Sys2Direction
     content?: string
+    tool_calls?: string
   }
 
   export type Sys2Role = "human" | "developer" | "bot" | "system" | "tool" | "you"

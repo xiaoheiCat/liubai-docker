@@ -18,7 +18,6 @@ import {
   type Table_User,
   type Table_Order,
   type Table_Subscription,
-  type AiToolAddCalendarParam,
   type AiAbility,
   type T_I18N,
   type AiImageSizeType,
@@ -2507,7 +2506,7 @@ class ToolHandler {
     this._aiParam = aiParam
     this._bot = bot
     this._tool_calls = tool_calls
-    this._toolShared = new ToolShared(bot, aiParam.entry.user)
+    this._toolShared = new ToolShared(aiParam.entry.user, { bot })
     this._chatCompletion = chatCompletion
   }
 
@@ -2531,24 +2530,6 @@ class ToolHandler {
     const assistantChatId = await AiHelper.addAssistantMsg(arg)
     return assistantChatId
   }
-
-  private _getAgreeAndEditLinks(assistantChatId: string) {
-    const domain = getLiuDoman()
-
-    const agreeLink = `${domain}/agree?chatId=${assistantChatId}`
-    const editLink = `${domain}/compose?chatId=${assistantChatId}`
-
-    return { agreeLink, editLink }
-  }
-
-  private _getEssentialReplyData(assistantChatId: string) {
-    const entry = this._aiParam.entry
-    const { user } = entry
-    const { t } = useI18n(aiLang, { user })
-    const { agreeLink, editLink } = this._getAgreeAndEditLinks(assistantChatId)
-    const botName = this._bot.name
-    return { t, agreeLink, editLink, botName }
-  }
   
   async add_note(funcJson: Record<string, any>) {
     // 1. check out param
@@ -2567,15 +2548,8 @@ class ToolHandler {
     if(!assistantChatId) return
 
     // 3. reply
-    const { t, agreeLink, editLink, botName } = this._getEssentialReplyData(assistantChatId)
-    let msg = ""
-    const { title, description } = funcJson
-    if(title) {
-      msg = t("add_note_with_title", { botName, title, desc: description, agreeLink, editLink })
-    }
-    else {
-      msg = t("add_note_only_desc", { botName, desc: description, agreeLink, editLink })
-    }
+    const toolShared = this._toolShared
+    const msg = toolShared.get_msg_for_adding_note(funcJson, assistantChatId)
     TellUser.text(this._aiParam.entry, msg)
   }
 
@@ -2588,7 +2562,7 @@ class ToolHandler {
       return
     }
 
-    // 2. add msg
+    // 2. add chat
     const assistantChatId = await this._addMsgToChat({
       funcName: "add_todo",
       funcJson,
@@ -2596,9 +2570,8 @@ class ToolHandler {
     if(!assistantChatId) return
 
     // 3. reply
-    const { t, agreeLink, editLink, botName } = this._getEssentialReplyData(assistantChatId)
-    const { title } = funcJson
-    let msg = t("add_todo", { botName, title, agreeLink, editLink })
+    const toolShared = this._toolShared
+    const msg = toolShared.get_msg_for_adding_todo(assistantChatId, funcJson)
     TellUser.text(this._aiParam.entry, msg)
   }
 
@@ -2625,91 +2598,8 @@ class ToolHandler {
     if(!assistantChatId) return
 
     // 3. reply
-    const { t, agreeLink, editLink, botName } = this._getEssentialReplyData(assistantChatId)
-    const {
-      title,
-      description,
-      date,
-      specificDate,
-      time,
-      earlyMinute,
-      laterHour,
-    } = funcJson as AiToolAddCalendarParam
-    let msg = t("add_calendar_1", { botName })
-    if(title) {
-      msg += t("add_calendar_2", { title })
-    }
-    msg += t("add_calendar_3", { desc: description })
-
-    /** Priority:
-     *   date > specificDate > laterHour
-     */
-    // 3.1 handle date
-    let hasAddedDate = false
-    if(date) {
-      const dateObj = LiuDateUtil.distractFromYYYY_MM_DD(date)
-      if(dateObj) {
-        hasAddedDate = true
-        msg += t("add_calendar_4", { date })
-      }
-    }
-    if(specificDate && !hasAddedDate) {
-      const strDate = t(specificDate)
-      if(strDate) {
-        hasAddedDate = true
-        msg += t("add_calendar_4", { date: strDate })
-      }
-    }
-
-    // 3.2 handle time
-    let hasAddedTime = false
-    if(time) {
-      const timeObj = LiuDateUtil.distractFromhh_mm(time)
-      if(timeObj) {
-        hasAddedTime = true
-        msg += t("add_calendar_5", { time })
-      }
-    }
-    if(earlyMinute && hasAddedTime) {
-      let strReminder = ""
-      if(earlyMinute < 60) {
-        strReminder = t("early_min", { min: earlyMinute })
-      }
-      else if(earlyMinute === 60 || earlyMinute === 120) {
-        const tmpHrs = Math.round(earlyMinute / 60)
-        strReminder = t("early_hr", { hr: tmpHrs })
-      }
-      else if(earlyMinute === 1440) {
-        strReminder = t("early_day", { day: 1 })
-      }
-      if(strReminder) {
-        msg += t("add_calendar_6", { str: strReminder })
-      }
-    }
-
-    // 3.3 handle later
-    if(laterHour && !hasAddedTime && !hasAddedDate) {
-      let strLater = ""
-      if(laterHour === 0.5) {
-        strLater = t("later_min", { min: 30 })
-      }
-      else if(laterHour < 24) {
-        strLater = t("later_hr", { hr: laterHour })
-      }
-      else if(laterHour === 24) {
-        strLater = t("later_day", { day: 1 })
-      }
-      if(strLater) {
-        msg += t("add_calendar_6", { str: strLater })
-      }
-    }
-
-    // 3.3 add footer
-    msg += t("add_calendar_7", { agreeLink, editLink })
-
-    console.warn("see msg for calendar: ")
-    console.log(msg)
-
+    const toolShared = this._toolShared
+    const msg = toolShared.get_msg_for_adding_calendar(assistantChatId, funcJson)
     TellUser.text(this._aiParam.entry, msg)
   }
 

@@ -30,12 +30,14 @@ import {
   type T_I18N,
   type OaiToolPrompt,
   type OaiToolCall,
+  type AiToolAddCalendarParam,
 } from "@/common-types"
 import { WxGzhSender } from "@/service-send"
 import { 
   checkAndGetWxGzhAccessToken,
   decryptEncData,
   getDocAddId,
+  getLiuDoman,
   getSummary,
   LiuDateUtil,
   liuFetch,
@@ -952,17 +954,31 @@ export class WebSearch {
 }
 
 /******************** shared tools ************************/
+
+export interface ToolSharedOpt {
+  bot?: AiBot
+  fromSystem2?: boolean
+}
+
 export class ToolShared {
 
-  private _bot: AiBot
   private _user: Table_User
+  private _botName = ""
 
   constructor(
-    bot: AiBot,
-    user: Table_User
+    user: Table_User,
+    opt?: ToolSharedOpt,
   ) {
-    this._bot = bot
+    // 1. init user
     this._user = user
+
+    // 2. handle botName
+    let botName = opt?.bot?.name ?? ""
+    if(opt?.fromSystem2) {
+      const { t } = useI18n(aiLang, { user })
+      botName = t("system2_r1")
+    }
+    this._botName = botName
   }
 
   async web_search(funcJson: Record<string, any>) {
@@ -1004,7 +1020,7 @@ export class ToolShared {
 
     // 2. construct basic query
     const now = getNowStamp()
-    const bot = this._bot
+    const botName = this._botName
     const user = this._user
     const q2: Record<string, any> = {
       user: user._id,
@@ -1020,7 +1036,7 @@ export class ToolShared {
     // 2.1 define replied text
     const { t } = useI18n(aiLang, { user })
     let textToBot = t("schedule_future")
-    let textToUser = t("bot_read_future", { bot: bot.name })
+    let textToUser = t("bot_read_future", { bot: botName })
 
     // 3. handle hoursFromNow
     if(hoursFromNow) {
@@ -1030,14 +1046,14 @@ export class ToolShared {
         const command3_2 = _.gte(now + hoursFromNow * HOUR)
         q2.calendarStamp = _.and(command3_1, command3_2)
         textToBot = t("schedule_last", { hour: hoursFromNow })
-        textToUser = t("bot_read_last", { bot: bot.name, hour: hoursFromNow })
+        textToUser = t("bot_read_last", { bot: botName, hour: hoursFromNow })
       }
       else {
         const command3_3 = _.gt(now)
         const command3_4 = _.lte(now + hoursFromNow * HOUR)
         q2.calendarStamp = _.and(command3_3, command3_4)
         textToBot = t("schedule_next", { hour: hoursFromNow })
-        textToUser = t("bot_read_next", { bot: bot.name, hour: hoursFromNow })
+        textToUser = t("bot_read_next", { bot: botName, hour: hoursFromNow })
       }
     }
 
@@ -1087,8 +1103,7 @@ export class ToolShared {
   ) {
     // 1. inject required data
     const user = this._user
-    const bot = this._bot
-    const botName = bot.name
+    const botName = this._botName
     const { t } = useI18n(aiLang, { user })
 
     // 2. get today
@@ -1193,7 +1208,7 @@ export class ToolShared {
     const cardType = funcJson.cardType as AiToolGetCardType
 
     // 2. construct basic query
-    const bot = this._bot
+    const botName = this._botName
     const user = this._user
     const userId = user._id
     const q2: Record<string, any> = {
@@ -1220,11 +1235,11 @@ export class ToolShared {
       contents = res3_0.data
       if(cardType === "TODO") {
         textToBot = t("todo_cards")
-        textToUser = t("bot_read_todo", { bot: bot.name })
+        textToUser = t("bot_read_todo", { bot: botName })
       }
       else if(cardType === "FINISHED") {
         textToBot = t("finished_cards")
-        textToUser = t("bot_read_finished", { bot: bot.name })
+        textToUser = t("bot_read_finished", { bot: botName })
       }
     }
     else if(cardType === "EVENT") {
@@ -1233,14 +1248,14 @@ export class ToolShared {
       const res3_1 = await q3_1.get<Table_Content>()
       contents = res3_1.data
       textToBot = t("event_cards")
-      textToUser = t("bot_read_event", { bot: bot.name })
+      textToUser = t("bot_read_event", { bot: botName })
     }
     else {
       const q3_2 = cCol.where(q2).orderBy("createdStamp", "desc").limit(10)
       const res3_2 = await q3_2.get<Table_Content>()
       contents = res3_2.data
       textToBot = t("note_cards")
-      textToUser = t("bot_read_note", { bot: bot.name })
+      textToUser = t("bot_read_note", { bot: botName })
     }
 
     // 6. package
@@ -1297,6 +1312,153 @@ export class ToolShared {
       markdown: text3,
       provider: "jina-ai"
     }
+  }
+
+  private getEssentialReplyData(assistantChatId: string) {
+    const user = this._user
+    const botName = this._botName
+    const { t } = useI18n(aiLang, { user })
+    const { agreeLink, editLink } = ToolShared.getAgreeAndEditLinks(assistantChatId)
+    return { t, agreeLink, editLink, botName }
+  }
+
+  static getAgreeAndEditLinks(assistantChatId: string) {
+    const domain = getLiuDoman()
+
+    const agreeLink = `${domain}/agree?chatId=${assistantChatId}`
+    const editLink = `${domain}/compose?chatId=${assistantChatId}`
+
+    return { agreeLink, editLink }
+  }
+
+  get_msg_for_adding_note(
+    funcJson: Record<string, any>,
+    assistantChatId: string,
+  ) {
+    const { 
+      t, 
+      agreeLink, 
+      editLink, 
+      botName,
+    } = this.getEssentialReplyData(assistantChatId)
+    let msg = ""
+    const { title, description } = funcJson
+    if(title) {
+      msg = t("add_note_with_title", { botName, title, desc: description, agreeLink, editLink })
+    }
+    else {
+      msg = t("add_note_only_desc", { botName, desc: description, agreeLink, editLink })
+    }
+    return msg
+  }
+
+  get_msg_for_adding_todo(
+    assistantChatId: string,
+    funcJson: Record<string, any>,
+  ) {
+    const { 
+      t, 
+      agreeLink, 
+      editLink, 
+      botName,
+    } = this.getEssentialReplyData(assistantChatId)
+    const { title } = funcJson
+    let msg = t("add_todo", { botName, title, agreeLink, editLink })
+    return msg
+  }
+
+  get_msg_for_adding_calendar(
+    assistantChatId: string,
+    funcJson: Record<string, any>,
+  ) {
+    const { 
+      t, 
+      agreeLink, 
+      editLink, 
+      botName,
+    } = this.getEssentialReplyData(assistantChatId)
+    const {
+      title,
+      description,
+      date,
+      specificDate,
+      time,
+      earlyMinute,
+      laterHour,
+    } = funcJson as AiToolAddCalendarParam
+    let msg = t("add_calendar_1", { botName })
+    if(title) {
+      msg += t("add_calendar_2", { title })
+    }
+    msg += t("add_calendar_3", { desc: description })
+
+    /** Priority:
+     *   date > specificDate > laterHour
+     */
+    // 3.1 handle date
+    let hasAddedDate = false
+    if(date) {
+      const dateObj = LiuDateUtil.distractFromYYYY_MM_DD(date)
+      if(dateObj) {
+        hasAddedDate = true
+        msg += t("add_calendar_4", { date })
+      }
+    }
+    if(specificDate && !hasAddedDate) {
+      const strDate = t(specificDate)
+      if(strDate) {
+        hasAddedDate = true
+        msg += t("add_calendar_4", { date: strDate })
+      }
+    }
+
+    // 3.2 handle time
+    let hasAddedTime = false
+    if(time) {
+      const timeObj = LiuDateUtil.distractFromhh_mm(time)
+      if(timeObj) {
+        hasAddedTime = true
+        msg += t("add_calendar_5", { time })
+      }
+    }
+    if(earlyMinute && hasAddedTime) {
+      let strReminder = ""
+      if(earlyMinute < 60) {
+        strReminder = t("early_min", { min: earlyMinute })
+      }
+      else if(earlyMinute === 60 || earlyMinute === 120) {
+        const tmpHrs = Math.round(earlyMinute / 60)
+        strReminder = t("early_hr", { hr: tmpHrs })
+      }
+      else if(earlyMinute === 1440) {
+        strReminder = t("early_day", { day: 1 })
+      }
+      if(strReminder) {
+        msg += t("add_calendar_6", { str: strReminder })
+      }
+    }
+
+    // 3.3 handle later
+    if(laterHour && !hasAddedTime && !hasAddedDate) {
+      let strLater = ""
+      if(laterHour === 0.5) {
+        strLater = t("later_min", { min: 30 })
+      }
+      else if(laterHour < 24) {
+        strLater = t("later_hr", { hr: laterHour })
+      }
+      else if(laterHour === 24) {
+        strLater = t("later_day", { day: 1 })
+      }
+      if(strLater) {
+        msg += t("add_calendar_6", { str: strLater })
+      }
+    }
+
+    // 3.4 add footer
+    msg += t("add_calendar_7", { agreeLink, editLink })
+
+    return msg
   }
 
 }

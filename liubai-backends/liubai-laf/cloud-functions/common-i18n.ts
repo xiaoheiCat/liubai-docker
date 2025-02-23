@@ -390,6 +390,9 @@ export const aiLang: LangAtom = {
     // failures
     "fail_to_search": "网络搜索失败",
     "fail_to_parse_link": "链接解析失败",
+
+    // system 2
+    "system2_r1": "系统二（R1）",
   },
   "zh-Hant": {
     "privacy_title": "🔓 隱私提示:",
@@ -499,6 +502,9 @@ export const aiLang: LangAtom = {
     // failures
     "fail_to_search": "網路搜尋失敗",
     "fail_to_parse_link": "連結解析失敗",
+
+    // system 2
+    "system2_r1": "系統二 (R1) ",
   },
   "en": {
     "privacy_title": "🔓 Privacy:",
@@ -608,6 +614,9 @@ export const aiLang: LangAtom = {
     // failures
     "fail_to_search": "Fail to search",
     "fail_to_parse_link": "Fail to parse link",
+
+    // system 2
+    "system2_r1": "System 2 (R1)",
   }
 }
 

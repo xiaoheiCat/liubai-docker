@@ -47,9 +47,9 @@ const system_prompt = `
 
 <direction>: 必填，用于告知我们你的决定。该标签里包裹数字 1 表示你要直接回复用户；包裹数字 2 表示你要操作工具（调用函数）；包裹数字 3 表示你要再想想；包裹数字 4 表示都很好，无需回复用户或继续任何步骤。
 
-<content>: 选填，关于此决定的相关数据。当 direction 为 1 时，请在此标签内包裹你要回复的文本；当 direction 为 2 时，请在此标签内包裹需要对应的函数和对应的参数，请务必包裹 JSON 格式的字符串；当 direction 为 3 时，可包裹一个 1 到 24 的数字表示若干小时后再想一遍，若不填则由我们指定；当 direction 为 4 时，无需回复 <content> 标签。
+<content>: 选填，关于此决定的相关数据。当 direction 为 1 时，请在此标签内包裹你要回复的文本；当 direction 为 3 时，可包裹一个 1 到 24 的数字表示若干小时后再想一遍，若不填则由我们指定；当 direction 为 2 或 4 时，无需回复 <content> 标签。
 
-<tool_calls>: 选填，当 direction 为 2 时必填，表示要调用的工具们和对应参数。
+<tool_calls>: 一个数组，表示欲调用的工具及其对应参数。选填，当 direction 为 2 时必填。
 
 ### 示例
 
@@ -542,7 +542,7 @@ const HR_47 = DAY * 47
 // 最小会话论述，聊天室的轮数必须大于等于该值，才会进入系统二
 const LEAST_CONVERSATION_COUNT = 11
 const MAX_INPUT_TOKEN_K = 24
-const MAX_OUTPUT_TOKEN_K = 2
+const MAX_OUTPUT_TOKENS = 2000
 
 const SYS2_CHARACTER: AiCharacter = "ds-reasoner"
 
@@ -812,7 +812,12 @@ class SystemTwo {
     const apiData = System2Util.getApiData()
     const { model, baseUrl, apiKey } = apiData
     const llm = new BaseLLM(apiKey, baseUrl)
-    const res7 = await llm.chat({ messages, model, temperature: 0.6 })
+    const res7 = await llm.chat({ 
+      messages, 
+      model, 
+      temperature: 0.6,
+      max_tokens: MAX_OUTPUT_TOKENS,
+    })
 
     return res7
   }
@@ -863,13 +868,17 @@ class SystemTwo {
     console.log("see result from SYS 2: ", res3)
     // 4. decide which path to go
     let res4 = false
-    const { direction, content: content4 } = res3
+    const { 
+      direction, 
+      content: content4,
+      tool_calls,
+    } = res3
     if(direction === "1" && content4) {
       // get to reply
       this.toReply(content4)
     }
-    else if(direction === "2" && content4) {
-      this.toUseTool(content4)
+    else if(direction === "2" && tool_calls) {
+      this.toUseTool(tool_calls)
     }
     else if(direction === "3" && reasoning_content1) {
       this.toThinkLater(reasoning_content1, content4)
@@ -890,14 +899,43 @@ class SystemTwo {
     })
 
     // 2. mock AiEntry
-    const entry = this._mockAiEntry()
+    const entry = System2Util.mockAiEntry(this._ctx.user)
     TellUser.text(entry, text, { fromSystem2: true })
 
     // 3. update needSystem2Stamp
     this.mapToSomeHourLater(23)
   }
 
-  private toUseTool(content: string) {
+  private toUseTool(tool_calls_str: string) {
+    // 1. parse tool calls
+    let tool_calls: Record<string, any>[] = []
+    try {
+      tool_calls = JSON.parse(tool_calls_str)
+    }
+    catch(err) {
+      console.warn("JSON.parse tool_calls error: ", err)
+      return true
+    }
+    if(!tool_calls || !Array.isArray(tool_calls)) {
+      console.warn("fail to parse tool_calls: ", tool_calls_str)
+      return true
+    }
+
+    for(let i=0; i<tool_calls.length; i++) {
+      const v = tool_calls[i]
+      const funcData = v["function"]
+
+      if(v.type !== "function" || !funcData) continue
+      const tool_call_id = v.id
+
+      const funcName = funcData.name
+      const funcArgs = funcData.arguments
+      const funcJson = valTool.strToObj(funcArgs)
+      console.log("funcName: ", funcName)
+      console.log(funcJson)
+
+    }
+
 
   }
 
@@ -984,23 +1022,8 @@ class SystemTwo {
     }
     await rCol.doc(roomId).update(u1)
   }
-
-  private _mockAiEntry() {
-    const user = this._ctx.user
-    const wx_gzh_openid = user.wx_gzh_openid
-    const entry: AiEntry = {
-      user,
-      msg_type: "text",
-      wx_gzh_openid,
-    }
-    return entry
-  }
   
 }
-
-
-
-
 
 
 class ChatToLog {
@@ -1187,6 +1210,16 @@ class System2Util {
     const baseUrl = _env.LIU_SYSTEM2_BASE_URL ?? ""
     const apiKey = _env.LIU_SYSTEM2_API_KEY ?? ""
     return { model, baseUrl, apiKey }
+  }
+
+  static mockAiEntry(user: Table_User) {
+    const wx_gzh_openid = user.wx_gzh_openid
+    const entry: AiEntry = {
+      user,
+      msg_type: "text",
+      wx_gzh_openid,
+    }
+    return entry
   }
 
 }
