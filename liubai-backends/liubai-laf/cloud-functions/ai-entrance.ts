@@ -2701,7 +2701,7 @@ class ToolHandler {
       data4.text = res3.prompt
     }
 
-    AiHelper.updateAiChat(assistantChatId, data4)
+    AiShared.updateAiChat(assistantChatId, data4)
 
     // 5. reply image
     const { entry } = this._aiParam
@@ -3442,13 +3442,6 @@ class AiHelper {
   static getBotsForCharacter(character: AiCharacter) {
     const bots = aiBots.filter(v => v.character === character)
     return bots
-  }
-
-  static async updateAiChat(id: string, data: Partial<Table_AiChat>) {
-    if(!data.updatedStamp) data.updatedStamp = getNowStamp()
-    const cCol = db.collection("AiChat")
-    const res = await cCol.doc(id).update(data)
-    return res
   }
 
   static async getNonUsedCharacters(roomId: string) {

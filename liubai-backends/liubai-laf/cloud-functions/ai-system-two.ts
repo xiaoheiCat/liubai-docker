@@ -9,6 +9,7 @@ import {
 import type { 
   AiCharacter,
   AiEntry,
+  AiImageSizeType,
   AiInfoType,
   LiuAi,
   OaiChatCompletion,
@@ -28,7 +29,7 @@ import {
   ValueTransform,
 } from "@/common-util"
 import xml2js from "xml2js"
-import { AiShared, BaseLLM, TellUser, ToolShared } from "@/ai-shared"
+import { AiShared, BaseLLM, Palette, TellUser, ToolShared, Translator } from "@/ai-shared"
 import { aiLang, i18nFill, useI18n } from "@/common-i18n"
 
 
@@ -970,6 +971,11 @@ class SystemTwo {
     else if(funcName === "parse_link") {
       await toolHandler2.parse_link(funcJson)
     }
+    else if(funcName === "draw_picture") {
+      let drawRes = await toolHandler2.draw_picture(funcJson)
+      if(!drawRes) return
+      
+    }
     else if(funcName === "get_schedule") {
       await toolHandler2.get_schedule(funcJson)
     }
@@ -1204,6 +1210,81 @@ class ToolHandler2 {
     }
     await this._addMsgToChat(data2)
     return searchRes
+  }
+
+
+  private async _getDrawResult(
+    prompt: string, 
+    sizeType: AiImageSizeType,
+  ) {
+    // 1. get param
+    let res: LiuAi.PaletteResult | undefined
+    
+    // 2. translate if needed
+    let imagePrompt = prompt
+    const num2 = valTool.getChineseCharNum(prompt)
+    if(num2 > 3) {
+      const translator = new Translator()
+      const res2 = await translator.run(prompt)
+      if(!res2) {
+        console.warn("fail to tranlate!!!")
+      }
+      else {
+        imagePrompt = res2.translatedText
+      }
+    }
+
+    // 3. run by default
+    res = await Palette.run(imagePrompt, sizeType)
+    return res
+  }
+
+  async draw_picture(
+    funcJson: Record<string, any>,
+  ) {
+    // 1. check out param
+    const prompt = funcJson.prompt
+    if(!prompt || typeof prompt !== "string") {
+      console.warn("draw_picture prompt is not string")
+      console.log(funcJson)
+      return
+    }
+    let sizeType = funcJson.sizeType as AiImageSizeType
+    if(sizeType !== "portrait" && sizeType !== "square") {
+      sizeType = "square"
+    }
+
+    // 2. add chat
+    const data2: Partial<Table_AiChat> = {
+      funcName: "draw_picture",
+      funcJson,
+      text: prompt,
+    }
+    const chatId = await this._addMsgToChat(data2)
+    if(!chatId) return
+
+    // 3. draw
+    const res3 = await this._getDrawResult(prompt, sizeType)
+    if(!res3) return
+
+    // 4. update chat
+    const data4: Partial<Table_AiChat> = {
+      drawPictureUrl: res3.url,
+      drawPictureData: res3.originalResult,
+      drawPictureModel: res3.model,
+    }
+    if(prompt !== res3.prompt) {
+      data4.text = res3.prompt
+    }
+    AiShared.updateAiChat(chatId, data4)
+
+    // 5. reply
+    const entry = System2Util.mockAiEntry(this._user)
+    await TellUser.image(entry, res3.url, {
+      fromSystem2: true,
+    })
+
+    return res3
   }
 
   async get_schedule(

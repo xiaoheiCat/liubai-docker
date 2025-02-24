@@ -524,7 +524,13 @@ export class AiShared {
     }
     return chatId
   }
-
+  
+  static async updateAiChat(id: string, data: Partial<Table_AiChat>) {
+    if(!data.updatedStamp) data.updatedStamp = getNowStamp()
+    const cCol = db.collection("AiChat")
+    const res = await cCol.doc(id).update(data)
+    return res
+  }
 
   static getToolMessage(
     tool_call_id: string,
