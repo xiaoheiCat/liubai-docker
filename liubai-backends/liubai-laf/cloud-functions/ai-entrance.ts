@@ -24,6 +24,7 @@ import {
   LiuAi,
   type AiBotMetaData,
   Ns_SiliconFlow,
+  DataPass,
 } from "@/common-types"
 import { 
   checkIfUserSubscribed, 
@@ -915,12 +916,12 @@ class BaseBot {
         await toolHandler.add_calendar(funcJson)
       }
       else if(funcName === "web_search") {
-        const searchRes = await toolHandler.web_search(funcJson)
-        if(searchRes) {
+        const searchPass = await toolHandler.web_search(funcJson)
+        if(searchPass.pass) {
           await this._continueAfterWebSearch(
             postParam, 
             tool_calls, 
-            searchRes, 
+            searchPass.data, 
             tool_call_id,
           )
           break
@@ -2591,11 +2592,14 @@ class ToolHandler {
     TellUser.text(this._aiParam.entry, msg)
   }
 
-  async web_search(funcJson: Record<string, any>) {
+  async web_search(
+    funcJson: Record<string, any>,
+  ): Promise<DataPass<LiuAi.SearchResult>> {
     // 1. search by ToolShared
     const toolShared = this._toolShared
-    const searchRes = await toolShared.web_search(funcJson)
-    if(!searchRes) return
+    const searchPass = await toolShared.web_search(funcJson)
+    if(!searchPass.pass) return searchPass
+    const searchRes = searchPass.data
 
     // 2. add msg
     const data3: Partial<LiuAi.HelperAssistantMsgParam> = {
@@ -2606,7 +2610,7 @@ class ToolHandler {
       text: searchRes.markdown,
     }
     await this._addMsgToChat(data3)
-    return searchRes
+    return searchPass
   }
 
   private async _getDrawResult(

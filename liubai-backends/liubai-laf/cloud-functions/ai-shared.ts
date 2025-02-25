@@ -31,10 +31,12 @@ import {
   type OaiToolPrompt,
   type OaiToolCall,
   type AiToolAddCalendarParam,
+  DataPass,
 } from "@/common-types"
 import { WxGzhSender } from "@/service-send"
 import { 
   checkAndGetWxGzhAccessToken,
+  checker,
   decryptEncData,
   getDocAddId,
   getLiuDoman,
@@ -987,22 +989,24 @@ export class ToolShared {
     this._botName = botName
   }
 
-  async web_search(funcJson: Record<string, any>) {
+  async web_search(
+    funcJson: Record<string, any>
+  ): Promise<DataPass<LiuAi.SearchResult>> {
     // 1. get q
     const q = funcJson.q
     if(typeof q !== "string") {
       console.warn("web_search q is not string")
-      return
+      return checker.getErrResult("web_search q is not string")
     }
 
     // 2. call WebSearch.run
     const searchRes = await WebSearch.run(q)
     if(!searchRes) {
       console.warn("fail to search on web")
-      return
+      return checker.getErrResult("fail to search on web", "E5004")
     }
 
-    return searchRes
+    return { pass: true, data: searchRes }
   }
 
   async get_schedule(funcJson: Record<string, any>) {

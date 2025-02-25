@@ -22,6 +22,7 @@ import type {
   Table_AiRoom, 
   Table_User,
   DataPass,
+  LiuErrReturn,
 } from "./common-types"
 import cloud from "@lafjs/cloud"
 import { 
@@ -984,7 +985,9 @@ class SystemTwo {
     }
     
     if(funcName === "web_search") {
-      await toolHandler2.web_search(funcJson)
+      const searchRes1 = await toolHandler2.web_search(funcJson)
+      const searchRes2 = this.afterSearching(searchRes1)
+      return searchRes2
     }
     
     if(funcName === "parse_link") {
@@ -1038,6 +1041,13 @@ class SystemTwo {
     return true
   }
 
+  private _addErrPromptsForToolUse(
+    err: LiuErrReturn,
+  ) {
+    const msg = valTool.objToStr(err)
+    return this._addPromptsForToolUse(msg)
+  }
+
 
   /** return `true` to represent `continue`,
    * otherwise to represent `stop`
@@ -1047,10 +1057,22 @@ class SystemTwo {
   ) {
     if(res.pass) return false
 
-    // 1. add prompts
-    const message = valTool.objToStr(res.err)
-    const res1 = this._addPromptsForToolUse(message)
-    return res1
+    // add error prompts
+    return this._addErrPromptsForToolUse(res.err)
+  }
+
+  /** return `true` to represent `continue`,
+   * otherwise to represent `stop`
+  */
+  private afterSearching(
+    dataPass: DataPass<LiuAi.SearchResult>,
+  ) {
+    if(!dataPass.pass) {
+      return this._addErrPromptsForToolUse(dataPass.err)
+    }
+    const searchRes = dataPass.data
+    const searchMd = searchRes.markdown
+    return this._addPromptsForToolUse(searchMd)
   }
 
 
@@ -1062,9 +1084,7 @@ class SystemTwo {
   ) {
     // 0. if error
     if(!dataPass.pass) {
-      const text0 = valTool.objToStr(dataPass.err)
-      const res0 = this._addPromptsForToolUse(text0)
-      return res0
+      return this._addErrPromptsForToolUse(dataPass.err)
     }
     const drawRes = dataPass.data
 
@@ -1089,8 +1109,6 @@ class SystemTwo {
 
     return false
   }
-
-
 
   private toThinkLater(
     reasoning_content: string,
@@ -1309,11 +1327,14 @@ class ToolHandler2 {
     return { pass: true }
   }
 
-  async web_search(funcJson: Record<string, any>) {
+  async web_search(
+    funcJson: Record<string, any>,
+  ): Promise<DataPass<LiuAi.SearchResult>> {
     // 1. search by ToolShared
     const toolShared = this._toolShared
-    const searchRes = await toolShared.web_search(funcJson)
-    if(!searchRes) return
+    const searchPass = await toolShared.web_search(funcJson)
+    if(!searchPass.pass) return searchPass
+    const searchRes = searchPass.data
 
     // 2. add to chat
     const data2: Partial<Table_AiChat> = {
@@ -1324,7 +1345,7 @@ class ToolHandler2 {
       text: searchRes.markdown,
     }
     await this._addMsgToChat(data2)
-    return searchRes
+    return searchPass
   }
 
 
