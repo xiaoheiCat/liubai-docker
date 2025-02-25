@@ -2756,10 +2756,11 @@ class ToolHandler {
     // 1. get to parse
     const toolShared = this._toolShared
     const res1 = await toolShared.parse_link(funcJson)
-    if(!res1) return
+    if(!res1.pass) return
+    const parsingRes = res1.data
 
     // 2. clip
-    let { markdown } = res1
+    let { markdown } = parsingRes
     if(markdown.length > 6666) {
       markdown = markdown.substring(0, 6666) + "......"
     }
@@ -2773,7 +2774,7 @@ class ToolHandler {
     const assistantChatId = await this._addMsgToChat(data8)
     if(!assistantChatId) return
     
-    return res1
+    return parsingRes
   }
 
 }

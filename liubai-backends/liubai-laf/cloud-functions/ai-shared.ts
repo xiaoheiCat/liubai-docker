@@ -1293,12 +1293,12 @@ export class ToolShared {
 
   async parse_link(
     funcJson: Record<string, any>
-  ): Promise<LiuAi.ParseLinkResult | undefined> {
+  ): Promise<DataPass<LiuAi.ParseLinkResult>> {
     // 1. check out if the link is valid
     const link = funcJson.link
     if(!valTool.isStringWithVal(link)) {
       console.warn("it is not a valid link:", funcJson)
-      return
+      return checker.getErrResult("parameter link is not valid")
     }
 
     // 2. to fetch
@@ -1315,12 +1315,15 @@ export class ToolShared {
     if(!text3) {
       console.warn("parsing link failed!")
       console.log(res2)
-      return
+      return checker.getErrResult("parsing link failed", "E5004")
     }
     
     return {
-      markdown: text3,
-      provider: "jina-ai"
+      pass: true,
+      data: {
+        markdown: text3,
+        provider: "jina-ai"
+      }
     }
   }
 

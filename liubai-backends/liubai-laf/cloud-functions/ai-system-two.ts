@@ -908,7 +908,7 @@ class SystemTwo {
       this.toReply(content4)
     }
     else if(direction === "2" && tool_calls) {
-      this.toUseTools(tool_calls)
+      res4 = await this.toUseTools(tool_calls)
     }
     else if(direction === "3" && reasoning_content1) {
       this.toThinkLater(reasoning_content1, content4)
@@ -952,14 +952,15 @@ class SystemTwo {
     }
 
     // 2. let's call tools
-    const aiLogs: LiuAi.RunLog[] = []
-    for(let i=0; i<tool_calls.length; i++) {
+    let hasAnyContinue = false
+    const maxToolCalls = Math.min(tool_calls.length, 3)
+    for(let i=0; i<maxToolCalls; i++) {
       const v = tool_calls[i]
-      await this.useATool(v as OaiToolCall)
-
+      let res2 = await this.useATool(v as OaiToolCall)
+      if(res2) hasAnyContinue = true
     }
 
-
+    return hasAnyContinue
   }
 
   private async useATool(
@@ -967,7 +968,7 @@ class SystemTwo {
   ) {
     // 1. check out param
     const funcData = tool_call["function"]
-    if(tool_call.type !== "function" || !funcData) return false
+    if(tool_call.type !== "function" || !funcData) return true
 
     // 2. get required params
     const funcName = funcData.name as LiuAi.ToolName
@@ -1007,7 +1008,9 @@ class SystemTwo {
     }
     
     if(funcName === "parse_link") {
-      await toolHandler2.parse_link(funcJson)
+      const parsingRes1 = await toolHandler2.parse_link(funcJson)
+      const parsingRes2 = this.afterParsingLink(parsingRes1, tool_call)
+      return parsingRes2
     }
     
     if(funcName === "draw_picture") {
@@ -1024,7 +1027,7 @@ class SystemTwo {
       await toolHandler2.get_cards(funcJson)
     }
     
-
+    return true
   }
 
   private _addPromptsForToolUse(
@@ -1106,6 +1109,18 @@ class SystemTwo {
     const searchRes = dataPass.data
     const searchMd = searchRes.markdown
     return this._addPromptsForToolUse(searchMd, tool_call)
+  }
+
+  private afterParsingLink(
+    dataPass: DataPass<LiuAi.ParseLinkResult>,
+    tool_call: OaiToolCall,
+  ) {
+    if(!dataPass.pass) {
+      return this._addErrPromptsForToolUse(dataPass.err, tool_call)
+    }
+    const parseRes = dataPass.data
+    const parseMd = parseRes.markdown
+    return this._addPromptsForToolUse(parseMd, tool_call)
   }
 
 
@@ -1513,14 +1528,15 @@ class ToolHandler2 {
 
   async parse_link(
     funcJson: Record<string, any>,
-  ) {
+  ): Promise<DataPass<LiuAi.ParseLinkResult>> {
     // 1. get to parse
     const toolShared = this._toolShared
     const res1 = await toolShared.parse_link(funcJson)
-    if(!res1) return
+    if(!res1.pass) return res1
+    const parsingRes = res1.data
 
     // 2. clip
-    let { markdown } = res1
+    let { markdown } = parsingRes
     if(markdown.length > 6666) {
       markdown = markdown.substring(0, 6666) + "......"
     }
@@ -1532,7 +1548,7 @@ class ToolHandler2 {
       text: markdown,
     }
     const chatId = await this._addMsgToChat(data3)
-    if(!chatId) return
+    if(!chatId) return this._getErrForAddingMsg()
 
     return res1
   }
