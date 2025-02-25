@@ -2533,12 +2533,8 @@ class ToolHandler {
   
   async add_note(funcJson: Record<string, any>) {
     // 1. check out param
-    const waitingData = AiToolUtil.turnJsonToWaitingData("add_note", funcJson)
-    if(!waitingData) {
-      console.warn("cannot parse funcJson in add_note: ")
-      console.log(funcJson)
-      return
-    }
+    const res1 = AiToolUtil.turnJsonToWaitingData("add_note", funcJson)
+    if(!res1.pass) return
 
     // 2. add msg
     const assistantChatId = await this._addMsgToChat({
@@ -2555,12 +2551,8 @@ class ToolHandler {
 
   async add_todo(funcJson: Record<string, any>) {
     // 1. check out param
-    const waitingData = AiToolUtil.turnJsonToWaitingData("add_todo", funcJson)
-    if(!waitingData) {
-      console.warn("cannot parse funcJson in add_todo: ")
-      console.log(funcJson)
-      return
-    }
+    const res1 = AiToolUtil.turnJsonToWaitingData("add_todo", funcJson)
+    if(!res1.pass) return
 
     // 2. add chat
     const assistantChatId = await this._addMsgToChat({
@@ -2583,14 +2575,10 @@ class ToolHandler {
     if(check0_2.pass) funcJson.laterHour = check0_2.data
 
     // 1. check out param
-    const waitingData = AiToolUtil.turnJsonToWaitingData("add_calendar", funcJson)
-    if(!waitingData) {
-      console.warn("cannot parse funcJson in add_calendar: ")
-      console.log(funcJson)
-      return
-    }
+    const res1 = AiToolUtil.turnJsonToWaitingData("add_calendar", funcJson)
+    if(!res1.pass) return
 
-    // 2. add msg
+    // 2. add chat
     const assistantChatId = await this._addMsgToChat({
       funcName: "add_calendar",
       funcJson,

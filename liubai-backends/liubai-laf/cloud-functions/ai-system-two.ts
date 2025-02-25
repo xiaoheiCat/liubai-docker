@@ -11,6 +11,8 @@ import type {
   AiEntry,
   AiImageSizeType,
   AiInfoType,
+  CommonPass_A,
+  CommonPass,
   LiuAi,
   OaiChatCompletion,
   OaiPrompt,
@@ -23,6 +25,7 @@ import type {
 import cloud from "@lafjs/cloud"
 import { 
   AiToolUtil,
+  checker,
   checkIfUserSubscribed, 
   LiuDateUtil, 
   valTool,
@@ -940,13 +943,16 @@ class SystemTwo {
   private async useATool(
     tool_call: Record<string, any>,
   ) {
+    // 1. check out param
     const funcData = tool_call["function"]
     if(tool_call.type !== "function" || !funcData) return false
     const tool_call_id = tool_call.id
 
+    // 2. get required params
     const funcName = funcData.name as LiuAi.ToolName
     const funcArgs = funcData.arguments
     const funcJson = valTool.strToObj(funcArgs)
+
     console.log("funcName: ", funcName)
     console.log(funcJson)
 
@@ -956,6 +962,7 @@ class SystemTwo {
       this._lastChatCompletion,
     )
 
+    // 3. decide which path to go
     if(funcName === "add_note") {
       await toolHandler2.add_note(funcJson)
     }
@@ -985,6 +992,36 @@ class SystemTwo {
     
 
   }
+
+  private afterDrawingPicture(
+    drawRes: LiuAi.PaletteResult,
+    tool_call: Record<string, any>,
+  ) {
+    // 1. get text which will be sent to user
+    const user = this._ctx.user
+    const { t } = useI18n(aiLang, { user })
+    const botName = t("system2_r1")
+    const drawTextToUser = t("bot_draw", {
+      botName,
+      model: drawRes.model,
+    })
+
+    // 2. add running log
+    const drawLog: LiuAi.RunLog = {
+      toolName: "draw_picture",
+      drawResult: drawRes,
+      character: SYS2_CHARACTER,
+      textToUser: drawTextToUser,
+      logStamp: getNowStamp(),
+    }
+    this._runLogs.push(drawLog)
+
+    // 3. add prompts
+    
+
+  }
+
+
 
   private toThinkLater(
     reasoning_content: string,
@@ -1122,13 +1159,15 @@ class ToolHandler2 {
     TellUser.text(entry, msg, { fromSystem2: true })
   }
 
-  async add_note(funcJson: Record<string, any>) {
+  private _getErrForAddingMsg() {
+    return checker.getErrResult("fail to add chat", "E5001")
+  }
+
+  async add_note(funcJson: Record<string, any>): Promise<CommonPass> {
     // 1. check out param
-    const waitingData = AiToolUtil.turnJsonToWaitingData("add_note", funcJson)
-    if(!waitingData) {
-      console.warn("fail to parse funcJson in add_note: ")
-      console.log(funcJson)
-      return
+    const res1 = AiToolUtil.turnJsonToWaitingData("add_note", funcJson)
+    if(!res1.pass) {
+      return res1
     }
 
     // 2. add msg
@@ -1136,21 +1175,24 @@ class ToolHandler2 {
       funcName: "add_note",
       funcJson,
     })
-    if(!chatId) return
+    if(!chatId) {
+      return this._getErrForAddingMsg()
+    }
 
     // 3. reply
     const toolShared = this._toolShared
     const msg = toolShared.get_msg_for_adding_note(funcJson, chatId)
-    this._replyToUser(msg)
+    await this._replyToUser(msg)
+    return { pass: true }
   }
 
-  async add_todo(funcJson: Record<string, any>) {
+  async add_todo(funcJson: Record<string, any>): Promise<CommonPass> {
     // 1. check out param
-    const waitingData = AiToolUtil.turnJsonToWaitingData("add_todo", funcJson)
-    if(!waitingData) {
+    const res1 = AiToolUtil.turnJsonToWaitingData("add_todo", funcJson)
+    if(!res1.pass) {
       console.warn("fail to parse funcJson in add_todo: ")
       console.log(funcJson)
-      return
+      return res1
     }
 
     // 2. add msg
@@ -1158,12 +1200,15 @@ class ToolHandler2 {
       funcName: "add_note",
       funcJson,
     })
-    if(!chatId) return
+    if(!chatId) {
+      return this._getErrForAddingMsg()
+    }
 
     // 3. reply
     const toolShared = this._toolShared
     const msg = toolShared.get_msg_for_adding_todo(chatId, funcJson)
     this._replyToUser(msg)
+    return { pass: true }
   }
 
   async add_calendar(funcJson: Record<string, any>) {
@@ -1174,11 +1219,9 @@ class ToolHandler2 {
     if(check0_2.pass) funcJson.laterHour = check0_2.data
 
     // 1. check out param
-    const waitingData = AiToolUtil.turnJsonToWaitingData("add_calendar", funcJson)
-    if(!waitingData) {
-      console.warn("cannot parse funcJson in add_calendar: ")
-      console.log(funcJson)
-      return
+    const res1 = AiToolUtil.turnJsonToWaitingData("add_calendar", funcJson)
+    if(!res1.pass) {
+      return res1
     }
 
     // 2. add chat
@@ -1186,12 +1229,15 @@ class ToolHandler2 {
       funcName: "add_calendar",
       funcJson,
     })
-    if(!chatId) return
+    if(!chatId) {
+      return this._getErrForAddingMsg()
+    }
 
     // 3. reply
     const toolShared = this._toolShared
     const msg = toolShared.get_msg_for_adding_calendar(chatId, funcJson)
-    this._replyToUser(msg)
+    await this._replyToUser(msg)
+    return { pass: true }
   }
 
   async web_search(funcJson: Record<string, any>) {
