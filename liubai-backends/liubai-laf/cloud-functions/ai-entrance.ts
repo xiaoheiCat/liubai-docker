@@ -4349,9 +4349,12 @@ class Image2Text {
           {
             type: "image_url",
             image_url: { url }
-          }
+          },
+          { type: "text", 
+            text: "解释一下图中的现象",
+          },
         ]
-      }
+      },
     ]
 
     // 3. fetch

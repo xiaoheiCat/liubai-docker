@@ -233,6 +233,14 @@ export class AiShared {
       apiKey = _env.LIU_GITEE_AI_API_KEY
       baseURL = _env.LIU_GITEE_AI_BASE_URL
     }
+    else if(p2 === "qiniu") {
+      apiKey = _env.LIU_QINIU_LLM_API_KEY
+      baseURL = _env.LIU_QINIU_LLM_BASE_URL
+    }
+    else if(p2 === "tencent-lkeap") {
+      apiKey = _env.LIU_TENCENT_LKEAP_API_KEY
+      baseURL = _env.LIU_TENCENT_LKEAP_BASE_URL
+    }
     else if(p === "aliyun-bailian") {
       apiKey = _env.LIU_ALIYUN_BAILIAN_API_KEY
       baseURL = _env.LIU_ALIYUN_BAILIAN_BASE_URL
