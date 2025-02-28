@@ -428,7 +428,7 @@ class AiDirective {
     if(!text) return
 
     // 2. is it a kick directive?
-    const text2 = text.trim().replace("+", " ")
+    const text2 = text.trim().replace(/\+/g, " ")
     const botKicked = this.isKickBot(text2)
     if(botKicked) {
       this.toKickBot(entry, botKicked)
