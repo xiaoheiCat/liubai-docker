@@ -16,6 +16,7 @@ export function useTcTopbar(
     if(a === "baixiaoying") return "baichuan.svg"
     if(a === "deepseek") return "deepseek.svg"
     if(a === "hailuo") return "hailuo.svg"
+    if(a === "hunyuan") return "hunyuan.svg"
     if(a === "kimi") return "kimi.png"
     if(a === "tongyi-qwen") return "tongyi-qwen.svg"
     if(a === "wanzhi") return "01-ai.png"

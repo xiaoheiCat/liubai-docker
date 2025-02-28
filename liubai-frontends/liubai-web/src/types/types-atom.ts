@@ -243,7 +243,7 @@ export type UploadTaskProgressType = "waiting" | "file_uploading" | "syncing"
 export type SyncSpeed = "instant" | "normal" | "slow"
 
 // about AI
-export type AiCharacter = "baixiaoying" | "deepseek" | "hailuo" | "kimi" | 
+export type AiCharacter = "baixiaoying" | "deepseek" | "hailuo" | "hunyuan" | "kimi" | 
   "wanzhi" | "yuewen" | "zhipu" | "ds-reasoner" | "tongyi-qwen"
 
 // for compose-page

@@ -169,6 +169,19 @@ export const aiBots: AiBot[] = [
     }
   },
   {
+    name: "混元",
+    character: "hunyuan",
+    provider: "tencent-hunyuan",
+    model: "hunyuan-turbos-latest",
+    abilities: ["chat"],
+    alias: ["混元", "混元AI", "腾讯混元", "HY"],
+    maxWindowTokenK: 24,
+    priority: 10,
+    metaData: {
+      onlyOneSystemRoleMsg: true,
+    }
+  },
+  {
     name: "Kimi",
     character: "kimi",
     provider: "moonshot",
@@ -224,6 +237,19 @@ export const aiBots: AiBot[] = [
 
   /** image to text */
   {
+    name: "混元",
+    character: "hunyuan",
+    provider: "tencent-hunyuan",
+    model: "hunyuan-vision",
+    abilities: ["chat", "image_to_text"],
+    alias: ["混元", "混元AI", "腾讯混元", "HY"],
+    maxWindowTokenK: 6,
+    priority: 10,
+    metaData: {
+      onlyOneSystemRoleMsg: true,
+    }
+  },
+  {
     name: "Kimi",
     character: "kimi",
     provider: "moonshot",
@@ -267,10 +293,10 @@ export const aiBots: AiBot[] = [
     name: "智谱",
     character: "zhipu",
     provider: "zhipu",
-    model: "glm-4v-plus",
+    model: "glm-4v-plus-0111",
     abilities: ["chat", "tool_use", "image_to_text"],
     alias: ["智谱AI", "智谱清言", "ChatGLM"],
-    maxWindowTokenK: 8,
+    maxWindowTokenK: 16,
     priority: 10,
     metaData: {
       zhipuWebSearch: true,
@@ -368,6 +394,10 @@ const system_settings = `
 你会在用词上体现出更多“支持性作用”，让对方感到慰藉，充满力量
 `.trim()
 
+const system_without_tools = `
+请注意，你目前没有工具调用的能力，当用户请求你帮他新建待办、查看笔记或画图时，又或是询问你“我明天有什么事”时，请诚实回答你没有能力或你不知道。
+`.trim()
+
 const system_last_request = `
 请你以尽可能少的文字、精炼地回复人们的消息。祝交流愉快！
 `.trim()
@@ -453,6 +483,32 @@ ${system_example}
 
 【你的设定】
 ${system_settings}
+
+【最后的请求】
+${system_last_request}
+`
+
+const wx_hunyuan_system_1 = `
+你叫混元，是由腾讯公司开发的人工智能助手。
+你将协同应用“留白记事”，为人们提供信息检索、内容整理、待办创建、查看最近的日程等服务，帮助每个人都成为超级个体！
+
+【留白记事介绍】
+${system_intro}
+
+【当前环境】
+${system_wx_env}
+
+【常用入口、捷径、网址】
+${system_wx_entry}
+
+【问答示例】
+${system_example}
+
+【你的设定】
+${system_settings}
+
+【注意事项】
+${system_without_tools}
 
 【最后的请求】
 ${system_last_request}
@@ -586,6 +642,9 @@ const wx_gzh_prompts = {
   },
   "hailuo": {
     "system_1": wx_hailuo_system_1
+  },
+  "hunyuan": {
+    "system_1": wx_hunyuan_system_1
   },
   "kimi": {
     "system_1": wx_kimi_system_1

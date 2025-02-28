@@ -607,7 +607,7 @@ export type DownloadUploadRes = DownloadUploadRes_1 | DownloadUploadRes_2
 
 
 /*********************** About AI **********************/
-export type AiProvider = "aliyun-bailian" | "baichuan" | "deepseek" | "minimax" | "moonshot" | "stepfun" | 
+export type AiProvider = "aliyun-bailian" | "baichuan" | "deepseek" | "tencent-hunyuan" | "minimax" | "moonshot" | "stepfun" | 
   "zero-one" | "zhipu"
 
 export type AiSecondaryProvider = "siliconflow" | "gitee-ai" | "qiniu" | "tencent-lkeap"
@@ -616,7 +616,7 @@ export type AiSecondaryProvider = "siliconflow" | "gitee-ai" | "qiniu" | "tencen
 
 
 // AiCharacter 不跟供应商绑定，它是角色，只不过现在各个供应商都有自己的 To C 角色罢了
-export type AiCharacter = "baixiaoying" | "deepseek" | "hailuo" | "kimi" | "yuewen" | 
+export type AiCharacter = "baixiaoying" | "deepseek" | "hailuo" | "hunyuan" | "kimi" | "yuewen" | 
   "wanzhi" | "zhipu" | "ds-reasoner" | "tongyi-qwen"
 
 export type AiInfoType = "user" | "assistant" | "summary" | "clear" | 
@@ -709,6 +709,7 @@ export interface AiI18nSharedParam {
 export const aiImageSizeTypes = ["square", "portrait"] as const
 export type AiImageSizeType = typeof aiImageSizeTypes[number]
 export type OaiPrompt = OpenAI.Chat.ChatCompletionMessageParam
+export type OaiContentPart = OpenAI.Chat.ChatCompletionContentPart
 export type OaiTool = OpenAI.Chat.ChatCompletionTool
 export type OaiToolPrompt = OpenAI.Chat.ChatCompletionToolMessageParam 
 export type OaiCreateParam = OpenAI.Chat.ChatCompletionCreateParams
