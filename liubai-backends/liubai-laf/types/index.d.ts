@@ -142,6 +142,8 @@ declare global {
       LIU_MOONSHOT_API_KEY?: string          // Moonshot AI 的 api key
       LIU_STEPFUN_BASE_URL?: string          // Stepfun AI 的 base url
       LIU_STEPFUN_API_KEY?: string           // Stepfun AI 的 api key
+      LIU_TENCENT_HUNYUAN_API_KEY?: string   // 腾讯混元 api key
+      LIU_TENCENT_HUNYUAN_BASE_URL?: string  // 腾讯混元 base url
       LIU_YI_BASE_URL?: string               // 01.ai 的 base url
       LIU_YI_API_KEY?: string                // 01.ai 的 api key
       LIU_ZHIPU_BASE_URL?: string            // 智谱的 base url
@@ -185,6 +187,7 @@ declare global {
       LIU_WXGZH_KF_DEEPSEEK?: string         // kf_account of deepseek
       LIU_WXGZH_KF_DS_REASONER?: string      // kf_account of ds-reasoner
       LIU_WXGZH_KF_HAILUO?: string           // kf_account of hailuo
+      LIU_WXGZH_KF_HUNYUAN?: string          // kf_account of tencent hunyuan
       LIU_WXGZH_KF_KIMI?: string             // kf_account of kimi
       LIU_WXGZH_KF_TONGYI_QWEN?: string      // kf_account of tongyi-qwen
       LIU_WXGZH_KF_WANZHI?: string           // kf_account of wanzhi

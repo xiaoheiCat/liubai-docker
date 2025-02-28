@@ -6,6 +6,7 @@ import {
   type AiEntry,
   type AiCommandByHuman,
   type OaiPrompt,
+  type OaiContentPart,
   type OaiTool,
   type OaiToolCall,
   type OaiChoice,
@@ -285,6 +286,11 @@ function mapBots(
     const proMinimax = botMinimax.run(aiParam)
     promises.push(proMinimax)
   }
+  else if(c === "hunyuan") {
+    const botHunyuan = new BotTencentHunyuan(user)
+    const proHunyuan = botHunyuan.run(aiParam)
+    promises.push(proHunyuan)
+  }
   else if(c === "kimi") {
     const bot2 = new BotMoonshot(user)
     const pro2 = bot2.run(aiParam)
@@ -328,7 +334,7 @@ class AiDirective {
     if(!text) return
 
     // 2. is it a kick directive?
-    const text2 = text.trim().replace("+", " ")
+    const text2 = text.trim().replace(/\+/g, " ")
     const botKicked = this.isKickBot(text2)
     if(botKicked) {
       this.toKickBot(entry, botKicked)
@@ -375,6 +381,7 @@ class AiDirective {
       const name = v.name.toLowerCase()
       const alias = v.alias.map(v => v.toLowerCase())
       if(name === txt2) return true
+      if(v.character === txt2) return true
       if(alias.includes(txt2)) return true
       return false
     })
@@ -1871,6 +1878,51 @@ class BotStepfun extends BaseBot {
 
 }
 
+class BotTencentHunyuan extends BaseBot {
+  constructor(user?: Table_User) {
+    super("hunyuan", user)
+  }
+
+  async run(aiParam: LiuAi.RunParam): Promise<LiuAi.RunSuccess | undefined> {
+    // 1. pre run
+    const res1 = this.preRun(aiParam)
+    if(!res1) return
+    const { prompts, totalToken, bot, chats, tools } = res1
+
+    // 2. get other params
+    const model = bot.model
+
+    // 3. handle other things
+    // 3.1 interleave user assistant
+    if(aiParam.isContinueCommand) {
+      prompts.push({ role: "user", content: "Continue / 继续" })
+    }
+    PromptsChecker.interleaveUserAssistant(prompts)
+
+    // 4. calculate maxTokens
+    const maxToken = AiHelper.getMaxToken(totalToken, chats[0], bot)
+
+    // 5. to chat
+    const chatParam: OaiCreateParam = {
+      messages: prompts,
+      max_tokens: maxToken,
+      model,
+      tools,
+    }
+    const chatCompletion = await this.chat(chatParam, bot)
+    
+    // 6. post run
+    const postParam: PostRunParam = {
+      aiParam,
+      chatParam,
+      chatCompletion,
+      bot,
+    }
+    const res6 = await this.postRun(postParam)
+    return res6
+  }
+}
+
 class BotTongyiQwen extends BaseBot {
   constructor(user?: Table_User) {
     super("tongyi-qwen", user)
@@ -2793,7 +2845,7 @@ class PromptsChecker {
   ) {
     this._removeTool(prompts)
     if(bot && AiShared.isReasoningBot(bot)) {
-      this._interleaveUserAssistant(prompts)
+      this.interleaveUserAssistant(prompts)
       this._constraintPromptsNum(prompts)
       this._ensureFirstPromptIsUser(prompts)
     }
@@ -2803,12 +2855,29 @@ class PromptsChecker {
    * Handle error: BadRequestError: 400 deepseek-reasoner does not support 
    * successive user or assistant messages (messages[9] and messages[10] in your input). 
    * You should interleave the user/assistant messages in the message sequence.
+   * 
+   * Error from Hunyuan:
+   *   messages 中 user（tool） 和 assistant 角色需交替出现 (一问一答)，以 user 提问开始， user（tool）提问结束, tool 可以连续出现多次
+   * 
    */
-  private static _interleaveUserAssistant(prompts: OaiPrompt[]) {
+  static interleaveUserAssistant(prompts: OaiPrompt[]) {
+    let hasUserAppeared = false
     for(let i=0; i<prompts.length-1; i++) {
       const currentOne = prompts[i]
-      const nextOne = prompts[i+1]
       const currentRole = currentOne.role
+
+      if(!hasUserAppeared) {
+        if(currentRole === "user") {
+          hasUserAppeared = true
+        }
+        else if(currentRole !== "system") {
+          prompts.splice(i, 1)
+          i--
+          continue
+        }
+      }
+
+      const nextOne = prompts[i+1]
       const nextRole = nextOne.role
 
       const twoUserPrompts = Boolean(currentRole === "user" && nextRole === "user")
@@ -2834,10 +2903,33 @@ class PromptsChecker {
   private static _mergeTwoPrompts(currentOne: OaiPrompt, nextOne: OaiPrompt) {
     const currentContent = currentOne.content
     const nextContent = nextOne.content
-    if(typeof currentContent !== "string") return
-    if(typeof nextContent !== "string") return
-    const newContent = `${currentContent}\n\n${nextContent}`
-    return newContent
+
+    const cType = typeof currentContent
+    const nType = typeof nextContent
+    if(cType === "string" && nType === "string") {
+      return `${currentContent}\n\n${nextContent}`
+    }
+
+    const isArr1 = Array.isArray(currentContent)
+    const isArr2 = Array.isArray(nextContent)
+    if(isArr1 && isArr2) {
+      return [...currentContent, ...nextContent] as OaiContentPart[]
+    }
+
+    if(isArr1 && typeof nType === "string") {
+      return [
+        ...currentContent,
+        { type: "text", text: nextContent }
+      ] as OaiContentPart[]
+    }
+
+    if(typeof cType === "string" && isArr2) {
+      return [
+        { type: "text", text: currentContent },
+        ...nextContent
+      ] as OaiContentPart[]
+    }
+
   }
 
   private static _removeTool(prompts: OaiPrompt[]) {
@@ -3162,6 +3254,12 @@ class AiHelper {
     }
     if(c === "hailuo") {
       if(_env.LIU_MINIMAX_API_KEY && _env.LIU_MINIMAX_BASE_URL) {
+        return true
+      }
+      return false
+    }
+    if(c === "hunyuan") {
+      if(_env.LIU_TENCENT_HUNYUAN_API_KEY && _env.LIU_TENCENT_HUNYUAN_BASE_URL) {
         return true
       }
       return false
@@ -3570,6 +3668,7 @@ class AiHelper {
     if(provider === "minimax") return "上海稀宇科技"
     if(provider === "moonshot") return "北京月之暗面"
     if(provider === "stepfun") return "上海阶跃星辰"
+    if(provider === "tencent-hunyuan") return "腾讯"
     if(provider === "zero-one") return "北京零一万物"
     if(provider === "zhipu") return "北京智谱华章"
   }

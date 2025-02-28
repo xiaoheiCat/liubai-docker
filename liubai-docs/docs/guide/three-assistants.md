@@ -27,6 +27,7 @@
 - 百小应（来自[百川智能](https://www.baichuan-ai.com/home)）
 - DeepSeek ([V3](https://api-docs.deepseek.com/zh-cn/news/news1226) 和 [R1](https://api-docs.deepseek.com/zh-cn/news/news250120))
 - 海螺 (来自 [MiniMax](https://minimaxi.com/))
+- 混元 (来自[腾讯](https://hunyuan.tencent.com/))
 - Kimi（来自[月之暗面](https://www.moonshot.cn/)）
 - 通义千问（来自[阿里巴巴](https://tongyi.aliyun.com/welcome)）
 - 万知（来自[零一万物](https://www.01.ai/cn)）
@@ -48,6 +49,8 @@
 `召唤r1`: 使用 DeepSeek R1，但目前使用它的人非常多，它有时可能不会回你。当你使用 `R1` 时，我们还支持在它回复的消息末尾展开思考过程。
 
 `召唤海螺`: 使用来自 MiniMax 的 AI 大模型。
+
+`召唤混元`: 使用来自腾讯的 AI 大模型。
 
 `召唤kimi`: 使用来自月之暗面的 AI 大模型。
 

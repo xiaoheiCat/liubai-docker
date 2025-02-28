@@ -253,6 +253,10 @@ export class AiShared {
       apiKey = _env.LIU_DEEPSEEK_API_KEY
       baseURL = _env.LIU_DEEPSEEK_BASE_URL
     }
+    else if(p === "tencent-hunyuan") {
+      apiKey = _env.LIU_TENCENT_HUNYUAN_API_KEY
+      baseURL = _env.LIU_TENCENT_HUNYUAN_BASE_URL
+    }
     else if(p === "minimax") {
       apiKey = _env.LIU_MINIMAX_API_KEY
       baseURL = _env.LIU_MINIMAX_BASE_URL
@@ -826,6 +830,9 @@ export class TellUser {
     }
     if(c === "hailuo") {
       return _env.LIU_WXGZH_KF_HAILUO
+    }
+    if(c === "hunyuan") {
+      return _env.LIU_WXGZH_KF_HUNYUAN
     }
     if(c === "kimi") {
       return _env.LIU_WXGZH_KF_KIMI
