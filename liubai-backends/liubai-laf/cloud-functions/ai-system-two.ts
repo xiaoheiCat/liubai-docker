@@ -509,49 +509,6 @@ const tool_result_tmpl = `
 请务必遵循 system prompt 中“你的输出格式”进行输出，也就是将你的想法包裹在 <xml> 标签中，里头还包含 <direction> 和 <content> 标签。
 `.trim()
 
-const basic_log_tmpl = `
-<log>
-  <role>{role}</role>
-  <content>{content}</content>
-  <time>{time}</time>
-</log>
-`.trim()
-
-const tool_log_tmpl = `
-<log>
-  <role>tool</role>
-  <content>{content}</content>
-  <tool_call_id>{tool_call_id}</tool_call_id>
-  <time>{time}</time>
-</log>
-`.trim()
-
-const bot_with_tool_calls = `
-<log>
-  <role>bot</role>
-  <tool_calls>{tool_calls}</tool_calls>
-  <time>{time}</time>
-</log>
-`.trim()
-
-const you_with_tool_calls = `
-<log>
-  <role>you</role>
-  <direction>2</direction>
-  <tool_calls>{tool_calls}</tool_calls>
-  <time>{time}</time>
-</log>
-`.trim()
-
-const you_log_tmpl = `
-<log>
-  <role>you</role>
-  <direction>{direction}</direction>
-  <content>{content}</content>
-  <time>{time}</time>
-</log>
-`.trim()
-
 const xml_with_tool_calls = `
 <xml>
   <direction>2</direction>
@@ -566,7 +523,6 @@ const _ = db.command
 const HR_47 = DAY * 47
 
 // 最小会话论述，聊天室的轮数必须大于等于该值，才会进入系统二
-const LEAST_CONVERSATION_COUNT = 11
 const MAX_INPUT_TOKEN_K = 24
 const MAX_OUTPUT_TOKENS = 2000
 
@@ -574,7 +530,7 @@ const SYS2_CHARACTER: AiCharacter = "ds-reasoner"
 
 /********************* empty function ****************/
 export async function main(ctx: FunctionContext) {
-  invoke_by_clock()
+  await invoke_by_clock()
   return true
 }
 
@@ -836,6 +792,15 @@ class SystemTwo {
 
     // 7. add _reasonerAndUs
     messages.push(...reasonerAndUs)
+
+
+    // const alwayTrue = true
+    // if(alwayTrue) {
+    //   console.warn("stop!")
+    //   console.log(messages)
+    //   return
+    // }
+
 
     // 8. call LLM
     const apiData = System2Util.getApiData()
@@ -1665,11 +1630,9 @@ class ChatToLog {
     // 3. handle content
     if(!roleStr || !contentStr) return
     const timeStr = this._getTimeStr(chat.sortStamp, user)
-    const logStr = i18nFill(basic_log_tmpl, {
-      role: roleStr,
+    const logStr = this.generateLog(roleStr, {
       content: contentStr,
-      time: timeStr,
-    })
+    }, timeStr)
     return [logStr]
   }
 
@@ -1711,12 +1674,28 @@ class ChatToLog {
     if(!directionStr || !contentStr) return
     
     const timeStr = this._getTimeStr(v.sortStamp, undefined)
-    const logStr = i18nFill(you_log_tmpl, {
+    const logStr = this.generateLog("you", {
       direction: directionStr,
       content: contentStr,
-      time: timeStr,
-    })
+    }, timeStr)
     return [logStr]
+  }
+
+  private static generateLog(
+    role: LiuAi.Sys2Role,
+    obj: Record<string, string>,
+    timeStr: string,
+  ) {
+    let str = "<log>\n"
+    str += `  <role>${role}</role>\n`
+    const keys = Object.keys(obj)
+    for(let i=0; i<keys.length; i++) {
+      const k = keys[i]
+      str += `  <${k}>${obj[k]}</${k}>\n`
+    }
+    str += `  <time>${timeStr}</time>\n`
+    str += "</log>\n"
+    return str
   }
 
   private static _turnForToolUse(
@@ -1737,11 +1716,10 @@ class ChatToLog {
       toolContent = toolMsg.content
     }
     const toolTime = this._getTimeStr(v.sortStamp + 1000, user)
-    const toolLog = i18nFill(tool_log_tmpl, {
+    const toolLog = this.generateLog("tool", {
       content: toolContent,
       tool_call_id,
-      time: toolTime,
-    })
+    }, toolTime)
 
     // 3. get assistant msg
     const tool_calls_msg = valTool.objToStr(tool_calls)
@@ -1749,16 +1727,15 @@ class ChatToLog {
     const assistantTime = this._getTimeStr(v.sortStamp, user)
     let assistantLog = ""
     if(v.fromSystem2) {
-      assistantLog = i18nFill(bot_with_tool_calls, {
+      assistantLog = this.generateLog("you", {
+        direction: "2",
         tool_calls: tool_calls_msg,
-        time: assistantTime,
-      })
+      }, assistantTime)
     }
     else {
-      assistantLog = i18nFill(you_with_tool_calls, {
+      assistantLog = this.generateLog("bot", {
         tool_calls: tool_calls_msg,
-        time: assistantTime,
-      })
+      }, assistantTime)
     }
 
     // n.
