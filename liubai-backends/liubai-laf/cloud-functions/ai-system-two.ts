@@ -1694,7 +1694,7 @@ class ChatToLog {
       str += `  <${k}>${obj[k]}</${k}>\n`
     }
     str += `  <time>${timeStr}</time>\n`
-    str += "</log>\n"
+    str += "</log>"
     return str
   }
 
