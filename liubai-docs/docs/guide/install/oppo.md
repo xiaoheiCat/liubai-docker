@@ -6,43 +6,40 @@
 
 <CopyButton />
 
-## 2. 打开 Chrome 浏览器
+## 2. 打开 Opera 浏览器
 
-若你还没有 Chrome 浏览器，可以[点击这里下载](https://musetransfer.com/s/03iwyyvxf)。
+若你还没有 Opera 浏览器，可以[点击这里下载](https://musetransfer.com/s/alppnpqsj)。
 
-<img src="./assets-android/1.png" width="280" /> 
+<img src="./assets-opera/1.jpg" width="280" /> 
 
 ## 3. 黏贴链接
 
 在地址栏上，黏贴链接。 
 
-<img src="./assets-android/2.jpg" width="320" />
+<img src="./assets-opera/2.jpg" width="320" />
 
-## 4. 注意页面底部
+## 4. 准备安装
 
-打开留白登录页面后
+点击右上方工具栏上的更多“...”按钮，弹出菜单；在菜单上选择 `添加至...`。
 
-- 如果页面底部有弹出 `安装` 按钮，点击即安装。
+<img src="./assets-opera/3.jpg" width="280" style="margin-bottom: 10px" />
 
-<img src="./assets-android/3.png" width="320" />
-
-- 如果没有，点击上方工具栏上的更多按钮，弹出菜单；在菜单上选择 `添加到主屏幕`。
-
-<img src="./assets-android/4.png" width="320" style="margin-bottom: 10px" />
-
-<img src="./assets-android/5.png" width="320" />
+<img src="./assets-opera/4.jpg" width="280" />
 
 ## 5. 开始安装
 
-根据引导，点击 `安装` 即可。
+接着点击 `主页屏幕`。
 
-<img src="./assets-android/6.png" width="320" style="margin-bottom: 10px" />
+<img src="./assets-opera/5.jpg" width="320" style="margin-bottom: 10px" />
 
-<img src="./assets-android/7.png" width="250" />
+依序点击 `添加`。
+
+<img src="./assets-opera/6.jpg" width="250" style="margin-bottom: 10px" />
+
+<img src="./assets-opera/7.jpg" width="250" />
 
 ## 6. 安装完成
 
-稍等片刻，留白应该就出现在你的桌面上啦！
+回到桌面上，留白应该已经在那等你了！
 
-<img src="./assets-android/8.jpg" width="320" />
-
+<img src="./assets-opera/8.jpg" width="250" />
