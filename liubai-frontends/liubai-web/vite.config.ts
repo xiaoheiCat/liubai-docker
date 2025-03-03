@@ -4,7 +4,7 @@ import {
   type PluginOption,
   type UserConfig,
 } from 'vite'
-import { resolve } from "path"
+import { resolve } from "node:path"
 import vue from '@vitejs/plugin-vue'
 import VueI18n from '@intlify/unplugin-vue-i18n/vite'
 import mkcert from 'vite-plugin-mkcert'
