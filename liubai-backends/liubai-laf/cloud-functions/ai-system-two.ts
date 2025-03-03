@@ -22,6 +22,7 @@ import type {
   Table_User,
   DataPass,
   LiuErrReturn,
+  Table_Member,
 } from "./common-types"
 import cloud from "@lafjs/cloud"
 import { 
@@ -472,6 +473,7 @@ const system_prompt = `
 const user_prompt = `
 ## 当前环境
 
+对方昵称: {user_nickname}
 当前日期: {current_date}
 当前时间: {current_time}
 沟通界面: 微信服务号
@@ -538,6 +540,7 @@ export async function main(ctx: FunctionContext) {
 
 interface UserCtx {
   user: Table_User
+  member: Table_Member
   room: Table_AiRoom
   chats: Table_AiChat[]
 }
@@ -573,12 +576,15 @@ class Controller {
       }
       if(res1.userIds.length < 1) break
 
-      // 2. get users
+      // 2.1 get users
       const users = await this.getUsers(res1.userIds)
       if(users.length < 1) continue
 
+      // 2.2 get personal members
+      const members = await this.getMembers(users)
+
       // 3. ctxs filled by users and rooms
-      const res3 = this.initUserCtxs(res1.rooms, users)
+      const res3 = this.initUserCtxs(res1.rooms, users, members)
       if(res3.length < 1) continue
 
       // 4. get chats for each ctx
@@ -677,6 +683,24 @@ class Controller {
     return newUsers
   }
 
+  private async getMembers(
+    users: Table_User[],
+  ) {
+    // 1. get user ids
+    const userIds = users.map(v => v._id)
+    if(userIds.length < 1) return []
+
+    // 2. construct where
+    const w2 = {
+      spaceType: "ME",
+      oState: "OK",
+      user: _.in(userIds),
+    }
+    const mCol = db.collection("Member")
+    const res2 = await mCol.where(w2).get<Table_Member>()
+    return res2.data
+  }
+
   private async getChats(
     roomId: string,
   ) {
@@ -690,13 +714,16 @@ class Controller {
   private initUserCtxs(
     rooms: Table_AiRoom[],
     users: Table_User[],
+    members: Table_Member[],
   ) {
     const list: UserCtx[] = []
     for(let i=0; i<rooms.length; i++) {
       const room = rooms[i]
       const user = users.find(v => v._id === room.owner)
       if(!user) continue
-      list.push({ user, room, chats: [] })
+      const member = members.find(v => v.user === user._id)
+      if(!member) continue
+      list.push({ user, room, member, chats: [] })
     }
     return list
   }
@@ -735,7 +762,7 @@ class SystemTwo {
 
   private async inputToLLM() {
     // 1. get params
-    const { chats, user } = this._ctx
+    const { chats, user, member } = this._ctx
     const reasonerAndUs = this._reasonerAndUs
     const maxInputToken = MAX_INPUT_TOKEN_K * 1000
 
@@ -751,7 +778,8 @@ class SystemTwo {
     let system2Logs: string[] = []
     for(let i=0; i<chats.length; i++) {
       const v = chats[i]
-      const res3_1 = ChatToLog.run(v, user)
+      const chat2log = new ChatToLog(this._ctx)
+      const res3_1 = chat2log.run(v)
       if(!res3_1) continue
       system2Logs.push(...res3_1)
       res3_1.forEach(v2 => {
@@ -773,6 +801,7 @@ class SystemTwo {
       time: current_time,
     } = LiuDateUtil.getDateAndTime(getNowStamp(), user.timezone)
     const userPrompt = i18nFill(user_prompt, {
+      user_nickname: member.name ?? "未知",
       current_date,
       current_time,
       logs,
@@ -1586,12 +1615,21 @@ class ToolHandler2 {
 
 class ChatToLog {
 
+  private _user: Table_User
+  private _member: Table_Member
+
+  constructor(ctx: UserCtx) {
+    this._user = ctx.user
+    this._member = ctx.member
+  }
+
   // it may turn a chat into two logs,
   // so we have to return an array
-  static run(
+  run(
     chat: Table_AiChat,
-    user?: Table_User,
   ) {
+    // 1. get user and member
+    const user = this._user
 
     // 2. handle <role> and <content>
     let roleStr: LiuAi.Sys2Role | undefined
@@ -1599,18 +1637,23 @@ class ChatToLog {
 
     // 3. specifically handle
     if(chat.infoType === "tool_use") {
-      const logs3_1 = this._turnForToolUse(chat, user)
+      const logs3_1 = this._turnForToolUse(chat)
       return logs3_1
     }
-    else if(chat.fromSystem2) {
+    if(chat.fromSystem2) {
       const logs3_2 = this._turnForSystem2(chat)
       return logs3_2
     }
-    if(chat.infoType === "user") {
-      roleStr = "human"
-      contentStr = this._getBasicContent(chat)
+    if(chat.infoType === "assistant") {
+      const logs3_3 = this._turnForBot(chat)
+      return logs3_3
     }
-    else if(chat.infoType === "background" && chat.text) {
+    if(chat.infoType === "user") {
+      const logs3_4 = this._turnForHuman(chat)
+      return logs3_4
+    }
+
+    if(chat.infoType === "background" && chat.text) {
       roleStr = "system"
       contentStr = `【背景信息】\n${chat.text}`
     }
@@ -1622,33 +1665,74 @@ class ChatToLog {
       roleStr = "system"
       contentStr = `【前方对话摘要】\n${chat.text}`
     }
-    else if(chat.infoType === "assistant") {
-      roleStr = "bot"
-      contentStr = this._getBasicContent(chat)
-    }
 
     // 3. handle content
     if(!roleStr || !contentStr) return
-    const timeStr = this._getTimeStr(chat.sortStamp, user)
+    const timeStr = this._getTimeStr(chat.sortStamp)
     const logStr = this.generateLog(roleStr, {
       content: contentStr,
     }, timeStr)
     return [logStr]
   }
 
-  private static _getTimeStr(
+  private _getTimeStr(
     stamp: number,
-    user?: Table_User,
   ) {
+    const user = this._user
     const res1 = LiuDateUtil.getDateAndTime(
       stamp,
-      user?.timezone,
+      user.timezone,
     )
     const timeStr = `${res1.date} ${res1.time}`
     return timeStr
   }
 
-  private static _turnForSystem2(
+  private _turnForHuman(
+    chat: Table_AiChat,
+  ) {
+    // 0. get member
+    const member = this._member
+
+    // 1. get content
+    let contentStr = this._getBasicContent(chat)
+    if(!contentStr) return
+
+    // 2. construct middle part
+    let obj: Record<string, string> = {
+      content: contentStr,
+    }
+    if(member.name) {
+      obj.name = member.name
+    }
+
+    // 3. construct log
+    const timeStr = this._getTimeStr(chat.sortStamp)
+    const logStr = this.generateLog("human", obj, timeStr)
+    return [logStr]
+  }
+
+  private _turnForBot(
+    chat: Table_AiChat,
+  ) {
+    // 1. get content
+    let contentStr = this._getBasicContent(chat)
+    if(!contentStr) return
+
+    // 2. construct middle part
+    let obj: Record<string, string> = {
+      content: contentStr,
+    }
+    if(chat.model) {
+      obj.name = chat.model
+    }
+
+    // 3. construct log
+    const timeStr = this._getTimeStr(chat.sortStamp)
+    const logStr = this.generateLog("bot", obj, timeStr)
+    return [logStr]
+  }
+
+  private _turnForSystem2(
     v: Table_AiChat,
   ) {
     const { reasoning_content, directionOfSystem2 } = v
@@ -1673,7 +1757,7 @@ class ChatToLog {
 
     if(!directionStr || !contentStr) return
     
-    const timeStr = this._getTimeStr(v.sortStamp, undefined)
+    const timeStr = this._getTimeStr(v.sortStamp)
     const logStr = this.generateLog("you", {
       direction: directionStr,
       content: contentStr,
@@ -1681,7 +1765,7 @@ class ChatToLog {
     return [logStr]
   }
 
-  private static generateLog(
+  private generateLog(
     role: LiuAi.Sys2Role,
     obj: Record<string, string>,
     timeStr: string,
@@ -1698,11 +1782,11 @@ class ChatToLog {
     return str
   }
 
-  private static _turnForToolUse(
+  private _turnForToolUse(
     v: Table_AiChat,
-    user?: Table_User,
   ) {
     // 1. get params
+    const user = this._user
     const { tool_calls } = v
     if(!tool_calls) return
     const tool_call_id = tool_calls[0]?.id
@@ -1715,7 +1799,7 @@ class ChatToLog {
     if(toolMsg && typeof toolMsg.content === "string") {
       toolContent = toolMsg.content
     }
-    const toolTime = this._getTimeStr(v.sortStamp + 1000, user)
+    const toolTime = this._getTimeStr(v.sortStamp + 1000)
     const toolLog = this.generateLog("tool", {
       content: toolContent,
       tool_call_id,
@@ -1724,7 +1808,7 @@ class ChatToLog {
     // 3. get assistant msg
     const tool_calls_msg = valTool.objToStr(tool_calls)
     if(!tool_calls_msg) return
-    const assistantTime = this._getTimeStr(v.sortStamp, user)
+    const assistantTime = this._getTimeStr(v.sortStamp)
     let assistantLog = ""
     if(v.fromSystem2) {
       assistantLog = this.generateLog("you", {
@@ -1741,9 +1825,8 @@ class ChatToLog {
     // n.
     return [toolLog, assistantLog]
   }
-  
 
-  private static _getBasicContent(
+  private _getBasicContent(
     v: Table_AiChat,
   ) {
     const {
@@ -1768,7 +1851,6 @@ class ChatToLog {
 
     return text
   }
-
 
 }
 
