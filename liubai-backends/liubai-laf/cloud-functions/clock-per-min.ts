@@ -20,6 +20,7 @@ import {
 import { commonLang, getCurrentLocale, useI18n } from "@/common-i18n";
 import { wx_reminder_tmpl } from "@/common-config";
 import { WxGzhSender } from "@/service-send";
+import { invoke_by_clock } from "@/ai-system-two";
 
 const db = cloud.database()
 const _ = db.command
@@ -66,9 +67,21 @@ type Field_Member = {
 export async function main(ctx: FunctionContext) {
 
   await handle_remind()
+  await handle_system_two()
 
   return { code: "0000" }
 }
+
+
+async function handle_system_two() {
+  const date = new Date()
+  const min = date.getMinutes()
+  const remainder = min % 5
+  if(remainder !== 3) return
+  console.log("get to run system two!")
+  await invoke_by_clock()
+}
+
 
 async function handle_remind() {
 

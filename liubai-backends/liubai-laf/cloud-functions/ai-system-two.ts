@@ -548,7 +548,9 @@ interface UserCtx {
 // invoke by CRON
 export async function invoke_by_clock() {
   const controller = new Controller()
-  await controller.batchRun()
+  const { num } = await controller.batchRun()
+  console.warn("estimated num: ", num)
+  return { num }
 }
 
 // continue after user approves
@@ -610,6 +612,8 @@ class Controller {
         break
       }
     }
+
+    return { num }
   }
 
 
