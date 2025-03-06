@@ -333,7 +333,8 @@
     "content_deleted": "🗑️ 该动态已被删除",
     "captured_that": "已接住你的{event}",
     "created_by_ai": "本卡片由 {name}（{company}）协助创建",
-    "created_by_ai2": "本卡片由 {name} 协助创建"
+    "created_by_ai2": "本卡片由 {name} 协助创建",
+    "no_ai": "拒绝 AI 的卡片"
   },
   "state_related": {
     "add_state": "添加状态",

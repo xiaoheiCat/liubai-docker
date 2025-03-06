@@ -793,26 +793,7 @@ export function aiI18nChannel(
 /***************************** Tools ***************************/
 
 export const aiTools: OaiTool[] = [
-  /** Parse Link  */
-  // {
-  //   type: "function",
-  //   function: {
-  //     name: "parse_link",
-  //     description: "解析链接。给定一个 http 链接，返回它的标题、摘要、内文......",
-  //     parameters: {
-  //       type: "object",
-  //       properties: {
-  //         url: {
-  //           type: "string",
-  //           description: "要解析的链接",
-  //         },
-  //       },
-  //       required: ["url"],
-  //       additionalProperties: false,
-  //     }
-  //   }
-  // },
-
+  
   /** Web Search */
   {
     type: "function",
@@ -833,12 +814,32 @@ export const aiTools: OaiTool[] = [
     },
   },
 
+  /** Parse Link  */
+  {
+    type: "function",
+    function: {
+      name: "parse_link",
+      description: "解析链接。给定一个 http 链接，返回它的标题、摘要、内文......",
+      parameters: {
+        type: "object",
+        properties: {
+          link: {
+            type: "string",
+            description: "要解析的链接，http 开头",
+          },
+        },
+        required: ["link"],
+        additionalProperties: false,
+      }
+    }
+  },
+
   /** Draw a picture */
   {
     type: "function",
     function: {
       name: "draw_picture",
-      description: "Drawing. Given a prompt, return an image drawn from it.",
+      description: "Drawing. Given a delicate prompt, return an image drawn from it.",
       parameters: {
         type: "object",
         properties: {

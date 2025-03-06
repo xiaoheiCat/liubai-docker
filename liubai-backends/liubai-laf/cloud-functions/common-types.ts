@@ -620,15 +620,13 @@ export type AiCharacter = "baixiaoying" | "deepseek" | "hailuo" | "hunyuan" | "k
   "wanzhi" | "zhipu" | "ds-reasoner" | "tongyi-qwen"
 
 export type AiInfoType = "user" | "assistant" | "summary" | "clear" | 
-  "action" | "background" | "tool_use"
+  "background" | "tool_use"
 // user: 用户发来的消息
 // assistant: AI 的回复
 // summary: AI 的总结 for context
 // clear: 清除对话
-// action: 记录用户的操作，比如“同意 xxx 读取 yyy”
 // background: 比如 url 的解析结果 / 关键词搜索结果
 // tool_use: 使用工具
-
 
 export type AiAbility = "chat" | "text_to_image" | "image_to_text" | "tool_use" | 
   "input_audio" | "reasoning"
@@ -644,19 +642,6 @@ export type AiCommandByHuman = "kick" | "add" | "clear_history"
   | "more_operations" | "continue" | "group_status"
 
 export type AiFinishReason = "stop" | "length"
-
-export interface AiApiEndpoint {
-  apiKey: string
-  baseURL: string
-  defaultHeaders?: Record<string, string>
-}
-
-export interface AiUsage {
-  cached_tokens?: number
-  completion_tokens: number
-  prompt_tokens: number
-  total_tokens: number
-}
 
 export interface AiBotMetaData {
   onlyOneSystemRoleMsg?: boolean
@@ -1656,6 +1641,7 @@ export interface Table_Order extends BaseTable {
 export interface Table_AiRoom extends BaseTable {
   owner: string           // corresponds to userId
   characters: AiCharacter[]
+  needSystem2Stamp?: number
 }
 
 /********* AI Chat *********/
@@ -1673,7 +1659,7 @@ export interface Table_AiChat extends BaseTable {
   // about LLM
   model?: string           // like "gpt-4o"
   character?: AiCharacter
-  usage?: AiUsage
+  usage?: LiuAi.Usage
   requestId?: string
   baseUrl?: string
   funcName?: string        // like "add_todo" | "web_search"
@@ -1681,6 +1667,11 @@ export interface Table_AiChat extends BaseTable {
   tool_calls?: OaiToolCall[]
   finish_reason?: AiFinishReason
   reasoning_content?: string        // from reasoning models like DeepSeek R1
+
+  // system 2
+  onlyInSystem2?: boolean
+  fromSystem2?: boolean
+  directionOfSystem2?: LiuAi.Sys2Direction
 
   // about web-search
   webSearchProvider?: LiuAi.SearchProvider
@@ -3358,6 +3349,11 @@ export namespace LiuAi {
     originalResult: Record<string, any>
   }
 
+  export interface ParseLinkResult {
+    markdown: string
+    provider: "jina-ai"
+  }
+
   export interface PaletteResult {
     url: string
     prompt: string
@@ -3378,11 +3374,124 @@ export namespace LiuAi {
     originalResult: Record<string, any>
   }
 
+  export interface ReadCardsSharedRes {
+    textToUser: string
+    textToBot: string
+    hasData: boolean
+  }
+
   export interface ReadCardsResult {
     textToUser: string
     textToBot: string
     assistantChatId: string
   }
+
+  export interface RunParam {
+    entry: AiEntry
+    room: Table_AiRoom
+    chatId?: string
+    chats: Table_AiChat[]
+    isContinueCommand?: boolean
+  }
+
+  export interface RunLog_A {
+    toolName: "get_schedule"
+    hoursFromNow?: AiToolGetScheduleHoursFromNow
+    specificDate?: AiToolGetScheduleSpecificDate
+  }
+  
+  export interface RunLog_B {
+    toolName: "get_cards"
+    cardType: AiToolGetCardType
+  }
+  
+  export interface RunLog_C {
+    toolName: "draw_picture"
+    drawResult: LiuAi.PaletteResult
+  }
+  
+  export type RunLog = (RunLog_A | RunLog_B | RunLog_C) & {
+    character: AiCharacter
+    textToUser: string
+    logStamp: number
+  }
+
+  export interface RunSuccess {
+    character: AiCharacter
+    replyStatus: "yes" | "has_new_msg"
+    assistantChatId?: string
+    chatCompletion?: OaiChatCompletion
+    toolName?: string
+    logs?: LiuAi.RunLog[]
+  }
+
+  export type RunResults = Array<RunSuccess | undefined>
+
+  export interface HelperAssistantMsgParam {
+    roomId: string
+    text?: string
+    reasoning_content?: string
+    model: string
+    character: AiCharacter
+    usage?: LiuAi.Usage
+    requestId?: string
+    baseUrl?: string
+    funcName?: string
+    funcJson?: Record<string, any>
+    tool_calls?: OaiToolCall[]
+    finish_reason?: AiFinishReason
+    webSearchProvider?: LiuAi.SearchProvider
+    webSearchData?: Record<string, any>
+    drawPictureUrl?: string
+    drawPictureModel?: string
+    drawPictureData?: Record<string, any>
+  }
+
+  export interface ApiEndpoint {
+    apiKey: string
+    baseURL: string
+    defaultHeaders?: Record<string, string>
+  }
+
+  export interface MenuItem {
+    operation: AiCommandByHuman
+    character?: AiCharacter
+  }
+
+  export interface BaseLLMChatOpt {
+    maxTryTimes?: number
+    user?: Table_User
+    timeoutSec?: number
+  }
+
+  export interface CardData {
+    title: string
+    summary: string
+    contentId: string
+    hasImage: boolean
+    hasFile: boolean
+    calendarStamp?: number
+    createdStamp: number
+  }
+
+  export interface TellUserOpt {
+    fromBot?: AiBot
+    fromCharacter?: AiCharacter
+    fromSystem2?: boolean
+  }
+
+  export type Sys2Direction = "1" | "2" | "3" | "4"
+
+  export interface Sys2Output {
+    direction?: Sys2Direction
+    content?: string
+    tool_calls?: string
+  }
+
+  export type Sys2Role = "human" | "developer" | "bot" | "system" | "tool" | "you"
+
+  export type ToolName = "add_note" | "add_todo" | "add_calendar" 
+    | "web_search" | "parse_link" | "draw_picture" | "get_schedule" | "get_cards"
 
 }
 

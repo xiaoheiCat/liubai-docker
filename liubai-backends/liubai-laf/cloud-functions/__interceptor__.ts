@@ -159,14 +159,14 @@ function preCheck(
     return "N"
   }
 
-  // 3. debug 系统，暂时通过
+  // 3. debug 系统
   if(funcName.startsWith("debug-")) {
     if(isDebugging) return "Y"
     return "N"
   }
 
-  // 4. 定时系统，暂时通过
-  if(funcName.startsWith("clock-")) {
+  // 4. 定时系统
+  if(funcName.startsWith("clock-") || funcName === "ai-system-two") {
     if(xLafTriggerToken) return "Y"
     if(isDebugging) return "Y"
     return "N"

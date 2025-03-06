@@ -44,6 +44,22 @@ const {
       </LiuTooltip>
     </div>
 
+    <!-- No AI -->
+    <div class="tct-item-container" 
+      v-else-if="!td.aiReadable || td.aiReadable === 'N'"
+    >
+      <LiuTooltip
+        :aria-label="t('thread_related.no_ai')"
+        :distance="2"
+        :placement="cloudOffPlacement"
+      >
+        <svg-icon class="tct-local-svg" color="var(--main-tip)"
+          name="no_ai"
+          disable-stroke
+        ></svg-icon>
+      </LiuTooltip>
+    </div>
+
     <!-- ai character -->
     <div v-if="aiCharacterUrl && td.aiCharacter" 
       class="tct-item-container tct-ai-box"

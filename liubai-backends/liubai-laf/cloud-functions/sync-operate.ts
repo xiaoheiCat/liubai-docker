@@ -109,9 +109,9 @@ async function get_aichat(
   }
 
   // 3. get waiting data
-  const waitingData = AiToolUtil.turnJsonToWaitingData(funcName, funcJson, user)
-  if(!waitingData) {
-    return { code: "E5001", errMsg: "fail to get waitingData" }
+  const res3 = AiToolUtil.turnJsonToWaitingData(funcName, funcJson, user)
+  if(!res3.pass) {
+    return res3.err
   }
 
   return {
@@ -119,7 +119,7 @@ async function get_aichat(
     data: {
       operateType: "get-aichat",
       result: "waiting",
-      waitingData,
+      waitingData: res3.data,
     }
   }
 }
@@ -159,10 +159,11 @@ async function agree_aichat(
   const { space, member } = spaceAndMember
 
   // 4. construct content
-  const waitingData = AiToolUtil.turnJsonToWaitingData(funcName, funcJson, user)
-  if(!waitingData) {
-    return { code: "E5001", errMsg: "fail to get waitingData" }
+  const res4 = AiToolUtil.turnJsonToWaitingData(funcName, funcJson, user)
+  if(!res4.pass) {
+    return res4.err
   }
+  const waitingData = res4.data
 
   // 5. encrypt waitingData
   const aesKey = getAESKey() ?? ""

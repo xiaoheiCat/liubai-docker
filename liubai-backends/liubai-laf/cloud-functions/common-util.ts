@@ -1450,11 +1450,23 @@ function isLiuContentArr(
   return true
 }
 
+function getErrResult(
+  defaultErrMsg = "",
+  code = "E4000"
+) {
+  const errRes: CommonPass_A = {
+    pass: false,
+    err: { code, errMsg: defaultErrMsg }
+  }
+  return errRes
+}
+
 export const checker = {
   getErrMsgFromIssues,
   isImagesLegal,
   isFilesLegal,
   isLiuContentArr,
+  getErrResult,
 }
 
 
@@ -3078,7 +3090,6 @@ export async function upgrade_user_subscription(
 /*************** About ai tool ***************/
 export class AiToolUtil {
 
-
   static turnTextToLiuDesc(text: string) {
     if(!text) return
     let list = text.split("\n")
@@ -3150,7 +3161,10 @@ export class AiToolUtil {
   private static _turnCalendarJsonToWaitingData(
     funcJson: Record<string, any>,
     user?: Table_User,
-  ) {
+  ): DataPass<SyncOperateAPI.WaitingData> {
+    // 0. define error structure
+    const errRes = getErrResult()
+
     // 1. get param and check out description
     const {
       title,
@@ -3165,7 +3179,8 @@ export class AiToolUtil {
     if(!liuDesc || liuDesc.length === 0) {
       console.warn("cannot get liuDesc1 in _turnCalendarJsonToWaitingData!")
       console.log(funcJson)
-      return
+      errRes.err.errMsg = "fail to turn text into liuDesc for description"
+      return errRes
     }
     let userTimezone = user?.timezone
     let calendarStamp: number | undefined
@@ -3200,7 +3215,8 @@ export class AiToolUtil {
       const timeObj = LiuDateUtil.distractFromhh_mm(time)
       if(!timeObj) {
         console.warn("cannot parse time: ", time)
-        return
+        errRes.err.errMsg = "fail to parse time"
+        return errRes
       }
       if(!whenStamp) {
         whenStamp = this._turnSpecificDateToWhenStamp("today", userTimezone)
@@ -3266,7 +3282,7 @@ export class AiToolUtil {
       whenStamp,
       remindMe,
     }
-    return waitingData
+    return { pass: true, data: waitingData }
   }
 
 
@@ -3274,7 +3290,8 @@ export class AiToolUtil {
     funcName: string,
     funcJson: Record<string, any>,
     user?: Table_User,
-  ): SyncOperateAPI.WaitingData | undefined {
+  ): DataPass<SyncOperateAPI.WaitingData> {
+    const errRes = checker.getErrResult("no function name matches")
 
     // 1. add_note
     if(funcName === "add_note") {
@@ -3283,7 +3300,8 @@ export class AiToolUtil {
         console.warn("cannot parse add_note param: ")
         console.log(funcJson)
         console.log(res1.issues)
-        return
+        errRes.err.errMsg = checker.getErrMsgFromIssues(res1.issues)
+        return errRes
       }
       
       const { title, description } = funcJson
@@ -3291,13 +3309,14 @@ export class AiToolUtil {
       if(!liuDesc1 || liuDesc1.length === 0) {
         console.warn("cannot get liuDesc1 in add_note!")
         console.log(funcJson)
-        return
+        errRes.err.errMsg = "fail to get liuDesc1 from description in add_note"
+        return errRes
       }
       const d1: SyncOperateAPI.WaitingData = {
         title,
         liuDesc: liuDesc1,
       }
-      return d1
+      return { pass: true, data: d1 }
     }
 
     // 2. add_todo
@@ -3307,7 +3326,8 @@ export class AiToolUtil {
         console.warn("cannot parse add_todo param: ")
         console.log(funcJson)
         console.log(res2.issues)
-        return
+        errRes.err.errMsg = checker.getErrMsgFromIssues(res2.issues)
+        return errRes
       }
 
       const { title } = funcJson
@@ -3315,12 +3335,13 @@ export class AiToolUtil {
       if(!liuDesc2 || liuDesc2.length === 0) {
         console.warn("cannot get liuDesc2 in add_todo!")
         console.log(funcJson)
-        return
+        errRes.err.errMsg = "fail to get liuDesc2 from title in add_todo"
+        return errRes
       }
       const d2: SyncOperateAPI.WaitingData = {
         liuDesc: liuDesc2,
       }
-      return d2
+      return { pass: true, data: d2 }
     }
 
     // 3. add_calendar
@@ -3330,12 +3351,14 @@ export class AiToolUtil {
         console.warn("cannot parse add_calendar param: ")
         console.log(funcJson)
         console.log(res3.issues)
-        return
+        errRes.err.errMsg = checker.getErrMsgFromIssues(res3.issues)
+        return errRes
       }
       const d3 = this._turnCalendarJsonToWaitingData(funcJson, user)
       return d3
     }
-    
+
+    return errRes
   }
 
 }

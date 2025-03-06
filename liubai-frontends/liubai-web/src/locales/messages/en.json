@@ -333,7 +333,8 @@
     "content_deleted": "🗑️ It's been deleted",
     "captured_that": "{event} captured!",
     "created_by_ai": "The card was created by {name} ({company})",
-    "created_by_ai2": "The card was created by {name}."
+    "created_by_ai2": "The card was created by {name}.",
+    "no_ai": "The card rejecting AI"
   },
   "state_related": {
     "add_state": "New State",

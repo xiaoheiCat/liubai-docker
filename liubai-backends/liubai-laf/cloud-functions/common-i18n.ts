@@ -311,9 +311,6 @@ export const aiLang: LangAtom = {
     "later_min": "{min} 分钟后",
     "later_hr": "{hr} 小时后",
     "later_day": "{day} 天后",
-    "added_note": "【客户已同意创建笔记】",
-    "added_todo": "【客户已同意创建待办】",
-    "added_calendar": "【客户已同意创建日程】",
     "not_agree_yet": "【客户尚未同意你的请求】",
     "too_many_words": "这么多字！它们思考不来💭\n（单条文本最多 3000 字符）",
     "no_more_to_continue": "没有更多可以继续了",
@@ -386,6 +383,13 @@ export const aiLang: LangAtom = {
     "view_thinking": "查看思考过程",
     "result_of_tool": "工具调用结果:\n{msg}",
     "thinking": "【思考中...💭】\n{text}",
+
+    // failures
+    "fail_to_search": "网络搜索失败",
+    "fail_to_parse_link": "链接解析失败",
+
+    // system 2
+    "system2_r1": "系统二（R1）",
   },
   "zh-Hant": {
     "privacy_title": "🔓 隱私提示:",
@@ -416,9 +420,6 @@ export const aiLang: LangAtom = {
     "later_min": "{min} 分鐘後",
     "later_hr": "{hr} 小時後",
     "later_day": "{day} 天後",
-    "added_note": "【客户已同意新增筆記】",
-    "added_todo": "【客户已同意新增待辦】",
-    "added_calendar": "【客户已同意新增日程】",
     "not_agree_yet": "【客户尚未同意你的請求】",
     "too_many_words": "這麼多字！它們思考不來💭\n（單則文本最多 3000 字元）",
     "no_more_to_continue": "沒有更多可以繼續了",
@@ -491,6 +492,13 @@ export const aiLang: LangAtom = {
     "view_thinking": "檢視思考過程",
     "result_of_tool": "工具調用結果:\n{msg}",
     "thinking": "［思考中...💭］\n{text}",
+
+    // failures
+    "fail_to_search": "網路搜尋失敗",
+    "fail_to_parse_link": "連結解析失敗",
+
+    // system 2
+    "system2_r1": "系統二 (R1) ",
   },
   "en": {
     "privacy_title": "🔓 Privacy:",
@@ -521,9 +529,6 @@ export const aiLang: LangAtom = {
     "later_min": "{min} min(s) later",
     "later_hr": "{hr} hr(s) later",
     "later_day": "{day} day(s) later",
-    "added_note": "【Customer has agreed to create a note】",
-    "added_todo": "【Customer has agreed to create a todo】",
-    "added_calendar": "【Customer has agreed to create a calendar】",
     "not_agree_yet": "Customer has not yet agreed to your request",
     "too_many_words": "Too many words to think💭\n(Text supports up to 3000 characters.)",
     "no_more_to_continue": "No more to continue",
@@ -596,6 +601,13 @@ export const aiLang: LangAtom = {
     "view_thinking": "Dive into Thinking",
     "result_of_tool": "Tool call result:\n{msg}",
     "thinking": "[Thinking..💭]\n{text}",
+
+    // failures
+    "fail_to_search": "Fail to search",
+    "fail_to_parse_link": "Fail to parse link",
+
+    // system 2
+    "system2_r1": "System 2 (R1)",
   }
 }
 
@@ -632,7 +644,7 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
     {
       msgtype: "text",
       text: {
-        content: '<a href="{LIU_DOMAIN}/wechat-bind">戳我绑定微信</a>',
+        content: '<a href="{LIU_DOMAIN}/connect/wechat">戳我绑定微信</a>',
       }
     }
   ],
@@ -683,7 +695,7 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
     {
       msgtype: "text",
       text: {
-        content: '<a href="{LIU_DOMAIN}/wechat-bind">輕觸我綁定微信</a>',
+        content: '<a href="{LIU_DOMAIN}/connect/wechat">輕觸我綁定微信</a>',
       }
     }
   ],
@@ -734,7 +746,7 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
     {
       msgtype: "text",
       text: {
-        content: '<a href="{LIU_DOMAIN}/wechat-bind">Click me to bind WeChat</a>',
+        content: '<a href="{LIU_DOMAIN}/connect/wechat">Click me to bind WeChat</a>',
       }
     }
   ],

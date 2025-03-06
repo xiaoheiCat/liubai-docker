@@ -172,6 +172,16 @@ declare global {
       LIU_TRANSLATION_API_KEY?: string
       LIU_TRANSLATION_MODEL?: string
 
+      /** Image to Text */
+      LIU_IMG2TXT_BASE_URL?: string
+      LIU_IMG2TXT_API_KEY?: string
+      LIU_IMG2TXT_MODEL?: string
+
+      /** System 2 */
+      LIU_SYSTEM2_BASE_URL?: string
+      LIU_SYSTEM2_API_KEY?: string
+      LIU_SYSTEM2_MODEL?: string
+
       /** Characters */
       LIU_WXGZH_KF_BAIXIAOYING?: string      // kf_account of baixiaoying
       LIU_WXGZH_KF_DEEPSEEK?: string         // kf_account of deepseek
@@ -183,6 +193,7 @@ declare global {
       LIU_WXGZH_KF_WANZHI?: string           // kf_account of wanzhi
       LIU_WXGZH_KF_YUEWEN?: string           // kf_account of yuewen
       LIU_WXGZH_KF_ZHIPU?: string            // kf_account of zhipu
+      LIU_WXGZH_KF_SYSTEM2?: string          // kf_account of system2
 
       /** Statistic */
       LIU_NOCODB_BASEURL?: string            // like https://app.nocodb.com
