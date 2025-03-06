@@ -1809,6 +1809,9 @@ class BotMoonshot extends BaseBot {
     const model = bot.model
 
     // 3. handle other things
+    if(aiParam.isContinueCommand) {
+      prompts.push({ role: "user", content: "Continue / 继续" })
+    }
     await ImageHelper.checkPromptsForBase64(prompts)
 
     // 4. calculate maxTokens
@@ -3179,7 +3182,7 @@ class AiHelper {
 
         if(imageNum > 3 || i > INDEX_TO_PRESERVE_IMAGES) {
           v.msgType = "text"
-          v.text = "[image]"
+          v.text = AiHelper.imageRecognitionText(v.text)
           delete v.imageUrl
         }
       }
