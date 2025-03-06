@@ -25,7 +25,7 @@ import {
   LiuAi,
   type AiBotMetaData,
   Ns_SiliconFlow,
-  DataPass,
+  type DataPass,
 } from "@/common-types"
 import { 
   checkIfUserSubscribed, 
@@ -730,8 +730,8 @@ class BaseBot {
     const theService = `${params.model} on ${apiData.baseURL}`
 
     // print last 5 prompts
-    // LogHelper.printLastItems(params.messages)
-    // console.log(`Let's ask ${theService}`)
+    LogHelper.printLastItems(params.messages)
+    console.log(`Let's ask ${theService}`)
 
     const llm = new BaseLLM(
       apiData.apiKey, 
@@ -3402,7 +3402,10 @@ class AiHelper {
     // 1. check if need to update
     const now = getNowStamp()
     const lastStamp = room.needSystem2Stamp ?? 0
-    if(lastStamp > (now + MIN_3)) return
+    const twoHoursLater = now + 2 * HOUR
+    if(lastStamp > now && lastStamp < twoHoursLater) {
+      return
+    }
     const roomId = room._id
     
     // 2. define map hours

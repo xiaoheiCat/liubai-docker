@@ -1,3 +1,8 @@
+/**
+ * Function Name: ai-system-two
+ * author: yenche123
+ */
+
 import { 
   getNowStamp, 
   isWithinMillis, 
@@ -549,15 +554,11 @@ interface UserCtx {
 export async function invoke_by_clock() {
   const controller = new Controller()
   const { num } = await controller.batchRun()
-  console.warn("estimated num: ", num)
+  if(num > 0) {
+    console.warn("estimated num: ", num)
+  }
   return { num }
 }
-
-// continue after user approves
-export async function invoke_by_user() {
-  
-}
-
 
 class Controller {
 

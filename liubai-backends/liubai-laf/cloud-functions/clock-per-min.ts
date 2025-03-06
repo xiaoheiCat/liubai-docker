@@ -78,7 +78,6 @@ async function handle_system_two() {
   const min = date.getMinutes()
   const remainder = min % 5
   if(remainder !== 3) return
-  console.log("get to run system two!")
   await invoke_by_clock()
 }
 

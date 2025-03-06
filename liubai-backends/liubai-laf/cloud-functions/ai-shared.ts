@@ -1,3 +1,5 @@
+// Function Name: ai-shared
+
 import cloud from "@lafjs/cloud"
 import { 
   type LiuAi, 
@@ -554,9 +556,11 @@ export class AiShared {
     const { funcName, contentId } = v
 
     let toolMsg: OaiToolPrompt | undefined
+    const successMsg = `{ "code": "0000", "data": { "id": "__id__" } }`
     if (funcName === "add_note") {
       if (contentId) {
-        toolMsg = { role: "tool", content: t("added_note"), tool_call_id }
+        const msg = successMsg.replace("__id__", contentId)
+        toolMsg = { role: "tool", content: msg, tool_call_id }
       }
       else {
         toolMsg = { role: "tool", content: t("not_agree_yet"), tool_call_id }
@@ -564,7 +568,8 @@ export class AiShared {
     }
     else if (funcName === "add_todo") {
       if (contentId) {
-        toolMsg = { role: "tool", content: t("added_todo"), tool_call_id }
+        const msg = successMsg.replace("__id__", contentId)
+        toolMsg = { role: "tool", content: msg, tool_call_id }
       }
       else {
         toolMsg = { role: "tool", content: t("not_agree_yet"), tool_call_id }
@@ -572,7 +577,8 @@ export class AiShared {
     }
     else if (funcName === "add_calendar") {
       if (contentId) {
-        toolMsg = { role: "tool", content: t("added_calendar"), tool_call_id }
+        const msg = successMsg.replace("__id__", contentId)
+        toolMsg = { role: "tool", content: msg, tool_call_id }
       }
       else {
         toolMsg = { role: "tool", content: t("not_agree_yet"), tool_call_id }
