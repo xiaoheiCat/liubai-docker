@@ -634,6 +634,7 @@
   "ai_character": {
     "baixiaoying": "百小應",
     "deepseek": "DeepSeek",
+    "ds-reasoner": "DeepSeek R1",
     "hailuo": "海螺",
     "hunyuan": "混元",
     "kimi": "Kimi",
@@ -645,6 +646,7 @@
   "ai_provider": {
     "baixiaoying": "百川智能",
     "deepseek": "深度求索",
+    "ds-reasoner": "深度求索",
     "hailuo": "MiniMax",
     "hunyuan": "騰訊",
     "kimi": "月之暗面",

@@ -634,6 +634,7 @@
   "ai_character": {
     "baixiaoying": "Ying",
     "deepseek": "DeepSeek",
+    "ds-reasoner": "DeepSeek R1",
     "hailuo": "Hailuo",
     "hunyuan": "Hunyuan",
     "kimi": "Kimi",
@@ -645,6 +646,7 @@
   "ai_provider": {
     "baixiaoying": "Baichuan",
     "deepseek": "DeepSeek",
+    "ds-reasoner": "DeepSeek",
     "hailuo": "MiniMax",
     "hunyuan": "Tencent",
     "kimi": "Moonshot",
