@@ -2106,13 +2106,14 @@ class AiController {
     const { entry } = aiParam
     const { msg_type } = entry
     if(aiParam.isContinueCommand || msg_type === "voice") return 0
+    if(msg_type === "image") return 0
 
     // 1. check out reasoning models exist
     const hasReasoningModel = this._hasReasoningBot(newCharacters)
     if(hasReasoningModel) return 0
 
-    // 2. andaomly wait for a while
-    const r = Math.floor((Math.random() * 3)) + 3
+    // 2. randomly wait for a while
+    const r = Math.floor((Math.random() * 3)) + 2
     return r
   }
 
@@ -3503,11 +3504,12 @@ class AiHelper {
     const maxIndex2 = Math.min(cLength, 5)
     for(let i=0; i<maxIndex2; i++) {
       const v = chats[i]
-      const { msgType, imageUrl, infoType } = v
+      const { msgType, imageUrl, infoType, text } = v
 
       // 1.2 if index is less than 2 and there is any image among the first 2 items
+      // and the text is empty
       // then we can't compress
-      if(i < maxIndex1) {
+      if(i < maxIndex1 && !text) {
         if(msgType === "image" || imageUrl) {
           canCompress = false
           break
@@ -3521,7 +3523,7 @@ class AiHelper {
         firstAssistantIdx = i
       }
 
-      if((msgType === "image" || imageUrl) && firstPhotoIdx < 0) {
+      if((msgType === "image" || imageUrl) && !text && firstPhotoIdx < 0) {
         firstPhotoIdx = i
       }
     }
@@ -3571,7 +3573,7 @@ class AiHelper {
     let need = false
     for(let i=0; i<chats.length; i++) {
       const chat = chats[i]
-      if(chat.msgType === "image" && !chat.text) {
+      if(chat.msgType === "image") {
         need = true
         break
       }
