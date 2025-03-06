@@ -556,7 +556,7 @@ export class AiShared {
     const { funcName, contentId } = v
 
     let toolMsg: OaiToolPrompt | undefined
-    const successMsg = `{ "code": "0000", "data": { "id": "__id__" } }`
+    const successMsg = `{'code':'0000','data':{'id':'__id__'}}`
     if (funcName === "add_note") {
       if (contentId) {
         const msg = successMsg.replace("__id__", contentId)
