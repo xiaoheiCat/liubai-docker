@@ -796,19 +796,20 @@ class SystemTwo {
 
     // 5. working logs
     if(workingLogs.length > 0) {
-      msg += (t("working_title") + "\n")
+      msg += (t("working_log_title") + "\n")
       workingLogs.forEach(v => {
         msg += (v.textToUser + "\n")
       })
       msg += "\n"
     }
-    console.log("see msg: ", msg)
 
     // 6. send
     if(msg) {
-      await valTool.waitMilli(900)
+      msg = msg.trim()
+      console.log("see msg in handleRunLogs: ", msg)
+      await valTool.waitMilli(1500)
       const entry = System2Util.mockAiEntry(this._ctx.user)
-      TellUser.text(entry, msg, { fromSystem2: true })
+      TellUser.text(entry, msg)
     }
   }
 
@@ -1155,6 +1156,8 @@ class SystemTwo {
       content: newUserContent,
     }
     this._reasonerAndUs.push(userPrompt)
+    
+    console.warn("tool result prompt: ", newUserContent)
 
     return true
   }
@@ -1439,7 +1442,7 @@ class ToolHandler2 {
     return chatId
   }
 
-  private async _replyToUser(msg: string) {
+  private _replyToUser(msg: string) {
     const entry = System2Util.mockAiEntry(this._user)
     TellUser.text(entry, msg, { fromSystem2: true })
   }
@@ -1467,7 +1470,8 @@ class ToolHandler2 {
     // 3. reply
     const toolShared = this._toolShared
     const msg = toolShared.get_msg_for_adding_note(funcJson, chatId)
-    await this._replyToUser(msg)
+    console.warn("add_note msg: ", msg)
+    this._replyToUser(msg)
     return { pass: true }
   }
 
@@ -1492,6 +1496,7 @@ class ToolHandler2 {
     // 3. reply
     const toolShared = this._toolShared
     const msg = toolShared.get_msg_for_adding_todo(chatId, funcJson)
+    console.warn("add_todo msg: ", msg)
     this._replyToUser(msg)
     return { pass: true }
   }
@@ -1521,7 +1526,8 @@ class ToolHandler2 {
     // 3. reply
     const toolShared = this._toolShared
     const msg = toolShared.get_msg_for_adding_calendar(chatId, funcJson)
-    await this._replyToUser(msg)
+    console.warn("add_calendar msg: ", msg)
+    this._replyToUser(msg)
     return { pass: true }
   }
 
@@ -1557,7 +1563,7 @@ class ToolHandler2 {
     // 2. translate if needed
     let imagePrompt = prompt
     const num2 = valTool.getChineseCharNum(prompt)
-    if(num2 > 3) {
+    if(num2 > 6) {
       const translator = new Translator()
       const res2 = await translator.run(prompt)
       if(!res2) {
@@ -1618,6 +1624,7 @@ class ToolHandler2 {
       data4.text = res3.prompt
     }
     AiShared.updateAiChat(chatId, data4)
+    console.warn("draw picture result: ", res3)
 
     // 5. reply
     const entry = System2Util.mockAiEntry(this._user)

@@ -2687,7 +2687,7 @@ class ToolHandler {
     let imagePrompt = prompt
     const num2 = valTool.getChineseCharNum(prompt)
     console.warn("chinese char num: ", num2)
-    if(num2 > 3) {
+    if(num2 > 6) {
       const user = this._aiParam.entry.user
       const translator = new Translator(bot, user)
       const res2 = await translator.run(prompt)
