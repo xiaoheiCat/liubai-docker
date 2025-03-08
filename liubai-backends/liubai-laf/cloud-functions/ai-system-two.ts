@@ -796,19 +796,20 @@ class SystemTwo {
 
     // 5. working logs
     if(workingLogs.length > 0) {
-      msg += (t("working_title") + "\n")
+      msg += (t("working_log_title") + "\n")
       workingLogs.forEach(v => {
         msg += (v.textToUser + "\n")
       })
       msg += "\n"
     }
-    console.log("see msg: ", msg)
 
     // 6. send
     if(msg) {
-      await valTool.waitMilli(900)
+      msg = msg.trim()
+      console.log("see msg in handleRunLogs: ", msg)
+      await valTool.waitMilli(1500)
       const entry = System2Util.mockAiEntry(this._ctx.user)
-      TellUser.text(entry, msg, { fromSystem2: true })
+      TellUser.text(entry, msg)
     }
   }
 
@@ -1557,7 +1558,7 @@ class ToolHandler2 {
     // 2. translate if needed
     let imagePrompt = prompt
     const num2 = valTool.getChineseCharNum(prompt)
-    if(num2 > 3) {
+    if(num2 > 6) {
       const translator = new Translator()
       const res2 = await translator.run(prompt)
       if(!res2) {
@@ -1618,6 +1619,7 @@ class ToolHandler2 {
       data4.text = res3.prompt
     }
     AiShared.updateAiChat(chatId, data4)
+    console.warn("draw picture result: ", res3)
 
     // 5. reply
     const entry = System2Util.mockAiEntry(this._user)
