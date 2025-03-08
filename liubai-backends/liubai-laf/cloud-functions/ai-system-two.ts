@@ -1156,6 +1156,8 @@ class SystemTwo {
       content: newUserContent,
     }
     this._reasonerAndUs.push(userPrompt)
+    
+    console.warn("tool result prompt: ", newUserContent)
 
     return true
   }
@@ -1440,7 +1442,7 @@ class ToolHandler2 {
     return chatId
   }
 
-  private async _replyToUser(msg: string) {
+  private _replyToUser(msg: string) {
     const entry = System2Util.mockAiEntry(this._user)
     TellUser.text(entry, msg, { fromSystem2: true })
   }
@@ -1468,7 +1470,8 @@ class ToolHandler2 {
     // 3. reply
     const toolShared = this._toolShared
     const msg = toolShared.get_msg_for_adding_note(funcJson, chatId)
-    await this._replyToUser(msg)
+    console.warn("add_note msg: ", msg)
+    this._replyToUser(msg)
     return { pass: true }
   }
 
@@ -1493,6 +1496,7 @@ class ToolHandler2 {
     // 3. reply
     const toolShared = this._toolShared
     const msg = toolShared.get_msg_for_adding_todo(chatId, funcJson)
+    console.warn("add_todo msg: ", msg)
     this._replyToUser(msg)
     return { pass: true }
   }
@@ -1522,7 +1526,8 @@ class ToolHandler2 {
     // 3. reply
     const toolShared = this._toolShared
     const msg = toolShared.get_msg_for_adding_calendar(chatId, funcJson)
-    await this._replyToUser(msg)
+    console.warn("add_calendar msg: ", msg)
+    this._replyToUser(msg)
     return { pass: true }
   }
 
