@@ -37,6 +37,7 @@ import {
   set as date_fn_set, 
   addDays,
 } from "date-fns"
+import { LiuReporter } from '@/service-send'
 
 const API_WECHAT_ACCESS_TOKEN = "https://api.weixin.qq.com/cgi-bin/token"
 const API_WX_JSAPI_TICKET = "https://api.weixin.qq.com/cgi-bin/ticket/getticket"
@@ -481,21 +482,37 @@ async function handleStatistics() {
   console.warn("statistic overview: ")
   console.log(data4)
 
-  // 5. fetch to nocodb
+  // 5. define data sent to nocodb
   const body = {
     ...data4,
     "Date": date,
   }
   const url = `${baseURL}/api/v2/tables/${tableId}/records`
   const headers = { "xc-token": token }
-  const res = await liuReq(url, body, { method: "POST", headers })
 
-  if(res.code !== "0000" || !res.data?.Id) {
-    console.warn("fail to add row into statistics!")
-    console.log(res)
+  // 6. define a function to add row into statistics
+  // and try again if needed
+  const _tryToAdd = async () => {
+    let res6 = await liuReq(url, body, { method: "POST", headers })
+
+    if(res6.code !== "0000" || !res6.data?.Id) {
+      await valTool.waitMilli(3000)
+      res6 = await liuReq(url, body, { method: "POST", headers })
+    }
+
+    return res6
   }
 
-  return res
+  // 7. fetch
+  let res7 = await _tryToAdd()
+  if(res7.code !== "0000" || !res7.data?.Id) {
+    console.warn("fail to add row into statistics!")
+    console.log(res7)
+    const reporter = new LiuReporter()
+    reporter.send("Liubai: fail to add row into statistics", "Statistics Error")
+  }
+
+  return res7
 }
 
 // get D1 / D2 .......
