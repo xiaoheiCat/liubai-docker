@@ -1060,8 +1060,11 @@ class SystemTwo {
 
     // 2. get required params
     const funcName = funcData.name as LiuAi.ToolName
-    const funcArgs = funcData.arguments
-    const funcJson = valTool.strToObj(funcArgs)
+    const funcArgs = funcData.arguments as any
+    let funcJson: any = funcArgs
+    if(typeof funcArgs === "string") {
+      funcJson = valTool.strToObj(funcArgs)
+    }
 
     console.log("funcName: ", funcName)
     console.log(funcJson)
