@@ -1238,10 +1238,13 @@ class SystemTwo {
     res: CommonPass,
     tool_call: OaiToolCall,
   ) {
-    if(res.pass) return false
+    if(!res.pass) {
+      return this._addErrPromptsForToolUse(res.err, tool_call)
+    }
 
-    // add error prompts
-    return this._addErrPromptsForToolUse(res.err, tool_call)
+    this.mapToSomeHourLater(12)
+
+    return false
   }
 
   /** return `true` to represent `continue`,
@@ -1303,6 +1306,9 @@ class SystemTwo {
       logStamp: getNowStamp(),
     }
     this._runLogs.push(drawLog)
+
+    // 3. map to some hour later
+    this.mapToSomeHourLater(12)
 
     return false
   }
