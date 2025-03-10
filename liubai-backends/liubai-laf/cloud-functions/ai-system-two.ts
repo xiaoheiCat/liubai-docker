@@ -557,14 +557,19 @@ class Controller {
 
   private _numPerLoop = 10
   private _maxUser = 100
+  private _maxRunTimes = 20
 
   // call by invoke_by_clock
   async batchRun() {
     const maxUser = this._maxUser
-    let minNeedSystem2Stamp = 1
+    const now0 = getNowStamp()
+    let minNeedSystem2Stamp = now0 - HR_47
 
     let num = 0
-    while(num < maxUser) {
+    let runTimes = 0
+    while(num < maxUser && runTimes < this._maxRunTimes) {
+      runTimes++
+
       // 1. get rooms
       const res1 = await this.getRooms(minNeedSystem2Stamp)
       if(res1.newNeedSystem2Stamp) {
@@ -1388,7 +1393,7 @@ class SystemTwo {
       needSystem2Stamp = maxStamp
     }
     if(needSystem2Stamp < now1) {
-      return
+      needSystem2Stamp = 0
     }
 
     // 3. update
