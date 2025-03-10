@@ -1037,11 +1037,11 @@ class SystemTwo {
     }
     catch(err) {
       console.warn("JSON.parse tool_calls error: ", err)
-      return true
+      return false
     }
     if(!tool_calls || !Array.isArray(tool_calls)) {
       console.warn("fail to parse tool_calls: ", tool_calls_str)
-      return true
+      return false
     }
 
     // 2. let's call tools
