@@ -934,12 +934,12 @@ export const aiTools: OaiTool[] = [
             description: "时间，格式为 hh:mm",
           },
           earlyMinute: {
-            type: "number",
+            type: "string",
             description: "提前多少分钟提醒。设置为 0 时表示准时提醒，设置 1440 表示提前一天提醒。",
             enum: aiToolAddCalendarEarlyMinutes,
           },
           laterHour: {
-            type: "number",
+            type: "string",
             description: `从现在起，往后推算多少小时后发生。设置为 0.5 表示三十分钟后，1 表示一小时后，24 表示一天后发生。该字段与 date, time, earlyMinute 三个字段互斥。`,
             enum: aiToolAddCalendarLaterHours,
           }
@@ -960,7 +960,7 @@ export const aiTools: OaiTool[] = [
         type: "object",
         properties: {
           hoursFromNow: {
-            type: "number",
+            type: "string",
             description: "获取最近几个小时内的日程，正数表示未来，举例: 24 表示获取未来 24 小时的日程，48 表示获取未来 48 小时的日程；负数表示过去，举例：-24 表示获取过去 24 小时的日程。",
             enum: aiToolGetScheduleHoursFromNow,
           },
