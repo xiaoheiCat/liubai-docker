@@ -739,13 +739,13 @@ export type AiToolAddCalendarSpecificDate = typeof aiToolAddCalendarSpecificDate
 export const Sch_AiToolAddCalendarSpecificDate = vbot.picklist(aiToolAddCalendarSpecificDates)
 
 export const aiToolAddCalendarEarlyMinutes = [
-  0, 10, 15, 30, 60, 120, 1440
+  "0", "10", "15", "30", "60", "120", "1440"
 ] as const
 export type AiToolAddCalendarEarlyMinute = typeof aiToolAddCalendarEarlyMinutes[number]
 export const Sch_AiToolAddCalendarEarlyMinute = vbot.picklist(aiToolAddCalendarEarlyMinutes)
 
 export const aiToolAddCalendarLaterHours = [
-  0.5, 1, 2, 3, 12, 24
+  "0.5", "1", "2", "3", "12", "24"
 ] as const
 export type AiToolAddCalendarLaterHour = typeof aiToolAddCalendarLaterHours[number]
 export const Sch_AiToolAddCalendarLaterHour = vbot.picklist(aiToolAddCalendarLaterHours)
@@ -772,7 +772,7 @@ export const Sch_AiToolAddCalendarParam = vbot.object({
 
 // the param of get_schedule
 export const aiToolGetScheduleHoursFromNow = [
-  -24, 24, 48
+  "-24", "24", "48"
 ] as const
 export type AiToolGetScheduleHoursFromNow = typeof aiToolGetScheduleHoursFromNow[number]
 export const Sch_AiToolGetScheduleHoursFromNow = vbot.picklist(aiToolGetScheduleHoursFromNow)

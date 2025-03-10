@@ -48,6 +48,7 @@ import {
   liuReq,
   MarkdownParser,
   valTool,
+  ValueTransform,
 } from "@/common-util"
 import { aiBots, aiI18nShared } from "@/ai-prompt"
 import { useI18n, aiLang, getCurrentLocale } from "@/common-i18n"
@@ -1038,9 +1039,8 @@ export class ToolShared {
     if(funcJson.specificDate === "dayAfterTomorrow") {
       funcJson.specificDate = "day_after_tomorrow"
     }
-    if(typeof funcJson.hoursFromNow === "string") {
-      const res0_1 = valTool.isStringAsNumber(funcJson.hoursFromNow)
-      funcJson.hoursFromNow = res0_1 ? Number(funcJson.hoursFromNow) : 24
+    if(typeof funcJson.hoursFromNow === "number") {
+      funcJson.hoursFromNow = String(funcJson.hoursFromNow)
     }
 
     // 1. checking out param
@@ -1050,7 +1050,12 @@ export class ToolShared {
       console.log(res1.issues)
       funcJson = {}
     }
-    const { hoursFromNow, specificDate } = funcJson as AiToolGetScheduleParam
+    const { 
+      hoursFromNow: strHoursFromNow, 
+      specificDate,
+    } = funcJson as AiToolGetScheduleParam
+    const resHoursFromNow = ValueTransform.str2Num(strHoursFromNow)
+    const hoursFromNow = resHoursFromNow.pass ? resHoursFromNow.data : undefined
 
     // 2. construct basic query
     const now = getNowStamp()
@@ -1429,14 +1434,18 @@ export class ToolShared {
       date,
       specificDate,
       time,
-      earlyMinute,
-      laterHour,
+      earlyMinute: strEarlyMinute,
+      laterHour: strLaterHour,
     } = funcJson as AiToolAddCalendarParam
     let msg = t("add_calendar_1", { botName })
     if(title) {
       msg += t("add_calendar_2", { title })
     }
     msg += t("add_calendar_3", { desc: description })
+    const resEarlyMinute = ValueTransform.str2Num(strEarlyMinute)
+    const earlyMinute = resEarlyMinute.pass ? resEarlyMinute.data : undefined
+    const resLaterHour = ValueTransform.str2Num(strLaterHour)
+    const laterHour = resLaterHour.pass ? resLaterHour.data : undefined
 
     /** Priority:
      *   date > specificDate > laterHour

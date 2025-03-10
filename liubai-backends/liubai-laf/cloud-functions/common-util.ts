@@ -362,6 +362,13 @@ export const valTool = {
 export class ValueTransform {
 
   static str2Num(x: any): DataPass<number> {
+    if(typeof x === "number") {
+      return {
+        pass: true,
+        data: x,
+      }
+    }
+
     if(!valTool.isStringAsNumber(x)) {
       return {
         pass: false,
@@ -3172,8 +3179,8 @@ export class AiToolUtil {
       date,
       specificDate,
       time,
-      earlyMinute,
-      laterHour,
+      earlyMinute: strEarlyMinute,
+      laterHour: strLaterHour,
     } = funcJson as AiToolAddCalendarParam
     const liuDesc = this.turnTextToLiuDesc(description)
     if(!liuDesc || liuDesc.length === 0) {
@@ -3187,6 +3194,10 @@ export class AiToolUtil {
     let remindStamp: number | undefined
     let whenStamp: number | undefined
     let remindMe: LiuRemindMe | undefined
+    const resEarlyMinute = ValueTransform.str2Num(strEarlyMinute)
+    const earlyMinute = resEarlyMinute.pass ? resEarlyMinute.data : undefined
+    const resLaterHour = ValueTransform.str2Num(strLaterHour)
+    const laterHour = resLaterHour.pass ? resLaterHour.data : undefined
 
     /** Priority:
      *   date > specificDate > laterHour
