@@ -3357,6 +3357,14 @@ export class AiToolUtil {
 
     // 3. add_calendar
     if(funcName === "add_calendar") {
+      // 3.1 normalize for bots which are not so smart
+      if(typeof funcJson.earlyMinute === "number") {
+        funcJson.earlyMinute = funcJson.earlyMinute.toString()
+      }
+      if(typeof funcJson.laterHour === "number") {
+        funcJson.laterHour = funcJson.laterHour.toString()
+      }
+
       const res3 = vbot.safeParse(Sch_AiToolAddCalendarParam, funcJson)
       if(!res3.success) {
         console.warn("cannot parse add_calendar param: ")
