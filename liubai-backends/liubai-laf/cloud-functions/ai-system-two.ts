@@ -84,7 +84,7 @@ const system_prompt = `
 // 调用工具
 <xml>
   <direction>2</direction>
-  <tool_calls>[{ "type": "function", "function": { "name": "echo", "arguments": { "text": "测试测试" } }, "id": "请为此次调用提供一个唯一值，若不指定将交由我们指定" }]</tool_calls>
+  <tool_calls>[{ "type": "function", "function": { "name": "echo", "arguments": { "text": "测试测试" } }, "id": "请为此次调用提供一个唯一值" }]</tool_calls>
 </xml>
 
 // 再想想
@@ -714,7 +714,13 @@ class Controller {
     const cCol = db.collection("AiChat")
     const q1 = cCol.where(w1).limit(50).orderBy("sortStamp", "desc")
     const res1 = await q1.get<Table_AiChat>()
-    return res1.data
+    const list = res1.data
+
+    // if the first item is direction of 4 from System2, return []
+    const firstItem = list[0]
+    if(firstItem && firstItem.directionOfSystem2 === "4") return []
+
+    return list
   }
 
   private initUserCtxs(
@@ -1327,6 +1333,7 @@ class SystemTwo {
 
   private toFeelAllGood() {
     this._addSystem2Chat("assistant", "4", {})
+    this.resetNeedSystem2Stamp()
   }
 
   private async _addSystem2Chat(
@@ -1397,6 +1404,18 @@ class SystemTwo {
     const u1: Partial<Table_AiRoom> = {
       updatedStamp: now1,
       needSystem2Stamp,
+    }
+    await rCol.doc(roomId).update(u1)
+  }
+
+  private async resetNeedSystem2Stamp() {
+    const room = this._ctx.room
+    const roomId = room._id
+    const now1 = getNowStamp()
+    const rCol = db.collection("AiRoom")
+    const u1: Partial<Table_AiRoom> = {
+      updatedStamp: now1,
+      needSystem2Stamp: 0,
     }
     await rCol.doc(roomId).update(u1)
   }
