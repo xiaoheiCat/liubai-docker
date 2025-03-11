@@ -13,7 +13,7 @@ import type {
   Wx_Gzh_Send_Msg,
   Wx_Gzh_Send_Text,
   Wx_Param_Msg_Templ_Send,
-  Wx_Res_Common,
+  Res_Common,
   LiuErrReturn,
 } from "@/common-types"
 import { 
@@ -22,9 +22,10 @@ import {
   DAY,
 } from "@/common-time"
 import { createEmailCode } from '@/common-ids'
-import { LiuDateUtil, liuReq } from '@/common-util'
+import { LiuDateUtil, liuReq, valTool } from '@/common-util'
 import { ses as TencentSES } from "tencentcloud-sdk-nodejs-ses"
 import { sms as TencentSMS } from "tencentcloud-sdk-nodejs-sms"
+import qiniu from "qiniu"
 
 const db = cloud.database()
 const _ = db.command
@@ -33,6 +34,10 @@ export async function main(ctx: FunctionContext) {
   console.log("do nothing in service-send")
   return true
 }
+
+/********************** some types *****************/
+
+type SendResolver = (res: LiuRqReturn) => void
 
 /********************** 发送邮件相关 *****************/
 
@@ -269,6 +274,152 @@ export class LiuTencentSMS {
 }
 
 
+/** package Qiniu SMS */
+export class LiuQiniuSMS {
+
+  private static _getMac() {
+    const _env = process.env
+    const ak = _env.LIU_QINIU_ACCESS_KEY
+    const sk = _env.LIU_QINIU_SECRET_KEY
+    if(!ak || !sk) {
+      console.warn("ak and sk are required to generate mac for qiniu")
+      return
+    }
+    const mac = new qiniu.auth.digest.Mac(ak, sk)
+    return mac
+  }
+
+  static sendVerifyCode(
+    code: string,
+    mobile: string,   // 11 digits
+  ): Promise<LiuRqReturn> {
+    // 1. get mac
+    const mac = this._getMac()
+    if(!mac) {
+      const err1: LiuErrReturn = { code: "E5001", errMsg: "no mac while sending sms" }
+      const emptyPro = valTool.getPromise(err1)
+      return emptyPro
+    }
+
+    // 2. get template id
+    const template_id = process.env.LIU_QINIU_SMS_TEMP_ID
+    if(!template_id) {
+      console.warn("LIU_QINIU_SMS_TEMP_ID is required")
+      const err2: LiuErrReturn = { code: "E5001", errMsg: "no template id while sending sms" }
+      const emptyPro = valTool.getPromise(err2)
+      return emptyPro
+    }
+
+    // 3. construct param
+    const reqBody = {
+      template_id,
+      mobile,
+      parameters: {
+        code,
+      }
+    }
+
+    const _send = (a: SendResolver) => {
+      // 1. custom timeout
+      let hasReturn = false
+      const timeout = setTimeout(() => {
+        hasReturn = true
+        console.warn("qiniu sms timeout!")
+        a({ code: "E5005", errMsg: "qiniu sms timeout" })
+      }, 5000)
+
+      // 2. send by qiniu
+      qiniu.sms.message.sendSingleMessage(reqBody, mac, (
+        respErr, respBody, respInfo,
+      ) => {
+        clearTimeout(timeout)
+        if(respErr) {
+          console.warn("sendSingleMessage failed")
+          console.log(respErr)
+
+          if(hasReturn) return
+          a({ code: "E5004", errMsg: "sending sms failed from qiniu" })
+          return
+        }
+        if(!respInfo || respInfo.statusCode !== 200) {
+          console.warn("qiniu sendSingleMessage got a non-200 response")
+          console.log(respInfo)
+        }
+
+        if(hasReturn) return
+        a({ code: "0000" })
+      })
+    }
+    
+    return new Promise(_send)
+  }
+  
+}
+
+
+export interface ResultOfSMS {
+  send_channel: "tencent-sms" | "qiniu-sms"
+  result: LiuRqReturn
+}
+
+export class SmsController {
+
+  static async send(
+    regionCode: string,
+    localNumber: string,
+    smsCode: string,
+  ): Promise<ResultOfSMS> {
+    // 1. send by qiniu
+    let res: LiuRqReturn
+    // res = await LiuQiniuSMS.sendVerifyCode(smsCode, localNumber)
+    // if(res.code === "0000") {
+    //   return {
+    //     send_channel: "qiniu-sms",
+    //     result: res,
+    //   }
+    // }
+
+    // 2. check out params for tencent sms
+    const _env = process.env
+    const SmsSdkAppId = _env.LIU_TENCENT_SMS_SDKAPPID
+    const SignName = _env.LIU_TENCENT_SMS_SIGNNAME
+    const TemplateId = _env.LIU_TENCENT_SMS_TEMPLATEID_1
+    if(!SmsSdkAppId || !SignName || !TemplateId) {
+      console.warn("there is no SmsSdkAppId or SignName or TemplateId in test_sms")
+      return {
+        send_channel: "tencent-sms",
+        result: { 
+          code: "E5001", 
+          errMsg: "there is no SmsSdkAppId or SignName or TemplateId in test_sms",
+        }
+      }
+    }
+
+    // 3. send by tencent SMS
+    const phone3 = `+${regionCode}${localNumber}`
+    const param3: LiuTencentSMSParam = {
+      SmsSdkAppId,
+      SignName,
+      TemplateId,
+      TemplateParamSet: [smsCode],
+      PhoneNumberSet: [phone3],
+    }
+    res = await LiuTencentSMS.send(param3)
+
+    // 4. see result for tencent sms
+    if(res.code === "0000" && res.data) {
+      LiuTencentSMS.seeResult(phone3)
+    }
+
+    return {
+      send_channel: "tencent-sms",
+      result: res,
+    }
+  }
+
+}
+
+
 
 /** package Resend */
 export class LiuResend {
@@ -498,7 +649,7 @@ export class WxGzhSender {
       touser: wx_gzh_openid,
       command: "Typing",
     }
-    const res = await liuReq<Wx_Res_Common>(url, arg)
+    const res = await liuReq<Res_Common>(url, arg)
     const { code, data } = res
     if(code !== "0000" || data?.errcode !== 0) {
       console.warn("sendTyping failed")
@@ -513,7 +664,7 @@ export class WxGzhSender {
     param: Wx_Param_Msg_Templ_Send,
   ) {
     const url = `${API_WECHAT_TMPL_SEND}?access_token=${access_token}`
-    const res = await liuReq<Wx_Res_Common>(url, param)
+    const res = await liuReq<Res_Common>(url, param)
     const { code, data } = res
     if(code !== "0000" || data?.errcode !== 0) {
       console.warn("sendTemplateMessage failed")
@@ -549,7 +700,7 @@ export class WxGzhSender {
     const url = new URL(API_WECHAT_MSG_SEND)
     url.searchParams.set("access_token", access_token)
     const link = url.toString()
-    const res = await liuReq<Wx_Res_Common>(link, obj)
+    const res = await liuReq<Res_Common>(link, obj)
     const { code, data } = res
     if(code !== "0000" || data?.errcode !== 0) {
       console.warn("sendMessage failed")
@@ -559,3 +710,61 @@ export class WxGzhSender {
     return res
   }
 }
+
+
+export class LiuReporter {
+  
+  private _dingtalkUrl?: string
+
+  constructor() {
+    const _env = process.env
+    if(_env.LIU_DINGTALK_REPORTER) {
+      this._dingtalkUrl = _env.LIU_DINGTALK_REPORTER
+    }
+  }
+
+  async send(
+    text: string,
+    title?: string,
+  ) {
+    const res = await this._sendByDingtalk(text, title)
+    return res
+  }
+
+  private async _sendByDingtalk(
+    text: string,
+    title?: string,
+  ) {
+    const url = this._dingtalkUrl
+    if(!url) return
+
+    const msgtype = Boolean(title) ? "markdown" : "text"
+    const body: Record<string, any> = {
+      msgtype,
+    }
+    if(msgtype === "text") {
+      body.text = {
+        content: text,
+      }
+    }
+    else {
+      body.markdown = {
+        title,
+        text,
+      }
+    }
+
+    const res1 = await liuReq<Res_Common>(url, body)
+    const data1 = res1.data
+    const isSuccess = data1?.errcode === 0
+    if(!isSuccess) {
+      console.warn("fail to report by dingtalk!", data1)
+    }
+
+    return isSuccess
+  }
+
+
+}
+
+

@@ -111,6 +111,7 @@ async function compress(files: File[]) {
 }
 
 function _toCompress(file: File) {
+  const fileSize = file.size
   const { width } = useWindowSize()
   let maxWidth = Math.floor(width.value * 2)
   if(maxWidth < 1280) maxWidth = 1280
@@ -122,7 +123,11 @@ function _toCompress(file: File) {
   else quality = 0.75
 
   const _excute = (a: CompressResolver) => {
-    const checkOrientation = file.size < CHECK_ORIENTATION_POINT
+    console.log("ready to compress, so see file size: ")
+    console.log(fileSize)
+    console.log(" ")
+
+    const checkOrientation = fileSize < CHECK_ORIENTATION_POINT
 
     const opt = {
       strict: true,

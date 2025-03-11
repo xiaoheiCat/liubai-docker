@@ -8,7 +8,7 @@
 
 ## 2. 打开 Chrome 浏览器
 
-若你还没有 Chrome 浏览器，可以[点击这里下载](https://musetransfer.com/s/pugj0q9uq)。
+若你还没有 Chrome 浏览器，可以[点击这里下载](https://musetransfer.com/s/03iwyyvxf)。
 
 <img src="./assets-android/1.png" width="280" /> 
 

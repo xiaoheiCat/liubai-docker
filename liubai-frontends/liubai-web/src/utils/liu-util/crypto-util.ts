@@ -102,8 +102,15 @@ async function importRsaPublicKey(pem: string) {
  * 将 uint8Array 转成 base64
  */
 function uint8ArrayToBase64(byteArr: Uint8Array) {
-  const byteStr = String.fromCharCode(...byteArr)
-  const b64 = window.btoa(byteStr)
+  const CHUNK_SIZE = 0x8000;    // 32k, 0x means hexadecimal (16进制)
+  let binary = '';
+
+  for(let i=0; i<byteArr.length; i+=CHUNK_SIZE) {
+    const chunk = byteArr.subarray(i, i+CHUNK_SIZE)
+    binary += String.fromCharCode.apply(null, chunk as unknown as number[])
+  }
+
+  const b64 = window.btoa(binary)
   return b64
 }
 

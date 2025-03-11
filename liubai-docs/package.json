@@ -1,7 +1,7 @@
 {
   "name": "liubai-docs",
   "private": true,
-  "version": "0.7.3",
+  "version": "0.10.1",
   "type": "module",
   "description": "It's the docs center for Liubai",
   "author": {
@@ -18,7 +18,7 @@
   },
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
-    "vitepress": "^1.6.1"
+    "vitepress": "^1.6.3"
   },
   "dependencies": {
     "howxm-js": "^0.0.10",

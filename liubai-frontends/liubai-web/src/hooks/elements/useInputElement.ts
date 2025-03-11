@@ -17,6 +17,10 @@ export function useInputElement() {
     const fsaAPI = liuApi.canIUse.fileSystemAccessAPI()
     if(fsaAPI) {
       const res = await tryToShowOpenFilePicker(opt)
+
+      console.warn("files from showOpenFilePicker: ")
+      console.log(res)
+
       return res
     }
     console.warn("Not supporting fileSystemAccessAPI")
@@ -84,8 +88,6 @@ async function tryToShowOpenFilePicker(
 
   try {
     handles = await window.showOpenFilePicker(options)
-    console.log("let me see handles: ")
-    console.log(handles)
   }
   catch(err) {
     console.warn("fail to call showOpenFilePicker")

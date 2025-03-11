@@ -34,7 +34,7 @@ import type {
   GetChaRes,
   Table_Order,
   Wx_Res_GzhUserInfo,
-  Wx_Res_Common,
+  Res_Common,
   Wx_Res_GzhOAuthAccessToken,
   WxpayReqAuthorizationOpt,
   Wxpay_Cert_Info,
@@ -315,12 +315,30 @@ const isAllNumber = (val: string, digit?: number) => {
   return res
 }
 
-const isStringAsNumber = (str: string) => {
+const isStringAsNumber = (str: any) => {
+  if(typeof str !== "string") return false
   str = str.trim()
   if(!str) return false
   const num = Number(str)
   if(isNaN(num)) return false
   return true
+}
+
+/**
+ * 统计字符的数量，拉丁字母为 1，中文字为 2
+ */
+const getTextCharNum = (val: string) => {
+  let num = 0
+  for(let i=0; i<val.length; i++) {
+    const v = val[i]
+    if(getChineseCharNum(v) > 0) num += 2
+    else num += 1
+  }
+  return num
+}
+
+const getPromise = <T = any>(val: T): Promise<T> => {
+  return new Promise(a => a(val)) 
 }
 
 export const valTool = {
@@ -339,6 +357,32 @@ export const valTool = {
   getChineseCharNum,
   isAllNumber,
   isStringAsNumber,
+  getTextCharNum,
+  getPromise,
+}
+
+export class ValueTransform {
+
+  static str2Num(x: any): DataPass<number> {
+    if(typeof x === "number") {
+      return {
+        pass: true,
+        data: x,
+      }
+    }
+
+    if(!valTool.isStringAsNumber(x)) {
+      return {
+        pass: false,
+        err: { code: "" }
+      }
+    }
+    return {
+      pass: true,
+      data: Number(x),
+    }
+  }
+
 }
 
 
@@ -982,6 +1026,12 @@ export class MarkdownParser {
 
 
   static mdToText(md: string) {
+    // Convert headings to plain text
+    md = md.replace(/^#{1,6}\s+(.+)$/gm, '$1');
+
+    // Covert bold/strong text with \n into plain-text
+    md = md.replace(/\n\*\*([^*\n]+)\*\*\s{0,3}\n/g, '\n$1\n');
+
     // Convert bold/strong text (**** or **) to Chinese quotes 「」
     // but skip if already has quotes
     const _handleBold = (match:string, content: any, offset: any) => {
@@ -1003,9 +1053,6 @@ export class MarkdownParser {
     md = md.replace(/^(\s*)[-*+][\s]+(.+)$/gm, (match, spaces, content) => {
       return `${spaces || ' '}• ${content}`
     });
-    
-    // Convert headings to plain text
-    md = md.replace(/^#{1,6}\s+(.+)$/gm, '$1');
 
     // trim “* - \n” in the beginning and ending
     md = this._trimText(md)
@@ -1412,11 +1459,23 @@ function isLiuContentArr(
   return true
 }
 
+function getErrResult(
+  defaultErrMsg = "",
+  code = "E4000"
+) {
+  const errRes: CommonPass_A = {
+    pass: false,
+    err: { code, errMsg: defaultErrMsg }
+  }
+  return errRes
+}
+
 export const checker = {
   getErrMsgFromIssues,
   isImagesLegal,
   isFilesLegal,
   isLiuContentArr,
+  getErrResult,
 }
 
 
@@ -2196,7 +2255,7 @@ export function decryptCloudData<T>(
     return {
       pass: false,
       err: {
-        code: "E5001",
+        code: "E4009",
         errMsg: "decryptWithAES failed in decryptCloudData",
       }
     }
@@ -2464,7 +2523,7 @@ export async function tagWxUserLang(
     openid_list: [wx_gzh_openid],
     tagid: tagId,
   }
-  const res3 = await liuReq<Wx_Res_Common>(link4, q4)
+  const res3 = await liuReq<Res_Common>(link4, q4)
   const errcode = res3.data?.errcode
   if(errcode !== 0) {
     console.warn("tag user for wechat gzh failed")
@@ -2490,7 +2549,7 @@ export async function untagWxUser(
     openid_list: [wx_gzh_openid],
     tagid,
   }
-  const res = await liuReq<Wx_Res_Common>(link, q)
+  const res = await liuReq<Res_Common>(link, q)
   const errcode = res.data?.errcode
   if(errcode !== 0) {
     console.warn("untag user for wechat gzh failed")
@@ -3047,7 +3106,6 @@ export async function upgrade_user_subscription(
 /*************** About ai tool ***************/
 export class AiToolUtil {
 
-
   static turnTextToLiuDesc(text: string) {
     if(!text) return
     let list = text.split("\n")
@@ -3056,12 +3114,9 @@ export class AiToolUtil {
       const v = list[i]
       const obj: LiuContent = {
         type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: v,
-          }
-        ]
+      }
+      if(v) {
+        obj.content = [{ type: "text", text: v }]
       }
       liuDesc.push(obj)
     }
@@ -3122,7 +3177,10 @@ export class AiToolUtil {
   private static _turnCalendarJsonToWaitingData(
     funcJson: Record<string, any>,
     user?: Table_User,
-  ) {
+  ): DataPass<SyncOperateAPI.WaitingData> {
+    // 0. define error structure
+    const errRes = getErrResult()
+
     // 1. get param and check out description
     const {
       title,
@@ -3130,20 +3188,25 @@ export class AiToolUtil {
       date,
       specificDate,
       time,
-      earlyMinute,
-      laterHour,
+      earlyMinute: strEarlyMinute,
+      laterHour: strLaterHour,
     } = funcJson as AiToolAddCalendarParam
     const liuDesc = this.turnTextToLiuDesc(description)
     if(!liuDesc || liuDesc.length === 0) {
       console.warn("cannot get liuDesc1 in _turnCalendarJsonToWaitingData!")
       console.log(funcJson)
-      return
+      errRes.err.errMsg = "fail to turn text into liuDesc for description"
+      return errRes
     }
     let userTimezone = user?.timezone
     let calendarStamp: number | undefined
     let remindStamp: number | undefined
     let whenStamp: number | undefined
     let remindMe: LiuRemindMe | undefined
+    const resEarlyMinute = ValueTransform.str2Num(strEarlyMinute)
+    const earlyMinute = resEarlyMinute.pass ? resEarlyMinute.data : undefined
+    const resLaterHour = ValueTransform.str2Num(strLaterHour)
+    const laterHour = resLaterHour.pass ? resLaterHour.data : undefined
 
     /** Priority:
      *   date > specificDate > laterHour
@@ -3172,7 +3235,8 @@ export class AiToolUtil {
       const timeObj = LiuDateUtil.distractFromhh_mm(time)
       if(!timeObj) {
         console.warn("cannot parse time: ", time)
-        return
+        errRes.err.errMsg = "fail to parse time"
+        return errRes
       }
       if(!whenStamp) {
         whenStamp = this._turnSpecificDateToWhenStamp("today", userTimezone)
@@ -3238,7 +3302,7 @@ export class AiToolUtil {
       whenStamp,
       remindMe,
     }
-    return waitingData
+    return { pass: true, data: waitingData }
   }
 
 
@@ -3246,7 +3310,8 @@ export class AiToolUtil {
     funcName: string,
     funcJson: Record<string, any>,
     user?: Table_User,
-  ): SyncOperateAPI.WaitingData | undefined {
+  ): DataPass<SyncOperateAPI.WaitingData> {
+    const errRes = checker.getErrResult("no function name matches")
 
     // 1. add_note
     if(funcName === "add_note") {
@@ -3255,7 +3320,8 @@ export class AiToolUtil {
         console.warn("cannot parse add_note param: ")
         console.log(funcJson)
         console.log(res1.issues)
-        return
+        errRes.err.errMsg = checker.getErrMsgFromIssues(res1.issues)
+        return errRes
       }
       
       const { title, description } = funcJson
@@ -3263,13 +3329,14 @@ export class AiToolUtil {
       if(!liuDesc1 || liuDesc1.length === 0) {
         console.warn("cannot get liuDesc1 in add_note!")
         console.log(funcJson)
-        return
+        errRes.err.errMsg = "fail to get liuDesc1 from description in add_note"
+        return errRes
       }
       const d1: SyncOperateAPI.WaitingData = {
         title,
         liuDesc: liuDesc1,
       }
-      return d1
+      return { pass: true, data: d1 }
     }
 
     // 2. add_todo
@@ -3279,7 +3346,8 @@ export class AiToolUtil {
         console.warn("cannot parse add_todo param: ")
         console.log(funcJson)
         console.log(res2.issues)
-        return
+        errRes.err.errMsg = checker.getErrMsgFromIssues(res2.issues)
+        return errRes
       }
 
       const { title } = funcJson
@@ -3287,27 +3355,38 @@ export class AiToolUtil {
       if(!liuDesc2 || liuDesc2.length === 0) {
         console.warn("cannot get liuDesc2 in add_todo!")
         console.log(funcJson)
-        return
+        errRes.err.errMsg = "fail to get liuDesc2 from title in add_todo"
+        return errRes
       }
       const d2: SyncOperateAPI.WaitingData = {
         liuDesc: liuDesc2,
       }
-      return d2
+      return { pass: true, data: d2 }
     }
 
     // 3. add_calendar
     if(funcName === "add_calendar") {
+      // 3.1 normalize for bots which are not so smart
+      if(typeof funcJson.earlyMinute === "number") {
+        funcJson.earlyMinute = funcJson.earlyMinute.toString()
+      }
+      if(typeof funcJson.laterHour === "number") {
+        funcJson.laterHour = funcJson.laterHour.toString()
+      }
+
       const res3 = vbot.safeParse(Sch_AiToolAddCalendarParam, funcJson)
       if(!res3.success) {
         console.warn("cannot parse add_calendar param: ")
         console.log(funcJson)
         console.log(res3.issues)
-        return
+        errRes.err.errMsg = checker.getErrMsgFromIssues(res3.issues)
+        return errRes
       }
       const d3 = this._turnCalendarJsonToWaitingData(funcJson, user)
       return d3
     }
-    
+
+    return errRes
   }
 
 }

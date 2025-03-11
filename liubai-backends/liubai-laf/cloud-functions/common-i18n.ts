@@ -241,7 +241,7 @@ export const wecomLang: LangAtom = {
 export const wechatLang: LangAtom = {
   "zh-Hans": {
     "welcome_1": "欢迎关注留白记事！\n\n留白记事 = AI 加持的备忘录📝 + 日历📆 + 任务📌 + 待办清单📂\n\n你可以在这里记录所有事情，所有“只属于你”的信息都将在这里汇聚。\n\n若这世界就是一个巨大的游乐园，请去体验，去创造🥂\n\n[未完待续]",
-    "login_guide": "若你想要马上拥有三个助手，欢迎使用<a href='{LIU_DOMAIN}/wechat-bind'>微信一键登录</a>",
+    "login_guide": "若你想要马上拥有三个超级 AI，欢迎使用<a href='{LIU_DOMAIN}/wechat-bind'>微信一键登录</a>\n\n登录后，你可以回复\n\n「召唤TY」: 让通义千问陪你聊天\n\n「召唤跃问」: 使用阶跃星辰开发的 AI 助手\n\n「踢掉xx」: xx替换为对应的 AI 名，它就会离开群聊\n\n「群聊状态」: 查看当前群里有谁",
     "already_bound": "当前微信已绑定帐号 {account}\n请先在原帐号上解绑后，再重新扫码。",
     "success_1": "绑定成功🎉\n\n小诀窍：<a href='https://mp.weixin.qq.com/s/3g1vn8wnps7nKntUKXIJuw'>如何避免漏接提醒</a>",
     "login_first": "尚未登录！\n欢迎使用<a href='{LIU_DOMAIN}/wechat-bind'>微信一键登录</a>",
@@ -250,10 +250,11 @@ export const wechatLang: LangAtom = {
     "link_unsupported": "🚧 暂不支持链接消息",
     "buy_time": "\n如果你急着需要，可以<a href='{LIU_CUSTOMER_SERVICE}'>与开发者联系</a>。买断他的时间，让他为你开发。",
     "invitation_link": "您已成为留白记事 Premium 会员🎉\n邀请您加入<a href='{link}'>会员限定群聊</a>",
+    "go_back_to_app": "登录中，请返回 APP 内查看......",
   },
   "zh-Hant": {
     "welcome_1": "歡迎追蹤留白記事！\n\n留白記事 = AI 加持的備忘錄📝 + 行事曆📆 + 任務📌 + 待辦清單📂\n\n你可以在這裡記錄所有事情，所有「只屬於你」的資訊都將在這裡匯聚。\n\n若這世界就是一個巨大的遊樂園，請去體驗、去創造🥂\n\n[未完待續]",
-    "login_guide": "若你想要馬上擁有三個助手，歡迎使用<a href='{LIU_DOMAIN}/wechat-bind'>微信一鍵登入</a>",
+    "login_guide": "若你想要馬上擁有三個強到爆的人工智慧，歡迎使用<a href='{LIU_DOMAIN}/wechat-bind'>微信一鍵登入</a>\n\n登入後，你可以回覆\n\n「召喚千問」: 讓通義千問陪你聊天\n\n「召喚躍問」: 使用階躍星辰開發的 AI 助手\n\n「踢掉xx」: xx替換為對應的 AI 名，它就會離開群聊\n\n「群聊狀態」: 查看目前群裡有誰",
     "already_bound": "當前微信已綁定帳號 {account}\n請先在原帳號上解綁後，再重新掃描 QR Code",
     "success_1": "綁定成功🎉\n\n小訣竅：<a href='https://mp.weixin.qq.com/s/3g1vn8wnps7nKntUKXIJuw'>如何避免漏接提醒</a>",
     "login_first": "尚未登入! \n歡迎使用<a href='{LIU_DOMAIN}/wechat-bind'>微信一鍵登入</a>",
@@ -261,11 +262,12 @@ export const wechatLang: LangAtom = {
     "location_unsupported": "🚧 暫不支援位置訊息",
     "link_unsupported": "🚧 暫不支援連結訊息",
     "buy_time": "\n如果你急著需要，可以<a href='{LIU_CUSTOMER_SERVICE}'>與開發者聯絡</a>。買斷他的時間，讓他為你開發。",
-    "invitation_link": "您已成为留白记事 Premium 會員🎉\n邀請您加入<a href='{link}'>會員限定群組</a>",
+    "invitation_link": "您已成為留白記事 Premium 會員🎉\n邀請您加入<a href='{link}'>會員限定群組</a>",
+    "go_back_to_app": "登入中，請返回 APP 內檢視......",
   },
   "en": {
     "welcome_1": "Welcome to follow Liubai!\n\nLiubai = Notes📝 + Calendar📆 + Tasks📌 + Todo📂 with AI\n\nYou can record all your life’s events, and all information you want is out here.\n\nIf this world is a giant playground, please experience it and create it 🥂\n\n[To be continued]",
-    "login_guide": "If you want to get three assistants immediately, welcome to <a href='{LIU_DOMAIN}/wechat-bind'>Continue with WeChat</a>",
+    "login_guide": "If you want to get three assistants immediately, welcome to <a href='{LIU_DOMAIN}/wechat-bind'>Continue with WeChat</a>\n\nAfter logging in, you can reply\n\n\"Call Qwen\": Let Qwen chat with you!\n\n\"Call yuewen\": Let AI from stepfun enter the chat room\n\n\"Kick xx\": xx is replaced with the corresponding AI name, and it will leave the group\n\n\"Status\": Check the current group status",
     "already_bound": "Current Wechat has already bound account {account}\nPlease unbind it from the original account first, then re-scan the QR code.",
     "success_1": "Binding successful🎉\n\nTip: <a href='https://mp.weixin.qq.com/s/3g1vn8wnps7nKntUKXIJuw'>How to avoid missing reminders</a>",
     "login_first": "Not logged in yet!\nWelcome to <a href='{LIU_DOMAIN}/wechat-bind'>Login via WeChat</a>",
@@ -274,6 +276,7 @@ export const wechatLang: LangAtom = {
     "link_unsupported": "🚧 Link message is still in development",
     "buy_time": "\nIf you want to use it urgently, you can <a href='{LIU_CUSTOMER_SERVICE}'>contact the developer</a>. Buy his time and let him develop for you.",
     "invitation_link": "You have become a member of Liubai Premium🎉\nWelcome to join our <a href='{link}'>VIP exclusive group!</a>",
+    "go_back_to_app": "Logging in......\nPlease go back to our app to view",
   }
 }
 
@@ -287,8 +290,8 @@ export const aiLang: LangAtom = {
     "kick": "踢掉",
     "add": "召唤",
     "clear_context": "清空上文",
-    "quota_warning": "免费版共有 {freeTimes} 轮对话机会\n购买会员畅享每月 {membershipTimes} 轮对话！同时解锁留白记事所有权益。\n<a href='{link}'>戳我立即解锁</a>",
-    "deploy_tip": "若你想给自己的公众号部署一套留白记事\n<a href='{link}'>欢迎咨询</a>",
+    "quota_warning": "免费版共有 {freeTimes} 轮对话机会\n购买会员畅享每月 {membershipTimes} 轮对话！同时解锁留白记事所有权益。\n<a href='{link}'>戳我立即解锁🔓</a>",
+    "see_question_box": "更多玩法，欢迎参见\n<a href='{LIU_DOCS_DOMAIN}/guide/faq/'>提问箱📬</a>",
     "quota_warning_2": "您已使用 {membershipTimes} 轮会员版对话额度。续费会员，可将“已使用额度”归零！\n<a href='{link}'>立即续费</a>",
     "cannot_read_images": "我目前没有识图的能力",
     "history_cleared": "已清空前面的历史记录",
@@ -308,9 +311,6 @@ export const aiLang: LangAtom = {
     "later_min": "{min} 分钟后",
     "later_hr": "{hr} 小时后",
     "later_day": "{day} 天后",
-    "added_note": "【客户已同意创建笔记】",
-    "added_todo": "【客户已同意创建待办】",
-    "added_calendar": "【客户已同意创建日程】",
     "not_agree_yet": "【客户尚未同意你的请求】",
     "too_many_words": "这么多字！它们思考不来💭\n（单条文本最多 3000 字符）",
     "no_more_to_continue": "没有更多可以继续了",
@@ -327,7 +327,7 @@ export const aiLang: LangAtom = {
     "already_exist": "{botName}已在群聊中",
     "already_left": "{botName}并不在群聊内",
     "continue_bot": "继续{botName}",
-    "there_are_3": "聊天室已有 3 个助手",
+    "there_are_3": "聊天室已有 3 个助手，请先踢掉再召唤。",
     "nobody_here": "当前群聊内没有任何助手",
     "do_not_use_tool": "【请根据以上搜索结果，直接给出你的回复，勿再使用工具调用】",
     "do_not_use_tool_2": "【请根据以上获取结果，直接给出你的回复，不要使用工具调用】",
@@ -380,6 +380,16 @@ export const aiLang: LangAtom = {
     "bot_read_note": "{bot}查看了最近的笔记",
     "bot_read_finished": "{bot}查看了最近完成的事项",
     "bot_read_event": "{bot}查看了最近添加的事件",
+    "view_thinking": "查看思考过程",
+    "result_of_tool": "工具调用结果:\n{msg}",
+    "thinking": "【思考中...💭】\n{text}",
+
+    // failures
+    "fail_to_search": "网络搜索失败",
+    "fail_to_parse_link": "链接解析失败",
+
+    // system 2
+    "system2_r1": "系统二（R1）",
   },
   "zh-Hant": {
     "privacy_title": "🔓 隱私提示:",
@@ -389,8 +399,8 @@ export const aiLang: LangAtom = {
     "kick": "踢掉",
     "add": "召喚",
     "clear_context": "清除上文",
-    "quota_warning": "免費版共有 {freeTimes} 輪對話機會\n購買會員暢享每月 {membershipTimes} 輪對話！同時解鎖留白記事所有權益。\n<a href='{link}'>輕觸立即解鎖</a>",
-    "deploy_tip": "若你想給自己的公眾號部署一套留白記事\n<a href='{link}'>歡迎諮詢</a>",
+    "quota_warning": "免費版共有 {freeTimes} 輪對話機會\n購買會員暢享每月 {membershipTimes} 輪對話！同時解鎖留白記事所有權益。\n<a href='{link}'>輕觸立即解鎖🔓</a>",
+    "see_question_box": "更多玩法，歡迎參見\n<a href='{LIU_DOCS_DOMAIN}/guide/faq/'>提問箱📬</a>",
     "quota_warning_2": "您已使用 {membershipTimes} 輪會員版對話額度。續費會員，可將「已使用額度」歸零！\n<a href='{link}'>立即續費</a>",
     "cannot_read_images": "我目前沒有讀取圖片的能力",
     "history_cleared": "已清空前面的歷史記錄",
@@ -410,9 +420,6 @@ export const aiLang: LangAtom = {
     "later_min": "{min} 分鐘後",
     "later_hr": "{hr} 小時後",
     "later_day": "{day} 天後",
-    "added_note": "【客户已同意新增筆記】",
-    "added_todo": "【客户已同意新增待辦】",
-    "added_calendar": "【客户已同意新增日程】",
     "not_agree_yet": "【客户尚未同意你的請求】",
     "too_many_words": "這麼多字！它們思考不來💭\n（單則文本最多 3000 字元）",
     "no_more_to_continue": "沒有更多可以繼續了",
@@ -427,9 +434,9 @@ export const aiLang: LangAtom = {
     "status_5": "會員每月享有: {maxTimes}輪",
     "no_member": "沒有其他助手",
     "already_exist": "{botName}已在群聊中",
-    "already_left": "{botName}並不在群聊内",
+    "already_left": "{botName}並不在群聊內",
     "continue_bot": "繼續{botName}",
-    "there_are_3": "聊天室已有 3 个助手",
+    "there_are_3": "聊天室已有 3 个助手，請先踢掉再召喚。",
     "nobody_here": "當前群組內沒有任何助手",
     "do_not_use_tool": "【請根據以上搜尋結果，直接給出你的回覆，勿再使用工具調用】",
     "do_not_use_tool_2": "【請根據以上檢索結果，請直接給出你的回覆，不要使用工具調用】",
@@ -482,17 +489,27 @@ export const aiLang: LangAtom = {
     "bot_read_note": "{bot}檢視了最近的筆記",
     "bot_read_finished": "{bot}檢視了最近完成的事項",
     "bot_read_event": "{bot}檢視了最近新增的事件",
+    "view_thinking": "檢視思考過程",
+    "result_of_tool": "工具調用結果:\n{msg}",
+    "thinking": "［思考中...💭］\n{text}",
+
+    // failures
+    "fail_to_search": "網路搜尋失敗",
+    "fail_to_parse_link": "連結解析失敗",
+
+    // system 2
+    "system2_r1": "系統二 (R1) ",
   },
   "en": {
     "privacy_title": "🔓 Privacy:",
     "working_log_title": "📜 Working Logs:",
     "operation_title": "🕹️ Operations:",
-    "generative_ai_warning": "⚠️ AI can make mistakes. Please double-check it.",
-    "kick": "Kick ",
+    "generative_ai_warning": "⚠️ AI might make mistakes. Please double-check it.",
+    "kick": "Remove ",
     "add": "Add ",
     "clear_context": "Clear context",
-    "quota_warning": "Free version has {freeTimes} conversation opportunities.\nPurchase membership to enjoy {membershipTimes} conversations per month! Also unlock all Liubai rights.\n<a href='{link}'>Tap to unlock</a>",
-    "deploy_tip": "If you want to deploy a Liubai for your public account\n<a href='{link}'>Welcome to consult</a>",
+    "quota_warning": "Free version has {freeTimes} conversation opportunities.\nPurchase membership to enjoy {membershipTimes} conversations per month! Also unlock all Liubai rights.\n<a href='{link}'>Tap to unlock 🔓</a>",
+    "see_question_box": "For more ways to play, please see our\n<a href='{LIU_DOCS_DOMAIN}/guide/faq/'>Question Box 📬</a>",
     "quota_warning_2": "You have used {membershipTimes} conversations of membership. Renew membership to reset the used quota!\n<a href='{link}'>Renew now</a>",
     "cannot_read_images": "I don't have the ability to read images yet",
     "history_cleared": "History cleared",
@@ -512,9 +529,6 @@ export const aiLang: LangAtom = {
     "later_min": "{min} min(s) later",
     "later_hr": "{hr} hr(s) later",
     "later_day": "{day} day(s) later",
-    "added_note": "【Customer has agreed to create a note】",
-    "added_todo": "【Customer has agreed to create a todo】",
-    "added_calendar": "【Customer has agreed to create a calendar】",
     "not_agree_yet": "Customer has not yet agreed to your request",
     "too_many_words": "Too many words to think💭\n(Text supports up to 3000 characters.)",
     "no_more_to_continue": "No more to continue",
@@ -531,7 +545,7 @@ export const aiLang: LangAtom = {
     "already_exist": "{botName} has already joined in the group chat",
     "already_left": "{botName} is not in the group chat",
     "continue_bot": "Continue {botName}",
-    "there_are_3": "There are 3 assistants in the group chat.",
+    "there_are_3": "There are 3 assistants in the group chat. Please kick one first.",
     "nobody_here": "There is no assistant here.",
     "do_not_use_tool": "[Reply me directly with the above search results please, and do not use tools again]",
     "do_not_use_tool_2": "[Reply me directly with the above results please, and do not use tools again]",
@@ -584,6 +598,16 @@ export const aiLang: LangAtom = {
     "bot_read_note": "{bot} read latest notes",
     "bot_read_finished": "{bot} read latest finished tasks",
     "bot_read_event": "{bot} read latest added events",
+    "view_thinking": "Dive into Thinking",
+    "result_of_tool": "Tool call result:\n{msg}",
+    "thinking": "[Thinking..💭]\n{text}",
+
+    // failures
+    "fail_to_search": "Fail to search",
+    "fail_to_parse_link": "Fail to parse link",
+
+    // system 2
+    "system2_r1": "System 2 (R1)",
   }
 }
 
@@ -595,7 +619,15 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
     {
       msgtype: "text",
       text: {
-        content: `🪧 指路牌
+        content: `【指路牌🪧】
+
+🤖 <a href='{LIU_DOCS_DOMAIN}/guide/three-assistants'>AI使用说明书</a>
+
+📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">开发者的小红书</a>
+
+🌐 <a href="https://github.com/yenche123/liubai">开源地址</a>
+
+📦 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">提问箱</a>
 
 📨 <a href="{LIU_DOMAIN}/">收件箱</a>
 
@@ -604,12 +636,6 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
 ⭐ <a href="{LIU_DOMAIN}/favorite">我的收藏</a>
 
 📂 <a href="{LIU_DOMAIN}/state">我的看板</a>
-
-📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">开发者的小红书</a>
-
-🌐 <a href="https://github.com/yenche123/liubai">开源地址</a>
-
-📦 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">提问箱</a>
 `,
       }
     }
@@ -618,7 +644,7 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
     {
       msgtype: "text",
       text: {
-        content: '<a href="{LIU_DOMAIN}/wechat-bind">戳我绑定微信</a>',
+        content: '<a href="{LIU_DOMAIN}/connect/wechat">戳我绑定微信</a>',
       }
     }
   ],
@@ -644,7 +670,15 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
     {
       msgtype: "text",
       text: {
-        content: `🪧 指路牌
+        content: `【指路牌🪧】
+
+🤖 <a href='{LIU_DOCS_DOMAIN}/guide/three-assistants'>AI使用說明書</a>
+
+📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">開發者的小紅書</a>
+
+🌐 <a href="https://github.com/yenche123/liubai">開源網址</a>
+
+📦 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">提問箱</a>
 
 📨 <a href="{LIU_DOMAIN}/">收件匣</a>
 
@@ -653,12 +687,6 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
 ⭐ <a href="{LIU_DOMAIN}/favorite">我的收藏</a>
 
 📂 <a href="{LIU_DOMAIN}/state">我的看板</a>
-
-📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">開發者的小紅書</a>
-
-🌐 <a href="https://github.com/yenche123/liubai">開源網址</a>
-
-📦 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">提問箱</a>
 `,
       }
     }
@@ -667,7 +695,7 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
     {
       msgtype: "text",
       text: {
-        content: '<a href="{LIU_DOMAIN}/wechat-bind">輕觸我綁定微信</a>',
+        content: '<a href="{LIU_DOMAIN}/connect/wechat">輕觸我綁定微信</a>',
       }
     }
   ],
@@ -693,7 +721,15 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
     {
       msgtype: "text",
       text: {
-        content: `🪧 Guidebook
+        content: `[Guidebook 🪧]
+
+🤖 <a href='{LIU_DOCS_DOMAIN}/guide/three-assistants'>AI Instructions</a>
+
+📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">Follow me on RED</a>
+
+🌐 <a href="https://github.com/yenche123/liubai">Open Source</a>
+
+📦 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">AMA</a>
 
 📨 <a href="{LIU_DOMAIN}/">My Inbox</a>
 
@@ -702,12 +738,6 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
 ⭐ <a href="{LIU_DOMAIN}/favorite">My Favorite</a>
 
 📂 <a href="{LIU_DOMAIN}/state">My Board</a>
-
-📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">Follow me on RED</a>
-
-🌐 <a href="https://github.com/yenche123/liubai">Open Source</a>
-
-📦 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">AMA</a>
 `,
       }
     }
@@ -716,7 +746,7 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
     {
       msgtype: "text",
       text: {
-        content: '<a href="{LIU_DOMAIN}/wechat-bind">Click me to bind WeChat</a>',
+        content: '<a href="{LIU_DOMAIN}/connect/wechat">Click me to bind WeChat</a>',
       }
     }
   ],

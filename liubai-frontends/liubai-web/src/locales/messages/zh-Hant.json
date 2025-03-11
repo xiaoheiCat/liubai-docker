@@ -199,6 +199,7 @@
     "email_verification_tip": "驗證代號已被發送至 {email}\n 請記得檢查你的垃圾郵件。",
     "verification_code": "驗證代號",
     "choosing_account": "選擇帳號",
+    "ready_to_login": "準備登入",
     "logging": "正在登入..",
     "logging2": "登入中..",
     "cannot_login_via": "目前不支援「使用 {thirdParty} 登入」，請改用其他登入方式。",
@@ -212,6 +213,8 @@
     "err_8": "電子信箱地址不存在，無法使用當前的登入方式",
     "err_9": "Email 發送失敗，請聯繫開發者",
     "err_10": "請輸入 11 位手機號碼",
+    "err_11": "你所使用的第三方帳號暫不支援登入留白",
+    "err_12": "當前微信帳號不支援被綁定",
     "get_permission": "你還不在體驗名單中。追蹤公眾號「留白記事」，享有你的體驗資格！",
     "bound": "綁定成功",
     "logged": "登入成功",
@@ -329,7 +332,9 @@
     "content_deleted": "🗑️ 該動態已被刪除",
     "captured_that": "已接住你的{event}",
     "created_by_ai": "本卡片由 {name}（{company}）協助創建",
-    "created_by_ai2": "本卡片由 {name} 協助創建"
+    "created_by_ai2": "本卡片由 {name} 協助創建",
+    "no_ai": "拒絕 AI 的卡片",
+    "no_ai_desc": "當前卡片無法被 AI 助手們讀取到。"
   },
   "state_related": {
     "add_state": "新增狀態",
@@ -431,7 +436,9 @@
     "modify": "修改",
     "rebind": "重新綁定",
     "unbind_tip_1": "確定要解除綁定{name}嗎？該操作可能會造成帳號遺失。",
-    "unbind_2": "確定解綁"
+    "unbind_tip_2": "解除綁定後，當前微信帳號一個月內不得再綁定。確定要解綁嗎？",
+    "unbind_2": "確定解綁",
+    "unbind_success": "已解除綁定"
   },
   "export": {
     "markdown": "匯出成 markdown 文件",
@@ -628,8 +635,11 @@
   "ai_character": {
     "baixiaoying": "百小應",
     "deepseek": "DeepSeek",
+    "ds-reasoner": "DeepSeek R1",
     "hailuo": "海螺",
+    "hunyuan": "混元",
     "kimi": "Kimi",
+    "tongyi-qwen": "通義千問",
     "wanzhi": "萬知",
     "yuewen": "躍問",
     "zhipu": "智譜"
@@ -637,8 +647,11 @@
   "ai_provider": {
     "baixiaoying": "百川智能",
     "deepseek": "深度求索",
+    "ds-reasoner": "深度求索",
     "hailuo": "MiniMax",
+    "hunyuan": "騰訊",
     "kimi": "月之暗面",
+    "tongyi-qwen": "阿里雲",
     "wanzhi": "零一萬物",
     "yuewen": "階躍星辰",
     "zhipu": "智譜"
@@ -664,5 +677,8 @@
     "opening_title": "正在開啟 {app} ",
     "opening_tip_1": "正在嘗試開啟 {app} ...",
     "opening_tip_2": "若沒有響應，你可以在 {app} 上輸入認證碼 {code} 完成驗證"
+  },
+  "ai_detail": {
+    "thinking_process": "思考過程"
   }
 }

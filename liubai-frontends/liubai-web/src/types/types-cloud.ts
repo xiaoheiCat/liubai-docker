@@ -149,7 +149,7 @@ export type CloudStorageService = "qiniu" | "tecent_cos" | "aliyun_oss"
 
 export namespace SyncOperateAPI {
   export interface Param {
-    operateType: "agree-aichat" | "get-aichat"
+    operateType: "agree-aichat" | "get-aichat" | "get-ai-detail"
     chatId: string
   }
 
@@ -177,7 +177,13 @@ export namespace SyncOperateAPI {
     waitingData?: WaitingData
   }
 
-  export type Result = Res_AgreeAichat | Res_GetAichat
+  export interface Res_GetAiDetail {
+    operateType: "get-ai-detail"
+    content?: string
+    reasoningContent?: string
+  }
+
+  export type Result = Res_AgreeAichat | Res_GetAichat | Res_GetAiDetail
 }
 
 /****************** service-poly api ***************/

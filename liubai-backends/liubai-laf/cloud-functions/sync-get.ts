@@ -9,6 +9,7 @@ import {
   valTool,
   decryptEncData,
   sortListWithIds,
+  getIp,
 } from "@/common-util"
 import {
   Sch_SyncGetAtom,
@@ -79,6 +80,16 @@ export async function main(ctx: FunctionContext) {
 
   // 6. to execute
   const results = await toRun(sgCtx, res3.newBody)
+
+  // 6.1 find decryption error
+  const hasDecryptionError = results.some(v => v.code === "E4009")
+  if(hasDecryptionError) {
+    console.warn("decryption or encryption failed!")
+    console.warn("newBody: ", res3.newBody)
+    console.warn("original body: ", body)
+    console.warn("ip: ", getIp(ctx))
+  }
+
   
   // 7. construct response
   const res7: Res_SyncGet_Cloud = {

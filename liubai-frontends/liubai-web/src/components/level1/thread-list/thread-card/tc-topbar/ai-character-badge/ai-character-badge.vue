@@ -38,6 +38,7 @@ const { t } = useI18n()
       <div class="tct-ai-character" :class="{
         'tct-ai-deepseek': aiCharacter === 'deepseek',
         'tct-ai-circle': aiCharacter === 'kimi' || aiCharacter === 'wanzhi',
+        'tct-ai-ds-reasoner': aiCharacter === 'ds-reasoner',
       }"></div>
 
       <span class="tctsb-text">{{ t(`ai_character.${aiCharacter}`) }}</span>
@@ -91,6 +92,10 @@ const { t } = useI18n()
 
 .tct-ai-circle {
   border-radius: 50%;
+}
+
+.tct-ai-ds-reasoner {
+  border-radius: 20%;
 }
 
 .tctsb-text {

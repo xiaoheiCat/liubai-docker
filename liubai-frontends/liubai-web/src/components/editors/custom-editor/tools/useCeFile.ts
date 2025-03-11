@@ -129,9 +129,12 @@ async function handleFiles(
   ceData: CeData,
   files: File[],
 ) {
+  const fileLength = files.length
   const imgFiles = liuUtil.getOnlyImageFiles(files)
+  const imgLength = imgFiles.length
   if(imgFiles.length > 0) {
     handleImages(ceData, imgFiles)
+    if(imgLength >= fileLength) return
   }
 
   const otherFiles = liuUtil.getNotImageFiles(files)

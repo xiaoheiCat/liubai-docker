@@ -22,6 +22,7 @@ const {
   cloudOffPlacement,
   aiCharacterUrl,
   onTapAiCharacter,
+  onTapNoAI,
 } = useTcTopbar(props)
 
 
@@ -40,6 +41,23 @@ const {
       >
         <svg-icon class="tct-local-svg" color="var(--main-tip)"
           name="cloud_off"
+        ></svg-icon>
+      </LiuTooltip>
+    </div>
+
+    <!-- No AI -->
+    <div class="tct-item-container tct-no-ai" 
+      v-else-if="!td.aiReadable || td.aiReadable === 'N'"
+      @click.stop="onTapNoAI"
+    >
+      <LiuTooltip
+        :aria-label="t('thread_related.no_ai')"
+        :distance="2"
+        :placement="cloudOffPlacement"
+      >
+        <svg-icon class="tct-local-svg" color="var(--main-tip)"
+          name="no_ai"
+          disable-stroke
         ></svg-icon>
       </LiuTooltip>
     </div>
@@ -108,6 +126,17 @@ const {
   width: 20px;
   height: 20px;
   outline: 0;
+}
+
+@media(hover: none) {
+  .tct-no-ai::before {
+    position: absolute;
+    content: "";
+    top: -5px;
+    left: 0;
+    right: -10px;
+    bottom: -5px;
+  }
 }
 
 

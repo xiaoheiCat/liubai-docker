@@ -3,6 +3,7 @@ import OpenAI from "openai"
 import Stripe from "stripe"
 import * as vbot from "valibot"
 import type { BaseSchema } from "valibot"
+import { Stream } from "openai/streaming"
 
 // 全局类型
 // Table_ 开头，表示为数据表结构
@@ -627,54 +628,48 @@ export type DownloadUploadRes = DownloadUploadRes_1 | DownloadUploadRes_2
 
 
 /*********************** About AI **********************/
-export type AiProvider = "baichuan" | "deepseek" | "minimax" | "moonshot" | "stepfun" | 
+export type AiProvider = "aliyun-bailian" | "baichuan" | "deepseek" | "tencent-hunyuan" | "minimax" | "moonshot" | "stepfun" | 
   "zero-one" | "zhipu"
 
-export type AiSecondaryProvider = "siliconflow"
+export type AiSecondaryProvider = "siliconflow" | "gitee-ai" | "qiniu" | "tencent-lkeap"
+
+// tencent-lkeap: 腾讯云，知识引擎原子能力（LLM Knowledge Engine Atomic Power）
+
 
 // AiCharacter 不跟供应商绑定，它是角色，只不过现在各个供应商都有自己的 To C 角色罢了
-export type AiCharacter = "baixiaoying" | "deepseek" | "hailuo" | "kimi" | "yuewen" | 
-  "wanzhi" | "zhipu"
+export type AiCharacter = "baixiaoying" | "deepseek" | "hailuo" | "hunyuan" | "kimi" | "yuewen" | 
+  "wanzhi" | "zhipu" | "ds-reasoner" | "tongyi-qwen"
 
 export type AiInfoType = "user" | "assistant" | "summary" | "clear" | 
-  "action" | "background" | "tool_use"
+  "background" | "tool_use"
 // user: 用户发来的消息
 // assistant: AI 的回复
 // summary: AI 的总结 for context
 // clear: 清除对话
-// action: 记录用户的操作，比如“同意 xxx 读取 yyy”
 // background: 比如 url 的解析结果 / 关键词搜索结果
 // tool_use: 使用工具
 
-
-export type AiAbility = "chat" | "text_to_image" | "image_to_text" | "tool_use" | "input_audio"
+export type AiAbility = "chat" | "text_to_image" | "image_to_text" | "tool_use" | 
+  "input_audio" | "reasoning"
 // chat: interact with plain-text
 // text_to_image: user inputs text and LLM return image
 // image_to_text: user inputs image and LLM return text
 // input_audio: user inputs audio and LLM can understand
+// reasoning: Reasoning Models
 
 export type AiMsgType = "text" | "image" | "voice"
 
 export type AiCommandByHuman = "kick" | "add" | "clear_history" 
   | "more_operations" | "continue" | "group_status"
 
-export type AiFinishReason = "stop" | "length"
-
-export interface AiApiEndpoint {
-  apiKey: string
-  baseURL: string
-}
-
-export interface AiUsage {
-  cached_tokens?: number
-  completion_tokens: number
-  prompt_tokens: number
-  total_tokens: number
-}
+export type AiFinishReason = "stop" | "length" | "tool_calls"
 
 export interface AiBotMetaData {
   onlyOneSystemRoleMsg?: boolean
   zhipuWebSearch?: boolean     // false is default
+  thinkingInContent?: boolean  // <think>......</think>\n\nAnd then this is real content
+  defaultHeaders?: Record<string, string>  // optional, it is in option of constructor 
+                                           // of new OpenAI() 
 }
 
 export interface AiBot {
@@ -686,6 +681,7 @@ export interface AiBot {
   abilities: AiAbility[]
   alias: string[]
   maxWindowTokenK: number  // 8 means 8k, 128 means 128k
+  priority: number         // more bigger means higher priority
 
   // other meta data
   metaData?: AiBotMetaData
@@ -706,7 +702,7 @@ export interface AiEntry {
 }
 
 export interface AiI18nChannelParam {
-  character: AiCharacter
+  bot: AiBot
   entry: AiEntry
 }
 
@@ -719,13 +715,26 @@ export interface AiI18nSharedParam {
 export const aiImageSizeTypes = ["square", "portrait"] as const
 export type AiImageSizeType = typeof aiImageSizeTypes[number]
 export type OaiPrompt = OpenAI.Chat.ChatCompletionMessageParam
+export type OaiContentPart = OpenAI.Chat.ChatCompletionContentPart
 export type OaiTool = OpenAI.Chat.ChatCompletionTool
 export type OaiToolPrompt = OpenAI.Chat.ChatCompletionToolMessageParam 
 export type OaiCreateParam = OpenAI.Chat.ChatCompletionCreateParams
 export type OaiChatCompletion = OpenAI.Chat.ChatCompletion
+export type OaiChatCompletionChunk = OpenAI.Chat.ChatCompletionChunk
 export type OaiMessage = OpenAI.Chat.ChatCompletionMessage
 export type OaiToolCall = OpenAI.Chat.ChatCompletionMessageToolCall
 export type OaiChoice = OpenAI.Chat.ChatCompletion.Choice
+export type OaiStreamCompletion = Stream<OaiChatCompletionChunk>
+export type OaiStreamChoiceDelta = OpenAI.Chat.ChatCompletionChunk.Choice.Delta & {
+  reasoning_content?: string
+}
+
+export interface DsReasonerMessage {
+  role: "assistant"
+  content: string
+  reasoning_content?: string
+}
+
 
 /******** ai tool-use *********/
 
@@ -757,13 +766,13 @@ export type AiToolAddCalendarSpecificDate = typeof aiToolAddCalendarSpecificDate
 export const Sch_AiToolAddCalendarSpecificDate = vbot.picklist(aiToolAddCalendarSpecificDates)
 
 export const aiToolAddCalendarEarlyMinutes = [
-  0, 10, 15, 30, 60, 120, 1440
+  "0", "10", "15", "30", "60", "120", "1440"
 ] as const
 export type AiToolAddCalendarEarlyMinute = typeof aiToolAddCalendarEarlyMinutes[number]
 export const Sch_AiToolAddCalendarEarlyMinute = vbot.picklist(aiToolAddCalendarEarlyMinutes)
 
 export const aiToolAddCalendarLaterHours = [
-  0.5, 1, 2, 3, 12, 24
+  "0.5", "1", "2", "3", "12", "24"
 ] as const
 export type AiToolAddCalendarLaterHour = typeof aiToolAddCalendarLaterHours[number]
 export const Sch_AiToolAddCalendarLaterHour = vbot.picklist(aiToolAddCalendarLaterHours)
@@ -790,7 +799,7 @@ export const Sch_AiToolAddCalendarParam = vbot.object({
 
 // the param of get_schedule
 export const aiToolGetScheduleHoursFromNow = [
-  -24, 24, 48
+  "-24", "24", "48"
 ] as const
 export type AiToolGetScheduleHoursFromNow = typeof aiToolGetScheduleHoursFromNow[number]
 export const Sch_AiToolGetScheduleHoursFromNow = vbot.picklist(aiToolGetScheduleHoursFromNow)
@@ -974,6 +983,7 @@ export interface CredentialMetaData {
   ww_qynb_config_id?: string
   wx_gzh_openid?: string
 
+  x_liu_device?: string
   x_liu_theme?: string           // to create a user while signing up
   x_liu_language?: string        // to create a user while signing up,
                                  // or to send welcome message for new wx gzh user
@@ -1307,6 +1317,7 @@ export interface Table_LogAi extends BaseTable {
   userId?: string
   choices?: any
   model?: string
+  requestId?: string
 }
 
 /** User表 */
@@ -1378,9 +1389,10 @@ export interface Table_AllowList extends BaseTable {
 
 /** 屏蔽表: 目前用于屏蔽特定 ip */
 export interface Table_BlockList extends BaseTable {
-  type: "ip"
+  type: "ip" | "wx_gzh_openid"
   isOn: BaseIsOn
   value: string
+  duration?: "one_month"
 }
 
 /** 内容表: 动态 + 评论 */
@@ -1662,6 +1674,7 @@ export interface Table_Order extends BaseTable {
 export interface Table_AiRoom extends BaseTable {
   owner: string           // corresponds to userId
   characters: AiCharacter[]
+  needSystem2Stamp?: number
 }
 
 /********* AI Chat *********/
@@ -1679,13 +1692,19 @@ export interface Table_AiChat extends BaseTable {
   // about LLM
   model?: string           // like "gpt-4o"
   character?: AiCharacter
-  usage?: AiUsage
+  usage?: LiuAi.Usage
   requestId?: string
   baseUrl?: string
   funcName?: string        // like "add_todo" | "web_search"
   funcJson?: Record<string, any>    // we have to filter from LLM response
   tool_calls?: OaiToolCall[]
   finish_reason?: AiFinishReason
+  reasoning_content?: string        // from reasoning models like DeepSeek R1
+
+  // system 2
+  onlyInSystem2?: boolean
+  fromSystem2?: boolean
+  directionOfSystem2?: LiuAi.Sys2Direction
 
   // about web-search
   webSearchProvider?: LiuAi.SearchProvider
@@ -2323,12 +2342,16 @@ export interface Res_SyncGet_Cloud {
 
 export namespace SyncOperateAPI {
   export interface Param {
-    operateType: "agree-aichat" | "get-aichat"
+    operateType: "agree-aichat" | "get-aichat" | "get-ai-detail"
     chatId: string
   }
 
   export const Sch_Param = vbot.object({
-    operateType: vbot.picklist(["agree-aichat", "get-aichat"]),
+    operateType: vbot.picklist([
+      "agree-aichat", 
+      "get-aichat",
+      "get-ai-detail",
+    ]),
     chatId: Sch_String_WithLength,
   })
 
@@ -2356,7 +2379,13 @@ export namespace SyncOperateAPI {
     waitingData?: WaitingData
   }
 
-  export type Result = Res_AgreeAichat | Res_GetAichat
+  export interface Res_GetAiDetail {
+    operateType: "get-ai-detail"
+    content?: string
+    reasoningContent?: string
+  }
+
+  export type Result = Res_AgreeAichat | Res_GetAichat | Res_GetAiDetail
 }
 
 /****************** service-poly api ***************/
@@ -2534,7 +2563,7 @@ export interface Shared_LoginState {
 /******************* Some Types from WeChat ****************/
 
 // common result: { errcode: 0, errmsg: "ok" }  
-export interface Wx_Res_Common {
+export interface Res_Common {
   errcode: number
   errmsg: string
   msgid?: string
@@ -3415,6 +3444,11 @@ export namespace LiuAi {
     originalResult: Record<string, any>
   }
 
+  export interface ParseLinkResult {
+    markdown: string
+    provider: "jina-ai"
+  }
+
   export interface PaletteResult {
     url: string
     prompt: string
@@ -3435,10 +3469,133 @@ export namespace LiuAi {
     originalResult: Record<string, any>
   }
 
+  export interface ReadCardsSharedRes {
+    textToUser: string
+    textToBot: string
+    hasData: boolean
+  }
+
   export interface ReadCardsResult {
     textToUser: string
     textToBot: string
     assistantChatId: string
+  }
+
+  export interface RunParam {
+    entry: AiEntry
+    room: Table_AiRoom
+    chatId?: string
+    chats: Table_AiChat[]
+    isContinueCommand?: boolean
+  }
+
+  export interface RunLog_A {
+    toolName: "get_schedule"
+    hoursFromNow?: AiToolGetScheduleHoursFromNow
+    specificDate?: AiToolGetScheduleSpecificDate
+  }
+  
+  export interface RunLog_B {
+    toolName: "get_cards"
+    cardType: AiToolGetCardType
+  }
+  
+  export interface RunLog_C {
+    toolName: "draw_picture"
+    drawResult: LiuAi.PaletteResult
+  }
+  
+  export type RunLog = (RunLog_A | RunLog_B | RunLog_C) & {
+    character: AiCharacter
+    textToUser: string
+    logStamp: number
+  }
+
+  export interface RunSuccess {
+    character: AiCharacter
+    replyStatus: "yes" | "has_new_msg"
+    assistantChatId?: string
+    chatCompletion?: OaiChatCompletion
+    toolName?: string
+    logs?: LiuAi.RunLog[]
+  }
+
+  export type RunResults = Array<RunSuccess | undefined>
+
+  export interface HelperAssistantMsgParam {
+    roomId: string
+    text?: string
+    reasoning_content?: string
+    model: string
+    character: AiCharacter
+    usage?: LiuAi.Usage
+    requestId?: string
+    baseUrl?: string
+    funcName?: string
+    funcJson?: Record<string, any>
+    tool_calls?: OaiToolCall[]
+    finish_reason?: AiFinishReason
+    webSearchProvider?: LiuAi.SearchProvider
+    webSearchData?: Record<string, any>
+    drawPictureUrl?: string
+    drawPictureModel?: string
+    drawPictureData?: Record<string, any>
+  }
+
+  export interface ApiEndpoint {
+    apiKey: string
+    baseURL: string
+    defaultHeaders?: Record<string, string>
+  }
+
+  export interface MenuItem {
+    operation: AiCommandByHuman
+    character?: AiCharacter
+  }
+
+  export interface BaseLLMChatOpt {
+    maxTryTimes?: number
+    user?: Table_User
+    timeoutSec?: number
+  }
+
+  export interface CardData {
+    title: string
+    summary: string
+    contentId: string
+    hasImage: boolean
+    hasFile: boolean
+    calendarStamp?: number
+    createdStamp: number
+  }
+
+  export interface TellUserOpt {
+    fromBot?: AiBot
+    fromCharacter?: AiCharacter
+    fromSystem2?: boolean
+  }
+
+  export type Sys2Direction = "1" | "2" | "3" | "4"
+
+  export interface Sys2Output {
+    direction?: Sys2Direction
+    content?: string
+    tool_calls?: string
+  }
+
+  export type Sys2Role = "human" | "developer" | "bot" | "system" | "tool" | "you"
+
+  export type ToolName = "add_note" | "add_todo" | "add_calendar" 
+    | "web_search" | "parse_link" | "draw_picture" | "get_schedule" | "get_cards"
+
+  export type Sys2Preference = "midnight" | "other"
+
+  export interface Sys2Ai {
+    character: AiCharacter
+    provider: AiProvider
+    secondaryProvider?: AiSecondaryProvider
+    model: string
+    maxInputTokenK: number
   }
 
 }

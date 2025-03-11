@@ -18,6 +18,129 @@ import { i18nFill } from "@/common-i18n"
 
 /***************************** Bots ***************************/
 export const aiBots: AiBot[] = [
+
+  /** R1 */
+  {
+    name: "DeepSeek R1",
+    character: "ds-reasoner",
+    provider: "deepseek",
+    secondaryProvider: "tencent-lkeap",
+    model: "deepseek-r1",
+    abilities: ["chat", "reasoning"],
+    alias: ["R1", "r1", "ds r1", "deep seek r1"],
+    maxWindowTokenK: 64,
+    priority: 31,
+    metaData: {
+      onlyOneSystemRoleMsg: true,
+    }
+  },
+  {
+    name: "DeepSeek R1",
+    character: "ds-reasoner",
+    provider: "deepseek",
+    secondaryProvider: "siliconflow",
+    model: "deepseek-ai/DeepSeek-R1",
+    abilities: ["chat", "reasoning"],
+    alias: ["R1", "r1", "ds r1", "deep seek r1"],
+    maxWindowTokenK: 64,
+    priority: 19,
+    metaData: {
+      onlyOneSystemRoleMsg: true,
+    }
+  },
+  {
+    name: "DeepSeek R1",
+    character: "ds-reasoner",
+    provider: "deepseek",
+    secondaryProvider: "gitee-ai",
+    model: "DeepSeek-R1-Distill-Qwen-32B",
+    abilities: ["chat", "reasoning"],
+    alias: ["R1", "r1", "ds r1", "deep seek r1"],
+    maxWindowTokenK: 32,
+    priority: 17,
+    metaData: {
+      thinkingInContent: true,
+      onlyOneSystemRoleMsg: true,
+      defaultHeaders: {
+        "X-Failover-Enabled": "true",
+        "X-Package": "1910",    // 指定资源包，其中 1910: 全模型资源包    1492: 沐曦    1917: 无问芯穹    
+      },
+    }
+  },
+  {
+    name: "DeepSeek R1",
+    character: "ds-reasoner",
+    provider: "deepseek",
+    secondaryProvider: "qiniu",
+    model: "deepseek-r1",
+    abilities: ["chat", "reasoning"],
+    alias: ["R1", "r1", "ds r1", "deep seek r1"],
+    maxWindowTokenK: 64,
+    priority: 29,
+    metaData: {
+      thinkingInContent: true,
+      onlyOneSystemRoleMsg: true,
+    }
+  },
+  {
+    name: "DeepSeek R1",
+    character: "ds-reasoner",
+    provider: "deepseek",
+    model: "deepseek-reasoner",
+    abilities: ["chat", "reasoning"],
+    alias: ["R1", "r1", "ds r1", "deep seek r1"],
+    maxWindowTokenK: 64,
+    priority: 15,
+    metaData: {
+      onlyOneSystemRoleMsg: true,
+    }
+  },
+
+  /** V3 */
+  {
+    name: "DeepSeek V3",
+    character: "deepseek",
+    provider: "deepseek",
+    secondaryProvider: "qiniu",
+    model: "deepseek-v3?search",
+    abilities: ["chat"],
+    alias: ["深度求索", "ds", "v3", "deepseek", "deep seek"],
+    priority: 19,
+    maxWindowTokenK: 64,
+  },
+  {
+    name: "DeepSeek V3",
+    character: "deepseek",
+    provider: "deepseek",
+    secondaryProvider: "siliconflow",
+    model: "Pro/deepseek-ai/DeepSeek-V3",
+    abilities: ["chat", "tool_use"],
+    alias: ["深度求索", "ds", "v3", "deepseek", "deep seek"],
+    priority: 35,
+    maxWindowTokenK: 64,
+  },
+  {
+    name: "DeepSeek V3",
+    character: "deepseek",
+    provider: "deepseek",
+    secondaryProvider: "tencent-lkeap",
+    model: "deepseek-v3",
+    abilities: ["chat"],
+    alias: ["深度求索", "ds", "v3", "deepseek", "deep seek"],
+    priority: 25,
+    maxWindowTokenK: 64,
+  },
+  {
+    name: "DeepSeek V3",
+    character: "deepseek",
+    provider: "deepseek",
+    model: "deepseek-chat",
+    abilities: ["chat", "tool_use"],
+    alias: ["深度求索", "ds", "v3", "deepseek", "deep seek"],
+    priority: 7,
+    maxWindowTokenK: 64,
+  },
+
   /** chat using official providers */
   {
     name: "百小应",
@@ -25,20 +148,12 @@ export const aiBots: AiBot[] = [
     provider: "baichuan",
     model: "Baichuan4-Air",
     abilities: ["chat", "tool_use"],
-    alias: ["百川", "百川AI"],
+    alias: ["百川", "百川AI", "百川智能"],
     maxWindowTokenK: 32,
+    priority: 10,
     metaData: {
       onlyOneSystemRoleMsg: true,
     }
-  },
-  {
-    name: "DeepSeek",
-    character: "deepseek",
-    provider: "deepseek",
-    model: "deepseek-chat",
-    abilities: ["chat", "tool_use"],
-    alias: ["深度求索"],
-    maxWindowTokenK: 64,
   },
   {
     name: "海螺",
@@ -48,6 +163,20 @@ export const aiBots: AiBot[] = [
     abilities: ["chat", "tool_use", "image_to_text", "input_audio"],
     alias: ["MM智能助理", "海螺AI"],
     maxWindowTokenK: 1000,
+    priority: 10,
+    metaData: {
+      onlyOneSystemRoleMsg: true,
+    }
+  },
+  {
+    name: "混元",
+    character: "hunyuan",
+    provider: "tencent-hunyuan",
+    model: "hunyuan-turbos-latest",
+    abilities: ["chat"],
+    alias: ["混元", "混元AI", "腾讯混元", "HY"],
+    maxWindowTokenK: 24,
+    priority: 10,
     metaData: {
       onlyOneSystemRoleMsg: true,
     }
@@ -60,33 +189,37 @@ export const aiBots: AiBot[] = [
     abilities: ["chat", "tool_use"],
     alias: ["Moonshot", "月之暗面"],
     maxWindowTokenK: 8,
+    priority: 10,
+  },
+  {
+    name: "通义千问",
+    character: "tongyi-qwen",
+    provider: "aliyun-bailian",
+    model: "qwen-plus-latest",
+    abilities: ["chat", "tool_use"],
+    alias: ["通义", "千问", "qwen", "qwq", "tongyi", "ty"],
+    maxWindowTokenK: 128,
+    priority: 10,
   },
   {
     name: "跃问",
     character: "yuewen",
     provider: "stepfun",
-    model: "step-1-8k",
+    model: "step-2-mini",
     abilities: ["chat"],
     alias: ["阶跃星辰", "stepfun", "阶跃"],
     maxWindowTokenK: 8,
+    priority: 10,
   },
-  // {
-  //   name: "万知",
-  //   character: "wanzhi",
-  //   provider: "zero-one",
-  //   model: "yi-large-fc",
-  //   abilities: ["chat", "tool_use"],
-  //   alias: ["零一万物", "01.ai", "01", "零一"],
-  //   maxWindowTokenK: 32,
-  // },
   {
     name: "万知",
     character: "wanzhi",
     provider: "zero-one",
     model: "yi-lightning",
     abilities: ["chat"],
-    alias: ["零一万物", "01.ai", "01", "零一"],
+    alias: ["零一万物", "01.ai", "01", "零一", "万只"],
     maxWindowTokenK: 16,
+    priority: 10,
   },
   {
     name: "智谱",
@@ -96,12 +229,26 @@ export const aiBots: AiBot[] = [
     abilities: ["chat", "tool_use"],
     alias: ["智谱AI", "智谱清言", "ChatGLM"],
     maxWindowTokenK: 128,
+    priority: 10,
     metaData: {
       zhipuWebSearch: true,
     }
   },
 
   /** image to text */
+  {
+    name: "混元",
+    character: "hunyuan",
+    provider: "tencent-hunyuan",
+    model: "hunyuan-vision",
+    abilities: ["chat", "image_to_text"],
+    alias: ["混元", "混元AI", "腾讯混元", "HY"],
+    maxWindowTokenK: 6,
+    priority: 10,
+    metaData: {
+      onlyOneSystemRoleMsg: true,
+    }
+  },
   {
     name: "Kimi",
     character: "kimi",
@@ -110,15 +257,27 @@ export const aiBots: AiBot[] = [
     abilities: ["chat", "tool_use", "image_to_text"],
     alias: ["Moonshot", "月之暗面"],
     maxWindowTokenK: 8,
+    priority: 10,
+  },
+  {
+    name: "通义千问",
+    character: "tongyi-qwen",
+    provider: "aliyun-bailian",
+    model: "qwen-vl-plus-latest",
+    abilities: ["chat", "image_to_text"],
+    alias: ["通义", "千问", "qwen", "qwq", "tongyi", "ty"],
+    maxWindowTokenK: 128,
+    priority: 10,
   },
   {
     name: "跃问",
     character: "yuewen",
     provider: "stepfun",
-    model: "step-1v-8k",
+    model: "step-1o-vision-32k",
     abilities: ["chat", "image_to_text"],
     alias: ["阶跃星辰", "stepfun", "阶跃"],
-    maxWindowTokenK: 8,
+    maxWindowTokenK: 32,
+    priority: 10,
   },
   {
     name: "万知",
@@ -126,17 +285,19 @@ export const aiBots: AiBot[] = [
     provider: "zero-one",
     model: "yi-vision-v2",                
     abilities: ["chat", "image_to_text"],
-    alias: ["零一万物", "01.ai", "01", "零一"],
+    alias: ["零一万物", "01.ai", "01", "零一", "万只"],
     maxWindowTokenK: 16,
+    priority: 10,
   },
   {
     name: "智谱",
     character: "zhipu",
     provider: "zhipu",
-    model: "glm-4v-plus",
+    model: "glm-4v-plus-0111",
     abilities: ["chat", "tool_use", "image_to_text"],
     alias: ["智谱AI", "智谱清言", "ChatGLM"],
-    maxWindowTokenK: 8,
+    maxWindowTokenK: 16,
+    priority: 10,
     metaData: {
       zhipuWebSearch: true,
     }
@@ -156,12 +317,14 @@ const system_wx_env = `
 回复格式：纯文本 plain-text
 当前日期：{current_date}
 当前时间：{current_time}
+当前大模型供应商：{current_provider}
 回复期望：简洁扼要，多使用换行符
 字数限制：300字以内
 其他限制：只能与人们对话，不能与其他机器人/LLM/人工智能助手进行协作和交流
 `.trim()
 
 const system_wx_entry = `
+如何使用、玩法介绍: {LIU_DOCS_DOMAIN}/guide/three-assistants
 联系客服、联系开发者: {LIU_CUSTOMER_SERVICE}
 我的日程: {LIU_DOMAIN}/schedule
 我的收藏: {LIU_DOMAIN}/favorite
@@ -172,12 +335,6 @@ const system_wx_entry = `
 
 const system_example = `
 下面使用 <user> 标签表示人们发来的消息，<assistant> 标签表示你的回复
-<user>
-你好
-</user>
-<assistant>
-Hi, 我是 deepseek，有什么需要帮助
-</assistant>
 
 <user>
 😥
@@ -237,6 +394,10 @@ const system_settings = `
 你会在用词上体现出更多“支持性作用”，让对方感到慰藉，充满力量
 `.trim()
 
+const system_without_tools = `
+请注意，你目前没有工具调用的能力，当用户请求你帮他新建待办、查看笔记或画图时，又或是询问你“我明天有什么事”时，请诚实回答你没有能力或你不知道。
+`.trim()
+
 const system_last_request = `
 请你以尽可能少的文字、精炼地回复人们的消息。祝交流愉快！
 `.trim()
@@ -287,6 +448,23 @@ ${system_settings}
 ${system_last_request}
 `
 
+const wx_ds_reasoner_system_1 = `
+你叫 DeepSeek R1，是由深度求索公司开发的人工智能助手。
+你当前在留白记事微信公众号内与人们交流！
+
+【当前环境】
+会话渠道：微信公众号
+回复格式：纯文本 plain-text
+当前日期：{current_date}
+当前时间：{current_time}
+当前大模型供应商：{current_provider}
+回复期望：简洁扼要，多使用换行符
+字数限制：300字以内
+其他限制：
+1. 只能与人们对话，不能与其他机器人/LLM/人工智能助手进行协作和交流；
+2. 此外，你还没有联网和调用工具的能力，当用户请求你帮他们创建日程、画一张图或查询任何你未知的信息时，请诚实地回复你没有能力。
+`
+
 const wx_hailuo_system_1 = `
 你叫海螺🐚，是由 MiniMax 公司开发的人工智能助手。
 你将协同应用“留白记事”，为人们提供信息检索、内容整理、待办创建、查看最近的日程等服务，帮助每个人都成为超级个体！
@@ -310,8 +488,57 @@ ${system_settings}
 ${system_last_request}
 `
 
+const wx_hunyuan_system_1 = `
+你叫混元，是由腾讯公司开发的人工智能助手。
+你将协同应用“留白记事”，为人们提供信息检索、内容整理、待办创建、查看最近的日程等服务，帮助每个人都成为超级个体！
+
+【留白记事介绍】
+${system_intro}
+
+【当前环境】
+${system_wx_env}
+
+【常用入口、捷径、网址】
+${system_wx_entry}
+
+【问答示例】
+${system_example}
+
+【你的设定】
+${system_settings}
+
+【注意事项】
+${system_without_tools}
+
+【最后的请求】
+${system_last_request}
+`
+
 const wx_kimi_system_1 = `
 你叫 Kimi，是由月之暗面公司 Moonshot 开发的人工智能助手。
+你将协同应用“留白记事”，为人们提供信息检索、内容整理、待办创建、查看最近的日程等服务，帮助每个人都成为超级个体！
+
+【留白记事介绍】
+${system_intro}
+
+【当前环境】
+${system_wx_env}
+
+【常用入口、捷径、网址】
+${system_wx_entry}
+
+【问答示例】
+${system_example}
+
+【你的设定】
+${system_settings}
+
+【最后的请求】
+${system_last_request}
+`
+
+const wx_tongyi_qwen_system_1 = `
+你叫通义千问，是由阿里云（阿里巴巴集团）开发的人工智能助手。
 你将协同应用“留白记事”，为人们提供信息检索、内容整理、待办创建、查看最近的日程等服务，帮助每个人都成为超级个体！
 
 【留白记事介绍】
@@ -410,11 +637,20 @@ const wx_gzh_prompts = {
   "deepseek": {
     "system_1": wx_deepseek_system_1
   },
+  "ds-reasoner": {
+    "system_1": wx_ds_reasoner_system_1
+  },
   "hailuo": {
     "system_1": wx_hailuo_system_1
   },
+  "hunyuan": {
+    "system_1": wx_hunyuan_system_1
+  },
   "kimi": {
     "system_1": wx_kimi_system_1
+  },
+  "tongyi-qwen": {
+    "system_1": wx_tongyi_qwen_system_1
   },
   "wanzhi": {
     "system_1": wx_wanzhi_system_1
@@ -543,7 +779,7 @@ export function aiI18nShared(
 export function aiI18nChannel(
   param: AiI18nChannelParam,
 ) {
-  const c = param.character
+  const c = param.bot.character
   let thePrompts: Record<string, string> = {}
   if(param.entry.wx_gzh_openid) {
     thePrompts = wx_gzh_prompts[c]
@@ -557,26 +793,7 @@ export function aiI18nChannel(
 /***************************** Tools ***************************/
 
 export const aiTools: OaiTool[] = [
-  /** Parse Link  */
-  // {
-  //   type: "function",
-  //   function: {
-  //     name: "parse_link",
-  //     description: "解析链接。给定一个 http 链接，返回它的标题、摘要、内文......",
-  //     parameters: {
-  //       type: "object",
-  //       properties: {
-  //         url: {
-  //           type: "string",
-  //           description: "要解析的链接",
-  //         },
-  //       },
-  //       required: ["url"],
-  //       additionalProperties: false,
-  //     }
-  //   }
-  // },
-
+  
   /** Web Search */
   {
     type: "function",
@@ -597,12 +814,32 @@ export const aiTools: OaiTool[] = [
     },
   },
 
+  /** Parse Link  */
+  {
+    type: "function",
+    function: {
+      name: "parse_link",
+      description: "解析链接。给定一个 http 链接，返回它的标题、摘要、内文......",
+      parameters: {
+        type: "object",
+        properties: {
+          link: {
+            type: "string",
+            description: "要解析的链接，http 开头",
+          },
+        },
+        required: ["link"],
+        additionalProperties: false,
+      }
+    }
+  },
+
   /** Draw a picture */
   {
     type: "function",
     function: {
       name: "draw_picture",
-      description: "Drawing. Given a prompt, return an image drawn from it.",
+      description: "Drawing. Given a delicate prompt, return an image drawn from it.",
       parameters: {
         type: "object",
         properties: {
@@ -697,12 +934,12 @@ export const aiTools: OaiTool[] = [
             description: "时间，格式为 hh:mm",
           },
           earlyMinute: {
-            type: "number",
+            type: "string",
             description: "提前多少分钟提醒。设置为 0 时表示准时提醒，设置 1440 表示提前一天提醒。",
             enum: aiToolAddCalendarEarlyMinutes,
           },
           laterHour: {
-            type: "number",
+            type: "string",
             description: `从现在起，往后推算多少小时后发生。设置为 0.5 表示三十分钟后，1 表示一小时后，24 表示一天后发生。该字段与 date, time, earlyMinute 三个字段互斥。`,
             enum: aiToolAddCalendarLaterHours,
           }
@@ -723,7 +960,7 @@ export const aiTools: OaiTool[] = [
         type: "object",
         properties: {
           hoursFromNow: {
-            type: "number",
+            type: "string",
             description: "获取最近几个小时内的日程，正数表示未来，举例: 24 表示获取未来 24 小时的日程，48 表示获取未来 48 小时的日程；负数表示过去，举例：-24 表示获取过去 24 小时的日程。",
             enum: aiToolGetScheduleHoursFromNow,
           },

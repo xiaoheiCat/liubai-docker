@@ -78,6 +78,7 @@ declare global {
       LIU_QINIU_CALLBACK_URL?: string
       LIU_QINIU_CDN_DOMAIN?: string       // 七牛云的 cdn 域名，结尾不要加 /
       LIU_QINIU_CUSTOM_KEY?: string       // 自定义密钥，用于在 webhook-qiniu 中验证使用
+      LIU_QINIU_SMS_TEMP_ID?: string      // 七牛云短信模板 ID
 
       /** 微信公众号 */
       LIU_WX_GZ_APPID?: string
@@ -129,6 +130,8 @@ declare global {
       LIU_ALIPAY_NOTIFY_URL?: string
 
       /** Official LLMs */
+      LIU_ALIYUN_BAILIAN_BASE_URL?: string   // 阿里云百炼 base url
+      LIU_ALIYUN_BAILIAN_API_KEY?: string    // 阿里云百炼 api key
       LIU_BAICHUAN_BASE_URL?: string         // 百川 AI 的 base url
       LIU_BAICHUAN_API_KEY?: string          // 百川 AI 的 api key
       LIU_DEEPSEEK_BASE_URL?: string         // DeepSeek AI 的 base url
@@ -139,6 +142,8 @@ declare global {
       LIU_MOONSHOT_API_KEY?: string          // Moonshot AI 的 api key
       LIU_STEPFUN_BASE_URL?: string          // Stepfun AI 的 base url
       LIU_STEPFUN_API_KEY?: string           // Stepfun AI 的 api key
+      LIU_TENCENT_HUNYUAN_API_KEY?: string   // 腾讯混元 api key
+      LIU_TENCENT_HUNYUAN_BASE_URL?: string  // 腾讯混元 base url
       LIU_YI_BASE_URL?: string               // 01.ai 的 base url
       LIU_YI_API_KEY?: string                // 01.ai 的 api key
       LIU_ZHIPU_BASE_URL?: string            // 智谱的 base url
@@ -148,6 +153,12 @@ declare global {
       LIU_SILICONFLOW_BASE_URL?: string
       LIU_SILICONFLOW_API_KEY?: string
       LIU_SILICONFLOW_IMAGE_GENERATION_MODEL?: string
+      LIU_GITEE_AI_BASE_URL?: string
+      LIU_GITEE_AI_API_KEY?: string
+      LIU_QINIU_LLM_BASE_URL?: string
+      LIU_QINIU_LLM_API_KEY?: string
+      LIU_TENCENT_LKEAP_BASE_URL?: string
+      LIU_TENCENT_LKEAP_API_KEY?: string
 
       /** Summary */
       LIU_SUMMARY_BASE_URL?: string
@@ -161,14 +172,28 @@ declare global {
       LIU_TRANSLATION_API_KEY?: string
       LIU_TRANSLATION_MODEL?: string
 
+      /** Image to Text */
+      LIU_IMG2TXT_BASE_URL?: string
+      LIU_IMG2TXT_API_KEY?: string
+      LIU_IMG2TXT_MODEL?: string
+
+      /** System 2 */
+      LIU_SYSTEM2_BASE_URL?: string
+      LIU_SYSTEM2_API_KEY?: string
+      LIU_SYSTEM2_MODEL?: string
+
       /** Characters */
       LIU_WXGZH_KF_BAIXIAOYING?: string      // kf_account of baixiaoying
       LIU_WXGZH_KF_DEEPSEEK?: string         // kf_account of deepseek
+      LIU_WXGZH_KF_DS_REASONER?: string      // kf_account of ds-reasoner
       LIU_WXGZH_KF_HAILUO?: string           // kf_account of hailuo
+      LIU_WXGZH_KF_HUNYUAN?: string          // kf_account of tencent hunyuan
       LIU_WXGZH_KF_KIMI?: string             // kf_account of kimi
+      LIU_WXGZH_KF_TONGYI_QWEN?: string      // kf_account of tongyi-qwen
       LIU_WXGZH_KF_WANZHI?: string           // kf_account of wanzhi
       LIU_WXGZH_KF_YUEWEN?: string           // kf_account of yuewen
       LIU_WXGZH_KF_ZHIPU?: string            // kf_account of zhipu
+      LIU_WXGZH_KF_SYSTEM2?: string          // kf_account of system2
 
       /** Statistic */
       LIU_NOCODB_BASEURL?: string            // like https://app.nocodb.com
@@ -178,6 +203,9 @@ declare global {
 
       /** devbox + ffmpeg */
       LIU_FFMPEG_BASEURL?: string            // like "https://xxxxxx.sealoshzh.site"
+
+      /** DingTalk */
+      LIU_DINGTALK_REPORTER?: string         // like "https://oapi.dingtalk.com/robot/send?access_token=xxxxxx"
 
     }
   }

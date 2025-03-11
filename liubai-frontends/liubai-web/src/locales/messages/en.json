@@ -199,6 +199,7 @@
     "email_verification_tip": "Verification code has been sent to {email}\nPlease remember to check out your junk/spam folder.",
     "verification_code": "Code",
     "choosing_account": "Choosing an Account",
+    "ready_to_login": "Hold on",
     "logging": "Logging in..",
     "logging2": "Logging..",
     "cannot_login_via": "\"Continue with {thirdParty}\" has been temporarily disabled. Please use other methods.",
@@ -212,6 +213,8 @@
     "err_8": "There is no email address through the current login way.",
     "err_9": "Fail to send the email. Contact the developer please.",
     "err_10": "Please enter 11 digits of phone number",
+    "err_11": "The third-party account is not permitted for logging into Liubai",
+    "err_12": "The current account on WeChat is not supported to link",
     "get_permission": "You have not been in the allowed list. Follow our WeChat \"留白记事\" to get the permission!",
     "bound": "Succeed to Bind",
     "logged": "Succeed to Login",
@@ -329,7 +332,9 @@
     "content_deleted": "🗑️ It's been deleted",
     "captured_that": "{event} captured!",
     "created_by_ai": "The card was created by {name} ({company})",
-    "created_by_ai2": "The card was created by {name}."
+    "created_by_ai2": "The card was created by {name}.",
+    "no_ai": "The card rejecting AI",
+    "no_ai_desc": "This card cannot be read by AI assistants."
   },
   "state_related": {
     "add_state": "New State",
@@ -431,7 +436,9 @@
     "modify": "Modify",
     "rebind": "Re-link",
     "unbind_tip_1": "Are you sure to unlink {name}? This operation may result in the loss of your account.",
-    "unbind_2": "Yes, Unlink"
+    "unbind_tip_2": "You cannot connect this WeChat's account to Liubai one month after unlinking. Are you sure to unlink?",
+    "unbind_2": "Yes, Unlink",
+    "unbind_success": "Success to Unlink"
   },
   "export": {
     "markdown": "Export as markdown files",
@@ -628,8 +635,11 @@
   "ai_character": {
     "baixiaoying": "Ying",
     "deepseek": "DeepSeek",
+    "ds-reasoner": "DeepSeek R1",
     "hailuo": "Hailuo",
+    "hunyuan": "Hunyuan",
     "kimi": "Kimi",
+    "tongyi-qwen": "Qwen",
     "wanzhi": "Wanzhi",
     "yuewen": "Yuewen",
     "zhipu": "Zhipu"
@@ -637,8 +647,11 @@
   "ai_provider": {
     "baixiaoying": "Baichuan",
     "deepseek": "DeepSeek",
+    "ds-reasoner": "DeepSeek",
     "hailuo": "MiniMax",
+    "hunyuan": "Tencent",
     "kimi": "Moonshot",
+    "tongyi-qwen": "Aliyun",
     "wanzhi": "01.ai",
     "yuewen": "Stepfun",
     "zhipu": "Zhipu"
@@ -664,5 +677,8 @@
     "opening_title": "Opening {app} ",
     "opening_tip_1": "It's redirecting to {app} ...",
     "opening_tip_2": "Enter the code {code} in {app} if no response"
+  },
+  "ai_detail": {
+    "thinking_process": "Thinking Process"
   }
 }

@@ -1,8 +1,10 @@
 import type { LiuFileStore, LiuImageStore } from "~/types"
 import time from "../basic/time"
 import { getCharacteristic } from "../liu-api/characteristic"
+import valTool from "../basic/val-tool"
 
 const MIN_3 = 3 * time.MINUTE
+const IMG_SUFFIXES = ["png", "jpg", "jpeg", "gif", "webp"]
 
 // 获取允许的图片类型 由 , 拼接而成的字符串
 export function getAcceptImgTypesString() {
@@ -133,18 +135,46 @@ export function getArrayFromFileList(fileList: FileList): File[] {
   return arr
 }
 
-function isImageFile(file: File) {
-  const { type } = file
+interface IsImageRes {
+  result: boolean
+  newFile?: File
+}
+
+
+function isImageFile(
+  file: File,
+): IsImageRes {
+  const { type, name, lastModified } = file
+
+  if(!type && name) {
+    const suffix = valTool.getSuffix(name)
+    if(!suffix) return { result: false }
+    const suffixMatched = IMG_SUFFIXES.includes(suffix)
+    if(!suffixMatched) return { result: false }
+    const newFile = new File([file], name, { 
+      type: `image/${suffix}`,
+      lastModified,
+    })
+
+    return { result: true, newFile }
+  }
+
   const arr = getAcceptImgTypesArray()
-  if(arr.includes(type)) return true
-  return type.startsWith("image/")
+  if(arr.includes(type)) return { result: true }
+  const prefixMatched = type.startsWith("image/")
+  if(!prefixMatched) return { result: false }
+  return { result: true }
 }
 
 export function getOnlyImageFiles(files: File[]): File[] {
   const imgFiles: File[] = []
   for(let i=0; i<files.length; i++) {
     const v = files[i]
-    if(isImageFile(v)) imgFiles.push(v)
+    const res1 = isImageFile(v)
+    if(!res1.result) continue
+    const { newFile } = res1
+    if(newFile) imgFiles.push(newFile)
+    else imgFiles.push(v)
   }
   return imgFiles
 }

@@ -32,10 +32,10 @@ import type {
   LiuSESChannel,
   Partial_Id,
   Table_LoginState,
-  LiuTencentSMSParam,
   DataPass,
   PhoneData,
   LiuIDEType,
+  Table_BlockList,
 } from "@/common-types"
 import { clientMaximum, UserLoginAPI } from "@/common-types"
 import { 
@@ -76,8 +76,8 @@ import {
   checkIfSmsSentTooMuch, 
   getActiveEmailCode,
   LiuResend,
+  SmsController,
   LiuTencentSES,
-  LiuTencentSMS,
   WxGzhSender,
 } from "@/service-send"
 import { 
@@ -201,16 +201,6 @@ async function handle_phone(
     return { code: "E4000", errMsg: "no phone" }
   }
 
-  // 1.2 check out system params
-  const _env = process.env
-  const SmsSdkAppId = _env.LIU_TENCENT_SMS_SDKAPPID
-  const SignName = _env.LIU_TENCENT_SMS_SIGNNAME
-  const TemplateId = _env.LIU_TENCENT_SMS_TEMPLATEID_1
-  if(!SmsSdkAppId || !SignName || !TemplateId) {
-    console.warn("there is no SmsSdkAppId or SignName or TemplateId in test_sms")
-    return { code: "E5001", errMsg: "there is no SmsSdkAppId or SignName or TemplateId in test_sms" }
-  }
-
   // 2. decrypt
   const res2 = getPhoneData(enc_phone)
   if(!res2.pass) return res2.err
@@ -240,39 +230,29 @@ async function handle_phone(
     phoneNumber,
   }
   const cCol = db.collection("Credential")
+
+  // 6. add a credential
   const res6 = await cCol.add(data6)
   const cId = getDocAddId(res6)
   if(!cId) {
     return { code: "E5000", errMsg: "creating credential failed"}
   }
 
-  // 6. send sms
-  const phone7 = `+${regionCode}${localNumber}`
-  const param7: LiuTencentSMSParam = {
-    SmsSdkAppId,
-    SignName,
-    TemplateId,
-    TemplateParamSet: [smsCode],
-    PhoneNumberSet: [phone7],
-  }
-  const res7 = await LiuTencentSMS.send(param7)
-  
-  // 7. handle result
-  if(res7.data) {
+  // 7. to send
+  const res7 = await SmsController.send(regionCode, localNumber, smsCode)
+  const { send_channel, result: result7 } = res7
+
+  // 8. record send result
+  if(result7.code === "0000") {
     const u8: Partial<Table_Credential> = {
-      send_channel: "tencent-sms",
-      sms_sent_result: res7.data,
+      send_channel,
+      sms_sent_result: result7.data,
     }
     cCol.doc(cId).update(u8)
-
-    // take a look of sending sms
-    LiuTencentSMS.seeResult(phone7)
-  }
-  else {
-    return res7
+    return { code: "0000" }
   }
 
-  return { code: "0000" }
+  return result7
 }
 
 async function handle_phone_code(
@@ -458,19 +438,26 @@ async function handle_scan_login(
   }
 
   // 7.1 login with wx_gzh_openid
-  const opt7 = { client_key }
   if(infoType === "wx-gzh-scan" && wx_gzh_openid) {
-    const res7_1 = await tryToSignInWithWxGzhOpenId(
-      ctx, body, wx_gzh_openid, opt7
-    )
+    const opt7_1 = { client_key }
+
+    const t7_1 = getNowStamp()
+    const res7_1 = await tryToSignInWithWxGzhOpenId(ctx, body, wx_gzh_openid, opt7_1)
+    const t7_2 = getNowStamp()
+    // console.warn(`user-login tryToSignInWithWxGzhOpenId takes ${t7_2 - t7_1}ms`)
     
-    if(res7_1.code === "0000") {
+    if(res7_1 && res7_1.code === "0000") {
       const lang = res7_1.data?.language
       sendLoginMsgToWxGzhUser(ctx, wx_gzh_openid, "wx-gzh-scan", { body, lang })
       _removeCredential()
+      return res7_1
     }
+    
+    console.warn("sign in with wx_gzh_openid failed")
+    console.log(wx_gzh_openid)
+    console.log(body)
 
-    return res7_1
+    return { code: "E4003", errMsg: "sign in with wx_gzh_openid failed" }
   }
 
   return { code: "E4003", errMsg: "no way to log in" }
@@ -516,8 +503,16 @@ async function handle_scan_check(
     return { code: "0000", data: resData }
   }
   if(verifyNum && verifyNum > 100) {
+    console.warn("Excessive credential checks detected", {
+      "function": "handle_scan_check",
+      "verifyNum": verifyNum,
+      "credential_data": fir1,
+    })
+
     return { code: "E4003", errMsg: "checking too much" }
   }
+
+  // console.log(`see credential in scan_check: `, fir1)
 
   // 3. check if credential_2 exists
   const credential_2 = fir1.credential_2
@@ -593,6 +588,7 @@ async function handle_wx_gzh_scan(
       qr_code: qr_code_4,
       x_liu_theme: body["x_liu_theme"],
       x_liu_language: body["x_liu_language"],
+      x_liu_device: body["x_liu_device"],
     }
   }
   const cCol = db.collection("Credential")
@@ -1348,6 +1344,21 @@ async function handle_wx_gzh_oauth(
     return { code: "U0007", errMsg: "the user is a snapshot user" }
   }
 
+  // 4.2 check out if the wx_gzh_openid is in BlockList
+  const bCol = db.collection("BlockList")
+  const w4_2: Partial<Table_BlockList> = {
+    type: "wx_gzh_openid",
+    value: wx_gzh_openid,
+    isOn: "Y",
+  }
+  const res4_2 = await bCol.where(w4_2).getOne<Table_BlockList>()
+  const data4_2 = res4_2?.data
+  if(data4_2) {
+    console.warn("wx_gzh_openid is in BlockList")
+    console.log(data4_2)
+    return { code: "U0012", errMsg: "wx_gzh_openid is in BlockList" }
+  }
+
   // 5. get user info
   const data5 = await getWxGzhSnsUserInfo(wx_gzh_openid, user_access_token)
   if(!data5?.nickname) {
@@ -1380,8 +1391,6 @@ async function handle_wx_gzh_oauth(
   if(!data8) {
     return { code: "E5004", errMsg: "there is no data8 from wx gzh" }
   }
-  console.log("let me see data8:::")
-  console.log(data8)
 
   // 9. set thirdData as new data (data8)
   wx_gzh.subscribe = data8.subscribe
@@ -1739,7 +1748,7 @@ async function tryToSignInWithWxGzhOpenId(
   body: Record<string, string>,
   wx_gzh_openid: string,
   opt: SignInOpt,
-): Promise<LiuRqReturn<Res_UserLoginNormal>> {
+): Promise<LiuRqReturn<Res_UserLoginNormal> | undefined> {
   const res1 = await findUserByWxOpenId(wx_gzh_openid)
   const rType = res1.type
   if(rType === 1) {
@@ -1757,8 +1766,6 @@ async function tryToSignInWithWxGzhOpenId(
 
     return res2
   }
-
-  return { code: "E5001", errMsg: "there is no user with wx_gzh_openid" }
 }
 
 /** 登录后，检查 token 是否过多，过多的拿去销毁 */
@@ -2558,7 +2565,7 @@ class LoginStater {
     const createdStamp = res2.insertedStamp
     let num = res2.num
     num++
-    if(num > 3) {
+    if(num > 5) {
       console.warn("the state has been checked for db too many times.......")
       this.clear(state)
       return { code: "U0004", errMsg: "maximum times to interact with the state" } 

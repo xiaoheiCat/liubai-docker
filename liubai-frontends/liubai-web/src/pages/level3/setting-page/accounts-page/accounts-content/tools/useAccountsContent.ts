@@ -46,6 +46,16 @@ export function useAccountsContent() {
     })
   }
 
+  const onMenuItemForWeChat = async (item: MenuItem, index: number) => {
+    if(index === 0) {
+      // Re-link
+      toBindWeChat(acData)
+    }
+    else if(index === 1) {
+      toUnlinkWeChat(acData)
+    }
+  }
+
   const onMenuItemForPhone = async (item: MenuItem, index: number) => {
     if(index === 0) {
       // Re-link
@@ -62,6 +72,30 @@ export function useAccountsContent() {
     onTapWeChat,
     onTapEmail,
     onMenuItemForPhone,
+    onMenuItemForWeChat,
+  }
+}
+
+async function toUnlinkWeChat(
+  acData: AcData,
+) {
+  const res1 = await cui.showModal({ 
+    title: "⚠️",
+    content_key: "setting.unbind_tip_2",
+    confirm_key: "setting.unbind_2",
+    isTitleEqualToEmoji: true,
+    modalType: "warning",
+  })
+  if(!res1.confirm) return
+  const url = APIs.BIND_DATA
+  const body = { operateType: "unbind-wx_gzh" }
+  cui.showLoading()
+  const res2 = await liuReq.request(url, body)
+  cui.hideLoading()
+  if(res2.code === "0000") {
+    acData.wx_gzh_nickname = undefined
+    acData.wx_gzh_openid = undefined
+    cui.showSnackBar({ text_key: "setting.unbind_success" })
   }
 }
 
@@ -88,7 +122,8 @@ async function toUnlinkPhone(
   console.log("res2 for toUnlinkPhone: ")
   console.log(res2)
   if(res2.code === "0000") {
-    CloudEventBus.addSyncNumManually()
+    acData.phone_pixelated = undefined
+    cui.showSnackBar({ text_key: "setting.unbind_success" })
   }
 }
 

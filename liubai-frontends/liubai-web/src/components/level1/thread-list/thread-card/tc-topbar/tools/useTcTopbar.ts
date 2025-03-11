@@ -15,8 +15,11 @@ export function useTcTopbar(
     if(!a) return
     if(a === "baixiaoying") return "baichuan.svg"
     if(a === "deepseek") return "deepseek.svg"
+    if(a === "ds-reasoner") return "ds_r.png"
     if(a === "hailuo") return "hailuo.svg"
+    if(a === "hunyuan") return "hunyuan.svg"
     if(a === "kimi") return "kimi.png"
+    if(a === "tongyi-qwen") return "tongyi-qwen.svg"
     if(a === "wanzhi") return "01-ai.png"
     if(a === "yuewen") return "yuewen.svg"
     if(a === "zhipu") return "zhipu.svg"
@@ -26,6 +29,7 @@ export function useTcTopbar(
     const t = td.value
     if(t.pinStamp) return true
     if(t.stateId && t.stateShow) return true
+    if(!t.aiReadable || t.aiReadable === "N") return true
     if(t.storageState === `LOCAL` || t.storageState === `ONLY_LOCAL`) return true
     if(aiCharacterUrl.value) return true
     return false
@@ -34,6 +38,7 @@ export function useTcTopbar(
   const cloudOffPlacement = computed<TooltipPlacement>(() => {
     const t = td.value
     if(t.stateShow) return `bottom`
+    if(t.aiCharacter) return `bottom`
     return `bottom-end`
   })
 
@@ -62,6 +67,16 @@ export function useTcTopbar(
     })
   }
 
+  const onTapNoAI = () => {
+    cui.showModal({
+      title: "🔒",
+      content_key: "thread_related.no_ai_desc",
+      showCancel: false,
+      confirm_key: "tip.got_it",
+      isTitleEqualToEmoji: true,
+    })
+  }
+
 
   return {
     td,
@@ -69,5 +84,6 @@ export function useTcTopbar(
     cloudOffPlacement,
     aiCharacterUrl,
     onTapAiCharacter,
+    onTapNoAI
   }
 }

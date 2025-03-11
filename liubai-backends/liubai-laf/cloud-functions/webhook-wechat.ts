@@ -12,6 +12,7 @@ import type {
   Table_User,
   UserThirdData,
   UserWeChatGzh,
+  Wx_Gzh_Auth_Change,
   Wx_Gzh_Click,
   Wx_Gzh_Image,
   Wx_Gzh_Link,
@@ -55,6 +56,7 @@ import { WxGzhSender } from "@/service-send";
 import { get_into_ai } from "@/ai-entrance";
 
 const db = cloud.database()
+const _ = db.command
 let wechat_access_token = ""
 
 /***************************** constants **************************/
@@ -80,8 +82,7 @@ export async function main(ctx: FunctionContext) {
     return res
   }
 
-  console.log("msgObj: ")
-  console.log(msgObj)
+  // console.log(msgObj)
 
   const { MsgType, FromUserName } = msgObj
   if(!FromUserName) {
@@ -121,11 +122,72 @@ export async function main(ctx: FunctionContext) {
     else if(Event === "CLICK") {
       handle_click(msgObj)
     }
+    else if(Event === "user_authorization_revoke") {
+      user_authorization_revoke(msgObj)
+    }
   }
   
   // respond with empty string, and then wechat will not retry
   return ""
 }
+
+async function user_authorization_revoke(
+  msgObj: Wx_Gzh_Auth_Change,
+) {
+  const wx_gzh_openid = msgObj.OpenID
+
+  // 0. define functions where we update user and cache
+  const uCol = db.collection("User")
+  const _updateUser = async (user: Table_User) => {
+    // 0.1 check if updating is required
+    const wx_gzh = user.thirdData?.wx_gzh
+    if(!wx_gzh) return
+
+    let needUpdate = false
+    if(wx_gzh.headimgurl) {
+      needUpdate = true
+      delete wx_gzh.headimgurl
+    }
+    if(wx_gzh.nickname) {
+      needUpdate = true
+      delete wx_gzh.nickname
+    }
+    if(!needUpdate) return true
+
+    // 0.2 update user
+    const userId = user._id
+    const now = getNowStamp()
+    const u3 = {
+      "thirdData.wx_gzh": _.set(wx_gzh),
+      "updatedStamp": now,
+    }
+    const res3 = await uCol.doc(userId).update(u3)
+
+    // 0.3 update cache
+    const thirdData = user.thirdData ?? {}
+    thirdData.wx_gzh = wx_gzh
+    user.thirdData = thirdData
+    user.updatedStamp = now
+    updateUserInCache(userId, user)
+  }
+
+  // 1. get the user
+  const q1 = uCol.where({ wx_gzh_openid }).orderBy("insertedStamp", "desc")
+  const res1 = await q1.get<Table_User>()
+  const list1 = res1.data
+  const len1 = list1.length
+  if(len1 < 1) return
+
+  // 2. to update
+  for(let i = 0; i < len1; i++) {
+    const user = list1[i]
+    if(i > (MAX_ACCOUNTS_TO_BIND - 1)) break
+    await _updateUser(user)
+  }
+
+  return true
+}
+
 
 async function handle_click(
   msgObj: Wx_Gzh_Click,
@@ -432,6 +494,8 @@ async function login_with_wechat_gzh(
   userInfo?: Wx_Res_GzhUserInfo,
   opt?: OperationOpt,
 ) {
+  // console.log("login_with_wechat_gzh......")
+
   // 1. get credential
   const cCol = db.collection("Credential")
   const w1: Partial<Table_Credential> = {
@@ -444,14 +508,27 @@ async function login_with_wechat_gzh(
   if(!data1) return false
   const cId = data1._id
   const meta_data = data1.meta_data ?? {}
+  const {
+    x_liu_device,
+    x_liu_language
+  } = meta_data
 
   // 1.1 optionally send welcome_message
   if(opt?.isFromSubscribeEvent) {
-    send_welcome(wx_gzh_openid, userInfo, meta_data.x_liu_language)
+    send_welcome(wx_gzh_openid, userInfo, x_liu_language)
   }
 
   // 2. define some functions
-  // 2.1 set credential_2
+  // 2.1 send "go back to our app" if needed
+  const _sendGoBackToOurApp = () => {
+    const deviceStr = x_liu_device ?? ""
+    let isMobile = deviceStr.includes("Mobile")
+    if(!isMobile) isMobile = deviceStr.startsWith("iOS")
+    if(!isMobile) return
+    send_logging(wx_gzh_openid, userInfo, x_liu_language)
+  }
+
+  // 2.2 set credential_2
   const _setCredential2 = async () => {
     const cred_2 = createCredential2()
     meta_data.wx_gzh_openid = wx_gzh_openid
@@ -461,6 +538,7 @@ async function login_with_wechat_gzh(
       updatedStamp: getNowStamp(),
     }
     await cCol.doc(cId).update(w2)
+    _sendGoBackToOurApp()
   }
 
   // 3. get user by wx_gzh_openid
@@ -646,6 +724,22 @@ async function send_welcome(
   await sendText(wx_gzh_openid, text)
 
   return true
+}
+
+async function send_logging(
+  wx_gzh_openid: string,
+  userInfo?: Wx_Res_GzhUserInfo,
+  x_liu_language?: string,
+) {
+  // 1. get language
+  const lang = x_liu_language ?? userInfo?.language
+
+  // 2. i18n
+  const { t } = useI18n(wechatLang, { lang })
+  const text = t("go_back_to_app")
+  
+  // 3. reply user with text
+  await sendText(wx_gzh_openid, text)
 }
 
 async function send_login_guide(

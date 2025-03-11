@@ -51,14 +51,35 @@ export async function main(ctx: FunctionContext) {
     // for compose-page
     res = await get_aichat(user, b.chatId)
   }
+  else if(b.operateType === "get-ai-detail") {
+    res = await get_ai_detail(user, b.chatId)
+  }
   
   return res
 }
 
 
+async function get_ai_detail(
+  user: Table_User,
+  chatId: string,
+): Promise<LiuRqReturn<SyncOperateAPI.Res_GetAiDetail>> {
+  // 1. get shared data
+  const data1 = await getSharedData(user, chatId)
+  if(!data1.pass) return data1.err
+  const { theChat } = data1.data
+
+  // 2. return the detail
+  const data2: SyncOperateAPI.Res_GetAiDetail = {
+    operateType: "get-ai-detail",
+    reasoningContent: theChat.reasoning_content,
+  }
+  return { code: "0000", data: data2 }
+}
+
+
 interface SharedData {
-  funcName: string
-  funcJson: Record<string, any>
+  funcName?: string
+  funcJson?: Record<string, any>
   theChat: Table_AiChat
   theRoom: Table_AiRoom
 }
@@ -71,6 +92,9 @@ async function get_aichat(
   const data1 = await getSharedData(user, chatId)
   if(!data1.pass) return data1.err
   const { funcName, funcJson, theChat } = data1.data
+  if(!funcName || !funcJson) {
+    return { code: "E5001", errMsg: "funcName or funcJson is empty" }
+  }
 
   // 2. return directly if there is a content associated with this chat
   if(theChat.contentId) {
@@ -85,9 +109,9 @@ async function get_aichat(
   }
 
   // 3. get waiting data
-  const waitingData = AiToolUtil.turnJsonToWaitingData(funcName, funcJson, user)
-  if(!waitingData) {
-    return { code: "E5001", errMsg: "fail to get waitingData" }
+  const res3 = AiToolUtil.turnJsonToWaitingData(funcName, funcJson, user)
+  if(!res3.pass) {
+    return res3.err
   }
 
   return {
@@ -95,7 +119,7 @@ async function get_aichat(
     data: {
       operateType: "get-aichat",
       result: "waiting",
-      waitingData,
+      waitingData: res3.data,
     }
   }
 }
@@ -108,6 +132,9 @@ async function agree_aichat(
   const data1 = await getSharedData(user, chatId)
   if(!data1.pass) return data1.err
   const { funcName, funcJson, theChat } = data1.data
+  if(!funcName || !funcJson) {
+    return { code: "E5001", errMsg: "funcName or funcJson is empty" }
+  }
 
   // 2. return if there is a content associated with this chat
   let contentType: SyncOperateAPI.ContentType = "note"
@@ -132,10 +159,11 @@ async function agree_aichat(
   const { space, member } = spaceAndMember
 
   // 4. construct content
-  const waitingData = AiToolUtil.turnJsonToWaitingData(funcName, funcJson, user)
-  if(!waitingData) {
-    return { code: "E5001", errMsg: "fail to get waitingData" }
+  const res4 = AiToolUtil.turnJsonToWaitingData(funcName, funcJson, user)
+  if(!res4.pass) {
+    return res4.err
   }
+  const waitingData = res4.data
 
   // 5. encrypt waitingData
   const aesKey = getAESKey() ?? ""
@@ -236,12 +264,6 @@ async function getSharedData(
     }
   }
   const { funcName, funcJson } = theChat
-  if(!funcName || !funcJson) {
-    return {
-      pass: false,
-      err: { code: "E5001", errMsg: "funcName or funcJson is empty" }
-    }
-  }
 
   // 2. get the room
   const roomId = theChat.roomId
