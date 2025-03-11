@@ -33,8 +33,8 @@
         "title": "%liubai.helloWorld.title%"
       },
       {
-        "command": "ptsd.liubai-vscode-extension.openBrowser",
-        "title": "Liubai: See console"
+        "command": "ptsd.liubai-vscode-extension.record",
+        "title": "%liubai.record.title%"
       }
     ]
   },

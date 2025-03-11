@@ -63,6 +63,9 @@ export class AuthenticationManager {
     if(res2) {
       console.log("it is already logged in")
       Logger.info("it is already logged in")
+
+      // WIP: 超过一周没刷新令牌，走一下 enter 流程
+      
       return
     }
 
@@ -71,7 +74,7 @@ export class AuthenticationManager {
   }
 
 
-  private async startToLogin() {
+  public async startToLogin() {
     const _this = this
 
     // 1. show message and wait user confirm
@@ -82,7 +85,7 @@ export class AuthenticationManager {
     const res2 = await this.getAuthStatus()
     if(res2) {
       this.showLoggedIn(res2)
-      return
+      return true
     }
 
     // 3. show progress and then fetch data for init
@@ -272,7 +275,9 @@ export class AuthenticationManager {
 
   private initListenToCode() {
     const _this = this
-    const handler = {
+
+    // 1. register uri handler
+    const uriHandler = {
       "handleUri": async (uri: vscode.Uri) => {
         const uriPath = uri.path
         console.warn("see uriPath: ")
@@ -303,10 +308,8 @@ export class AuthenticationManager {
         _this.afterGettingCode()
       }
     }
-    vscode.window.registerUriHandler(handler)
+    vscode.window.registerUriHandler(uriHandler)
   }
-
-
 
   private async afterGettingCode() {
     // 1. check out code and credential
@@ -392,6 +395,8 @@ export class AuthenticationManager {
     const res7 = await vscode.window.showInformationMessage(title7, confirmTxt, cancelTxt)
     if(res7 === confirmTxt) {
       console.log("let's start to record!")
+      const extId = liuInfo.getExtId()
+      vscode.commands.executeCommand(`${extId}.record`)
     }
 
   }

@@ -100,8 +100,13 @@ const getInfo = () => {
   return _info
 }
 
+const getExtId = () => {
+  return _info.extensionId
+}
+
 export default {
   getIdeType,
   init,
   getInfo,
+  getExtId,
 }

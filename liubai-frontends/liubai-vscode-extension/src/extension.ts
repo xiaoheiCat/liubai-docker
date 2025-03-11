@@ -6,6 +6,7 @@ import liuInfo from './utils/liu-info';
 import { i18n } from './locales/i18n';
 import liuUtil from './utils/liu-util';
 import { Logger } from './utils/Logger';
+import { LiuRecorder } from './managers/LiuRecorder';
 
 function isSafeEnvironment() {
 	const theCrypto = liuUtil.crypto.getCrypto()
@@ -57,6 +58,8 @@ export function activate(context: vscode.ExtensionContext) {
 	// 3. init auth manager
 	const authManager = AuthenticationManager.getInstance(context)
 
+	// 4. init recorder
+	LiuRecorder.initialize(context, authManager)
 
 	const disposable1 = vscode.commands.registerCommand(`${info.extensionId}.helloWorld`, async () => {
 		const title = i18n.t("login.h1")
