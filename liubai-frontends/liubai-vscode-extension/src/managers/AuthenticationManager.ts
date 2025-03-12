@@ -17,7 +17,10 @@ import {
   showProgressWithStop, 
   showWarning,
 } from '~/utils/show-msg';
-import { createClientKey, getNicknameFromSpaceMemberList } from "./tools/common-tools"
+import { 
+  createClientKey, 
+  getMyDataFromSpaceMemberList,
+} from "./tools/common-tools"
 import type { LiuTimeout, SimpleFunc } from '~/utils/basic/type-tool';
 import { Logger } from '~/utils/Logger';
 import { SimpleEventBus } from '~/utils/event-bus/simple-event-bus'
@@ -312,6 +315,17 @@ export class AuthenticationManager {
     vscode.window.registerUriHandler(uriHandler)
   }
 
+  public async loginAgain() {
+    try {
+      await this._context.secrets.delete(LOGIN_DATA_KEY)
+    }
+    catch(err) {
+      Logger.warn("loginAgain error", err)
+      return
+    }
+    this.startToLogin()
+  }
+
   private async afterGettingCode() {
     // 1. check out code and credential
     const code = this._code
@@ -375,13 +389,19 @@ export class AuthenticationManager {
     }
 
     // 6.1 storage login data into secrets
-    const nickname = getNicknameFromSpaceMemberList(spaceMemberList)
+    const myData = getMyDataFromSpaceMemberList(spaceMemberList)
+    const { personal_space_id, nickname } = myData
+    if(!personal_space_id) {
+      Logger.warn("there is no personal space id")
+      return
+    }
     const data6: LiuAuthStatus = {
       token,
       serial: serial_id,
       client_key,
       updated_stamp: time.getTime(),
       nickname,
+      personal_space_id,
     }
     const val6 = valTool.objToStr(data6)
     await this._context.secrets.store(LOGIN_DATA_KEY, val6)

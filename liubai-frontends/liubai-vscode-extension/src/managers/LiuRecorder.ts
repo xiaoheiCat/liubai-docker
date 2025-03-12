@@ -4,6 +4,9 @@ import liuInfo from '~/utils/liu-info';
 import time from '~/utils/basic/time';
 import { i18n } from '~/locales/i18n';
 import { SimpleEventBus } from '~/utils/event-bus/simple-event-bus';
+import type { SyncSetAPI } from '~/types/types-req';
+import type { LiuContent } from '~/types/types-atom';
+import ider from '~/utils/ider';
 
 const MIN_3 = time.MINUTE * 3
 
@@ -86,12 +89,69 @@ export class LiuRecorder {
     const text = res1.trim()
     if(!text) return
 
-    // 2. package data
+    // 2. package thread
+    const atom = await this._packeageAtomForThread(text)
+    if(!atom) {
+      this._authManager.loginAgain()
+      return
+    }
+
+    // 3. fetch
+    
 
   }
 
 
+  private async _packeageAtomForThread(text: string) {
 
+    // 1. get auth data for spaceId
+    const authManager = this._authManager
+    const authStatus = await authManager.getAuthStatus()
+    if(!authStatus) return
+
+    // 2. generate id / stamp
+    const task_id = ider.createUploadTaskId()
+    const first_id = ider.createThreadId()
+    const now = time.getTime()
+
+    // 3. package desc
+    text = text.replace(/\n/g, " ")
+    const liuDesc: LiuContent[] = [
+      {
+        type: "paragraph",
+        content: [
+          {
+            type: "text",
+            text,
+          }
+        ]
+      }
+    ]
+
+    // 4. package thread
+    const thread: SyncSetAPI.LiuUploadThread = {
+      first_id,
+      spaceId: authStatus.personal_space_id,
+      liuDesc,
+      editedStamp: now,
+      oState: "OK",
+      createdStamp: now,
+      emojiData: {
+        total: 0,
+        system: [],
+      },
+      aiReadable: "Y",
+    }
+
+    // 5. package atom
+    const atom: SyncSetAPI.Atom = {
+      taskType: "thread-post",
+      taskId: task_id,
+      thread,
+      operateStamp: now,
+    }
+    return atom
+  }
 
 
 

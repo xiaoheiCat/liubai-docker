@@ -22,9 +22,14 @@ export async function createClientKey(
   return { aesKey, cipher }
 }
 
-export function getNicknameFromSpaceMemberList(
-  spaceMemberList: LiuSpaceAndMember[]
+export function getMyDataFromSpaceMemberList(
+  spaceMemberList: LiuSpaceAndMember[],
 ) {
   const personalMember = spaceMemberList.find(v => v.spaceType === "ME")
-  return personalMember?.member_name
+  if(!personalMember) return {}
+
+  return {
+    personal_space_id: personalMember.spaceId,
+    nickname: personalMember.member_name,
+  }
 }
