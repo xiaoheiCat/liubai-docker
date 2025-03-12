@@ -3,6 +3,7 @@ import OpenAI from "openai"
 import Stripe from "stripe"
 import * as vbot from "valibot"
 import type { BaseSchema } from "valibot"
+import { Stream } from "openai/streaming"
 
 // 全局类型
 // Table_ 开头，表示为数据表结构
@@ -641,7 +642,7 @@ export type AiMsgType = "text" | "image" | "voice"
 export type AiCommandByHuman = "kick" | "add" | "clear_history" 
   | "more_operations" | "continue" | "group_status"
 
-export type AiFinishReason = "stop" | "length"
+export type AiFinishReason = "stop" | "length" | "tool_calls"
 
 export interface AiBotMetaData {
   onlyOneSystemRoleMsg?: boolean
@@ -699,9 +700,15 @@ export type OaiTool = OpenAI.Chat.ChatCompletionTool
 export type OaiToolPrompt = OpenAI.Chat.ChatCompletionToolMessageParam 
 export type OaiCreateParam = OpenAI.Chat.ChatCompletionCreateParams
 export type OaiChatCompletion = OpenAI.Chat.ChatCompletion
+export type OaiChatCompletionChunk = OpenAI.Chat.ChatCompletionChunk
 export type OaiMessage = OpenAI.Chat.ChatCompletionMessage
 export type OaiToolCall = OpenAI.Chat.ChatCompletionMessageToolCall
 export type OaiChoice = OpenAI.Chat.ChatCompletion.Choice
+export type OaiStreamCompletion = Stream<OaiChatCompletionChunk>
+export type OaiStreamChoiceDelta = OpenAI.Chat.ChatCompletionChunk.Choice.Delta & {
+  reasoning_content?: string
+}
+
 export interface DsReasonerMessage {
   role: "assistant"
   content: string
@@ -3493,6 +3500,16 @@ export namespace LiuAi {
 
   export type ToolName = "add_note" | "add_todo" | "add_calendar" 
     | "web_search" | "parse_link" | "draw_picture" | "get_schedule" | "get_cards"
+
+  export type Sys2Preference = "midnight" | "other"
+
+  export interface Sys2Ai {
+    character: AiCharacter
+    provider: AiProvider
+    secondaryProvider?: AiSecondaryProvider
+    model: string
+    maxInputTokenK: number
+  }
 
 }
 

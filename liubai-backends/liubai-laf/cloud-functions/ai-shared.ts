@@ -33,7 +33,10 @@ import {
   type OaiToolPrompt,
   type OaiToolCall,
   type AiToolAddCalendarParam,
-  DataPass,
+  type DataPass,
+  type OaiStreamCompletion,
+  type OaiStreamChoiceDelta,
+  type OaiChatCompletionChunk,
 } from "@/common-types"
 import { WxGzhSender } from "@/service-send"
 import { 
@@ -108,7 +111,13 @@ export class BaseLLM {
       }, timeoutSec * 1000)
 
       // 2. to chat
-      const res = await _this._chat(params, opt)
+      let res: OaiChatCompletion | undefined
+      if(params.stream) {
+        res = await _this._streamChat(params, opt)
+      }
+      else {
+        res = await _this._chat(params, opt)
+      }
 
       // 3. decide to continue
       if(hasReturn) return
@@ -120,6 +129,127 @@ export class BaseLLM {
 
     return new Promise(_wait)
   }
+
+
+  private async _streamChat(
+    params: OaiCreateParam,
+    opt?: LiuAi.BaseLLMChatOpt,
+  ) {
+    const _this = this
+    const client = _this._client
+    if(!client) return
+
+    _this._tryTimes++
+    const copiedParams = valTool.copyObject(params)
+    copiedParams.stream_options = { include_usage: true }
+
+    let usage: LiuAi.Usage | undefined
+    let id = ""
+    let created = 0
+    let model = ""
+    let reasoningContent = ""
+    let answerContent = ""
+    let finishReason: AiFinishReason | undefined
+    let system_fingerprint = ""
+
+    const _handleOtherData = (chunk: OaiChatCompletionChunk) => {
+      const tmpChoice = chunk.choices?.[0] as any
+      if(chunk.usage) usage = chunk.usage
+      else if(tmpChoice?.usage) usage = tmpChoice.usage
+
+      if(chunk.id) id = chunk.id
+      if(chunk.model) model = chunk.model
+      if(chunk.created) created = chunk.created
+      if(chunk.system_fingerprint) {
+        system_fingerprint = chunk.system_fingerprint
+      }
+    }
+
+    try {
+      const chatCompletion = await client.chat.completions.create(copiedParams)
+      const completion = chatCompletion as OaiStreamCompletion
+      for await (const chunk of completion) {
+        const aChoice = chunk.choices[0]
+
+        // if no choice
+        if(!aChoice) {
+          _handleOtherData(chunk)
+          continue
+        }
+
+        // handle delta
+        const delta = aChoice.delta as OaiStreamChoiceDelta
+        if(delta.reasoning_content) {
+          reasoningContent += delta.reasoning_content
+        }
+        else if(delta.content) {
+          answerContent += delta.content
+        }
+
+        // handle finish_reason
+        const reason = aChoice.finish_reason
+        if(reason) {
+          finishReason = AiShared.getAiFinishReason(reason)
+          _handleOtherData(chunk)
+        }
+      }
+
+    }
+    catch(err) {
+      console.warn("BaseLLM streamChat error: ", err)
+      return
+    }
+
+    if(!usage) {
+      console.warn("no usage in streamChat")
+      return
+    }
+    if(!created) {
+      console.warn("no created in streamChat")
+      return
+    }
+    if(!id) {
+      console.warn("no id in streamChat")
+      return
+    }
+    if(!model) {
+      console.warn("no model in streamChat")
+      return
+    }
+    if(!finishReason) {
+      console.warn("no finishReason in streamChat")
+      return
+    }
+
+    const message = {
+      content: answerContent,
+      role: "assistant"
+    } as DsReasonerMessage
+    if(reasoningContent) {
+      message.reasoning_content = reasoningContent
+    }
+
+    const result = {
+      id,
+      choices: [
+        {
+          finish_reason: finishReason,
+          index: 0,
+          message,
+          logprobs: null,
+        }
+      ],
+      created,
+      model,
+      system_fingerprint,
+      object: "chat.completion",
+      usage,
+    } as OaiChatCompletion
+    _this._tryTimes = 0
+    _this._log(result, opt)
+    return result
+  }
+
 
   private async _chat(
     params: OaiCreateParam,
@@ -300,11 +430,18 @@ export class AiShared {
     return _env.LIU_WX_GZ_TYPE ?? "subscription_account"
   }
 
+  static getAiFinishReason(
+    reason: string
+  ): AiFinishReason | undefined {
+    if(reason === "stop" || reason === "length") return reason
+    if(reason === "tool_calls") return reason
+  }
+
   static getFinishReason(
     chatCompletion: OaiChatCompletion
   ): AiFinishReason | undefined {
     const reason = chatCompletion.choices?.[0]?.finish_reason
-    if(reason === "stop" || reason === "length") return reason
+    return this.getAiFinishReason(reason)
   }
 
   static setFinishReasonToLength(

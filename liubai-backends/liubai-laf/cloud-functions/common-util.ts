@@ -2246,7 +2246,7 @@ export function decryptCloudData<T>(
     return {
       pass: false,
       err: {
-        code: "E5001",
+        code: "E4009",
         errMsg: "decryptWithAES failed in decryptCloudData",
       }
     }

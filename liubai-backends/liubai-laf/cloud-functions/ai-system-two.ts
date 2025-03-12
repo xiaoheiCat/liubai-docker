@@ -878,15 +878,6 @@ class SystemTwo {
     // 7. add _reasonerAndUs
     messages.push(...reasonerAndUs)
 
-
-    // const alwayTrue = true
-    // if(alwayTrue) {
-    //   console.warn("stop!")
-    //   console.log(messages)
-    //   return
-    // }
-
-
     // 8. call LLM
     const apiData = System2Util.getApiData()
     const { model, baseUrl, apiKey } = apiData

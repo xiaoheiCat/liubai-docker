@@ -118,6 +118,11 @@ async function toNext(
     return { code: `E5002` }
   }
 
+  if(nextRes?.code === "E4009") {
+    console.warn("decryption or encryption failed", ctx.body)
+    console.warn("ip: ", getIp(ctx))
+  }
+
   return nextRes
 }
 
