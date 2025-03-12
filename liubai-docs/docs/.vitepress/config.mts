@@ -19,7 +19,7 @@ export default defineConfig({
 
     nav: [
       { text: "指南", link: "/guide/what-is-liubai", activeMatch: "/guide/" },
-      { text: "文章", link: "/article/2024/supercharge-yourself", activeMatch: "/article/" },
+      { text: "文章", link: "/article/2025/system-two", activeMatch: "/article/" },
       { text: "网页版", link: "https://my.liubai.cc" },
     ],
 
@@ -74,6 +74,10 @@ export default defineConfig({
       ],
 
       "/article": [
+        {
+          text: "系统二",
+          link: "/article/2025/system-two"
+        },
         {
           text: "使用 devbox 实现 amr 转 mp3",
           link: "/article/2025/devbox-voice-input"
