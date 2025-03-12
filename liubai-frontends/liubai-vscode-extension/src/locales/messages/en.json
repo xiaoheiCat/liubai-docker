@@ -16,5 +16,7 @@
   "tip.err_2": "{errMsg} (Code: {code})",
   "tip.unknown_err": "[Unknown Error] ",
   "tip.try_again_later": "Please try again later",
-  "tip.contact_us": "Contact us"
+  "tip.contact_us": "Contact us",
+  "record.title": "Quick Record",
+  "record.placeholder": "What are you thinking?"
 }

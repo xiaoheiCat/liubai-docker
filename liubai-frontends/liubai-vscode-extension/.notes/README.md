@@ -2,6 +2,15 @@
 
 ## 开发备注
 
+
+### 快速运行
+
+两种方式：
+
+1. `Fn + F5`: 这时会在新的窗口打开 Extension Development Host
+2. `Cmd + Shift +P`: 打开命令面板，输入 `Debug` 选择 `Debug: Start Debugging`
+
+
 ### 在当前 IDE 中启动一个 Chromium 进行调试
 
 运行 `pnpm open-in-browser`

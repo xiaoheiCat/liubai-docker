@@ -62,11 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
 	LiuRecorder.initialize(context, authManager)
 
 	const disposable1 = vscode.commands.registerCommand(`${info.extensionId}.helloWorld`, async () => {
-		const title = i18n.t("login.h1")
-		const confirmTxt = i18n.t("login.sign_in")
-		const cancelTxt = i18n.t("common.cancel")
-		const res = await vscode.window.showInformationMessage(title, confirmTxt, cancelTxt)
-		console.log("result: ", res)
+		
 	})
 	context.subscriptions.push(disposable1)
 }

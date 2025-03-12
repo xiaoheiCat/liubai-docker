@@ -20,6 +20,7 @@ import {
 import { createClientKey, getNicknameFromSpaceMemberList } from "./tools/common-tools"
 import type { LiuTimeout, SimpleFunc } from '~/utils/basic/type-tool';
 import { Logger } from '~/utils/Logger';
+import { SimpleEventBus } from '~/utils/event-bus/simple-event-bus'
 
 const LOGIN_DATA_KEY = `${cfg.appPrefix}login_data`
 const AUTH_CALLBACK_PATH = "/auth-complete"
@@ -373,7 +374,7 @@ export class AuthenticationManager {
       return
     }
 
-    // 6. storage login data into secrets
+    // 6.1 storage login data into secrets
     const nickname = getNicknameFromSpaceMemberList(spaceMemberList)
     const data6: LiuAuthStatus = {
       token,
@@ -384,6 +385,10 @@ export class AuthenticationManager {
     }
     const val6 = valTool.objToStr(data6)
     await this._context.secrets.store(LOGIN_DATA_KEY, val6)
+
+    // 6.2 emit event
+    const eventBus = SimpleEventBus.getInstance()
+    eventBus.getEmitter().fire("just-logged")
 
     // 7. show success
     let title7 = i18n.t("login.has_signed_in")
