@@ -7,6 +7,9 @@ import { SimpleEventBus } from '~/utils/event-bus/simple-event-bus';
 import type { SyncSetAPI } from '~/types/types-req';
 import type { LiuContent } from '~/types/types-atom';
 import ider from '~/utils/ider';
+import APIs from '~/requests/APIs';
+import liuReq from '~/requests/liu-req';
+import { Logger } from '~/utils/Logger';
 
 const MIN_3 = time.MINUTE * 3
 
@@ -97,8 +100,18 @@ export class LiuRecorder {
     }
 
     // 3. fetch
+    const url3 = APIs.SYNC_SET
+    const body3 = {
+      operateType: "single_sync",
+      plz_enc_atoms: [atom],
+    }
+    const res3 = await liuReq.request<SyncSetAPI.Res_Client>(url3, body3)
+    const { code, data } = res3
+    console.log("see res3: ")
+    console.log(code)
+    console.log(data)
+    Logger.info("see res3: ", code, data)
     
-
   }
 
 

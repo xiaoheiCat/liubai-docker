@@ -179,6 +179,8 @@ export class AuthenticationManager {
     }
     const credential = data9.credential
     const baseUrl = data9.baseUrl
+    console.log("baseUrl: ", baseUrl)
+    Logger.info("baseUrl: ", baseUrl)
     _this._credential = credential
 
     // 10. splice a string
@@ -192,8 +194,13 @@ export class AuthenticationManager {
     // console.log("authUri: ", authUri)
     
     // 11. open in browser
-    await vscode.env.openExternal(authUri)
-    this.whenOpeningBrowserForAuth()
+    const res11 = await vscode.env.openExternal(authUri)
+    if(res11) {
+      this.whenOpeningBrowserForAuth()
+    }
+    else {
+      this.cancelProgressForOpeningBrowser()
+    }
   }
   
   private whenOpeningBrowserForAuth() {
@@ -223,7 +230,15 @@ export class AuthenticationManager {
 
     // 3. show input box
     console.log("get to input")
-
+    const res3 = await vscode.window.showInputBox({
+      title: i18n.t("login.title"),
+      placeHolder: i18n.t("login.placeHolder"),
+    })
+    if(!res3) return
+    const code = res3.trim()
+    if(code.length < 5) return
+    this._code = code
+    this.afterGettingCode()
   }
 
 
@@ -308,7 +323,7 @@ export class AuthenticationManager {
           console.warn("state does not match")
           return
         }
-        this._code = code
+        _this._code = code
         _this.afterGettingCode()
       }
     }

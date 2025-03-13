@@ -9,6 +9,8 @@
   "login.input_auth_code": "输入授权码",
   "login.logging": "登录中...",
   "login.logged_in": "Hi {nickname}, 欢迎你！",
+  "login.title": "登录留白记事",
+  "login.placeHolder": "请粘贴授权码",
   "common.record_1": "去记录",
   "common.cancel": "取消",
   "common.env_unsupported": "当前环境不支持运行本插件",

@@ -9,6 +9,8 @@
   "login.input_auth_code": "填入認證碼",
   "login.logging": "登入中...",
   "login.logged_in": "Hi {nickname}, 歡迎你！",
+  "login.title": "登入留白記事",
+  "login.placeHolder": "請黏貼認證碼",
   "common.record_1": "去記錄",
   "common.cancel": "取消",
   "common.env_unsupported": "當前環境不支援執行本擴充套件",

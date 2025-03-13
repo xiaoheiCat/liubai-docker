@@ -127,6 +127,11 @@ export namespace SyncSetAPI {
     new_id?: string    // the new id of either content or draft
   }
 
+  export interface Param_SingleSync {
+    operateType: "single_sync"
+    plz_enc_atoms: Atom[]
+  }
+
   export interface Res_Client {
     results: AtomRes[]
   }

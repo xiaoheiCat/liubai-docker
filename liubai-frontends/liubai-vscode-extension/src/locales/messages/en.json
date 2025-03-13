@@ -9,6 +9,8 @@
   "login.input_auth_code": "Enter Code",
   "login.logging": "Logging in...",
   "login.logged_in": "Hi {nickname}, welcome!",
+  "login.title": "Login to Liubai",
+  "login.placeHolder": "Paste the code",
   "common.record_1": "Get to Record",
   "common.cancel": "Cancel",
   "common.env_unsupported": "The current environment does not support running this extension",
