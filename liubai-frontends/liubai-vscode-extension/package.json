@@ -35,6 +35,10 @@
       {
         "command": "ptsd.liubai-vscode-extension.record",
         "title": "%liubai.record.title%"
+      },
+      {
+        "command": "ptsd.liubai-vscode-extension.loginOrLogout",
+        "title": "%liubai.login_or_logout.title%"
       }
     ]
   },

@@ -359,7 +359,7 @@ const {
 
   .av-btn-container {
     flex-direction: row-reverse;
-    justify-content: space-around;
+    justify-content: space-evenly;
   }
 
   .av-btn {

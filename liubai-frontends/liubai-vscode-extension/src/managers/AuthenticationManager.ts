@@ -68,7 +68,7 @@ export class AuthenticationManager {
       console.log("it is already logged in")
       Logger.info("it is already logged in")
 
-      // WIP: 超过一周没刷新令牌，走一下 enter 流程
+      // WIP: poll for any cards that need to be notified?
       
       return
     }
@@ -78,18 +78,22 @@ export class AuthenticationManager {
   }
 
 
-  public async startToLogin() {
+  public async startToLogin(
+    skipPrompt: boolean = false,
+  ) {
     const _this = this
 
-    // 1. show message and wait user confirm
-    const res1 = await this.showLoginFirst()
-    if(!res1) return
+    if(!skipPrompt) {
+      // 1. show message and wait user confirm
+      const res1 = await this.showLoginFirst()
+      if(!res1) return
 
-    // 2. check out auth status again
-    const res2 = await this.getAuthStatus()
-    if(res2) {
-      this.showLoggedIn(res2)
-      return true
+      // 2. check out auth status again
+      const res2 = await this.getAuthStatus()
+      if(res2) {
+        this.showLoggedIn(res2)
+        return true
+      }
     }
 
     // 3. show progress and then fetch data for init
@@ -178,9 +182,8 @@ export class AuthenticationManager {
       return
     }
     const credential = data9.credential
-    const baseUrl = data9.baseUrl
-    console.log("baseUrl: ", baseUrl)
-    Logger.info("baseUrl: ", baseUrl)
+    let baseUrl = data9.baseUrl
+    // baseUrl = "http://localhost:5175"
     _this._credential = credential
 
     // 10. splice a string
@@ -233,6 +236,8 @@ export class AuthenticationManager {
     const res3 = await vscode.window.showInputBox({
       title: i18n.t("login.title"),
       placeHolder: i18n.t("login.placeHolder"),
+      prompt: i18n.t("login.code_tip"),
+      ignoreFocusOut: true,
     })
     if(!res3) return
     const code = res3.trim()
@@ -328,16 +333,70 @@ export class AuthenticationManager {
       }
     }
     vscode.window.registerUriHandler(uriHandler)
+
+    // 2. register `login or logout` command
+    const extId = liuInfo.getExtId()
+    const cmdId = `${extId}.loginOrLogout`
+    const disposable2 = vscode.commands.registerCommand(cmdId, async () => {
+      _this.handleLoginOrLogout()
+    })
+    this._context.subscriptions.push(disposable2)
   }
 
-  public async loginAgain() {
+
+  private async handleLoginOrLogout() {
+    const res = await this.getAuthStatus()
+    if(res) {
+      this.showLogout(res)
+    }
+    else {
+      this.startToLogin(true)
+    }
+  }
+
+  private async showLogout(authStatus: LiuAuthStatus) {
+    const title = i18n.t("logout.title")
+    let desc = i18n.t("logout.desc_2")
+    const name = authStatus.nickname
+    if(name) {
+      desc = i18n.t("logout.desc_1", { name })
+    }
+
+    const confirmTxt = i18n.t("logout.confirm")
+    const cancelTxt = i18n.t("common.cancel")
+    const confirmItem = { title: confirmTxt }
+    const cancelItem = { title: cancelTxt, isCloseAffordance: true }
+
+    // 1. show logout tip
+    const res1 = await vscode.window.showInformationMessage(title, {
+      detail: desc,
+      modal: true,
+    }, confirmItem, cancelItem)
+    if(!res1) return
+    if(res1.title !== confirmTxt) return
+
+    // 2. logout remotely
+    const url2 = APIs.LOGOUT
+    const res2 = await liuReq.request(url2, { operateType: "logout" })
+
+    // 3. logout locally
+    await this.logoutLocally()
+  }
+
+  private async logoutLocally() {
     try {
       await this._context.secrets.delete(LOGIN_DATA_KEY)
     }
     catch(err) {
       Logger.warn("loginAgain error", err)
-      return
+      return false
     }
+    return true
+  }
+
+  public async loginAgain() {
+    const res = await this.logoutLocally()
+    if(!res) return
     this.startToLogin()
   }
 

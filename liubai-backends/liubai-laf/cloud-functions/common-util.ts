@@ -1655,7 +1655,7 @@ export async function insertToken(
     ip,
   }
   if(platform === "ide-extension") {
-    const ideType = body["x_liu_device"] as LiuIDEType
+    const ideType = body["x_liu_ide_type"] as LiuIDEType
     if(ideType && liuIDETypes.includes(ideType)) {
       obj1.ideType = ideType
     }

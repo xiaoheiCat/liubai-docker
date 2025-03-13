@@ -2,5 +2,6 @@
   "package.displayName": "留白記事",
   "package.description": "在 VS Code / Windsurf / Cursor 等 vscode-based IDE 中使用留白記事",
   "liubai.helloWorld.title": "Liubai: 你好喔",
-  "liubai.record.title": "Liubai: 記一件事"
+  "liubai.record.title": "Liubai: 記一件事",
+  "liubai.login_or_logout.title": "Liubai: 登入 / 登出"
 }
