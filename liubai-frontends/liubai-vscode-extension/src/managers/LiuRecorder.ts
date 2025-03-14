@@ -13,6 +13,7 @@ import { Logger } from '~/utils/Logger';
 import { LiuStatusBar } from './LiuStatusBar';
 import { showErrMsg } from '~/utils/show-msg';
 import liuEnv from '~/utils/liu-env';
+import { languageIdToSupported } from './tools/lowlight-related';
 
 const MIN_3 = time.MINUTE * 3
 
@@ -78,17 +79,47 @@ export class LiuRecorder {
   }
 
   private async _recordWithCode() {
+    // 0. check out logging data
+    const authManager = this._authManager
+    const authStatus = await authManager.getAuthStatus()
+    if(!authStatus) {
+      this._waitingForLoginStamp = 0
+      await authManager.startToLogin()
+      return
+    }
+
+    // 1. get editor
     const editor = vscode.window.activeTextEditor
     if(!editor || editor.selection.isEmpty) {
       Logger.warn("no selection")
       return
     }
 
+    // 2. get selected text
     const selectedText = editor.document.getText(editor.selection)
     const tmpText = selectedText.trim()
     if(!tmpText) return
-    Logger.info("selectedText: ", selectedText)
 
+    // 3. get language
+    const langId = editor.document.languageId
+    Logger.info("langId: ", langId)
+    const supportedLang = languageIdToSupported(langId)
+    const codeBlock: LiuContent = {
+      type: "codeBlock",
+      content: [
+        {
+          type: "text",
+          text: selectedText,
+        }
+      ]
+    }
+    if(supportedLang) {
+      codeBlock.attrs = {
+        language: supportedLang,
+      }
+    }
+
+    this._startRecording(codeBlock)
   }
 
   private async _prepareToRecord() {
@@ -103,21 +134,34 @@ export class LiuRecorder {
     this._startRecording()
   }
 
-  private async _startRecording() {
+  private async _startRecording(
+    codeBlock?: LiuContent,
+  ) {
+    // 0. get some params
+    const isCoding = Boolean(codeBlock)
 
-    // 1. show input box
-    const title = i18n.t("record.title")
-		const placeholder = i18n.t("record.placeholder")
+    // 1.1 get title, placeholder, and prompt 
+    let title = i18n.t("record.title")
+		let placeholder = i18n.t("record.placeholder")
+    let prompt: string | undefined
+    if(isCoding) {
+      title = i18n.t("record.title_2")
+      placeholder = i18n.t("record.placeholder_2")
+      prompt = i18n.t("record.save_code")
+    }
+
+    // 1.2 show input box
     const res1 = await vscode.window.showInputBox({
       title,
       placeHolder: placeholder,
+      prompt,
     })
-    if(!res1) return
+    if(typeof res1 !== "string") return
     const text = res1.trim()
-    if(!text) return
+    if(!isCoding && !text) return
 
     // 2. package thread
-    const atom = await this._packeageAtomForThread(text)
+    const atom = await this._packeageAtomForThread(text, codeBlock)
     if(!atom) {
       this._authManager.loginAgain()
       return
@@ -135,16 +179,13 @@ export class LiuRecorder {
     }
     const res3 = await liuReq.request<SyncSetAPI.Res_Client>(url3, body3)
     const { code, data } = res3
-    console.log("see res3: ")
-    console.log(code)
-    console.log(data)
-    Logger.info("see res3: ", code, data)
 
     // 3.2 reset status bar
     statusBar.reset()
 
     // 4.1 show error message
     if(code !== "0000" || !data) {
+      Logger.warn("fail to note: ", res3)
       showErrMsg("other", res3)
       return
     }
@@ -175,7 +216,10 @@ export class LiuRecorder {
   }
 
 
-  private async _packeageAtomForThread(text: string) {
+  private async _packeageAtomForThread(
+    text: string,
+    codeBlock?: LiuContent,
+  ) {
 
     // 1. get auth data for spaceId
     const authManager = this._authManager
@@ -187,10 +231,16 @@ export class LiuRecorder {
     const first_id = ider.createThreadId()
     const now = time.getTime()
 
-    // 3. package desc
+    // 3.1 package codeBlock
+    const liuDesc: LiuContent[] = []
+    if(codeBlock) {
+      liuDesc.push(codeBlock)
+    }
+ 
+    // 3.2 package desc
     text = text.replace(/\n/g, " ")
-    const liuDesc: LiuContent[] = [
-      {
+    if(text) {
+      liuDesc.push({
         type: "paragraph",
         content: [
           {
@@ -198,8 +248,8 @@ export class LiuRecorder {
             text,
           }
         ]
-      }
-    ]
+      })
+    }
 
     // 4. package thread
     const thread: SyncSetAPI.LiuUploadThread = {

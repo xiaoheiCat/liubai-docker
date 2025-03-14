@@ -28,7 +28,10 @@
   "tip.try_again_later": "Please try again later",
   "tip.contact_us": "Contact us",
   "record.title": "Liubai: Add Something",
+  "record.title_2": "Liubai: Note for Code",
   "record.placeholder": "What are you thinking?",
+  "record.placeholder_2": "Input the note here",
+  "record.save_code": "Press ↵ to save instantly",
   "record.recording": "Recording..",
   "record.recorded": "Liubai has received!"
 }

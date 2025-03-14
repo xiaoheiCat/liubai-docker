@@ -28,7 +28,10 @@
   "tip.try_again_later": "請稍後再試",
   "tip.contact_us": "聯絡客服", 
   "record.title": "Liubai: 記一件事",
+  "record.title_2": "Liubai: 註記程式碼",
   "record.placeholder": "想記些什麼？",
+  "record.placeholder_2": "在此輸入註記...",
+  "record.save_code": "按 Enter 直接儲存",
   "record.recording": "記錄中..",
   "record.recorded": "留白已收到！"
 }
