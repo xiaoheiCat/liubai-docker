@@ -45,11 +45,11 @@ import {
   decryptEncData,
   getDocAddId,
   getLiuDoman,
-  getSummary,
   LiuDateUtil,
   liuFetch,
   liuReq,
   MarkdownParser,
+  RichTexter,
   valTool,
   ValueTransform,
 } from "@/common-util"
@@ -2021,7 +2021,7 @@ export class TransformContent {
   static getCardData(v: Table_Content) {
     const data = decryptEncData(v)
     if(!data.pass) return
-    const summary = getSummary(data.liuDesc)
+    const summary = RichTexter.getSummary(data.liuDesc)
     const obj: LiuAi.CardData = {
       title: data.title ?? "",
       summary,

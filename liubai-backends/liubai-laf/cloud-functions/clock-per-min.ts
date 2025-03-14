@@ -11,11 +11,11 @@ import type {
   SupportedLocale,
 } from "@/common-types";
 import { 
-  decryptEncData, 
-  getSummary,
+  decryptEncData,
   LiuDateUtil,
   valTool,
   checkAndGetWxGzhAccessToken,
+  RichTexter,
 } from "@/common-util";
 import { commonLang, getCurrentLocale, useI18n } from "@/common-i18n";
 import { wx_reminder_tmpl } from "@/common-config";
@@ -383,7 +383,7 @@ function turnContentIntoAtom(
     title = res1.title
   }
   else if(res1.liuDesc) {
-    title = getSummary(res1.liuDesc)
+    title = RichTexter.getSummary(res1.liuDesc)
   }
 
   const atom: RemindAtom = {

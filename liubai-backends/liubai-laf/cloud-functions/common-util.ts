@@ -896,71 +896,73 @@ function getUserName(
 
 /*************************** 动态、评论 富文本编辑器相关 ****************************/
 
-/**
- * 将 TipTapJSONContent 格式的数组，转换成纯文本
- * @param list 当前要转换成文本的 TipTapJSONContent[]
- * @param plainText 已转换完毕的文本
- * @param moreText 是否开启更多文字的模式，比如遇到链接，把链接也加载进来。默认为 false，表示关闭
- */
-export function listToText(
-  list: LiuContent[],
-  plainText: string = "",
-  parentType?: string,
-): string {
+export class RichTexter {
 
-  for(let i=0; i<list.length; i++) {
-    const v = list[i]
-    const { type, content, text } = v
-    if(text) {
-      plainText += text
-      continue
-    }
+  /**
+   * 将 TipTapJSONContent 格式的数组，转换成纯文本
+   * @param list 当前要转换成文本的 TipTapJSONContent[]
+   * @param plainText 已转换完毕的文本
+   * @param moreText 是否开启更多文字的模式，比如遇到链接，把链接也加载进来。默认为 false，表示关闭
+   */
+  static turnDescToText(
+    list: LiuContent[],
+    plainText: string = "",
+    parentType?: string,
+  ) {
 
-    if(type === "listItem") {
-      if(parentType === "orderedList") {
-        plainText += `${i + 1}. `
+    for(let i=0; i<list.length; i++) {
+      const v = list[i]
+      const { type, content, text } = v
+      if(text) {
+        plainText += text
+        continue
       }
-      else if(parentType === "bulletList") {
-        plainText += " · "
+  
+      if(type === "listItem") {
+        if(parentType === "orderedList") {
+          plainText += `${i + 1}. `
+        }
+        else if(parentType === "bulletList") {
+          plainText += " · "
+        }
       }
+  
+      if(content) {
+        plainText = this.turnDescToText(content, plainText, type)
+        if(type === "codeBlock") plainText += "\n"
+      }
+  
+      let addes: LiuNodeType[] = [
+        "heading",
+        "paragraph",
+        "taskList",
+        "blockquote", 
+        "codeBlock",
+        "horizontalRule",
+        "listItem",
+      ]
+      if(type && addes.includes(type as LiuNodeType)) {
+        plainText += "\n"
+      }
+  
     }
-
-    if(content) {
-      plainText = listToText(content, plainText, type)
-      if(type === "codeBlock") plainText += "\n"
-    }
-
-    let addes: LiuNodeType[] = [
-      "heading",
-      "paragraph",
-      "taskList",
-      "blockquote", 
-      "codeBlock",
-      "horizontalRule",
-      "listItem",
-    ]
-    if(type && addes.includes(type as LiuNodeType)) {
-      plainText += "\n"
-    }
-
+  
+    return plainText
   }
 
-  return plainText
-}
-
-export function getSummary(
-  content: LiuContent[] | undefined,
-) {
-  let text = ""
-  if(content && content.length > 0) {
-    text = listToText(content)
-    text = text.replace(/\n/g, " ")
-    text = text.trim()
-    if(text.length > 140) text = text.substring(0, 140)
-    if(text) return text
+  static getSummary(
+    content: LiuContent[] | undefined,
+  ) {
+    let text = ""
+    if(content && content.length > 0) {
+      text = this.turnDescToText(content)
+      text = text.replace(/\n/g, " ")
+      text = text.trim()
+      if(text.length > 140) text = text.substring(0, 140)
+      if(text) return text
+    }
+    return text
   }
-
-  return text
 }
 
 export function sortListWithIds<T extends SyncGetTable>(

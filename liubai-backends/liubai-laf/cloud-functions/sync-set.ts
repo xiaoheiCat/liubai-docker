@@ -66,6 +66,7 @@ import {
 } from "@/common-time"
 import cloud from '@lafjs/cloud'
 import * as vbot from "valibot"
+import { afterPostingThread } from "@/sync-after"
 
 const db = cloud.database()
 const _ = db.command
@@ -422,8 +423,8 @@ function singleSyncAfterUpdating(
   const { new_id } = res
   if(!new_id) return
 
-
   // 3. trigger AI!
+  afterPostingThread(new_id)
 
 }
 
