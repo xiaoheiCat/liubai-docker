@@ -12,6 +12,7 @@ import liuReq from '~/requests/liu-req';
 import { Logger } from '~/utils/Logger';
 import { LiuStatusBar } from './LiuStatusBar';
 import { showErrMsg } from '~/utils/show-msg';
+import liuEnv from '~/utils/liu-env';
 
 const MIN_3 = time.MINUTE * 3
 
@@ -158,10 +159,19 @@ export class LiuRecorder {
     }
 
     // 5. get success message
+    const customEnv = liuEnv.getEnv()
+    const liuDomain = customEnv.liuDomain ?? ""
+    const link5 = `${liuDomain}/${new_id}`
+    const title5 = i18n.t("record.recorded")
+    const confirmTxt5 = i18n.t("common.get_it")
+    const cancelTxt5 = i18n.t("common.view")
+    const w = vscode.window
+    const res5 = await w.showInformationMessage(title5, confirmTxt5, cancelTxt5)
 
-
-
-
+    // 6. open link if needed
+    if(res5 !== cancelTxt5) return
+    const uri6 = vscode.Uri.parse(link5)
+    await vscode.env.openExternal(uri6)
   }
 
 
