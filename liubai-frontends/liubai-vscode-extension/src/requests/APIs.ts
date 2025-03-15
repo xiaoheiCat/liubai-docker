@@ -7,5 +7,6 @@ export default {
   TIME: d + `hello-world`,
   LOGIN: d + `user-login`,
   LOGOUT: d + `user-settings`,
+  USER_ENTER: d + `user-settings`,
   SYNC_SET: d + 'sync-set',
 }

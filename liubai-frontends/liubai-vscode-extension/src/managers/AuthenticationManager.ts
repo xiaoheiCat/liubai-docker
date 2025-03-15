@@ -22,8 +22,9 @@ import {
 } from "./tools/common-tools"
 import type { LiuTimeout, SimpleFunc } from '~/utils/basic/type-tool';
 import { Logger } from '~/utils/Logger';
-import { SimpleEventBus } from '~/utils/event-bus/simple-event-bus'
+import { SimpleEventBus } from '~/utils/event-bus/simple-event-bus';
 import liuEnv from '~/utils/liu-env';
+import { RefreshAuth } from './tools/refresh-auth';
 
 const customEnv = liuEnv.getEnv()
 const appPrefix = customEnv.appPrefix ?? ""
@@ -67,17 +68,26 @@ export class AuthenticationManager {
     // 2. check out auth status
     const res2 = await this.getAuthStatus()
     if(res2) {
-      console.log("it is already logged in")
-      Logger.info("it is already logged in")
-
-      // WIP: poll for any cards that need to be notified?
-      
+      this.tryToRefreshAuth(res2)
       return
     }
 
     // 3. request login first to user
     this.startToLogin()
   }
+
+  private async tryToRefreshAuth(
+    oldAuthStatus: LiuAuthStatus,
+  ) {
+    // 1. to refresh
+    const refreshAuth = new RefreshAuth(this._context, LOGIN_DATA_KEY)
+    const res1 = await refreshAuth.refreshToken(oldAuthStatus)
+    if(res1) return
+
+    // 2. to logout
+    this.logoutLocally()
+  }
+
 
 
   public async startToLogin(
