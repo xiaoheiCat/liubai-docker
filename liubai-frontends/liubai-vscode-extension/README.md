@@ -1,71 +1,48 @@
-# liubai-vscode-extension README
+# 留白记事 vscode-based 插件
 
-This is the README for your extension "liubai-vscode-extension". After writing up a brief description, we recommend including the following sections.
+安装之后，有两个功能：
 
-## Features
+- 快速记事
+- 备注代码
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+## 快速记事
 
-For example if there is an image subfolder under your extension project workspace:
+点击窗口左下角的 `Liubai`，如下图所示。
 
-\!\[feature X\]\(images/feature-x.png\)
+![Tap Liubai](images/record_1.jpeg)
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+或者
 
-## Requirements
+- `Cmd + Shift + P`（macOS）
+- `Ctrl + Shift + P`（Windows）
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+唤起命令面板，输入 `liubai`，选择 `Add Something`，如下图所示。
 
-## Extension Settings
+![Add Something](images/record_2.jpeg)
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+紧接着输入任何你想记录的一件事，并按下回车 `Enter`，即可记录。
 
-For example:
+![Record](images/record_3.jpeg)
 
-This extension contributes the following settings:
+过程中，插件若发现你尚未登录，按照提示登录即可。
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+## 备注代码
 
-## Known Issues
+在编辑器中，选中任何代码，右键弹出菜单栏，选择 `Note (Liubai)`，如下图所示。
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+![right click](images/code_1.jpeg)
 
-## Release Notes
+或者
 
-Users appreciate release notes as you update your extension.
+- `Cmd + Shift + P`（macOS）
+- `Ctrl + Shift + P`（Windows）
 
-### 1.0.0
+唤起命令面板，输入 `liubai`，选择 `Note for Code`，如下图所示。
 
-Initial release of ...
+![Note for Code](images/code_2.jpeg)
 
-### 1.0.1
+紧接着输入你想备注的文字，或者直接按下回车 `Enter`，即可保存。
 
-Fixed issue #.
+![record with code](images/code_3.jpeg)
 
-### 1.1.0
 
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
