@@ -3613,6 +3613,10 @@ export namespace LiuAi {
 
   export type ComputingProvider = AiProvider | AiSecondaryProvider
 
+  export interface AiWorker {
+    computingProvider: ComputingProvider
+  }
+
 }
 
 

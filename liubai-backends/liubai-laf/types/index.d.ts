@@ -159,6 +159,8 @@ declare global {
       LIU_QINIU_LLM_API_KEY?: string
       LIU_TENCENT_LKEAP_BASE_URL?: string
       LIU_TENCENT_LKEAP_API_KEY?: string
+      LIU_SUANLEME_BASE_URL?: string
+      LIU_SUANLEME_API_KEY?: string
 
       /** Summary */
       LIU_SUMMARY_BASE_URL?: string

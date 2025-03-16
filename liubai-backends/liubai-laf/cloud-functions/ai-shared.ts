@@ -349,33 +349,33 @@ interface ThinkTagContent {
 
 export class AiShared {
 
-  static getApiEndpointFromBot(
-    bot: AiBot
+  static getApiEndpointFromComputingProvider(
+    p: LiuAi.ComputingProvider,
   ): LiuAi.ApiEndpoint | undefined {
-    const _env = process.env
-    const p = bot.provider
-    const p2 = bot.secondaryProvider
-
     let apiKey: string | undefined
     let baseURL: string | undefined
-    let defaultHeaders = bot.metaData?.defaultHeaders
+    const _env = process.env
 
     // If secondaryProvider exists, use it first
-    if(p2 === "siliconflow") {
+    if(p === "siliconflow") {
       apiKey = _env.LIU_SILICONFLOW_API_KEY
       baseURL = _env.LIU_SILICONFLOW_BASE_URL
     }
-    else if(p2 === "gitee-ai") {
+    else if(p === "gitee-ai") {
       apiKey = _env.LIU_GITEE_AI_API_KEY
       baseURL = _env.LIU_GITEE_AI_BASE_URL
     }
-    else if(p2 === "qiniu") {
+    else if(p === "qiniu") {
       apiKey = _env.LIU_QINIU_LLM_API_KEY
       baseURL = _env.LIU_QINIU_LLM_BASE_URL
     }
-    else if(p2 === "tencent-lkeap") {
+    else if(p === "tencent-lkeap") {
       apiKey = _env.LIU_TENCENT_LKEAP_API_KEY
       baseURL = _env.LIU_TENCENT_LKEAP_BASE_URL
+    }
+    else if(p === "suanleme") {
+      apiKey = _env.LIU_SUANLEME_API_KEY
+      baseURL = _env.LIU_SUANLEME_BASE_URL
     }
     else if(p === "aliyun-bailian") {
       apiKey = _env.LIU_ALIYUN_BAILIAN_API_KEY
@@ -413,10 +413,34 @@ export class AiShared {
       apiKey = _env.LIU_ZHIPU_API_KEY
       baseURL = _env.LIU_ZHIPU_BASE_URL
     }
-    
+
     if(apiKey && baseURL) {
-      return { apiKey, baseURL, defaultHeaders }
+      return { apiKey, baseURL }
     }
+
+  }
+
+
+  static getApiEndpointFromBot(
+    bot: AiBot
+  ): LiuAi.ApiEndpoint | undefined {
+    const p = bot.provider
+    const p2 = bot.secondaryProvider
+    let defaultHeaders = bot.metaData?.defaultHeaders
+
+    let apiEndpoint: LiuAi.ApiEndpoint | undefined
+    if(p2) {
+      apiEndpoint = AiShared.getApiEndpointFromComputingProvider(p2)
+    }
+    if(!apiEndpoint) {
+      apiEndpoint = AiShared.getApiEndpointFromComputingProvider(p)
+    }
+
+    if(apiEndpoint) {
+      apiEndpoint.defaultHeaders = defaultHeaders
+    }
+
+    return apiEndpoint
   }
 
   static getCharacterName(character?: AiCharacter) {

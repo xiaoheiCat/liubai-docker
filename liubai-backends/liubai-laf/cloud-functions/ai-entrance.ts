@@ -3672,6 +3672,7 @@ class AiHelper {
     if(secondaryProvider === "gitee-ai") return "Gitee AI"
     if(secondaryProvider === "qiniu") return "七牛云"
     if(secondaryProvider === "tencent-lkeap") return "腾讯云"
+    if(secondaryProvider === "suanleme") return "算了么"
     if(provider === "aliyun-bailian") return "阿里云"
     if(provider === "baichuan") return "北京百川智能"
     if(provider === "deepseek") return "杭州深度求索"
