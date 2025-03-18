@@ -45,4 +45,17 @@
 
 ![record with code](images/code_3.jpeg)
 
+## 问题排查
+
+### 1. 为什么在状态栏上点击左下角的 ✏️ Liubai 没有反应？
+
+通常是 IDE 把通知收起来导致的。
+
+在状态栏最右侧，有一个 🔔 图标，点击后就会展开通知了，如下二图所示。
+
+![Notification](images/notification_1.jpeg)
+
+![Notification](images/notification_2.jpeg)
+
+
 
