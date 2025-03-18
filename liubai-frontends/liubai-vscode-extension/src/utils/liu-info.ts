@@ -4,6 +4,7 @@ import * as vscode from 'vscode'
 import { getDeviceStrForWeb, getDeviceStrForNode } from "./tools/characteristic"
 import typeCheck from "./basic/type-check"
 import liuEnv from "./liu-env"
+import { Logger } from "./Logger"
 
 let _info: LiuInfo
 
@@ -13,6 +14,10 @@ const getIdeType = (): LiuIDEType | undefined => {
 
   console.log("see appName: ", appName)
   console.log("see appHost: ", appHost)
+  Logger.info("see appName: ", appName)
+  Logger.info("see appHost: ", appHost)
+  Logger.info("see uriScheme: ", uriScheme)
+  Logger.info("see remoteName: ", remoteName)
 
   if(appHost === "vscode.dev") return "vscode.dev"
   if(appHost === "github.dev") return "github.dev"
@@ -26,6 +31,7 @@ const getIdeType = (): LiuIDEType | undefined => {
   if(appName === "Project IDX") return "project-idx"
   if(uriScheme === "cloud-studio") return "tencent-cloud-studio"
   if(remoteName?.endsWith(".cnb.cool")) return "cnb.cool"
+  if(appName === "Trae" || uriScheme === "trae") return "trae"
 }
 
 const _getDeviceData = (isWeb: boolean) => {

@@ -710,6 +710,22 @@
     "stackblitz-com": "StackBlitz",
     "project-idx": "Project IDX",
     "tencent-cloud-studio": "Cloud Studio",
-    "cnb-cool": "CNB"
+    "cnb-cool": "CNB",
+    "trae": "Trae"
+  },
+  "ide_full": {
+    "vscode": "VS Code",
+    "vscode-insiders": "vscode-insiders",
+    "cursor": "Cursor",
+    "windsurf": "Windsurf",
+    "vscodium": "VSCodium",
+    "github-dev": "github.dev",
+    "vscode-dev": "vscode.dev",
+    "gitpod-io": "Gitpod",
+    "stackblitz-com": "StackBlitz",
+    "project-idx": "Project IDX",
+    "tencent-cloud-studio": "Cloud Studio",
+    "cnb-cool": "Cloud Native Build (CNB)",
+    "trae": "Trae"
   }
 }

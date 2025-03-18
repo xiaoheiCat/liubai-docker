@@ -18,8 +18,11 @@ const props = defineProps({
 
 const fontColor = computed(() => {
   const ideType = props.ideType
+  if(ideType === "cnb.cool") return "var(--liu-cnb-cool-font)"
   if(ideType === "github.dev") return "var(--liu-github-font)"
   if(ideType === "vscode.dev") return "var(--liu-vscode-font)"
+  if(ideType === "gitpod.io") return "var(--liu-gitpod-font)"
+  if(ideType === "stackblitz.com") return "var(--liu-stackblitz-font)"
   return `var(--liu-${ideType}-font)`
 })
 
@@ -58,6 +61,9 @@ const ideName = computed(() => {
       <svg-icon v-else class="ib-icon"
         :name="iconName"
         :coverFillStroke="false"
+        :class="{
+          'ib-icon_trae': ideType === 'trae'
+        }"
       ></svg-icon>
 
       <!-- text -->
@@ -108,6 +114,11 @@ const ideName = computed(() => {
   width: 14px;
   height: 14px;
   margin-inline-end: 6px;
+}
+
+.ib-icon_trae {
+  width: 12px;
+  height: 12px;
 }
 
 .ib-icon_windsurf {

@@ -7,6 +7,12 @@ export function showIdeName(ideType: LiuIDEType) {
   return t(`ide_type.${newIdeType}`)
 }
 
+export function showIdeFullName(ideType: LiuIDEType) {
+  const t = i18n.global.t
+  const newIdeType = ideType.replace(/\./g, "-")
+  return t(`ide_full.${newIdeType}`)
+}
+
 export function showModelName(
   model: string,
 ) {

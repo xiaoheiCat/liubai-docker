@@ -102,7 +102,7 @@ async function getAuthInfo(
   apData.credential = credential
 
   // setTimeout(() => {
-  //   apData.appType = "windsurf"
+  //   apData.appType = "cnb.cool"
   //   apData.serial = "xxxxxx"
   //   apData.pageState = pageStates.OK
   // }, 3000)

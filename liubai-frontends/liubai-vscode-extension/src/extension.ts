@@ -56,6 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const info = liuInfo.getInfo()
 	console.log("see custom info: ")
 	console.log(info)
+	Logger.info("custom info: ", info)
 
 	// 3. init auth manager
 	const authManager = AuthenticationManager.getInstance(context)

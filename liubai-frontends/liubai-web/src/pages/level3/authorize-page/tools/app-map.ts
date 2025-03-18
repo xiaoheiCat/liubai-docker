@@ -12,5 +12,6 @@ export const appMap: Record<LiuAppType, string> = {
   "stackblitz.com": "Stackblitz",
   "tencent-cloud-studio": "Cloud Studio",
   "cnb.cool": "CNB",
-  "project-idx": "Project IDX"
+  "project-idx": "Project IDX",
+  "trae": "Trae"
 }

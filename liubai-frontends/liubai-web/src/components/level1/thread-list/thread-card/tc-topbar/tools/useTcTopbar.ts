@@ -6,7 +6,7 @@ import { i18n } from "~/locales"
 import { showModelName } from "~/utils/show/custom-show"
 import { useSystemStore } from "~/hooks/stores/useSystemStore"
 import { storeToRefs } from "pinia"
-import { showIdeName } from "~/utils/show/custom-show"
+import { showIdeFullName } from "~/utils/show/custom-show"
 
 export function useTcTopbar(
   props: TctProps,
@@ -48,11 +48,18 @@ export function useTcTopbar(
     if(!ideType) return
 
     const prefix = "logos-"
+
+    if(ideType === "cnb.cool") return `${prefix}cnb-cool`
     if(ideType === "cursor") {
       if(theme.value === "light") return `${prefix}cursor`
       return `${prefix}cursor_dark`
     }
     if(ideType === "github.dev") return `${prefix}github`
+    if(ideType === "gitpod.io") return `${prefix}gitpod`
+    if(ideType === "project-idx") return `${prefix}project-idx`
+    if(ideType === "stackblitz.com") return `${prefix}stackblitz`
+    if(ideType === "tencent-cloud-studio") return `${prefix}tencent-cloud-studio`
+    if(ideType === "trae") return `${prefix}trae`
     if(ideType === "vscode") return `${prefix}vscode`
     if(ideType === "vscode.dev") return `${prefix}vscode`
     if(ideType === "vscode-insiders") return `${prefix}vscode-insiders`
@@ -118,10 +125,11 @@ export function useTcTopbar(
     }
     
     cui.showModal({
-      title_key: "tip.tip",
+      title: "🪄",
       content,
       showCancel: false,
-      confirm_key: "common.ok"
+      confirm_key: "common.ok",
+      isTitleEqualToEmoji: true,
     })
   }
 
@@ -140,7 +148,7 @@ export function useTcTopbar(
     const ideType = _td.ideType
     if(!ideType) return
     const dateTime = _td.createdStr
-    const ide = showIdeName(ideType)
+    const ide = showIdeFullName(ideType)
     cui.showModal({
       title: "🧑‍💻",
       content_key: "thread_related.ide_desc",

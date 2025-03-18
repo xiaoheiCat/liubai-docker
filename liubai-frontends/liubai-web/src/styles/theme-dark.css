@@ -153,8 +153,14 @@
 
   /** ide types */
   --liu-ide-bg: linear-gradient(-30deg, #202120, #101110);
+  --liu-cnb-cool-font: #c05e09;
   --liu-cursor-font: #989898;
   --liu-github-font: #989898;
+  --liu-gitpod-font: #bf690d;
+  --liu-project-idx-font: #6e49cc;
+  --liu-stackblitz-font: #1068c0;
+  --liu-tencent-cloud-studio-font: #4b7bce;
+  --liu-trae-font: #ad4c41;
   --liu-vscode-font: #046bb0;
   --liu-vscode-insiders-font: #058b75;
   --liu-vscodium-font: #215eae;

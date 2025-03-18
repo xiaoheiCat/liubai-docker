@@ -214,6 +214,7 @@ export const liuIDETypes = [
   "project-idx",
   "tencent-cloud-studio",
   "cnb.cool",
+  "trae",
 ] as const
 export type LiuIDEType = typeof liuIDETypes[number]
 export const Sch_LiuIDEType = vbot.picklist(liuIDETypes)

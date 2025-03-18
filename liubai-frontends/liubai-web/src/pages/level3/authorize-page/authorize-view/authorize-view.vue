@@ -61,23 +61,38 @@ const {
       <div class="av-logo-box"
         :class="{ 'av-logo-box_windsurf': appType === 'windsurf' }"
       >
-        <svg-icon v-if="appType === 'cursor'"  class="av-cursor-svg"
+        <svg-icon v-if="appType === 'cnb.cool'" 
+          class="av-cnb-svg"
+          name="logos-cnb-cool"
+          :coverFillStroke="false"
+        ></svg-icon>
+        <svg-icon v-else-if="appType === 'cursor'"  class="av-cursor-svg"
           :name="theme === 'dark' ? 'logos-cursor_dark' : 'logos-cursor'"
           :coverFillStroke="false"
         ></svg-icon>
-        <svg-icon v-else-if="appType === 'github.dev'"  class="av-logo-svg"
+        <svg-icon v-else-if="appType === 'github.dev'" class="av-logo-svg"
           name="logos-github"
         ></svg-icon>
-        <svg-icon v-else-if="appType === 'gitpod.io'"  class="av-gitpod-svg"
+        <svg-icon v-else-if="appType === 'gitpod.io'" class="av-gitpod-svg"
           name="logos-gitpod"
           :coverFillStroke="false"
         ></svg-icon>
-        <svg-icon v-else-if="appType === 'project-idx'"  class="av-project-idx-svg"
+        <svg-icon v-else-if="appType === 'project-idx'" class="av-project-idx-svg"
           name="logos-project-idx"
           :coverFillStroke="false"
         ></svg-icon>
-        <svg-icon v-else-if="appType === 'stackblitz.com'"  class="av-stackblitz-svg"
+        <svg-icon v-else-if="appType === 'stackblitz.com'" class="av-stackblitz-svg"
           name="logos-stackblitz"
+          :coverFillStroke="false"
+        ></svg-icon>
+        <svg-icon v-else-if="appType === 'tencent-cloud-studio'" 
+          class="av-tencent-cloud-studio-svg"
+          name="logos-tencent-cloud-studio"
+          :coverFillStroke="false"
+        ></svg-icon>
+        <svg-icon v-else-if="appType === 'trae'" 
+          class="av-trae-svg"
+          name="logos-trae"
           :coverFillStroke="false"
         ></svg-icon>
         <svg-icon v-else-if="appType === 'windsurf'"  class="av-windsurf-svg"
@@ -252,14 +267,23 @@ const {
   height: 80%;
 }
 
-.av-cursor-svg, .av-vscodium-svg {
+.av-cnb-svg,
+.av-cursor-svg, 
+.av-vscodium-svg {
   width: 70%;
   height: 70%;
 }
 
-.av-gitpod-svg, .av-stackblitz-svg, .av-project-idx-svg {
+.av-gitpod-svg, 
+.av-stackblitz-svg, 
+.av-tencent-cloud-studio-svg,
+.av-project-idx-svg {
   width: 66%;
   height: 66%;
+}
+
+.av-tencent-cloud-studio-svg {
+  margin-inline-start: 4px;
 }
 
 .av-windsurf-svg {
@@ -272,6 +296,10 @@ const {
   height: 60%;
 }
 
+.av-trae-svg {
+  width: 50%;
+  height: 50%;
+}
 
 .av-title {
   margin-block-end: min(5%, 20px);
