@@ -3,12 +3,17 @@ import type { TctProps } from "./types"
 import type { TooltipPlacement } from "~/components/common/liu-tooltip/tools/types"
 import cui from "~/components/custom-ui"
 import { i18n } from "~/locales"
-import { showModelName } from "~/utils/show/show-model-name"
+import { showModelName } from "~/utils/show/custom-show"
+import { useSystemStore } from "~/hooks/stores/useSystemStore"
+import { storeToRefs } from "pinia"
+import { showIdeName } from "~/utils/show/custom-show"
 
 export function useTcTopbar(
   props: TctProps,
 ) {
   const td = computed(() => props.threadData)
+  const systemStore = useSystemStore()
+  const { supported_theme: theme } = storeToRefs(systemStore)
 
   const aiCharacterUrl = computed(() => {
     const _td = td.value
@@ -37,6 +42,24 @@ export function useTcTopbar(
     if(a === "zhipu") return "zhipu.svg"
   })
 
+  const ideIconName = computed(() => {
+    const _td = td.value
+    const ideType = _td.ideType
+    if(!ideType) return
+
+    const prefix = "logos-"
+    if(ideType === "cursor") {
+      if(theme.value === "light") return `${prefix}cursor`
+      return `${prefix}cursor_dark`
+    }
+    if(ideType === "github.dev") return `${prefix}github`
+    if(ideType === "vscode") return `${prefix}vscode`
+    if(ideType === "vscode.dev") return `${prefix}vscode`
+    if(ideType === "vscode-insiders") return `${prefix}vscode-insiders`
+    if(ideType === "vscodium") return `${prefix}vscodium`
+    if(ideType === "windsurf") return `${prefix}windsurf`
+  })
+
   const showTopbar = computed(() => {
     const t = td.value
     if(t.pinStamp) return true
@@ -44,6 +67,7 @@ export function useTcTopbar(
     if(!t.aiReadable || t.aiReadable === "N") return true
     if(t.storageState === `LOCAL` || t.storageState === `ONLY_LOCAL`) return true
     if(aiCharacterUrl.value) return true
+    if(ideIconName.value) return true
     return false
   })
 
@@ -51,6 +75,7 @@ export function useTcTopbar(
     const _td = td.value
     if(_td.stateShow) return `bottom`
     if(_td.aiCharacter) return `bottom`
+    if(_td.ideType) return `bottom`
     return `bottom-end`
   })
 
@@ -110,13 +135,31 @@ export function useTcTopbar(
     })
   }
 
+  const onTapIDEType = () => {
+    const _td = td.value
+    const ideType = _td.ideType
+    if(!ideType) return
+    const dateTime = _td.createdStr
+    const ide = showIdeName(ideType)
+    cui.showModal({
+      title: "🧑‍💻",
+      content_key: "thread_related.ide_desc",
+      content_opt: { dateTime, ide },
+      showCancel: false,
+      confirm_key: "common.ok",
+      isTitleEqualToEmoji: true,
+    })
+  }
+
 
   return {
     td,
     showTopbar,
     cloudOffPlacement,
     aiCharacterUrl,
+    ideIconName,
     onTapAiCharacter,
-    onTapNoAI
+    onTapNoAI,
+    onTapIDEType,
   }
 }

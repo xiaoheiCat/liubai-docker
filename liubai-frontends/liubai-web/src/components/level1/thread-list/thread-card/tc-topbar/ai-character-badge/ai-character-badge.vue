@@ -73,7 +73,13 @@ const { t } = useI18n()
     width: 100%;
     height: 100%;
     opacity: .11;
+    z-index: 0;
   }
+}
+
+.tct-ai-character, .tctsb-text {
+  position: relative;
+  z-index: 1;
 }
 
 .tct-ai-character {

@@ -6,6 +6,7 @@ import { useTcTopbar } from './tools/useTcTopbar';
 import type { TctEmits } from "./tools/types"
 import StateBadge from '~/components/common/state-badge/state-badge.vue';
 import AiCharacterBadge from './ai-character-badge/ai-character-badge.vue';
+import IdeBadge from './ide-badge/ide-badge.vue';
 
 const props = defineProps({
   threadData: {
@@ -21,8 +22,10 @@ const {
   showTopbar,
   cloudOffPlacement,
   aiCharacterUrl,
+  ideIconName,
   onTapAiCharacter,
   onTapNoAI,
+  onTapIDEType,
 } = useTcTopbar(props)
 
 
@@ -71,6 +74,17 @@ const {
         :ai-character="td.aiCharacter"
         :icon-url="aiCharacterUrl"
       ></AiCharacterBadge>
+    </div>
+
+    <!-- ide type -->
+    <div v-if="ideIconName && td.ideType" 
+      class="tct-item-container tct-ai-box"
+      @click.stop="onTapIDEType"
+    >
+      <IdeBadge
+        :ide-type="td.ideType"
+        :icon-name="ideIconName"
+      ></IdeBadge>
     </div>
 
     <!-- 状态 -->

@@ -334,7 +334,8 @@
     "created_by_ai": "The card was created by {name} ({company})",
     "created_by_ai2": "The card was created by {name}.",
     "no_ai": "The card rejecting AI",
-    "no_ai_desc": "This card cannot be read by AI assistants."
+    "no_ai_desc": "This card cannot be read by AI assistants.",
+    "ide_desc": "You created the card in {ide} at {dateTime}."
   },
   "state_related": {
     "add_state": "New State",
@@ -696,5 +697,19 @@
   },
   "ai_detail": {
     "thinking_process": "Thinking Process"
+  },
+  "ide_type": {
+    "vscode": "VS Code",
+    "vscode-insiders": "vscode-insiders",
+    "cursor": "Cursor",
+    "windsurf": "Windsurf",
+    "vscodium": "VSCodium",
+    "github-dev": "github.dev",
+    "vscode-dev": "vscode.dev",
+    "gitpod-io": "Gitpod",
+    "stackblitz-com": "StackBlitz",
+    "project-idx": "Project IDX",
+    "tencent-cloud-studio": "Cloud Studio",
+    "cnb-cool": "CNB"
   }
 }

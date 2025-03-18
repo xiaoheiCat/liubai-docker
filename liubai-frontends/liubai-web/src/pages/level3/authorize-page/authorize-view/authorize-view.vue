@@ -82,7 +82,7 @@ const {
         ></svg-icon>
         <svg-icon v-else-if="appType === 'windsurf'"  class="av-windsurf-svg"
           name="logos-windsurf"
-          :coverFillStroke="false"
+          color="#58E5BB"
         ></svg-icon>
         <svg-icon v-else-if="appType === 'vscodium'"  class="av-vscodium-svg"
           name="logos-vscodium"

@@ -334,7 +334,8 @@
     "created_by_ai": "本卡片由 {name}（{company}）協助創建",
     "created_by_ai2": "本卡片由 {name} 協助創建",
     "no_ai": "拒絕 AI 的卡片",
-    "no_ai_desc": "當前卡片無法被 AI 助手們讀取到。"
+    "no_ai_desc": "當前卡片無法被 AI 助手們讀取到。",
+    "ide_desc": "{dateTime}，你在 {ide} 上創建"
   },
   "state_related": {
     "add_state": "新增狀態",
@@ -696,5 +697,19 @@
   },
   "ai_detail": {
     "thinking_process": "思考過程"
+  },
+  "ide_type": {
+    "vscode": "VS Code",
+    "vscode-insiders": "vscode-insiders",
+    "cursor": "Cursor",
+    "windsurf": "Windsurf",
+    "vscodium": "VSCodium",
+    "github-dev": "github.dev",
+    "vscode-dev": "vscode.dev",
+    "gitpod-io": "Gitpod",
+    "stackblitz-com": "StackBlitz",
+    "project-idx": "Project IDX",
+    "tencent-cloud-studio": "Cloud Studio",
+    "cnb-cool": "CNB"
   }
 }

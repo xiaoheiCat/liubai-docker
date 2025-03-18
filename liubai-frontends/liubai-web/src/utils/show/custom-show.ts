@@ -1,4 +1,11 @@
+import { i18n } from "~/locales";
+import type { LiuIDEType } from "~/types/types-atom";
 
+export function showIdeName(ideType: LiuIDEType) {
+  const t = i18n.global.t
+  const newIdeType = ideType.replace(/\./g, "-")
+  return t(`ide_type.${newIdeType}`)
+}
 
 export function showModelName(
   model: string,

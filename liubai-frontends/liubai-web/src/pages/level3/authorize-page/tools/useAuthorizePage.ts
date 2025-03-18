@@ -102,10 +102,10 @@ async function getAuthInfo(
   apData.credential = credential
 
   // setTimeout(() => {
-  //   apData.appType = "github.dev"
+  //   apData.appType = "windsurf"
   //   apData.serial = "xxxxxx"
   //   apData.pageState = pageStates.OK
-  // }, 1000)
+  // }, 3000)
 
   // 1. fetch 
   const url1 = APIs.AUTHORIZE

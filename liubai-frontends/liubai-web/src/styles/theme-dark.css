@@ -151,6 +151,15 @@
   --yuewen-color: #36DBFF;
   --zhipu-color: #76A8F6;
 
+  /** ide types */
+  --liu-ide-bg: linear-gradient(-30deg, #202120, #101110);
+  --liu-cursor-font: #989898;
+  --liu-github-font: #989898;
+  --liu-vscode-font: #046bb0;
+  --liu-vscode-insiders-font: #058b75;
+  --liu-vscodium-font: #215eae;
+  --liu-windsurf-font: #258669;
+
   /** 状态色 */
   --liu-state-1: #C3BBB3;
   --liu-state-2: #b3b788;
