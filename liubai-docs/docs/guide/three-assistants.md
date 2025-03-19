@@ -12,7 +12,7 @@
 
 <img src="./assets-three-assistants/follow-and-reply.png" width="600" style="margin-block-end: 10px">
 
-关注后，根据引导完成登录，再点击对话框右下角 `⌨️` 键盘图标（如上图第 3 步骤），即可开始聊天！
+关注后，根据引导完成登录，再点击对话框左下角 `⌨️` 图标（如上图第 3 步骤），即可开始聊天！
 
 ## 用说的比较快 {#just-talk}
 
