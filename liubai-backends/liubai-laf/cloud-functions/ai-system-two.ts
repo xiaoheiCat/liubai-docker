@@ -7,7 +7,6 @@ import {
   getNowStamp, 
   isWithinMillis, 
   MINUTE,
-  DAY,
   getBasicStampWhileAdding,
   HOUR,
 } from "@/common-time"
@@ -520,7 +519,7 @@ const xml_with_tool_calls = `
 const db = cloud.database()
 const _ = db.command
 
-const HR_47 = DAY * 47
+const HR_47 = HOUR * 47
 
 // 最小会话论述，聊天室的轮数必须大于等于该值，才会进入系统二
 const MAX_INPUT_TOKEN_K = 24
