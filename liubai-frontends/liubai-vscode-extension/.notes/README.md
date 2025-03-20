@@ -60,5 +60,17 @@ mkcert localhost
 
 这样安装好的插件，在 `VSCodium` 的顶部导航栏中选择 `Help / Toggle Developer Tools` 即可看到插件打印的日志。
 
+### 打包
+
+全局安装 `pnpm i -g vsce` 之后，在 `liubai-vscode-extension` 目录下运行：
+
+```shell
+vsce package --no-dependencies
+```
+
+这个命令会检测 `package.json` 的 `scripts` 字段，找到 `vscode:prepublish` 命令，然后执行它。
+
+
+
 
 

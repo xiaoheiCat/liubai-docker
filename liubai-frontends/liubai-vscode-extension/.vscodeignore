@@ -12,3 +12,8 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 **/.vscode-test.*
+.notes/
+pnpm-lock.yaml
+.env
+*.local
+.env.template
