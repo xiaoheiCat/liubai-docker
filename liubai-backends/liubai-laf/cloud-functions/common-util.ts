@@ -3347,62 +3347,81 @@ export class AiToolUtil {
       return res0
     }
 
-    const errRes = checker.getErrResult("no function name matches")
-
     // 1. add_note
     if(funcName === "add_note") {
-      const res1 = vbot.safeParse(Sch_AiToolAddNoteParam, funcJson)
-      if(!res1.success) {
-        console.warn("cannot parse add_note param: ")
-        console.log(funcJson)
-        console.log(res1.issues)
-        errRes.err.errMsg = checker.getErrMsgFromIssues(res1.issues)
-        return errRes
-      }
-      
-      const { title, description } = funcJson
-      const liuDesc1 = this.turnTextToLiuDesc(description)
-      if(!liuDesc1 || liuDesc1.length === 0) {
-        console.warn("cannot get liuDesc1 in add_note!")
-        console.log(funcJson)
-        errRes.err.errMsg = "fail to get liuDesc1 from description in add_note"
-        return errRes
-      }
-      const d1: SyncOperateAPI.WaitingData = {
-        title,
-        liuDesc: liuDesc1,
-      }
-      return { pass: true, data: d1 }
+      const res1 = this.turnJsonForAddNote(funcJson)
+      return res1
     }
 
     // 2. add_todo
     if(funcName === "add_todo") {
-      const res2 = vbot.safeParse(Sch_AiToolAddTodoParam, funcJson)
-      if(!res2.success) {
-        console.warn("cannot parse add_todo param: ")
-        console.log(funcJson)
-        console.log(res2.issues)
-        errRes.err.errMsg = checker.getErrMsgFromIssues(res2.issues)
-        return errRes
-      }
-
-      const { title } = funcJson
-      const liuDesc2 = this.turnTextToLiuDesc(title)
-      if(!liuDesc2 || liuDesc2.length === 0) {
-        console.warn("cannot get liuDesc2 in add_todo!")
-        console.log(funcJson)
-        errRes.err.errMsg = "fail to get liuDesc2 from title in add_todo"
-        return errRes
-      }
-      const d2: SyncOperateAPI.WaitingData = {
-        liuDesc: liuDesc2,
-      }
-      return { pass: true, data: d2 }
+      const res2 = this.turnJsonForAddTodo(funcJson)
+      return res2
     }
 
+    const errRes = checker.getErrResult("no function name matches")
     return errRes
   }
+  
+  static turnJsonForAddTodo(
+    funcJson: Record<string, any>,
+  ): DataPass<SyncOperateAPI.WaitingData> {
+    const errRes = checker.getErrResult("no function name matches")
+    const res2 = vbot.safeParse(Sch_AiToolAddTodoParam, funcJson)
+    if(!res2.success) {
+      console.warn("cannot parse add_todo param: ")
+      console.log(funcJson)
+      console.log(res2.issues)
+      errRes.err.errMsg = checker.getErrMsgFromIssues(res2.issues)
+      return errRes
+    }
 
+    const { title } = funcJson
+    const liuDesc2 = this.turnTextToLiuDesc(title)
+    if(!liuDesc2 || liuDesc2.length === 0) {
+      console.warn("cannot get liuDesc2 in add_todo!")
+      console.log(funcJson)
+      errRes.err.errMsg = "fail to get liuDesc2 from title in add_todo"
+      return errRes
+    }
+    const d2: SyncOperateAPI.WaitingData = {
+      liuDesc: liuDesc2,
+    }
+    return { pass: true, data: d2 }
+  }
+
+  static turnJsonForAddNote(
+    funcJson: Record<string, any>,
+  ): DataPass<SyncOperateAPI.WaitingData> {
+    const errRes = checker.getErrResult("no function name matches")
+    if(funcJson.title && !funcJson.description) {
+      funcJson.description = funcJson.title
+      funcJson.title = undefined
+    }
+
+    const res1 = vbot.safeParse(Sch_AiToolAddNoteParam, funcJson)
+    if(!res1.success) {
+      console.warn("cannot parse add_note param: ")
+      console.log(funcJson)
+      console.log(res1.issues)
+      errRes.err.errMsg = checker.getErrMsgFromIssues(res1.issues)
+      return errRes
+    }
+    
+    const { title, description } = funcJson
+    const liuDesc1 = this.turnTextToLiuDesc(description)
+    if(!liuDesc1 || liuDesc1.length === 0) {
+      console.warn("cannot get liuDesc1 in add_note!")
+      console.log(funcJson)
+      errRes.err.errMsg = "fail to get liuDesc1 from description in add_note"
+      return errRes
+    }
+    const d1: SyncOperateAPI.WaitingData = {
+      title,
+      liuDesc: liuDesc1,
+    }
+    return { pass: true, data: d1 }
+  }
 
   static turnJsonForAddCalendar(
     funcJson: Record<string, any>,
