@@ -56,6 +56,15 @@ export default defineConfig({
                 { text: "Mac", link: "/guide/install/mac" },
                 { text: "Windows", link: "/guide/install/windows" },
               ]
+            },
+            {
+              text: "IDE",
+              link: "/guide/ide/",
+              collapsed: true,
+              items: [
+                { text: "如何使用插件", link: "/guide/ide/how-to-use-vscode-ext" },
+                { text: "Windsurf", link: "/guide/ide/windsurf" },
+              ]
             }
           ]
         },
