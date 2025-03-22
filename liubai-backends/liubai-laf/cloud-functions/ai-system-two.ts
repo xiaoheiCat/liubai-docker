@@ -941,14 +941,54 @@ class SystemTwo {
     catch(err) {
       console.warn("xml2js.Parser parse error: ", err)
     }
+
+    // 3.2 start to handle parsing error
     if(!res3) {
-      console.log("try again due to no result")
-      const msg3_1 = `### Parse Error\n\n${content1}`
-      this._toReporter(msg3_1)
-      return true
+      const msg3_2 = `### Parse Error\n\n${content1}`
+
+      // 3.2.1 if content1 has <direction> but parser failed
+      if(content1.includes("<direction>")) {
+        this._toReporter(msg3_2)
+        return true
+      }
+
+      // 3.2.2 if content1 has <content> but parser failed
+      if(content1.includes("<content>")) {
+        this._toReporter(msg3_2)
+        return true
+      }
+
+      // 3.2.3 if content1 has <tool_calls> but parser failed
+      if(content1.includes("<tool_calls>")) {
+        this._toReporter(msg3_2)
+        return true
+      }
+
+      // 3.2.4 if contents has too less characters
+      if(content1.length < 10) {
+        this._toReporter(msg3_2)
+        return true
+      }
+
+      // 3.2.n package content1 with <xml> and <direction>1</direction>
+      try {
+        const newContent1 = `<xml>\n  <direction>1</direction>\n  <content>${content1}</content>\n</xml>`
+        const { xml: xml2 } = await parser.parseStringPromise(newContent1)
+        res3 = xml2
+      }
+      catch(err) {
+        console.warn("parsing failed again: ", err)
+      }
     }
 
-    // 3.2 calibrate output
+    // 3.3 parsing error again
+    if(!res3) {
+      const msg3_3 = `### Parse Error Again\n\n${content1}`
+      this._toReporter(msg3_3)
+      return false
+    }
+
+    // 3.4 calibrate output
     this._calibrateOutput(res3)
     console.log("see result from SYS 2: ", res3)
 
