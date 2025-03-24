@@ -465,24 +465,25 @@ class AiDirective {
     msg += msg3_2
 
     // 4. add subscription link
-    if(!isSubscribed) {
-      const msg4 = t("buy_premium")
-      msg += `\n\n${msg4}`
-    }
+    let msg4 = isSubscribed ? t("renew_premium") : t("buy_premium")
+    msg += `\n\n${msg4}`
 
     // 5. text user
     TellUser.text(entry, msg)
   }
 
   private static isViewingStatus(text: string) {
-    if(text === "ai" || text === "AI") return true
-    const prefix = [
+    const prefix1 = ["AI", "额度", "額度"]
+    const res1 = this._areTheyMatched(prefix1, text)
+    if(res1) return res1
+
+    const prefix2 = [
       "群聊状态", "查看群聊状态", "群聊有谁", "群聊还有谁", "群里还有谁",
       "群聊狀態", "檢視群聊狀態", "群組裡有誰", "群組還有誰", "群組中還有誰",
       "Status", "Group Status",
     ]
-    const res1 = this._areTheyMatched(prefix, text, true)
-    return res1
+    const res2 = this._areTheyMatched(prefix2, text, true)
+    return res2
   }
 
   private static async toKickBot(entry: AiEntry, bot: AiBot) {
