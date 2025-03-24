@@ -60,6 +60,13 @@ export default defineConfig({
           ]
         },
         {
+          text: "连接",
+          collapsed: true,
+          items: [
+            { text: "WPS", link: "/guide/connect/wps" },
+          ]
+        },
+        {
           text: "提问箱",
           link: "/guide/faq/"
         },

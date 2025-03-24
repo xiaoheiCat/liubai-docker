@@ -10,6 +10,7 @@ const {
   onWebhookUrlInput,
   onTapCopyWebhookPassword,
   onTapSave,
+  onTapConfigMethod,
 } = useConnectWps()
 
 </script>
@@ -76,6 +77,7 @@ const {
           <custom-btn 
             size="mini" 
             type="transparent"
+            @click="onTapConfigMethod"
           >
             <span>{{ t('connect.check_config') }}</span>
           </custom-btn>

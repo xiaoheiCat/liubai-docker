@@ -30,7 +30,7 @@ import {
   BaseLLM,
   LogHelper,
 } from '@/ai-shared'
-import { i18nFill } from '@/common-i18n'
+import { commonLang, i18nFill, useI18n } from '@/common-i18n'
 import { getNowStamp } from '@/common-time'
 import xml2js from "xml2js"
 import { LiuReporter } from '@/service-send'
@@ -275,11 +275,32 @@ export class BackupToOthers {
     const {
       liuDesc,
       title,
+      images,
+      files,
     } = this._decryptedData
+
+    // handle desc
     let desc = ""
     if(liuDesc) {
       desc = RichTexter.turnDescToText(liuDesc)
     }
+    if(!desc) {
+      const user = this._user
+      const { t } = useI18n(commonLang, { user })
+      const imgLength = images?.length ?? 0
+      const fileLength = files?.length ?? 0
+      if(fileLength && imgLength) {
+        desc = `[${t("image")} + ${t("file")}]`
+      }
+      else if(imgLength) {
+        desc = `[${t("image")}]`
+      }
+      else if(fileLength) {
+        desc = `[${t("file")}]`
+      }
+    }
+
+
     const {
       _id: id,
       ideType,

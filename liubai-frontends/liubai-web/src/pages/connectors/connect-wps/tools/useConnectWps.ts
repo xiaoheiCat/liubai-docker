@@ -61,6 +61,11 @@ export function useConnectWps() {
     const isSame = Boolean(newUrl === oldUrl)
     cwData.canSave = !isSame
   }
+
+  const onTapConfigMethod = () => {
+    const link = "https://docs.liubai.cc/guide/connect/wps"
+    window.open(link, "_blank")
+  }
   
   return {
     cwData,
@@ -68,6 +73,7 @@ export function useConnectWps() {
     onWebhookUrlInput,
     onTapCopyWebhookPassword,
     onTapSave: () => toSave(cwData),
+    onTapConfigMethod,
   }
 }
 
