@@ -5,7 +5,10 @@ import {
   type RouteAndLiuRouter, 
   useRouteAndLiuRouter,
 } from "~/routes/liu-router"
-import type { Res_OC_GetWps, Res_OC_SetWps } from "~/requests/req-types"
+import type { 
+  Res_OC_GetWps, 
+  Res_OC_SetWps,
+} from "~/requests/req-types"
 import { pageStates } from "~/utils/atom"
 import { useAwakeNum } from "~/hooks/useCommon"
 import { useWorkspaceStore } from "~/hooks/stores/useWorkspaceStore"
@@ -14,6 +17,7 @@ import liuReq from "~/requests/liu-req"
 import { useThrottleFn } from "~/hooks/useVueUse"
 import { showErrMsg } from "~/pages/level1/tools/show-msg"
 import cui from "~/components/custom-ui"
+import liuApi from "~/utils/liu-api"
 
 export function useConnectWps() {
   const hasBE = liuEnv.hasBackend()
@@ -23,6 +27,7 @@ export function useConnectWps() {
     pageState: hasBE ? pageStates.LOADING : pageStates.NEED_BACKEND,
     webhook_toggle: false,
     canSave: false,
+    original_webhook_url: "",
   })
 
   const { awakeNum } = useAwakeNum()
@@ -35,10 +40,30 @@ export function useConnectWps() {
   const onWebhookChanged = useThrottleFn((newV: boolean) => {
     toChangeWebhook(cwData, newV)
   }, 400)
+
+  const onTapCopyWebhookPassword = async () => {
+    const pw = cwData.webhook_password
+    if(!pw) return
+    const res1 = await liuApi.copyToClipboard(pw)
+    if(res1) {
+      cui.showSnackBar({ text_key: "common.copied" })
+    }
+  }
+
+  const onWebhookUrlInput = (e: Event) => {
+    //@ts-ignore
+    const val = e.target.value ?? ""
+    const newUrl = val.trim()
+    const oldUrl = cwData.original_webhook_url ?? ""
+    const isSame = Boolean(newUrl === oldUrl)
+    cwData.canSave = !isSame
+  }
   
   return {
     cwData,
     onWebhookChanged,
+    onWebhookUrlInput,
+    onTapCopyWebhookPassword,
   }
 }
 
@@ -61,8 +86,6 @@ async function toChangeWebhook(
   }
   const url2 = APIs.OPEN_CONNECT
   const res2 = await liuReq.request<Res_OC_SetWps>(url2, data2)
-
-  console.log("res2: ", res2)
   
   // 3. handle result
   const data3 = res2.data
@@ -129,4 +152,5 @@ async function checkoutData(
   cwData.webhook_toggle = Boolean(data3.enable === "Y")
   cwData.webhook_url = data3.webhook_url
   cwData.webhook_password = data3.webhook_password
+  cwData.original_webhook_url = data3.webhook_url ?? ""
 }

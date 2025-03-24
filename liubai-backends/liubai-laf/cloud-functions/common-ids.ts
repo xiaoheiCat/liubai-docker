@@ -185,7 +185,7 @@ export function createPaymentNonce() {
 }
 
 export function createThirdPartyPassword() {
-  return "tp0" + createRandom(10)
+  return "tp2" + createRandom(8)
 }
 
 export function createThreadId() {

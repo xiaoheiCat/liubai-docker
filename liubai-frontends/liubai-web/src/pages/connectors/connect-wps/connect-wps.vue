@@ -7,6 +7,8 @@ const { t } = useI18n()
 const { 
   cwData,
   onWebhookChanged,
+  onWebhookUrlInput,
+  onTapCopyWebhookPassword,
 } = useConnectWps()
 
 </script>
@@ -49,13 +51,14 @@ const {
           v-model="cwData.webhook_url" 
           class="ph-no-capture cw-answer" 
           placeholder="https://www.kdocs.cn/chatflow/......"
+          @input="onWebhookUrlInput"
         />
 
         <!-- password -->
         <div class="liu-no-user-select cw-question">
           <span>{{ t('connect.wps_webhook_password') }}</span>
         </div>
-        <div class="liu-hover cw-answer">
+        <div class="liu-hover cw-answer" @click.stop="onTapCopyWebhookPassword">
           <div class="cw-answer-text">
             <span>{{ cwData.webhook_password }}</span>
           </div>
