@@ -26,6 +26,7 @@ import {
   type DataPass,
   type Res_OC_GetWps,
   type Res_OC_SetWps,
+  type Res_OC_GetDingTalk,
 } from "@/common-types"
 import { 
   checkAndGetWxGzhAccessToken,
@@ -81,8 +82,122 @@ export async function main(ctx: FunctionContext) {
   else if(oT === "set-wps") {
     res = await handle_set_wps(vRes, body)
   }
+  else if(oT === "get-dingtalk") {
+    res = await handle_get_dingtalk(vRes, body)
+  }
+  else if(oT === "set-dingtalk") {
+    res = await handle_set_dingtalk(vRes, body)
+  }
 
   return res
+}
+
+async function handle_set_dingtalk(
+  vRes: VerifyTokenRes_B,
+  body: Record<string, any>,
+) {
+  // 0. decrypt body
+  const res0 = getDecryptedBody(body, vRes)
+  const newBody = res0.newBody
+  if(!newBody || res0.rqReturn) {
+    return res0.rqReturn ?? { code: "E5001" }
+  }
+
+  // 1. check out data
+  const enable = newBody.enable
+  if(enable !== "Y" && enable !== "N") {
+    return { code: "E4000", errMsg: "enable is required" }
+  }
+  const aesKey = getAESKey()
+  if(!aesKey) return { code: "E5001", errMsg: "getAESKey failed in set-dingtalk" }
+
+  // 1.1 checking whether webhook_url is from dingtalk
+  const webhook_url = newBody.webhook_url
+  if(typeof webhook_url === "string" && webhook_url) {
+    const isDingTalkUrl = WebhookHandler.isDingTalkWebhookUrl(webhook_url)
+    if(!isDingTalkUrl) {
+      return { code: "E4000", errMsg: "webhook_url is not from dingtalk" }
+    }
+  }
+
+  // 2. get workspace
+  const res2 = await getSharedData1(vRes, newBody)
+  if(!res2.pass) return res2.err
+  const space = res2.data
+
+  // 3. handle dingtalk config
+  const cfg = space.dingtalk ?? {}
+  let updated = false
+
+  // 3.1 for enable
+  if(cfg.enable !== enable) {
+    cfg.enable = enable
+    updated = true
+  }
+
+  // 3.2 for webhook_url
+  let old_url = ""
+  if(cfg.enc_webhook_url) {
+    const d3_2 = decryptCloudData<string>(cfg.enc_webhook_url)
+    if(!d3_2.pass) return d3_2.err
+    old_url = d3_2.data ?? ""
+  }
+  if(typeof webhook_url === "string") {
+    if(webhook_url !== old_url) {
+      cfg.enc_webhook_url = encryptDataWithAES(webhook_url, aesKey)
+      updated = true
+    }
+  }
+
+  // 4. get to update
+  if(updated) {
+    const wCol = db.collection("Workspace")
+    await wCol.doc(space._id).update({ dingtalk: cfg })
+  }
+
+  return { code: "0000" }
+}
+
+async function handle_get_dingtalk(
+  vRes: VerifyTokenRes_B,
+  body: Record<string, any>,
+) {
+  // 1. checking out memberId
+  const res1 = await getSharedData1(vRes, body)
+  if(!res1.pass) return res1.err
+  const space = res1.data
+
+  // 2. handle return data
+  const returnData: Res_OC_GetDingTalk = {
+    operateType: "get-dingtalk",
+  }
+  const cfg = space.dingtalk
+  if(!cfg) {
+    return {
+      code: "0000",
+      data: returnData,
+    }
+  }
+
+  // 3.1 decrypt enc_webhook_url
+  if(cfg.enc_webhook_url) {
+    const d1 = decryptCloudData<string>(cfg.enc_webhook_url)
+    if(!d1.pass) {
+      console.warn("enc_webhook_url decrypt failed in handle_get_dingtalk: ", d1.err)
+      return { 
+        code: "E4009", 
+        errMsg: "enc_webhook_url decryption failed while getting dingtalk",
+      }
+    }
+    returnData.plz_enc_webhook_url = d1.data
+  }
+
+  // 3.2 handle enable
+  returnData.enable = cfg.enable
+
+  // 4. encrypt data
+  const res4 = getSharedData2(vRes, returnData)
+  return res4
 }
 
 
@@ -108,7 +223,7 @@ async function handle_set_wps(
   // 1.1 checking whether webhook_url is from wps
   const webhook_url = newBody.webhook_url
   if(typeof webhook_url === "string" && webhook_url) {
-    const isWpsUrl = WpsHandler.isWpsWebhookUrl(webhook_url)
+    const isWpsUrl = WebhookHandler.isWpsWebhookUrl(webhook_url)
     if(!isWpsUrl) {
       return { code: "E4000", errMsg: "webhook_url is not from wps" }
     }
@@ -220,15 +335,19 @@ async function handle_get_wps(
   return res4
 }
 
-class WpsHandler {
+class WebhookHandler {
 
-  static domains = ["kdocs.cn", "wps.cn"]
+  static wpsDomains = ["kdocs.cn", "wps.cn"]
+  static dingtalkDomains = ["dingtalk.com"]
 
-  static isWpsWebhookUrl(webhook_url: string) {
+  private static _checkWebhookUrl(
+    link: string,
+    domains: string[],
+  ) {
     try {
-      const url1 = new URL(webhook_url)
+      const url1 = new URL(link)
       const origin = url1.origin
-      const domain = this.domains.find(d => {
+      const domain = domains.find(d => {
         const d1 = "." + d
         const res1 = origin.endsWith(d1)
         if(res1) return true
@@ -239,9 +358,22 @@ class WpsHandler {
       return Boolean(domain)
     }
     catch(err) {
-      console.warn("isWpsWebhookUrl error: ", err)
+      console.warn("_checkWebhookUrl error: ", err)
     }
     return false
+
+  }
+
+  static isWpsWebhookUrl(link: string) {
+    const list = this.wpsDomains
+    const res = this._checkWebhookUrl(link, list)
+    return res
+  }
+
+  static isDingTalkWebhookUrl(link: string) {
+    const list = this.dingtalkDomains
+    const res = this._checkWebhookUrl(link, list)
+    return res
   }
 
 }

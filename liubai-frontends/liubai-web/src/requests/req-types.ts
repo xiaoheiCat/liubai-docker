@@ -278,3 +278,9 @@ export interface Res_OC_SetWps {
   operateType: "set-wps"
   webhook_password?: string
 }
+
+export interface Res_OC_GetDingTalk {
+  operateType: "get-dingtalk"
+  enable?: BaseIsOn
+  webhook_url?: string
+}

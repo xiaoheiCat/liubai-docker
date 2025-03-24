@@ -2541,6 +2541,12 @@ export interface Res_OC_SetWps {
   plz_enc_webhook_password?: string
 }
 
+export interface Res_OC_GetDingTalk {
+  operateType: "get-dingtalk"
+  enable?: BaseIsOn
+  plz_enc_webhook_url?: string
+}
+
 
 /******************** 一些云函数间内部的入参和出参类型 **********/
 
