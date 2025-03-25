@@ -137,7 +137,7 @@ export const aiBots: AiBot[] = [
     model: "deepseek-chat",
     abilities: ["chat", "tool_use"],
     alias: ["深度求索", "ds", "v3", "deepseek", "deep seek"],
-    priority: 7,
+    priority: 70,
     maxWindowTokenK: 64,
   },
 
