@@ -591,12 +591,16 @@
     "wps": "WPS",
     "wps_desc": "Send your cards to WPS Docs",
     "wps_backup": "Backup to WPS",
-    "wps_backup_desc": "After turning on, your cards on Liubai can be backed up to WPS Docs",
+    "wps_backup_desc": "After turning on, your cards on Liubai can be backed up to WPS Docs.",
     "wps_webhook_url": "Callback Url",
     "wps_webhook_password": "Password",
     "wps_webhook_err": "It might not be a url from WPS. Input a link like https://www.kdocs.cn/xxxxxx please.",
     "dingtalk": "DingTalk",
     "dingtalk_desc": "Using Liubai quietly on DingTalk",
+    "dingtalk_backup": "Backup to DingTalk",
+    "dingtalk_backup_desc": "After turning on, your cards on Liubai can be backed up to DingTalk.",
+    "dingtalk_webhook_url": "Webhook",
+    "dingtalk_webhook_err": "This does not seem to be a DingTalk's webhook address. Please enter a link starting with https://connector.dingtalk.com/...",
     "feishu": "Feishu",
     "feishu_desc": "All of super individuals on Feishu is using Liubai",
     "line": "LINE",
@@ -609,7 +613,7 @@
     "teams_desc": "Liubai for Microsoft Teams",
     "whatsapp": "WhatsApp",
     "whatsapp_desc": "Using Liubai on WhatsApp",
-    "check_config": "View Method"
+    "check_config": "How to Config"
   },
   "qrcode": {
     "title": "Your exclusive QR code",

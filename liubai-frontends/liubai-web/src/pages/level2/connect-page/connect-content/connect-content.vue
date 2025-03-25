@@ -23,7 +23,7 @@ const {
     desc-key="connect.wps_desc" icon-url="/images/third-party/wps.svg"
   ></ConnectItem>
 
-  <!-- TODO: dingtalk -->
+  <!-- dingtalk -->
   <ConnectItem v-if="_env.C_DINGTALK" 
     :prefix="prefix" connector-id="dingtalk" title-key="connect.dingtalk"
     desc-key="connect.dingtalk_desc" icon-url="/images/third-party/dingtalk.svg"

@@ -6,10 +6,7 @@ import {
   type RouteAndLiuRouter, 
   useRouteAndLiuRouter,
 } from "~/routes/liu-router"
-import type { 
-  Res_OC_GetWps, 
-  Res_OC_SetWps,
-} from "~/requests/req-types"
+import type { Res_OC_GetDingTalk } from "~/requests/req-types"
 import { pageStates } from "~/utils/atom"
 import { useAwakeNum } from "~/hooks/useCommon"
 import { useWorkspaceStore } from "~/hooks/stores/useWorkspaceStore"
@@ -18,12 +15,11 @@ import liuReq from "~/requests/liu-req"
 import { useThrottleFn } from "~/hooks/useVueUse"
 import { showErrMsg } from "~/pages/level1/tools/show-msg"
 import cui from "~/components/custom-ui"
-import liuApi from "~/utils/liu-api"
 import time from "~/utils/basic/time"
 
 let lastSetStamp = 0
 
-export function useConnectWps() {
+export function useConnectDingTalk() {
   const hasBE = liuEnv.hasBackend()
   const rr = useRouteAndLiuRouter()
 
@@ -47,15 +43,6 @@ export function useConnectWps() {
     toChangeWebhook(cwData, newV)
   }, 400)
 
-  const onTapCopyWebhookPassword = async () => {
-    const pw = cwData.webhook_password
-    if(!pw) return
-    const res1 = await liuApi.copyToClipboard(pw)
-    if(res1) {
-      cui.showSnackBar({ text_key: "common.copied" })
-    }
-  }
-
   const onWebhookUrlInput = (e: Event) => {
     //@ts-ignore
     const val = e.target.value ?? ""
@@ -66,7 +53,7 @@ export function useConnectWps() {
   }
 
   const onTapConfigMethod = () => {
-    const link = "https://docs.liubai.cc/guide/connect/wps"
+    const link = "https://docs.liubai.cc/guide/connect/dingtalk"
     window.open(link, "_blank")
   }
   
@@ -74,7 +61,6 @@ export function useConnectWps() {
     cwData,
     onWebhookChanged,
     onWebhookUrlInput,
-    onTapCopyWebhookPassword,
     onTapSave: () => toSave(cwData),
     onTapConfigMethod,
   }
@@ -95,12 +81,12 @@ async function toSave(
   const tmp_url = cwData.webhook_url ?? ""
   const webhook_url = tmp_url.trim()
   if(webhook_url) {
-    const res1 = WebhookHandler.isWpsWebhookUrl(webhook_url)
+    const res1 = WebhookHandler.isDingTalkWebhookUrl(webhook_url)
     if(!res1) {
       cwData.canSave = false
       cui.showModal({
         title: "🤔",
-        content_key: "connect.wps_webhook_err",
+        content_key: "connect.dingtalk_webhook_err",
         isTitleEqualToEmoji: true,
         showCancel: false,
       })
@@ -111,25 +97,21 @@ async function toSave(
   // 3. construct query
   const url3 = APIs.OPEN_CONNECT
   const q3 = {
-    operateType: "set-wps",
+    operateType: "set-dingtalk",
     memberId,
     enable: "Y",
     plz_enc_webhook_url: webhook_url
   }
   lastSetStamp = time.getTime()
   cwData.isSaving = true
-  const res3 = await liuReq.request<Res_OC_SetWps>(url3, q3)
+  const res3 = await liuReq.request(url3, q3)
   cwData.isSaving = false
   
   // 4. handle result
   const code4 = res3.code
-  const data4 = res3.data
   if(code4 !== "0000") {
     showErrMsg("other", res3)
     return
-  }
-  if(data4?.webhook_password) {
-    cwData.webhook_password = data4.webhook_password
   }
   cwData.original_webhook_url = webhook_url
   cwData.canSave = false
@@ -149,25 +131,20 @@ async function toChangeWebhook(
 
   // 2. construct query
   const data2 = {
-    operateType: "set-wps",
+    operateType: "set-dingtalk",
     memberId,
     enable: newVal ? "Y" : "N",
   }
   lastSetStamp = time.getTime()
   const url2 = APIs.OPEN_CONNECT
-  const res2 = await liuReq.request<Res_OC_SetWps>(url2, data2)
+  const res2 = await liuReq.request(url2, data2)
   
   // 3. handle result
-  const data3 = res2.data
   const code3 = res2.code
   if(code3 !== "0000") {
     cwData.webhook_toggle = !newVal
     showErrMsg("other", res2)
     return
-  }
-  const webhook_password = data3?.webhook_password
-  if(webhook_password) {
-    cwData.webhook_password = webhook_password
   }
 
   if(newVal && cwData.webhook_url) {
@@ -191,12 +168,14 @@ async function checkoutData(
   // 2. fetch data
   const url2 = APIs.OPEN_CONNECT
   const w2 = {
-    operateType: "get-wps",
+    operateType: "get-dingtalk",
     memberId,
   }
-  const res2 = await liuReq.request<Res_OC_GetWps>(url2, w2)
+  const res2 = await liuReq.request<Res_OC_GetDingTalk>(url2, w2)
 
   // 3. handle data
+  console.log(res2)
+
   const code3 = res2.code
   const data3 = res2.data
 
@@ -218,7 +197,6 @@ async function checkoutData(
   if(code3 !== "0000" || !data3) return
   if(time.isWithinMillis(lastSetStamp, 1000)) return
   cwData.webhook_toggle = Boolean(data3.enable === "Y")
-  cwData.webhook_password = data3.webhook_password
 
   const new_url = data3.webhook_url ?? ""
   if(new_url !== cwData.original_webhook_url) {
