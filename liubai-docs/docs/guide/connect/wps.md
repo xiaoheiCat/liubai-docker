@@ -10,7 +10,7 @@
 
 请先登录[金山文档](https://www.kdocs.cn/latest)。
 
-然后打开这篇多维表格: [https://www.kdocs.cn/l/chDKViRt3A2g](https://www.kdocs.cn/l/chDKViRt3A2g)
+登录后，打开这篇多维表格: [https://www.kdocs.cn/l/chDKViRt3A2g](https://www.kdocs.cn/l/chDKViRt3A2g)
 
 <img src="./assets-wps/wps-1.png" alt="另存为" width="450" />
 
@@ -60,7 +60,7 @@
 }
 ```
 
-复制以上文本，然后返回到 WPS 上，往下滑找到**请求体**，如下图所示粘贴。
+复制以上文本，返回到 WPS 上，往下滑找到**请求体**，如下图所示粘贴。
 
 <img src="./assets-wps/wps-7.png" alt="设置请求体" width="650" />
 
