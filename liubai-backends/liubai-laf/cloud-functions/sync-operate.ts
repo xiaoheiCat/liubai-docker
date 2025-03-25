@@ -26,6 +26,7 @@ import {
 import { getBasicStampWhileAdding, getNowStamp } from './common-time'
 import { createThreadId } from '@/common-ids'
 import { AiShared } from '@/ai-shared'
+import { afterPostingThread } from '@/sync-after'
 
 const db = cloud.database()
 const _ = db.command
@@ -239,6 +240,9 @@ async function agree_aichat(
   const u10: Partial<Table_AiChat> = { contentId, updatedStamp: now10 }
   const aCol = db.collection("AiChat")
   aCol.doc(chatId).update(u10)
+
+  // 11. call sync-after
+  afterPostingThread(contentId, { disableAiCluster: true })
 
   return { 
     code: "0000", 

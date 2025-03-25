@@ -421,9 +421,7 @@ async function generalSyncAfterUpdating(
     const { new_id } = result
     if(!new_id) continue
 
-    afterPostingThread(new_id, {
-      disableAiCluster: true,
-    })
+    afterPostingThread(new_id, { disableAiCluster: true })
     await valTool.waitMilli(1000)
   }
 }
