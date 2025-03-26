@@ -68,7 +68,7 @@
 
 ## 使用 {#use}
 
-具体使用方式，请[参见这里](./how-to-use-vscode-ext)。
+具体使用方式，请参见[如何使用插件](./how-to-use-vscode-ext)。
 
 
 

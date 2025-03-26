@@ -16,12 +16,20 @@ title: 安装
   <img src="./liu-assets/iPhone.png" alt="iPhone" width="280" style="margin-block-end: 10px; border-radius: 10px;">
 </a>
 
+<a href="./iQOO">
+  <img src="./liu-assets/iQOO.png" alt="iQOO" width="280" style="margin-block-end: 10px; border-radius: 10px;">
+</a>
+
 <a href="./oppo">
   <img src="./liu-assets/oppo.png" alt="oppo" width="280" style="margin-block-end: 10px; border-radius: 10px;">
 </a>
 
 <a href="./realme">
   <img src="./liu-assets/realme.jpg" alt="realme" width="280" style="margin-block-end: 10px; border-radius: 10px;">
+</a>
+
+<a href="./samsung">
+  <img src="./liu-assets/samsung.png" alt="三星" width="280" style="margin-block-end: 10px; border-radius: 10px;">
 </a>
 
 <a href="./vivo">
