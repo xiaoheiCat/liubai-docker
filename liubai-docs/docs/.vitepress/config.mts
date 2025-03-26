@@ -71,6 +71,10 @@ export default defineConfig({
                 { text: "VSCodium", link: "/guide/ide/vscodium" },
                 { text: "Trae", link: "/guide/ide/trae" },
                 { text: "github.dev", link: "/guide/ide/github-dev" },
+                { text: "cnb.cool", link: "/guide/ide/cnb-cool" },
+                { text: "Project IDX", link: "/guide/ide/project-idx" },
+                { text: "gitpod.io", link: "/guide/ide/gitpod-io" },
+                { text: "vscode.dev", link: "/guide/ide/vscode-dev" },
               ]
             }
           ]
