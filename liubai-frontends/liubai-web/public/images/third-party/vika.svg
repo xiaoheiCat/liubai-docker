@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="5 5 20 20">
+  <defs>
+    <style>
+      .cls-2 {
+        fill: #7b67ee;
+      }
+    </style>
+  </defs>
+  <g id="图层_2" data-name="图层 2">
+    <g id="图层_1-2" data-name="图层 1">
+      <rect class="cls-2" x="18.66" y="18.66" width="5.32" height="5.32" rx="2.66" />
+      <polygon class="cls-2"
+        points="18.66 13.34 13.34 18.66 8.01 23.99 8.01 18.66 8.01 13.34 8.01 8.01 13.34 8.01 13.34 13.34 18.66 8.01 23.99 8.01 18.66 13.34" />
+    </g>
+  </g>
+</svg>

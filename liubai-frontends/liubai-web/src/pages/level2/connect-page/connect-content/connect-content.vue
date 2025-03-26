@@ -17,10 +17,22 @@ const {
     desc-key="connect.wechat_desc" icon-url="/images/third-party/wechat.png"
   ></ConnectItem>
 
-  <!-- TODO: dingtalk -->
+  <!-- WPS -->
+  <ConnectItem v-if="_env.C_WPS" 
+    :prefix="prefix" connector-id="wps" title-key="connect.wps"
+    desc-key="connect.wps_desc" icon-url="/images/third-party/wps.svg"
+  ></ConnectItem>
+
+  <!-- dingtalk -->
   <ConnectItem v-if="_env.C_DINGTALK" 
     :prefix="prefix" connector-id="dingtalk" title-key="connect.dingtalk"
     desc-key="connect.dingtalk_desc" icon-url="/images/third-party/dingtalk.svg"
+  ></ConnectItem>
+
+  <!-- vika -->
+  <ConnectItem v-if="_env.C_VIKA" 
+    :prefix="prefix" connector-id="vika" title-key="connect.vika"
+    desc-key="connect.vika_desc" icon-url="/images/third-party/vika.svg"
   ></ConnectItem>
 
   <!-- TODO: feishu -->

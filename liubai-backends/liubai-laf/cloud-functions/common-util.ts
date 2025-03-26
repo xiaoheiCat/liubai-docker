@@ -2032,7 +2032,7 @@ export function getAESKey() {
 /************************** 加解密相关 **********************/
 
 interface GetEncryptedDataRes {
-  rqReturn?: LiuRqReturn
+  rqReturn?: LiuErrReturn
   data?: Record<string, any>
 }
 

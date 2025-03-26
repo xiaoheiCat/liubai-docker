@@ -81,6 +81,17 @@ export class AuthenticationManager {
     oldAuthStatus: LiuAuthStatus,
     duration: RefreshDuration = "WEEK",
   ) {
+    // 0. check out api_domain
+    const storagedDomain = oldAuthStatus.api_domain
+    const currentDomain = customEnv.apiDomain
+    if(storagedDomain !== currentDomain) {
+      Logger.warn("the api domains do not match")
+      Logger.info("see storagedDomain: ", storagedDomain)
+      Logger.info("see currentDomain: ", currentDomain)
+      this.logoutLocally()
+      return
+    }
+
     // 1. to refresh
     const refreshAuth = new RefreshAuth(this._context, LOGIN_DATA_KEY)
     const res1 = await refreshAuth.refreshToken(oldAuthStatus, duration)
@@ -490,6 +501,7 @@ export class AuthenticationManager {
       updated_stamp: time.getTime(),
       nickname,
       personal_space_id,
+      api_domain: customEnv.apiDomain,
     }
     const val6 = valTool.objToStr(data6)
     await this._context.secrets.store(LOGIN_DATA_KEY, val6)

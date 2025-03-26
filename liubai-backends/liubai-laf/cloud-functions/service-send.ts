@@ -755,11 +755,15 @@ export class LiuReporter {
   async sendAny(
     title: string,
     data: any,
+    footer?: string,
   ) {
     let text = title
     const newText = this._getTextFromAny(data)
     if(newText) {
       text = `## ${title}\n\n${newText}`
+    }
+    if(footer) {
+      text += `\n\n${footer}`
     }
 
     const res = await this.send(text, title)

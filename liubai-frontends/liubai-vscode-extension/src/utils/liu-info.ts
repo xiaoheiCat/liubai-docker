@@ -32,6 +32,7 @@ const getIdeType = (): LiuIDEType | undefined => {
   if(uriScheme === "cloud-studio") return "tencent-cloud-studio"
   if(remoteName?.endsWith(".cnb.cool")) return "cnb.cool"
   if(appName === "Trae" || uriScheme === "trae") return "trae"
+  if(uriScheme === "trae-cn") return "trae"
 }
 
 const _getDeviceData = (isWeb: boolean) => {

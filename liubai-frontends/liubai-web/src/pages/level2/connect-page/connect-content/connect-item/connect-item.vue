@@ -53,7 +53,7 @@ const { t } = useI18n()
   align-items: flex-start;
   background-color: var(--card-bg);
   border-radius: 16px;
-  padding: 32px 32px 32px 48px;
+  padding: 28px 28px 28px 40px;
   box-sizing: border-box;
   box-shadow: var(--card-shadow-2);
   transition: .15s;
@@ -97,7 +97,7 @@ const { t } = useI18n()
 /** if container query is not supported yet */
 @media screen and (max-width: 480px) {
   .ci-box {
-    padding: 24px 24px 24px 32px;
+    padding: 24px;
   }
 
   .ci-icon {
@@ -119,7 +119,7 @@ const { t } = useI18n()
 
 @container liu-mc-container (max-width: 480px) {
   .ci-box {
-    padding: 24px 24px 24px 32px;
+    padding: 24px;
   }
 
   .ci-icon {

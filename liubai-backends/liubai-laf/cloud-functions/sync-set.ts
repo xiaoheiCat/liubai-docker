@@ -397,13 +397,34 @@ async function toExecute(
 
   await updateAllData(ssCtx)
 
-  if(oT === "single_sync") {
+  if(oT === "general_sync") {
+    generalSyncAfterUpdating(list, results)
+  }
+  else if(oT === "single_sync") {
     singleSyncAfterUpdating(list, results)
   }
 
   return results
 }
 
+async function generalSyncAfterUpdating(
+  inputs: SyncSetAtom[],
+  outputs: SyncSetAtomRes[],
+) {
+  for(let i=0; i<inputs.length; i++) {
+    const origin = inputs[i]
+    const taskType = origin?.taskType
+    if(taskType !== "thread-post") continue
+
+    const result = outputs[i]
+    if(!result) continue
+    const { new_id } = result
+    if(!new_id) continue
+
+    afterPostingThread(new_id, { disableAiCluster: true })
+    await valTool.waitMilli(1000)
+  }
+}
 
 function singleSyncAfterUpdating(
   inputs: SyncSetAtom[],

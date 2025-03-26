@@ -16,12 +16,20 @@ title: 安装
   <img src="./liu-assets/iPhone.png" alt="iPhone" width="280" style="margin-block-end: 10px; border-radius: 10px;">
 </a>
 
+<a href="./iQOO">
+  <img src="./liu-assets/iQOO.png" alt="iQOO" width="280" style="margin-block-end: 10px; border-radius: 10px;">
+</a>
+
 <a href="./oppo">
   <img src="./liu-assets/oppo.png" alt="oppo" width="280" style="margin-block-end: 10px; border-radius: 10px;">
 </a>
 
 <a href="./realme">
   <img src="./liu-assets/realme.jpg" alt="realme" width="280" style="margin-block-end: 10px; border-radius: 10px;">
+</a>
+
+<a href="./samsung">
+  <img src="./liu-assets/samsung.png" alt="三星" width="280" style="margin-block-end: 10px; border-radius: 10px;">
 </a>
 
 <a href="./vivo">
@@ -45,4 +53,10 @@ title: 安装
 </a>
 
 以上品牌，按首字母排序。
+
+## 🧑‍💻 IDE 插件
+
+留白记事支持在所有兼容 VS Code 的编辑器中运行，请点击 [IDE](../ide/index) 查看详情。
+
+
 

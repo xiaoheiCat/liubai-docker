@@ -13,6 +13,17 @@
 
 <br>
 
+## 黑板报 📢
+
+👉 [直接使用](https://my.liubai.cc)
+
+📥 [文档中心](https://docs.liubai.cc)
+
+📲 [前往安装](https://docs.liubai.cc/guide/install)
+
+🗞️ [最新功能: vscode 插件，现已上线](https://docs.liubai.cc/guide/ide/how-to-use-vscode-ext)
+
+
 ## 已实现 🥂
 
 ✅ 原子化附着: 文本、图片、多级标签、状态、文件
@@ -35,12 +46,6 @@
 
 ✅ 富文本编辑器，支持轻量 Markdown
 
-## 快速开始 🚀
-
-👉 [直接使用](https://my.liubai.cc)
-
-📲 [前往安装](https://docs.liubai.cc/guide/install)
-
 ## 概览 📂
 
 ```
@@ -50,13 +55,16 @@
 ├─ liubai-docs
 └─ liubai-frontends
    └─ liubai-web
+   └─ liubai-vscode-extension
 ```
-
-`liubai-web` 为前端根目录，主要基于 [Vue 3.x](https://vuejs.org/) + [Vite](https://vite.dev/) + [VueUse](https://vueuse.org/) + [TypeScript](https://www.typescriptlang.org/) + [Dexie.js](https://dexie.org/docs/) + [TipTap](https://tiptap.dev/) ...... 等一系列前端工具链构建，在该目录下运行 `pnpm i` 和 `pnpm dev` 即可启动留白前端。
 
 `liubai-laf` 为后端根目录，使用 [Laf](https://github.com/labring/laf) 构建；该目录下的 `cloud-functions/` 存放本项目的云函数。
 
 `liubai-docs` 为文档根目录，使用 [VitePress](https://vitepress.dev/) 构建。
+
+`liubai-web` 为前端根目录，主要基于 [Vue 3.x](https://vuejs.org/) + [Vite](https://vite.dev/) + [VueUse](https://vueuse.org/) + [TypeScript](https://www.typescriptlang.org/) + [Dexie.js](https://dexie.org/docs/) + [TipTap](https://tiptap.dev/) ...... 等一系列前端工具链构建，在该目录下运行 `pnpm i` 和 `pnpm dev` 即可启动留白前端。
+
+`liubai-vscode-extension` 为 vscode 插件根目录，使用 typescript 编写，[esbuild](https://code.visualstudio.com/api/working-with-extensions/bundling-extension#using-esbuild) 打包，[vsce](https://code.visualstudio.com/api/working-with-extensions/publishing-extension#vsce) 发布。该插件除了能在常见的 node 环境运行，还支持 [vscode for web](https://code.visualstudio.com/docs/editor/vscode-web)，让你在 github.dev / gitpod.io / codespaces 等浏览器 IDE 环境中也能使用。
 
 
 ## 保持联络 👋

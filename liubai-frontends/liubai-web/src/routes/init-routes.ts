@@ -24,6 +24,9 @@ const SubscribePage = () => import("../pages/level3/payments/subscribe-page/subs
 const PaymentSuccessPage = () => import("../pages/level3/payments/success-page/success-page.vue")
 const A2hsPage = () => import("../pages/level3/a2hs-page/a2hs-page.vue")
 const ConnectWechat = () => import("../pages/connectors/connect-wechat/connect-wechat.vue")
+const ConnectWps = () => import("../pages/connectors/connect-wps/connect-wps.vue")
+const ConnectDingtalk = () => import("../pages/connectors/connect-dingtalk/connect-dingtalk.vue")
+const ConnectVika = () => import("../pages/connectors/connect-vika/connect-vika.vue")
 const PaymentPage = () => import("../pages/level3/payments/payment-page/payment-page.vue")
 const MinePage = () => import("../pages/level2/mine-page/mine-page.vue")
 const TagManagement = () => import("../pages/level3/tag-management/tag-management.vue")
@@ -266,6 +269,39 @@ export const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: "/connect/wps",
+    components: {
+      default: ConnectWps,
+      LeftSidebar,
+    },
+    name: "connect-wps",
+    meta: {
+      hasViceView: false,
+    },
+  },
+  {
+    path: "/connect/dingtalk",
+    components: {
+      default: ConnectDingtalk,
+      LeftSidebar,
+    },
+    name: "connect-dingtalk",
+    meta: {
+      hasViceView: false,
+    },
+  },
+  {
+    path: "/connect/vika",
+    components: {
+      default: ConnectVika,
+      LeftSidebar,
+    },
+    name: "connect-vika",
+    meta: {
+      hasViceView: false,
+    },
+  },
+  {
     path: "/mine",
     components: {
       default: MinePage,
@@ -461,6 +497,39 @@ export const routes: Array<RouteRecordRaw> = [
       LeftSidebar,
     },
     name: "collaborative-connect-wechat",
+    meta: {
+      hasViceView: false,
+    },
+  },
+  {
+    path: "/w/:workspaceId(\\w{10,})/connect/wps",
+    components: {
+      default: ConnectWps,
+      LeftSidebar,
+    },
+    name: "collaborative-connect-wps",
+    meta: {
+      hasViceView: false,
+    },
+  },
+  {
+    path: "/w/:workspaceId(\\w{10,})/connect/dingtalk",
+    components: {
+      default: ConnectDingtalk,
+      LeftSidebar,
+    },
+    name: "collaborative-connect-dingtalk",
+    meta: {
+      hasViceView: false,
+    },
+  },
+  {
+    path: "/w/:workspaceId(\\w{10,})/connect/vika",
+    components: {
+      default: ConnectVika,
+      LeftSidebar,
+    },
+    name: "collaborative-connect-vika",
     meta: {
       hasViceView: false,
     },

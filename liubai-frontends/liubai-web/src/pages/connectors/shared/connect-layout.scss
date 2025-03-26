@@ -1,0 +1,127 @@
+
+.cw-container {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: var(--card-bg);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: var(--card-shadow-2);
+  transition: .15s;
+}
+
+.cw-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-block-end: 8px;
+}
+
+.cwb-title {
+  flex: 3;
+  font-size: var(--title-font);
+  color: var(--main-normal);
+  font-weight: 700;
+}
+
+.cwb-footer {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.cwbf-arrow {
+  padding-inline-end: 8px;
+  width: 20px;
+  height: 20px;
+  position: relative;
+}
+
+.cwbf-arrow-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.cw-desc {
+  width: 100%;
+  font-size: var(--btn-font);
+  color: var(--main-code);
+  line-height: 1.5;
+}
+
+.cw-panel {
+  width: 100%;
+  position: relative;
+  padding-block-start: 24px;
+}
+
+.cw-question {
+  width: 100%;
+  font-size: var(--btn-font);
+  color: var(--main-normal);
+  font-weight: 700;
+  margin-block-end: 8px;
+}
+
+.cw-answer {
+  width: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background-color: var(--bg-color);
+  font-size: var(--btn-font);
+  color: var(--main-normal);
+  margin-block-end: 16px;
+  display: flex;
+  align-items: center;
+
+  &::placeholder {
+    color: var(--main-note);
+  }
+}
+
+.cw-answer-text {
+  flex: 1;
+  letter-spacing: 1px;
+}
+
+.cw-icon-btn {
+  width: 20px;
+  height: 20px;
+  position: relative;
+  flex: none;
+  padding-inline-start: 10px;
+}
+
+.cw-icon-btn-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.cw-btns {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  align-items: center;
+  padding-block-start: 16px;
+}
+
+.cw-save-btn {
+  padding-inline: 30px;
+}
+
+
+/** if container query is not supported yet */
+@media screen and (max-width: 480px) {
+  .cw-container {
+    padding: 24px;
+  }
+}
+
+@container liu-mc-container (max-width: 480px) {
+  .cw-container {
+    padding: 24px;
+  }
+}

@@ -7,6 +7,7 @@ export interface LiuAuthStatus {
   updated_stamp: number
   nickname?: string
   personal_space_id: string
+  api_domain?: string
 }
 
 

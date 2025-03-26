@@ -161,6 +161,9 @@ export type OrderStatus = typeof orderStatuses[number]
 // channel of payment
 export type PayChannel = "stripe" | "wxpay" | "alipay"
 
+// running status
+export type RunningStatus = "no_need" | "fail" | "success"
+
 // type of order
 export const orderTypes = ["subscription", "product"] as const
 export type OrderType = typeof orderTypes[number]
@@ -367,6 +370,23 @@ export const Sch_ContentConfig = vbot.object({
 export interface WorkspaceConfig {
   // last stamp when user edited tagList of workspace
   lastOperateTag?: number
+}
+
+export interface WorkspaceWps {
+  enable?: BaseIsOn
+  enc_webhook_url?: CryptoCipherAndIV
+  enc_webhook_password?: CryptoCipherAndIV
+}
+
+export interface WorkspaceDingTalk {
+  enable?: BaseIsOn
+  enc_webhook_url?: CryptoCipherAndIV
+}
+
+export interface WorkspaceVika {
+  enable?: BaseIsOn
+  enc_api_token?: CryptoCipherAndIV
+  enc_datasheet_id?: CryptoCipherAndIV
 }
 
 /** The config of Member */
@@ -1371,6 +1391,11 @@ export interface Table_Workspace extends BaseTable {
   avatar?: Cloud_ImageStore
   editedStamp?: number       // 同步时，用来比大小的
   config?: WorkspaceConfig
+
+  // third party config
+  wps?: WorkspaceWps
+  dingtalk?: WorkspaceDingTalk
+  vika?: WorkspaceVika
 }
 
 /** Member 表 */
@@ -2511,6 +2536,30 @@ export interface Res_OC_GetWeChat {
   wx_gzh_subscribed?: boolean
 }
 
+export interface Res_OC_GetWps {
+  operateType: "get-wps"
+  enable?: BaseIsOn
+  plz_enc_webhook_url?: string
+  plz_enc_webhook_password?: string
+}
+
+export interface Res_OC_SetWps {
+  operateType: "set-wps"
+  plz_enc_webhook_password?: string
+}
+
+export interface Res_OC_GetDingTalk {
+  operateType: "get-dingtalk"
+  enable?: BaseIsOn
+  plz_enc_webhook_url?: string
+}
+
+export interface Res_OC_GetVika {
+  operateType: "get-vika"
+  enable?: BaseIsOn
+  plz_enc_api_token?: string
+  plz_enc_datasheet_id?: string
+}
 
 
 /******************** 一些云函数间内部的入参和出参类型 **********/
@@ -3436,7 +3485,7 @@ export interface Res_Alipay_Refund {
   buyer_user_id?: string
   buyer_open_id?: string
   send_back_fee?: string
-  fund_change?: "Y" | "N"
+  fund_change?: BaseIsOn
   refund_hyb_amount?: string     // 本次请求退惠营宝金额。单位：元。
 }
 

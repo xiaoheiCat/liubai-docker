@@ -97,7 +97,9 @@ export interface LiuSystemEnv {
   // connectors
   CONNECTORS?: boolean
   C_WECHAT?: boolean
+  C_WPS?: boolean
   C_DINGTALK?: boolean
+  C_VIKA?: boolean
   C_FEISHU?: boolean
   C_TELEGRAM?: boolean
   C_WHATSAPP?: boolean

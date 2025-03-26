@@ -102,7 +102,9 @@ function getEnv(): LiuSystemEnv {
   // connectors
   const CONNECTORS = import.meta.env.VITE_CONNECTORS === "01"
   const C_WECHAT = import.meta.env.VITE_CONNECT_WECHAT === "01"
+  const C_WPS = import.meta.env.VITE_CONNECT_WPS === "01"
   const C_DINGTALK = import.meta.env.VITE_CONNECT_DINGTALK === "01"
+  const C_VIKA = import.meta.env.VITE_CONNECT_VIKA === "01"
   const C_FEISHU = import.meta.env.VITE_CONNECT_FEISHU === "01"
   const C_TELEGRAM = import.meta.env.VITE_CONNECT_TELEGRAM === "01"
   const C_WHATSAPP = import.meta.env.VITE_CONNECT_WHATSAPP === "01"
@@ -179,7 +181,9 @@ function getEnv(): LiuSystemEnv {
     WECOM_GROUP_LINK,
     CONNECTORS,
     C_WECHAT,
+    C_WPS,
     C_DINGTALK,
+    C_VIKA,
     C_FEISHU,
     C_TELEGRAM,
     C_WHATSAPP,

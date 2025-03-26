@@ -43,8 +43,10 @@ export default defineConfig({
               items: [
                 { text: "华为", link: "/guide/install/huawei" },
                 { text: "iPhone", link: "/guide/install/iphone" },
+                { text: "iQOO", link: "/guide/install/iqoo" },
                 { text: "OPPO", link: "/guide/install/oppo" },
                 { text: "Realme", link: "/guide/install/realme" },
+                { text: "三星", link: "/guide/install/samsung" },
                 { text: "vivo", link: "/guide/install/vivo" },
                 { text: "小米", link: "/guide/install/xiaomi" },
               ]
@@ -56,7 +58,30 @@ export default defineConfig({
                 { text: "Mac", link: "/guide/install/mac" },
                 { text: "Windows", link: "/guide/install/windows" },
               ]
+            },
+            {
+              text: "IDE",
+              link: "/guide/ide/",
+              collapsed: true,
+              items: [
+                { text: "如何使用插件", link: "/guide/ide/how-to-use-vscode-ext" },
+                { text: "Cursor", link: "/guide/ide/cursor" },
+                { text: "Windsurf", link: "/guide/ide/windsurf" },
+                { text: "VS Code", link: "/guide/ide/vscode" },
+                { text: "VSCodium", link: "/guide/ide/vscodium" },
+                { text: "Trae", link: "/guide/ide/trae" },
+                { text: "github.dev", link: "/guide/ide/github-dev" },
+              ]
             }
+          ]
+        },
+        {
+          text: "连接",
+          link: "/guide/connect",
+          items: [
+            { text: "WPS", link: "/guide/connect/wps" },
+            { text: "钉钉", link: "/guide/connect/dingtalk" },
+            { text: "维格云", link: "/guide/connect/vika" },
           ]
         },
         {

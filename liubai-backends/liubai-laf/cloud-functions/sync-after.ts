@@ -1,21 +1,29 @@
 // Function Name: sync-after
 import cloud from '@lafjs/cloud'
 import { 
+  aiToolAddCalendarSpecificDates,
   type Table_Content, 
   type Table_User,
   type LiuAi,
   type OaiPrompt,
   type OaiCreateParam,
   type SyncOperateAPI,
-  aiToolAddCalendarSpecificDates,
+  type Table_Workspace,
+  type WorkspaceWps,
+  type RunningStatus,
+  type WorkspaceDingTalk,
+  type WorkspaceVika,
 } from '@/common-types'
 import { 
   AiToolUtil,
   checkIfUserSubscribed, 
+  decryptCloudData, 
   decryptEncData, 
   encryptDataWithAES, 
   getAESKey, 
   LiuDateUtil, 
+  liuReq, 
+  RichTexter, 
   valTool, 
   type DecryptEncData_B,
 } from '@/common-util'
@@ -24,7 +32,7 @@ import {
   BaseLLM,
   LogHelper,
 } from '@/ai-shared'
-import { i18nFill } from '@/common-i18n'
+import { commonLang, i18nFill, useI18n } from '@/common-i18n'
 import { getNowStamp } from '@/common-time'
 import xml2js from "xml2js"
 import { LiuReporter } from '@/service-send'
@@ -42,6 +50,11 @@ const aiWorkers: LiuAi.AiWorker[] = [
     "computingProvider": "tencent-hunyuan",
     "model": "hunyuan-turbos-latest",
     "character": "hunyuan",
+  },
+  {
+    "computingProvider": "tencent-hunyuan",
+    "model": "hunyuan-t1-latest",
+    "character": "hunyuan"
   },
   {
     "computingProvider": "aliyun-bailian",
@@ -77,6 +90,10 @@ const aiWorkers: LiuAi.AiWorker[] = [
     "computingProvider": "zhipu",
     "model": "glm-4-flash",
     "character": "zhipu",
+  },{
+    "computingProvider": "stepfun",
+    "model": "step-2-mini",
+    "character": "yuewen",
   }
 ]
 
@@ -111,8 +128,9 @@ export async function afterPostingThread(
   const res2 = await uCol.doc(userId).get<Table_User>()
   const user = res2.data
   if(!user) return
+  if(user.oState !== "NORMAL") return
 
-  // 3. decide whether to go to cluster
+  // 3.1 decide whether to go to cluster
   let goToCluster = true
   if(opt?.disableAiCluster) goToCluster = false
   const quota = user.quota
@@ -123,14 +141,316 @@ export async function afterPostingThread(
   }
   if(thread.calendarStamp) goToCluster = false
 
-  // 4. go to cluster
+  // 3.2 go to cluster
   if(goToCluster) {
     const aiCluster = new AiCluster(thread, user, res1_2)
-    await aiCluster.run(2)
+    aiCluster.run(2)
   }
 
+  // 4.1 backup
+  const backup = new BackupToOthers(thread, user, res1_2)
+  backup.run()
 
 }
+
+
+interface BackupStructure {
+  id: string
+  desc: string
+  title: string
+  source: string
+  _from: "liubai"
+}
+
+export class BackupToOthers {
+
+  private _thread: Table_Content
+  private _user: Table_User
+  private _decryptedData: DecryptEncData_B
+  private _basicData: BackupStructure
+
+  constructor(
+    thread: Table_Content,
+    user: Table_User,
+    decryptedData: DecryptEncData_B,
+  ) {
+    this._thread = thread
+    this._user = user
+    this._decryptedData = decryptedData
+    this._basicData = this._getBasicData()
+  }
+
+  public async run() {
+    // 1. get workspace
+    const spaceId = this._thread.spaceId
+    const wCol = db.collection("Workspace")
+    const res1 = await wCol.doc(spaceId).get<Table_Workspace>()
+    const space = res1.data
+    if(!space) return false
+    if(space.oState !== "OK") return false
+
+    // 2. start to push to outside services
+
+    // 2.1 wps
+    if(space.wps) {
+      this.pushToWPS(space.wps)
+    }
+
+    // 2.2 dingtalk
+    if(space.dingtalk) {
+      this.pushToDingTalk(space.dingtalk)
+    }
+
+    // 2.3 vika
+    if(space.vika) {
+      this.pushToVika(space.vika)
+    }
+    
+  }
+
+  private async pushToVika(
+    cfg: WorkspaceVika,
+  ) {
+    if(cfg.enable !== "Y") return "no_need"
+    const { enc_api_token, enc_datasheet_id } = cfg
+    if(!enc_api_token || !enc_datasheet_id) return "no_need"
+
+    // 1. Let's decrypt
+    // 1.1 decrypt enc_api_token
+    const d_token = decryptCloudData<string>(enc_api_token)
+    if(!d_token.pass) {
+      console.warn("enc_api_token decrypt failed in pushToVika: ", d_token.err)
+      this._callReporter("decrypt failed in pushToVika", d_token.err)
+      return "fail"
+    }
+    const api_token = d_token.data
+    if(!api_token) {
+      return "no_need"
+    }
+
+    // 1.2 decrypt enc_datasheet_id
+    const d_datasheet_id = decryptCloudData<string>(enc_datasheet_id)
+    if(!d_datasheet_id.pass) {
+      console.warn("enc_datasheet_id decrypt failed in pushToVika: ", d_datasheet_id.err)
+      this._callReporter("decrypt failed in pushToVika", d_datasheet_id.err)
+      return "fail"
+    }
+    const datasheet_id = d_datasheet_id.data
+    if(!datasheet_id) {
+      return "no_need"
+    }
+
+    // 2. fetch
+    const payload = valTool.copyObject(this._basicData)
+    const body2 = {
+      records: [
+        {
+          "fields": {
+            "卡片唯一值": payload.id,
+            "内文": payload.desc,
+            "可选的标题": payload.title,
+            "接收时间": getNowStamp(),
+            "来源": payload.source,
+          }
+        }
+      ]
+    }
+    const link2 = `https://api.vika.cn/fusion/v1/datasheets/${datasheet_id}/records`
+    const headers = {
+      "Authorization": `Bearer ${api_token}`,
+      "Content-Type": "application/json",
+    }
+    const res2 = await liuReq(link2, body2, { headers })
+    console.log("push to vika: ", res2)
+
+    // 3. handle result
+    const code3 = res2?.code
+    const data3 = res2?.data
+    if(code3 !== "0000" || !data3) {
+      console.warn("fail to fetch vika: ", res2)
+      this._callReporter("fail to fetch vika 1", res2)
+      return "fail"
+    }
+    if(!data3.success) {
+      console.warn("fail to fetch vika: ", data3)
+      this._callReporter("fail to fetch vika 2", data3)
+      return "fail"
+    }
+
+    return "success"
+  }
+
+  private async pushToDingTalk(
+    cfg: WorkspaceDingTalk,
+  ) {
+    if(cfg.enable !== "Y") return "no_need"
+    const { enc_webhook_url } = cfg
+    if(!enc_webhook_url) return "no_need"
+
+    // 1. Let's decrypt
+    // 1.1 decrypt enc_webhook_url
+    const d_url = decryptCloudData<string>(enc_webhook_url)
+    if(!d_url.pass) {
+      console.warn("enc_webhook_url decrypt failed in pushToWPS: ", d_url.err)
+      this._callReporter("decrypt failed in pushToWPS", d_url.err)
+      return "fail"
+    }
+    const webhook_url = d_url.data
+    if(!webhook_url) {
+      return "no_need"
+    }
+
+    // 2. fetch
+    const payload = valTool.copyObject(this._basicData)
+    const res2 = await liuReq(webhook_url, payload)
+    console.log("push to dingtalk: ", res2)
+
+    // 3. handle result
+    const code3 = res2?.code
+    const data3 = res2?.data
+    if(code3 !== "0000" || !data3) {
+      console.warn("fail to fetch dingtalk: ", res2)
+      this._callReporter("fail to fetch dingtalk 1", res2)
+      return "fail"
+    }
+    if(!data3.success) {
+      console.warn("fail to fetch dingtalk: ", data3)
+      this._callReporter("fail to fetch dingtalk 2", data3)
+      return "fail"
+    }
+
+    return "success"
+  }
+
+  private async pushToWPS(
+    cfg: WorkspaceWps,
+  ): Promise<RunningStatus> {
+    if(cfg.enable !== "Y") return "no_need"
+    const {
+      enc_webhook_url,
+      enc_webhook_password,
+    } = cfg
+    if(!enc_webhook_url || !enc_webhook_password) return "no_need"
+
+    // 1. Let's decrypt
+    // 1.1 decrypt enc_webhook_url
+    const d_url = decryptCloudData<string>(enc_webhook_url)
+    if(!d_url.pass) {
+      console.warn("enc_webhook_url decrypt failed in pushToWPS: ", d_url.err)
+      this._callReporter("decrypt failed in pushToWPS", d_url.err)
+      return "fail"
+    }
+    const webhook_url = d_url.data
+    if(!webhook_url) {
+      return "no_need"
+    }
+
+    // 1.2 decrypt enc_webhook_password
+    const d_password = decryptCloudData<string>(enc_webhook_password)
+    if(!d_password.pass) {
+      console.warn("enc_webhook_password decrypt failed in pushToWPS: ", d_password.err)
+      this._callReporter("decrypt failed in pushToWPS", d_password.err)
+      return "fail"
+    }
+    const webhook_password = d_password.data
+    if(!webhook_password) {
+      console.warn("no webhook_password in pushToWPS")
+      this._callReporter("no webhook_password in pushToWPS", enc_webhook_password)
+      return "fail"
+    }
+
+    // 2. generate basic auth
+    const basic_auth = `liubai:${webhook_password}`
+    const b64_basic_auth = Buffer.from(basic_auth).toString("base64")
+
+    // 3. fetch
+    const payload = valTool.copyObject(this._basicData)
+    const headers = {
+      "Origin": "www.wps.cn",
+      "Authorization": `Basic ${b64_basic_auth}`
+    }
+    const res3 = await liuReq(webhook_url, payload, { headers })
+    const code3 = res3?.code
+    const data3 = res3?.data
+    if(code3 !== "0000" || !data3) {
+      console.warn("fail to fetch wps: ", res3)
+      this._callReporter("fail to fetch wps 1", res3)
+      return "fail"
+    }
+    if(data3.code !== 0) {
+      console.warn("fail to fetch wps: ", data3)
+      this._callReporter("fail to fetch wps 2", data3)
+      return "fail"
+    }
+
+    return "success"
+  }
+
+  private _callReporter(
+    title: string,
+    data: any,
+  ) {
+    let footer = ""
+    const userId = this._user._id
+    const threadId = this._thread._id
+    footer += `**User id:** ${userId}\n\n`
+    footer += `**Thread id:** ${threadId}\n\n`
+
+    const reporter = new LiuReporter()
+    reporter.sendAny(title, data, footer)
+  }
+  
+
+  private _getBasicData() {
+    const {
+      liuDesc,
+      title,
+      images,
+      files,
+    } = this._decryptedData
+
+    // handle desc
+    let desc = ""
+    if(liuDesc) {
+      desc = RichTexter.turnDescToText(liuDesc)
+    }
+    if(!desc) {
+      const user = this._user
+      const { t } = useI18n(commonLang, { user })
+      const imgLength = images?.length ?? 0
+      const fileLength = files?.length ?? 0
+      if(fileLength && imgLength) {
+        desc = `[${t("image")} + ${t("file")}]`
+      }
+      else if(imgLength) {
+        desc = `[${t("image")}]`
+      }
+      else if(fileLength) {
+        desc = `[${t("file")}]`
+      }
+    }
+
+
+    const {
+      _id: id,
+      ideType,
+      aiCharacter,
+    } = this._thread
+    const basicData: BackupStructure = {
+      id,
+      desc,
+      title: title ?? "",
+      source: ideType ?? aiCharacter ?? "",
+      _from: "liubai",
+    }
+    return basicData
+  }
+
+}
+
+
+
+/*************** About Cluster *************/
 
 const cluster_system_prompt = `
 你是当今世界上最强大的分类器。你非常擅长将抽象的内容转化成结构化的数据。
