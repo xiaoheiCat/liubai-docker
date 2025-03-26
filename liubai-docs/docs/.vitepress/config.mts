@@ -69,6 +69,7 @@ export default defineConfig({
                 { text: "Windsurf", link: "/guide/ide/windsurf" },
                 { text: "VS Code", link: "/guide/ide/vscode" },
                 { text: "Trae", link: "/guide/ide/trae" },
+                { text: "github.dev", link: "/guide/ide/github-dev" },
               ]
             }
           ]
