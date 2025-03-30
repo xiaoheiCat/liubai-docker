@@ -102,91 +102,21 @@ export async function updateUserQuota() {
   }
   console.warn("the moment is the 1st day of the month and in midnight")
 
-  // 2. construct query
+  // 2. get to update
   const w2 = {
-    oState: "NORMAL",
-    subscription: {
-      isOn: "Y",
-    },
+    quota: _.exists(true),
   }
+  const u2 = {
+    "quota.aiConversationCount": 0,
+    "quota.aiClusterCount": 0,
+  } 
   const uCol = db.collection("User")
+  const res2 = await uCol.where(w2).update(u2, { multi: true })
+  console.log("updateUserQuota res2: ", res2)
 
-  // 3. to get
-  const MAX_RUN_TIMES = 50
-  const NUM_PER_RUN = 50
-  let runTimes = 0
-  while(runTimes < MAX_RUN_TIMES) {
-    let q3 = uCol.where(w2)
-    q3 = q3.limit(NUM_PER_RUN).orderBy("insertedStamp", "asc")
-    if(runTimes > 0) {
-      q3 = q3.skip(runTimes * NUM_PER_RUN)
-    }
-    const res3 = await q3.get<Table_User>()
-    const list3 = res3.data
-    const len3 = list3.length
-    console.log("updateUserQuota len3: ", len3)
-    if(len3 < 1) break
-
-    // 4. get updated ids
-    const updatedIds: string[] = []
-    for(let i=0; i<len3; i++) {
-      const v = list3[i]
-      const userId = v._id
-      const sub = v.subscription
-      if(!sub) continue
-      const isSubscribed = checkIfUserSubscribed(v)
-      if(!isSubscribed) continue
-
-      if(sub.isLifelong) {
-        updatedIds.push(userId)
-        continue
-      }
-
-      console.log(`see ${userId} subscription: `)
-      console.log(sub)
-
-      // 5. calculate the duration between now and the expireStamp
-      const expireStamp = sub.expireStamp ?? 1
-      const stamp5 = localizeStamp(expireStamp)
-      const d5 = new Date(stamp5)
-      const diffMonths5 = differenceInCalendarMonths(d5, d1)
-      console.log("months between now and expireStamp: ", diffMonths5)
-
-
-      // 6. calcuate the duration between now and the chargedStamp
-      const chargedStamp = sub.chargedStamp ?? 1
-      const stamp6 = localizeStamp(chargedStamp)
-      const d6 = new Date(stamp6)
-      const diffMonths6 = differenceInCalendarMonths(d1, d6)
-      console.log("months between chargedStamp and now: ", diffMonths6)
-
-      // 7. ignore if the expiredStamp is within this month
-      //   and the timing when the user charged is within the last month
-      if(diffMonths5 === 0 && diffMonths6 <= 1) {
-        continue
-      }
-
-      updatedIds.push(userId)
-    }
-
-    // 5. update quota
-    if(updatedIds.length > 0) {
-      const q5 = uCol.where({ _id: _.in(updatedIds) })
-      const u5: Partial<UserQuota> = {
-        aiConversationCount: 0,
-        aiClusterCount: 0,
-      }
-      const res5 = await q5.update({ quota: u5 })
-      console.log("updateUserQuota res5: ")
-      console.log(res5)
-    }
-
-    // 6. break if len3 is less than NUM_PER_RUN
-    if(len3 < NUM_PER_RUN) {
-      break
-    }
-    runTimes++
-  }
+  // 3. send report
+  const reporter = new LiuReporter()
+  reporter.sendAny("Monthly Update User Quota", res2)
   
 }
 

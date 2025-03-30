@@ -616,7 +616,7 @@ class AiDirective {
   }
 
   private static isKickBot(text: string) {
-    const prefix = ["踢掉", "踢掉", "Kick", "Remove"]
+    const prefix = ["踢掉", "踢掉", "Kick", "Remove", "T调"]
     const botMatched = this._getCommandedBot(prefix, text)
     return botMatched 
   }
