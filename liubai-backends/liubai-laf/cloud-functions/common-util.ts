@@ -1653,6 +1653,26 @@ export function checkIfUserSubscribed(
   return false
 }
 
+export class SubscriptionManager {
+
+  private _user: Table_User
+
+  constructor(user: Table_User) {
+    this._user = user
+  }
+
+  getSubscribed() {
+    return checkIfUserSubscribed(this._user)
+  }
+
+  getExpireStamp() {
+    const s = this._user.subscription
+    if(!s) return
+    return s.expireStamp
+  }
+}
+
+
 /** 插入 token 数据至 Token 表中
  *  并且存到缓存里
  */

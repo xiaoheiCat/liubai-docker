@@ -35,6 +35,7 @@ import {
   LiuDateUtil,
   getLiuDoman,
   AiToolUtil,
+  SubscriptionManager,
 } from "@/common-util"
 import { 
   getBasicStampWhileAdding, 
@@ -52,7 +53,7 @@ import {
   aiTools,
 } from "@/ai-prompt"
 import cloud from "@lafjs/cloud"
-import { useI18n, aiLang } from "@/common-i18n"
+import { useI18n, aiLang, getCurrentLocale } from "@/common-i18n"
 import { downloadFile, responseToFormData } from "@/file-utils"
 import { createRandom } from "@/common-ids"
 import axios from "axios"
@@ -3938,12 +3939,18 @@ class UserHelper {
     if(!quota) return true
 
     const count = quota.aiConversationCount
-    const isSubscribed = checkIfUserSubscribed(user)
+    const subscriptionManager = new SubscriptionManager(user)
+    const isSubscribed = subscriptionManager.getSubscribed()
     const MAX_TIMES = isSubscribed ? MAX_TIMES_MEMBERSHIP : MAX_TIMES_FREE
 
     const available = count < MAX_TIMES
     if(!available) {
-      if(MAX_TIMES === MAX_TIMES_FREE) {
+      const expireStamp = subscriptionManager.getExpireStamp()
+
+      if(expireStamp) {
+        this.sendQuotaWarning3(entry, expireStamp)
+      }
+      else if(MAX_TIMES === MAX_TIMES_FREE) {
         this.sendQuotaWarning(entry)
       }
       else {
@@ -3951,6 +3958,31 @@ class UserHelper {
       }
     }
     return available
+  }
+
+  static async sendQuotaWarning3(
+    entry: AiEntry,
+    expireStamp: number,
+  ) {
+    // 1. get payment link
+    const paymentLink = await this._getPaymentLink(entry)
+    if(!paymentLink) return
+
+    // 2. calculate expired date
+    const { user } = entry
+    const locale = getCurrentLocale({ user })
+    const expiredStr = LiuDateUtil.displayTime(expireStamp, locale, user.timezone)
+
+    // 3. construct message to send
+    const { t } = useI18n(aiLang, { user })
+    let msg = t("quota_warning_3", {
+      expiredStr,
+      membershipTimes: MAX_TIMES_MEMBERSHIP,
+      link: paymentLink,
+    })
+
+    // 4. send
+    TellUser.text(entry, msg)
   }
 
   static async sendQuotaWarning2(entry: AiEntry) {
@@ -3971,7 +4003,6 @@ class UserHelper {
 
   static async sendQuotaWarning(entry: AiEntry) {
     // 1. get payment link
-    const _env = process.env
     const paymentLink = await this._getPaymentLink(entry)
     if(!paymentLink) return
 
