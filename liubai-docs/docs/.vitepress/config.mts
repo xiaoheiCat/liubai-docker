@@ -47,7 +47,7 @@ export default defineConfig({
               items: [
                 { text: "华为", link: "/guide/install/huawei" },
                 { text: "iPhone", link: "/guide/install/iphone" },
-                { text: "iQOO", link: "/guide/install/iqoo" },
+                { text: "iQOO", link: "/guide/install/iQOO" },
                 { text: "OPPO", link: "/guide/install/oppo" },
                 { text: "Realme", link: "/guide/install/realme" },
                 { text: "三星", link: "/guide/install/samsung" },
