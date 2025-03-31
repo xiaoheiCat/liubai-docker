@@ -110,4 +110,8 @@
 
 ## 更多详情
 
-欢迎查看[在微信中使用多个 AI](../article/2024/how-to-use-multi-ai-on-wechat.md)。
+更多使用方法，欢迎参阅 [在微信中使用多个 AI](../article/2024/how-to-use-multi-ai-on-wechat.md)。
+
+关于计费方式，请参阅 [提问箱](./faq/index)。
+
+想购买会员支持我们，请查看 [会员中心](https://my.liubai.cc/subscription)。

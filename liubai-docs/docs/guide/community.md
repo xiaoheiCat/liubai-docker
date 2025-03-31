@@ -8,7 +8,7 @@
 
 <img src="./assets-community/weixin.png" alt="留白记事微信公众号" width="330" style="margin-block-end: 10px">
 
-<a href="https://github.com/yenche123/liubai/discussions" target="_blank">
+<a href="https://github.com/yenche123/liubai" target="_blank">
   <img src="./assets-community/github.png" alt="GitHub: yenche123/liubai" width="330">
 </a>
 
