@@ -160,7 +160,7 @@ https://icon-sets.iconify.design/
 
 10. “新建工作区”“加入工作区”“退出工作区”“会修改到 User 表” 的操作，不要使用 sync-set 同步接口，因为这个操作影响太大了，若联网后云端拒绝创建，存在里头的动态和评论怎么办？会非常难处理。
 
-11. 使用 https://npmgraph.js.org/ 查看依赖关系图
+11. 使用 https://npmgraph.js.org/ 查看依赖关系图；运行 `pnpx node-modules-inspector` 也可以查看当前项目依赖的详细信息。
 
 12. 使用 `where node` 得知 `node` 的安装路径
 
