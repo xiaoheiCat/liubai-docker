@@ -668,6 +668,12 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
       text: {
         content: '📨 期待你的来信！\n\n<a href="mailto:hi@liubai.cc">hi@liubai.cc</a>',
       }
+    },
+    {
+      msgtype: "image",
+      image: {
+        media_id: "{LIU_WX_GZ_MEDIA_ID_FOR_CONTACT}"
+      }
     }
   ],
 
@@ -719,6 +725,12 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
       text: {
         content: '📨 期待你的來信！\n\n<a href="mailto:hi@liubai.cc">hi@liubai.cc</a>',
       }
+    },
+    {
+      msgtype: "image",
+      image: {
+        media_id: "{LIU_WX_GZ_MEDIA_ID_FOR_CONTACT}"
+      }
     }
   ],
 
@@ -769,6 +781,12 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
       msgtype: "text",
       text: {
         content: '📨 I am looking forward to your letter!\n\n<a href="mailto:hi@liubai.cc">hi@liubai.cc</a>',
+      }
+    },
+    {
+      msgtype: "image",
+      image: {
+        media_id: "{LIU_WX_GZ_MEDIA_ID_FOR_CONTACT}"
       }
     }
   ]
@@ -822,6 +840,12 @@ export const wxTextRepliesItems: WxTextReplyItem[] = [
         text: {
           content: '📨 期待你的来信！\n\n<a href="mailto:hi@liubai.cc">hi@liubai.cc</a>',
         }
+      },
+      {
+        msgtype: "image",
+        image: {
+          media_id: "{LIU_WX_GZ_MEDIA_ID_FOR_CONTACT}"
+        }
       }
     ]
   },
@@ -833,6 +857,12 @@ export const wxTextRepliesItems: WxTextReplyItem[] = [
         text: {
           content: '📨 期待你的來信！\n\n<a href="mailto:hi@liubai.cc">hi@liubai.cc</a>',
         }
+      },
+      {
+        msgtype: "image",
+        image: {
+          media_id: "{LIU_WX_GZ_MEDIA_ID_FOR_CONTACT}"
+        }
       }
     ]
   },
@@ -843,6 +873,12 @@ export const wxTextRepliesItems: WxTextReplyItem[] = [
         msgtype: "text",
         text: {
           content: '📨 I am looking forward to your letter!\n\n<a href="mailto:hi@liubai.cc">hi@liubai.cc</a>',
+        }
+      },
+      {
+        msgtype: "image",
+        image: {
+          media_id: "{LIU_WX_GZ_MEDIA_ID_FOR_CONTACT}"
         }
       }
     ]
