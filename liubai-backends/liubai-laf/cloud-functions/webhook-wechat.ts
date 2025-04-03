@@ -200,15 +200,28 @@ async function handle_click(
   // 2. get replies and the domain
   const replies = wxClickReplies[EventKey]
   if(!replies || replies.length < 1) return false
+  const _env = process.env
+  const contactMediaId = _env.LIU_WX_GZ_MEDIA_ID_FOR_CONTACT ?? ""
   
   // 3. reply
   for(let i = 0; i < replies.length; i++) {
     const v = replies[i]
     const obj = valTool.copyObject(v)
-    if(obj.msgtype === "text") {
-      const str = obj.text.content 
-      obj.text.content = i18nFill(str, {})
+    const msgtype = obj.msgtype
+    if(msgtype === "text") {
+      const str1 = obj.text.content 
+      obj.text.content = i18nFill(str1, {})
     }
+
+    if(msgtype === "image") {
+      const str2_1 = obj.image.media_id
+      const str2_2 = i18nFill(str2_1, {
+        LIU_WX_GZ_MEDIA_ID_FOR_CONTACT: contactMediaId,
+      })
+      if(!str2_2) continue
+      obj.image.media_id = str2_2
+    }
+
     await sendObject(wx_gzh_openid, obj)
   }
 
@@ -906,18 +919,31 @@ async function autoReplyAfterReceivingText(
     }
   }
   if(theReplies.length < 1) return false
-  theReplies = theReplies.map(v => {
-    if(v.msgtype !== "text") return v
-    const obj = valTool.copyObject(v)
-    const txt = obj.text.content
-    obj.text.content = i18nFill(txt, {})
-    return obj
-  })
+  const _env = process.env
+  const contactMediaId = _env.LIU_WX_GZ_MEDIA_ID_FOR_CONTACT ?? ""
   
-  // 5. auto reply
-  for(let i = 0; i < theReplies.length; i++) {
+  // 5. ready to send
+  for(let i=0; i<theReplies.length; i++) {
     const v = theReplies[i]
-    await sendObject(wx_gzh_openid, v)
+    const obj = valTool.copyObject(v)
+    const msgtype = obj.msgtype
+    if(msgtype === "text") {
+      const str1 = obj.text.content 
+      obj.text.content = i18nFill(str1, {})
+    }
+
+    if(msgtype === "image") {
+      const str2_1 = obj.image.media_id
+      const str2_2 = i18nFill(str2_1, {
+        LIU_WX_GZ_MEDIA_ID_FOR_CONTACT: contactMediaId,
+      })
+      if(!str2_2) continue
+      obj.image.media_id = str2_2
+    }
+
+    theReplies[i] = obj
+
+    await sendObject(wx_gzh_openid, obj)
   }
   return true
 }

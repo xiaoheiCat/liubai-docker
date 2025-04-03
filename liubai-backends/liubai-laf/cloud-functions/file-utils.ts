@@ -398,9 +398,13 @@ export class WxGzhUploader {
 
   // 上传临时素材
   static API_MEDIA_UPLOAD = "https://api.weixin.qq.com/cgi-bin/media/upload"
+  static API_MATERIAL_ADD = "https://api.weixin.qq.com/cgi-bin/material/add_material"
 
   // temporary media
-  static async mediaByUrl(file_url: string) {
+  static async mediaByUrl(
+    file_url: string,
+    isMaterial: boolean = false,
+  ) {
     // 0. get access token
     const access_token = await checkAndGetWxGzhAccessToken()
     if(!access_token) {
@@ -423,7 +427,8 @@ export class WxGzhUploader {
     const { form } = await responseToFormData(res2)
 
     // 3. construct request
-    let link3 = this.API_MEDIA_UPLOAD + `?access_token=${access_token}`
+    const url3 = isMaterial ? this.API_MATERIAL_ADD : this.API_MEDIA_UPLOAD
+    let link3 = `${url3}?access_token=${access_token}`
     link3 += `&type=image`
 
     // 4. upload

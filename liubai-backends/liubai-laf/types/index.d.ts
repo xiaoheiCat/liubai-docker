@@ -88,8 +88,10 @@ declare global {
       LIU_WX_GZ_TAG_MANAGEMENT?: string    // 01: tag management enabled, otherwise disabled
       LIU_WX_GZ_LOGIN?: string             // 01: logging in by wx gzh enabled, otherwise disabled
       LIU_WX_GZ_TMPL_ID_1?: string         // reminder template id enabled, otherwise disabled
+      LIU_WX_GZ_TMPL_ID_2?: string         // subscription reminder template id enabled, otherwise disabled
       LIU_WX_GZ_TEST_OPENID?: string       // test openid of wx_gzh for testing ai
       LIU_WX_GZ_TYPE?: "service_account" | "subscription_account"      // 服务号 or 订阅号
+      LIU_WX_GZ_MEDIA_ID_FOR_CONTACT?: string     // the media id to send, when user tap "商务合作"
       LIU_WECOM_GROUP_LINK?: string        // vip group link
 
       /** 企业微信 企业内部自建应用 */

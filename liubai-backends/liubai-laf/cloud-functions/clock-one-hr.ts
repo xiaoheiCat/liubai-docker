@@ -19,10 +19,9 @@ import type {
   Res_Wxpay_Download_Cert,
   LiuWxpayCert,
   Table_User,
-  UserQuota,
 } from '@/common-types'
-import { 
-  checkIfUserSubscribed, 
+import {
+  checkAndGetWxGzhAccessToken,
   LiuDateUtil, 
   liuFetch, 
   liuReq, 
@@ -34,11 +33,11 @@ import {
   wxpay_apiclient_serial_no,
 } from "@/secret-config"
 import { 
-  differenceInCalendarMonths, 
   set as date_fn_set, 
   addDays,
 } from "date-fns"
-import { LiuReporter } from '@/service-send'
+import { LiuReporter, WxGzhSender } from '@/service-send'
+import { wx_expired_tmpl } from '@/common-config'
 
 const API_WECHAT_ACCESS_TOKEN = "https://api.weixin.qq.com/cgi-bin/token"
 const API_WX_JSAPI_TICKET = "https://api.weixin.qq.com/cgi-bin/ticket/getticket"
@@ -83,10 +82,75 @@ export async function main(ctx: FunctionContext) {
   // 8. statistics
   await handleStatistics()
 
+  // 9. find users whose membership will be expired within 3 hours
+  await findMembershipWillExpired()
+  
+  
+
   // console.log("---------- End clock-one-hr ----------")
   // console.log("                                      ")
 
   return true
+}
+
+
+
+export async function findMembershipWillExpired() {
+  const now1 = getNowStamp()
+  const TWO_HOURS_LATER = now1 + (2 * HOUR)
+  const THREE_HOURS_LATER = now1 + (3 * HOUR)
+
+  // 1. find users
+  const w1 = {
+    "oState": "NORMAL",
+    "wx_gzh_openid": _.exists(true),
+    "subscription.expireStamp": _.and(
+      _.gt(TWO_HOURS_LATER),
+      _.lte(THREE_HOURS_LATER),
+    ),
+    "subscription.isOn": "Y",
+  }
+  const uCol = db.collection("User")
+  const res1 = await uCol.where(w1).get<Table_User>()
+  const users = res1.data
+  if(users.length < 1) return { code: "E4004" }
+
+  // 2. get required params
+  const access_token = await checkAndGetWxGzhAccessToken()
+  if(!access_token) {
+    console.warn("fail to get access token for coming soon expired users")
+    return { code: "E4000" }
+  }
+  const _env = process.env
+  const domain = _env.LIU_DOMAIN
+  const tmplId = _env.LIU_WX_GZ_TMPL_ID_2
+  if(!tmplId || !domain) {
+    console.warn("domain and tmplid are required for coming soon expired users")
+    return { code: "E4000" }
+  }
+  const baseBody = { ...wx_expired_tmpl }
+  baseBody.template_id = tmplId
+  baseBody.url = `${domain}/subscription`
+  
+  // 3. send message
+  let num = 0
+  for(let i=0; i<users.length; i++) {
+
+    // 3.1 get wx_gzh_openid
+    const user = users[i]
+    const wx_gzh_openid = user.wx_gzh_openid
+    if(!wx_gzh_openid) continue
+
+    // 3.2 construct object
+    const body = { ...baseBody }
+    body.touser = wx_gzh_openid
+    WxGzhSender.sendTemplateMessage(access_token, body)
+
+    await valTool.waitMilli(100)
+    num++
+  }
+
+  return { code: "0000", data: { num } }
 }
 
 

@@ -31,6 +31,20 @@ export const wx_reminder_tmpl = {
   }
 }
 
+export const wx_expired_tmpl = {
+  touser: "",
+  template_id: "",
+  url: "",
+  data: {
+    thing4: {
+      value: "3 小时后会员将过期，续费能支持我开发",
+    },
+    const5: {
+      value: "会员到期",
+    },
+  }
+}
+
 /********************* tencent SES template config ****************/
 export const tencent_ses_tmpl_cfg = {
   "confirmation": {
