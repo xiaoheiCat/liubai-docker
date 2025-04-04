@@ -5,8 +5,8 @@ import localCache from "~/utils/system/local-cache"
 import type { VciProps } from "./types"
 import thirdLink from "~/config/third-link"
 import valTool from "~/utils/basic/val-tool"
-import liuEnv from "~/utils/liu-env"
 import { add_white_bg } from "~/config/add-white-bgs"
+import cfg from "~/config"
 
 export function useVcIframe(props: VciProps) {
   const { route } = useRouteAndLiuRouter()
@@ -137,7 +137,14 @@ function getStyles(
 
     const topVirtual = Math.round(h * 0.01)
     const bottomVirtual = Math.round(h * 0.02)
-    const height = h - topVirtual - bottomVirtual
+    let height = h - topVirtual - bottomVirtual
+
+    // adjust height for Apple Podcast
+    const od = props.otherData
+    if(od?.isApplePodcast && height > cfg.apple_podcast_height) {
+      height = cfg.apple_podcast_height
+    }
+
     return {
       width: w,
       height,

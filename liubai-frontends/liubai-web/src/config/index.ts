@@ -82,4 +82,6 @@ export default {
     tablet: 1150,
   },
 
+  apple_podcast_height: 175,
+
 }
