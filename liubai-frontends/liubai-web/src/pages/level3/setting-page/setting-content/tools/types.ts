@@ -43,5 +43,6 @@ export interface SettingContentData {
   contactLink?: string
   emailLink?: string
   showA2HS: boolean
+  documentationLink?: string
   
 }

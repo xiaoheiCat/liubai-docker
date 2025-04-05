@@ -259,6 +259,24 @@ const iconColor = "var(--main-normal)"
           </div>
         </div>
 
+        <!-- help center -->
+        <a v-if="data.documentationLink"
+          class="liu-no-user-select liu-hover sc-bar" 
+          :href="data.documentationLink" target="_blank"
+        >
+          <div class="scb-hd">
+            <span>{{ t('setting.documentation') }}</span>
+          </div>
+          <div class="scb-footer">
+            <div class="scb-footer-icon">
+              <svg-icon class="scbf-svg-icon"
+                name="document_center"
+                :color="iconColor"
+              ></svg-icon>
+            </div>
+          </div>
+        </a>
+
         <!-- GitHub -->
         <a class="liu-no-user-select liu-hover sc-bar" 
           :href="data.openSourceLink" target="_blank"

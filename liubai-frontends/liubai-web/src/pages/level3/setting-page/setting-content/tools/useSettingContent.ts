@@ -51,6 +51,7 @@ export function useSettingContent() {
     hasBackend,
 
     redLink: thirdLink.RED_FOLLOW_URL,
+    documentationLink: _env.DOCUMENTATION_URL,
     openSourceLink: thirdLink.OPEN_SOURCE_URL,
 
     debugBtn: Boolean(_env.DEBUG_BTN),

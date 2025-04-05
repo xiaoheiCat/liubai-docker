@@ -5,6 +5,7 @@ export interface LiuSystemEnv {
 
   API_DOMAIN?: string
   APP_NAME?: string
+  DOCUMENTATION_URL?: string
 
   PAYMENT_PRIORITY?: "stripe" | "one-off"
 

@@ -443,7 +443,8 @@
     "unbind_tip_1": "确定要解除绑定{name}吗？该操作可能造成帐号遗失。",
     "unbind_tip_2": "解绑后，当前微信一个月内不得再绑定。确定要解绑吗？",
     "unbind_2": "确定解绑",
-    "unbind_success": "解绑成功"
+    "unbind_success": "解绑成功",
+    "documentation": "帮助中心"
   },
   "export": {
     "markdown": "导出成 markdown 文件",
