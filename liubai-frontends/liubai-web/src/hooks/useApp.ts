@@ -86,6 +86,10 @@ function initOnceData() {
     onceData.launchStamp = now
     localCache.setOnceData("launchStamp", now)
   }
+
+  const launchNum = onceData.launchNum ?? 0
+  localCache.setOnceData("launchNum", launchNum + 1)
+
   return onceData
 }
 

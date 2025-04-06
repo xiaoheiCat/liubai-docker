@@ -11,7 +11,7 @@ export interface LocalPreference {
   client_key?: string   // 前端生成的 aes 密钥
 
   loginStamp?: number
-  loadEditStamp?: number
+  loadEditStamp?: number   // 上一次加载“最近编辑动态”的时间戳
 }
 
 export interface LocalOnceData {
@@ -53,6 +53,7 @@ export interface LocalOnceData {
 
   // the timestamp when user launched the app
   launchStamp?: number
+  launchNum?: number
 
   // font size
   fontSize?: "L" | "M"
