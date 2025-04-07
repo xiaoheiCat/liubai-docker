@@ -37,5 +37,8 @@ export interface SettingContentData {
   emailLink?: string
   showA2HS: boolean
   documentationLink?: string
+
+  lastTapFooterStamp: number
+  tapFooterNum: number
   
 }

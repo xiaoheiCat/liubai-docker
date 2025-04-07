@@ -28,8 +28,8 @@ import liuReq from "~/requests/liu-req"
 import APIs from "~/requests/APIs"
 import liuUtil from "~/utils/liu-util"
 import { useNetworkStore } from "~/hooks/stores/useNetworkStore"
-import { useQRCode } from "~/hooks/useVueUse"
 import thirdLink from "~/config/third-link"
+import time from "~/utils/basic/time"
 
 export function useSettingContent() {
 
@@ -52,12 +52,14 @@ export function useSettingContent() {
     documentationLink: _env.DOCUMENTATION_URL,
     openSourceLink: thirdLink.OPEN_SOURCE_URL,
 
-    debugBtn: Boolean(_env.DEBUG_BTN),
+    debugBtn: false,
     openDebug: false,
     mobileDebug: Boolean(onceData.mobile_debug),
     contactLink,
     emailLink,
     showA2HS: false,
+    lastTapFooterStamp: 0,
+    tapFooterNum: 0,
   })
 
   const { toA2HS } = listenToA2HS(data)
@@ -82,7 +84,6 @@ export function useSettingContent() {
     toA2HS?.()
   }
 
-  const contactQR = useQRCode(contactLink ?? "")
   const onTapContact = () => {
     if(!contactLink) return
     window.open(contactLink, "_blank")
@@ -94,6 +95,26 @@ export function useSettingContent() {
       imgs: [{ src, id: "gzh-qrcode", width: 500, height: 150 }]
     })
     cui.showSnackBar({ text_key: "common.scan_with_wx" })
+  }
+
+  const onTapFooter = () => {
+    if(!data.lastTapFooterStamp) {
+      data.lastTapFooterStamp = time.getTime()
+    }
+    const isIn500ms = time.isWithinMillis(data.lastTapFooterStamp, 500)
+    data.lastTapFooterStamp = time.getTime()
+    if(!isIn500ms) {
+      data.tapFooterNum = 0
+      return
+    }
+
+    if(data.tapFooterNum >= 5) {
+      data.debugBtn = !data.debugBtn
+      data.tapFooterNum = 0
+    }
+    else {
+      data.tapFooterNum++
+    }
   }
 
   return {
@@ -112,29 +133,17 @@ export function useSettingContent() {
     onTapA2HS,
     onTapContact,
     onTapWxGzh,
+    onTapFooter,
     version,
     appName,
+    hasNewVersion,
   }
 }
 
 async function whenTapVersionUpdate(
   hasNewVersion: Ref<boolean>
 ) {
-
-  // 1. check network
-  const networkStore = useNetworkStore()
-  if(networkStore.level < 1) {
-    cui.showModal({
-      title: "🌐",
-      content_key: "tip.network_required",
-      showCancel: false,
-      isTitleEqualToEmoji: true,
-    })
-    return
-  }
-
-
-  // 2. define some functions
+  // 1. define some functions
   const _newVersion = async () => {
     const res = await cui.showModal({
       title_key: "pwa.new_version_title",
@@ -164,11 +173,22 @@ async function whenTapVersionUpdate(
     })
   }
 
-
-  // 3. if hasNewVersion has been already true
+  // 2. if hasNewVersion has been already true
   let value = hasNewVersion.value
   if(value) {
     _newVersion()
+    return
+  }
+
+  // 3. check network
+  const networkStore = useNetworkStore()
+  if(networkStore.level < 1) {
+    cui.showModal({
+      title: "🌐",
+      content_key: "tip.network_required",
+      showCancel: false,
+      isTitleEqualToEmoji: true,
+    })
     return
   }
 

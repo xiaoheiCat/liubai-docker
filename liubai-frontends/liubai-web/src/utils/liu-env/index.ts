@@ -16,10 +16,6 @@ function getEnv(): LiuSystemEnv {
   // payment priority
   const PAYMENT_PRIORITY = import.meta.env.VITE_PAYMENT_PRIORITY
 
-  // debug btn
-  const VITE_DEBUG_BTN = import.meta.env.VITE_DEBUG_BTN
-  const DEBUG_BTN = VITE_DEBUG_BTN === "01"
-
   // SaaS 各个服务情况上限
   const LOCAL_PIN_NUM = import.meta.env.VITE_LOCAL_PIN_NUM
   const FREE_PIN_NUM = import.meta.env.VITE_FREE_PIN_NUM
@@ -132,7 +128,6 @@ function getEnv(): LiuSystemEnv {
     APP_NAME,
     DOCUMENTATION_URL,
     PAYMENT_PRIORITY,
-    DEBUG_BTN,
     LOCAL_PIN_NUM: Number(LOCAL_PIN_NUM),
     FREE_PIN_NUM: Number(FREE_PIN_NUM),
     PREMIUM_PIN_NUM: Number(PREMIUM_PIN_NUM),

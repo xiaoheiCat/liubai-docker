@@ -9,8 +9,6 @@ export interface LiuSystemEnv {
 
   PAYMENT_PRIORITY?: "stripe" | "one-off"
 
-  DEBUG_BTN?: boolean
-
   LOCAL_PIN_NUM: number
   FREE_PIN_NUM: number
   PREMIUM_PIN_NUM: number

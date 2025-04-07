@@ -21,7 +21,6 @@ const deviceIcon = computed(() => {
 
 const {
   myProfile,
-  prefix,
   data,
   onTapTheme,
   onTapLanguage,
@@ -35,8 +34,10 @@ const {
   onTapA2HS,
   onTapContact,
   onTapWxGzh,
+  onTapFooter,
   version,
   appName,
+  hasNewVersion,
 } = useSettingContent()
 
 // 主题字段 i18n 的 key
@@ -350,20 +351,6 @@ const iconColor = "var(--main-normal)"
               </div>
             </div>
 
-            <!-- 版本更新 -->
-            <div v-if="data.showA2HS" class="liu-no-user-select liu-hover sc-pad-item" 
-              @click.stop="onTapVersionUpdate"
-            >
-              <div class="sc-pad-title">
-                <span>{{ t('setting.detect_version') }}</span>
-              </div>
-              <div class="sc-pad-icon">
-                <svg-icon class="scti-back"
-                  name="arrow-right2"
-                ></svg-icon>
-              </div>
-            </div>
-
           </div>
         </div>
 
@@ -387,7 +374,7 @@ const iconColor = "var(--main-normal)"
 
         <!-- Version Update -->
         <div class="liu-no-user-select liu-hover sc-bar"
-          v-else
+          v-if="hasNewVersion || !data.showA2HS"
           @click.stop="onTapVersionUpdate"
         >
           <div class="scb-hd">
@@ -473,7 +460,7 @@ const iconColor = "var(--main-normal)"
 
     </div>
 
-    <div class="liu-no-user-select sc-footer">
+    <div class="liu-no-user-select sc-footer" @click.stop="onTapFooter">
       <span translate="no">Powered by {{appName}} @ {{ version }}</span>
     </div>
 
