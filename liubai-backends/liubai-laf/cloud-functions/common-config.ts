@@ -37,7 +37,7 @@ export const wx_expired_tmpl = {
   url: "",
   data: {
     thing4: {
-      value: "3 小时后会员将过期，续费能支持我开发",
+      value: "3 小时后过期，续费我会真的很爱你",
     },
     const5: {
       value: "会员到期",
