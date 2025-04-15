@@ -37,6 +37,7 @@ import {
   type OaiStreamCompletion,
   type OaiStreamChoiceDelta,
   type OaiChatCompletionChunk,
+  type LiuRqReturn,
 } from "@/common-types"
 import { WxGzhSender } from "@/service-send"
 import { 
@@ -54,7 +55,7 @@ import {
   ValueTransform,
 } from "@/common-util"
 import { aiBots, aiI18nShared } from "@/ai-prompt"
-import { useI18n, aiLang, getCurrentLocale } from "@/common-i18n"
+import { useI18n, aiLang, getCurrentLocale, commonLang } from "@/common-i18n"
 import { WxGzhUploader } from "@/file-utils"
 import { 
   getBasicStampWhileAdding, 
@@ -908,6 +909,84 @@ export class AiShared {
   }
 
 
+  static convertTextBeforeReplying(
+    text: string,
+    user?: Table_User,
+  ) {
+    if(!text.startsWith("{")) return text
+    if(!text.endsWith("}")) return text
+    let newText = text
+
+    // 1. structure text to location
+    const res1 = valTool.strToObj(text)
+    
+    // 2. if it's a location
+    if(res1.type === "location") {
+      const res2 = this._turnIntoMapInfo(res1, user)
+      if(!res2) return
+      newText = res2
+    }
+    
+    return newText
+  }
+
+  private static _turnIntoMapInfo(
+    obj: Record<string, any>,
+    user?: Table_User,
+  ) {
+    const { latitude, longitude, title, address } = obj
+
+    // 1. check out params
+    const res1 = ValueTransform.str2Num(latitude)
+    const res2 = ValueTransform.str2Num(longitude)
+    if(!res1.pass || !res2.pass) return
+    if(!title || typeof title !== "string") return
+
+    // 2. init msg
+    const { t: t1 } = useI18n(aiLang, { user })
+    const { t: t2 } = useI18n(commonLang, { user })
+    let msg = t1("location_msg") + "\n\n"
+
+    // 2.1 add title
+    msg += (title + "\n")
+
+    // 2.2 add address
+    if(address && typeof address === "string") {
+      msg += (address + "\n")
+    }
+    msg += "\n"
+
+    // 2.3 add amap link
+    const amapUrl = new URL("https://uri.amap.com/marker")
+    const amapSp = amapUrl.searchParams
+    amapSp.set("position", `${longitude},${latitude}`)
+    amapSp.set("name", title)
+    amapSp.set("src", t2("app_name"))
+    amapSp.set("callnative", "1")
+    const amapLink = amapUrl.toString()
+    msg += `<a href="${amapLink}">${t1('open_via_amap')}</a>\n`
+
+    // 2.4 add baidu link
+    const baiduUrl = new URL("http://api.map.baidu.com/marker")
+    const baiduSp = baiduUrl.searchParams
+    baiduSp.set("location", `${latitude},${longitude}`)
+    baiduSp.set("title", title)
+    if(address && typeof address === "string") {
+      baiduSp.set("content", address)
+    }
+    else {
+      baiduSp.set("content", t2("from_us"))
+    }
+    baiduSp.set("src", "webapp.ptsd.liubai")
+    baiduSp.set("output", "html")
+    baiduSp.set("coord_type", "gcj02")
+    const baiduLink = baiduUrl.toString()
+    msg += `<a href="${baiduLink}">${t1('open_via_baidu')}</a>`
+
+    return msg
+  }
+
+
 }
 
 export class TellUser {
@@ -1225,6 +1304,126 @@ export class WebSearch {
 
 /******************** tool for geo / location ************************/
 export class GeoLocation {
+
+  private _amapApiKey: string
+
+  constructor() {
+    const _env = process.env
+    this._amapApiKey = _env.LIU_AMAP_WEB_KEY ?? ""
+  }
+
+  preCheck() {
+    if(!this._amapApiKey) {
+      return checker.getErrResult("amap api key is not set", "E5001")
+    }
+  }
+
+  postCheck(res: LiuRqReturn) {
+    if(res.code !== "0000" || !res.data) {
+      const err = checker.getErrResult(
+        res.errMsg ?? "network error",
+        res.code,
+      )
+      return err
+    }
+  }
+
+  /**
+   * 逆地理编码: 根据经纬度获取地址
+   * https://lbs.amap.com/api/webservice/guide/api/georegeo
+   */
+  async maps_regeo(
+    funcJson: Record<string, any>,
+  ): Promise<DataPass<LiuAi.MapResult>> {
+    const err1 = this.preCheck()
+    if(err1) return err1
+
+    const { latitude, longitude } = funcJson
+    const res2_1 = ValueTransform.str2Num(latitude)
+    const res2_2 = ValueTransform.str2Num(longitude)
+    if(!res2_1.pass || !res2_2.pass) {
+      const err2 = checker.getErrResult(
+        "latitude and longitude are not numbers",
+      )
+      return err2
+    }
+    
+    const location = `${res2_2.data},${res2_1.data}`
+    console.warn("location: ", location)
+    const key = this._amapApiKey
+    const url = new URL("https://restapi.amap.com/v3/geocode/regeo")
+    url.searchParams.set("key", key)
+    url.searchParams.set("location", location)
+    url.searchParams.set("extensions", "all")
+    const link = url.toString()
+    const res3 = await liuReq(link, undefined, { method: "GET" })
+    console.warn("res3: ", res3)
+
+    // 4. handle error
+    const err4 = this.postCheck(res3)
+    if(err4) return err4
+    const data4 = res3.data ?? {}
+
+    // 5. handle return data
+    const data5: LiuAi.MapResult = {
+      provider: "amap",
+      textToBot: valTool.objToStr(data4),
+      originalResult: data4,
+    }
+
+    return {
+      pass: true,
+      data: data5,
+    }
+  }
+
+  /**
+   * 地理编码: 根据地址获取经纬度
+   * https://lbs.amap.com/api/webservice/guide/api/georegeo
+   */
+  async maps_geo(
+    funcJson: Record<string, any>,
+  ) {
+
+  }
+
+  /**
+   * 骑行路径规划
+   * https://lbs.amap.com/api/webservice/guide/api/newroute
+   */
+  async maps_direction_bicycling(
+    funcJson: Record<string, any>,
+  ) {
+
+  }
+
+  /**
+   * 驾车路径规划
+   */
+  async maps_direction_driving(
+    funcJson: Record<string, any>,
+  ) {
+    
+  }
+
+  /**
+   * 步行路径规划
+   */
+  async maps_direction_walking(
+    funcJson: Record<string, any>,
+  ) {
+
+  }
+
+  /**
+   *  关键词搜
+   *  https://lbs.amap.com/api/webservice/guide/api-advanced/newpoisearch
+   */
+  async maps_text_search(
+    funcJson: Record<string, any>,
+  ) {
+
+  }
   
 }
 
@@ -1760,63 +1959,12 @@ export class ToolShared {
     return msg
   }
 
+  async maps_regeo(funcJson: Record<string, any>) {
+    const geo = new GeoLocation()
+    const res1 = await geo.maps_regeo(funcJson)
+    if(!res1.pass) return res1
 
-  /****************************** about maps ************************/
-  /**
-   * 逆地理编码: 根据经纬度获取地址
-   * https://lbs.amap.com/api/webservice/guide/api/georegeo
-   */
-  async maps_regeo(
-    funcJson: Record<string, any>,
-  ) {
-
-  }
-
-  /**
-   * 地理编码: 根据地址获取经纬度
-   * https://lbs.amap.com/api/webservice/guide/api/georegeo
-   */
-  async maps_geo(
-    funcJson: Record<string, any>,
-  ) {
-
-  }
-
-  /**
-   * 骑行路径规划
-   * https://lbs.amap.com/api/webservice/guide/api/newroute
-   */
-  async maps_direction_bicycling(
-    funcJson: Record<string, any>,
-  ) {
-
-  }
-
-  /**
-   * 驾车路径规划
-   */
-  async maps_direction_driving(
-    funcJson: Record<string, any>,
-  ) {
     
-  }
-
-  /**
-   * 步行路径规划
-   */
-  async maps_direction_walking(
-    funcJson: Record<string, any>,
-  ) {
-
-  }
-
-  /**
-   *  关键词搜
-   *  https://lbs.amap.com/api/webservice/guide/api-advanced/newpoisearch
-   */
-  async maps_text_search(
-    funcJson: Record<string, any>,
-  ) {
 
   }
 

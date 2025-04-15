@@ -65,6 +65,7 @@ import {
   BaseLLM,
   LogHelper,
   Translator,
+  GeoLocation,
 } from "@/ai-shared"
 import { ai_cfg } from "@/common-config"
 
@@ -150,10 +151,11 @@ export async function get_into_ai(
   if(!res0) return
 
   // 1. check out text or image_url
-  const { msg_type, image_url, text, audio_url } = entry
+  const { msg_type, image_url, text, audio_url, location } = entry
   if(msg_type === "text" && !text) return
   if(msg_type === "image" && !image_url) return
   if(msg_type === "voice" && !audio_url) return
+  if(msg_type === "location" && !location) return
 
   // 1.1 check out text
   if(msg_type === "text" && text) {
@@ -957,6 +959,16 @@ class BaseBot {
           tool_call_id,
         )
       }
+      else if(funcName === "maps_regeo") {
+        const mapsRes = await toolHandler.maps_regeo(funcJson)
+        if(!mapsRes) continue
+        await this._continueAfterMaps(
+          postParam,
+          tool_calls,
+          mapsRes,
+          tool_call_id,
+        )
+      }
       else if(funcName === "draw_picture") {
         const drawRes = await toolHandler.draw_picture(funcJson)
         if(!drawRes) continue
@@ -1070,30 +1082,29 @@ class BaseBot {
     return { restTokens, prompts }
   }
 
-  private async _continueAfterReadingCards(
+  private async _contineAfterToolUse(
     postParam: PostRunParam,
     tool_calls: OaiToolCall[],
-    readRes: LiuAi.ReadCardsResult,
+    textToBot: string,
     tool_call_id: string,
   ) {
     // 1. handle max tokens
-    let textToBot = readRes.textToBot
     const data1 = this._getRestTokensAndPrompts(postParam, textToBot)
     if(!data1) return
     let { restTokens, prompts } = data1
 
-    // 2. get some params
+    // 2. get other params
     const c = this._character
     const assistantName = AiShared.getCharacterName(c)
-    const { chatParam, bot, aiParam } = postParam
+    const { chatParam, aiParam, bot } = postParam
     const user = aiParam.entry.user
     const canUseTool = bot.abilities.includes("tool_use")
     const { t } = useI18n(aiLang, { user })
 
-    // 3. add new prompts with tool_calls and its result
+    // 3. add prompts with tool_calls and its result
     if(canUseTool) {
       prompts.push({ role: "assistant", tool_calls, name: assistantName })
-      textToBot += (`\n\n` + t("do_not_use_tool_2"))
+      textToBot += (`\n\n` + t("do_not_use_tool"))
       prompts.push({
         role: "tool",
         content: textToBot,
@@ -1108,152 +1119,9 @@ class BaseBot {
         t,
         assistantName,
       )
-      console.warn("see newPrompts in _continueAfterReadingCards: ")
-      console.log(newPrompts)
       if(newPrompts.length < 1) return
       prompts.push(...newPrompts)
     }
-
-
-    // 4. new chat create param
-    const newChatParam: OaiCreateParam = { 
-      ...chatParam,
-      messages: prompts,
-      max_tokens: restTokens,
-    }
-    const res4 = await this.chat(newChatParam, bot)
-    if(!res4) return
-
-    // console.warn(`${c}'s chat _continueAfterReadingCards: `)
-    // console.log(res4.choices?.[0]?.message)
-    // console.log(res4.choices?.[0].finish_reason)
-
-    // 5. handle text from response
-    const assistantChatId = await this._handleAssistantText(res4, aiParam, bot)
-    if(!assistantChatId) {
-      console.warn("no assistantChatId in _continueAfterReadingCards")
-      console.log(res4)
-      return
-    }
-  }
-
-  private async _continueAfterWebSearch(
-    postParam: PostRunParam,
-    tool_calls: OaiToolCall[],
-    searchRes: LiuAi.SearchResult,
-    tool_call_id: string,
-  ) {
-    // 1. handle max tokens
-    let searchMarkdown = searchRes.markdown
-    const data1 = this._getRestTokensAndPrompts(postParam, searchMarkdown)
-    if(!data1) return
-    let { restTokens, prompts } = data1
-
-    // 2. get other params
-    const c = this._character
-    const assistantName = AiShared.getCharacterName(c)
-    const { chatParam, aiParam, bot } = postParam
-    const user = aiParam.entry.user
-    const canUseTool = bot.abilities.includes("tool_use")
-    const { t } = useI18n(aiLang, { user })
-
-    // 3. add prompts with tool_calls and its result
-    if(canUseTool) {
-      prompts.push({ role: "assistant", tool_calls, name: assistantName })
-      searchMarkdown += (`\n\n` + t("do_not_use_tool"))
-      prompts.push({
-        role: "tool",
-        content: searchMarkdown,
-        tool_call_id,
-      })
-    }
-    else {
-      const newPrompts = AiHelper.turnToolCallsIntoNormalPrompts(
-        tool_calls,
-        tool_call_id,
-        searchMarkdown,
-        t,
-        assistantName,
-      )
-      if(newPrompts.length < 1) return
-      prompts.push(...newPrompts)
-    }
-
-    // print last 3 prompts
-    // LogHelper.printLastItems(prompts, 3)
-
-    // 4. new chat create param
-    const newChatParam: OaiCreateParam = { 
-      ...chatParam,
-      messages: prompts,
-      max_tokens: restTokens,
-    }
-    const res4 = await this.chat(newChatParam, bot)
-    if(!res4) {
-      console.warn("no result of chat in _continueAfterWebSearch......")
-      return
-    }
-
-    // 5. see result
-    const choice5 = res4.choices?.[0]
-    const msg5 = choice5?.message
-    console.log(msg5)
-    if(msg5?.tool_calls) {
-      console.log(msg5.tool_calls[0])
-    }
-
-    // 6. can i reply
-    const res6 = await AiHelper.canReply(aiParam, bot)
-    if(!res6) return
-
-    // 7. handle text from response
-    const assistantChatId = await this._handleAssistantText(res4, aiParam, bot)
-    if(!assistantChatId) return
-  }
-
-  private async _continueAfterParsingLink(
-    postParam: PostRunParam,
-    tool_calls: OaiToolCall[],
-    parsingLinkRes: LiuAi.ParseLinkResult,
-    tool_call_id: string,
-  ) {
-    // 1. handle max tokens
-    const { markdown } = parsingLinkRes
-    const data1 = this._getRestTokensAndPrompts(postParam, markdown)
-    if(!data1) return
-    let { restTokens, prompts } = data1
-
-    // 2. get other params
-    const c = this._character
-    const assistantName = AiShared.getCharacterName(c)
-    const { chatParam, aiParam, bot } = postParam
-    const user = aiParam.entry.user
-    const canUseTool = bot.abilities.includes("tool_use")
-    const { t } = useI18n(aiLang, { user })
-
-    // 3. add prompts with tool_calls and its result
-    if(canUseTool) {
-      prompts.push({ role: "assistant", tool_calls, name: assistantName })
-      prompts.push({ role: "tool", content: markdown, tool_call_id })
-    }
-    else {
-      const newPrompts = AiHelper.turnToolCallsIntoNormalPrompts(
-        tool_calls,
-        tool_call_id,
-        markdown,
-        t,
-        assistantName,
-      )
-      if(newPrompts.length < 1) {
-        console.warn("fail to convert tool_calls into prompts")
-        console.log(newPrompts)
-        return
-      }
-      prompts.push(...newPrompts)
-    }
-
-    // print
-    LogHelper.printLastItems(prompts, 4)
 
     // 4. new chat create param
     const newChatParam: OaiCreateParam = {
@@ -1263,17 +1131,15 @@ class BaseBot {
     }
     const res4 = await this.chat(newChatParam, bot)
     if(!res4) {
-      console.warn("no result in _continueAfterParsingLink ......")
+      console.warn("no result in _continueAfterToolUse ......")
       return
     }
 
     // 5. see result
-    console.warn(`${c}'s chat continues after parsing link: `)
-    console.log(res4.usage)
     const choice5 = res4.choices?.[0]
     const msg5 = choice5?.message
-    console.log(msg5)
     if(msg5?.tool_calls) {
+      console.warn("what?! msg5.tool_calls[0]: ")
       console.log(msg5.tool_calls[0])
     }
 
@@ -1282,8 +1148,63 @@ class BaseBot {
     if(!res6) return
 
     // 7. handle text from response
-    const assistantChatId = await this._handleAssistantText(res4, aiParam, bot)
-    if(!assistantChatId) return
+    await this._handleAssistantText(res4, aiParam, bot)
+  }
+
+  private async _continueAfterReadingCards(
+    postParam: PostRunParam,
+    tool_calls: OaiToolCall[],
+    readRes: LiuAi.ReadCardsResult,
+    tool_call_id: string,
+  ) {
+    await this._contineAfterToolUse(
+      postParam,
+      tool_calls,
+      readRes.textToBot,
+      tool_call_id,
+    )
+  }
+
+  private async _continueAfterWebSearch(
+    postParam: PostRunParam,
+    tool_calls: OaiToolCall[],
+    searchRes: LiuAi.SearchResult,
+    tool_call_id: string,
+  ) {
+    await this._contineAfterToolUse(
+      postParam,
+      tool_calls,
+      searchRes.markdown,
+      tool_call_id,
+    )
+  }
+
+  private async _continueAfterParsingLink(
+    postParam: PostRunParam,
+    tool_calls: OaiToolCall[],
+    parsingLinkRes: LiuAi.ParseLinkResult,
+    tool_call_id: string,
+  ) {
+    await this._contineAfterToolUse(
+      postParam,
+      tool_calls,
+      parsingLinkRes.markdown,
+      tool_call_id,
+    )
+  }
+
+  private async _continueAfterMaps(
+    postParam: PostRunParam,
+    tool_calls: OaiToolCall[],
+    mapRes: LiuAi.MapResult,
+    tool_call_id: string,
+  ) {
+    await this._contineAfterToolUse(
+      postParam,
+      tool_calls,
+      mapRes.textToBot,
+      tool_call_id,
+    )
   }
 
   private async _handleAssistantText(
@@ -1309,7 +1230,18 @@ class BaseBot {
       const { t } = useI18n(aiLang, { user })
       textToUser = t("thinking", { text: txt_b ?? "" })
     }
+
+    // 1.2 clip content
     textToUser = this._clipContent(textToUser, chatCompletion)
+
+    // 1.3 handle special message, like location info
+    const textToUser2 = AiShared.convertTextBeforeReplying(textToUser, user)
+    if(!textToUser2) {
+      console.warn("fail to convert text before replying")
+      console.log(textToUser)
+      return
+    }
+    textToUser = textToUser2
 
     // 2. reply to user without CoT
     if(!showCoT) {
@@ -2848,7 +2780,20 @@ class ToolHandler {
   async maps_regeo(
     funcJson: Record<string, any>,
   ) {
+    const geo = new GeoLocation()
+    const res1 = await geo.maps_regeo(funcJson)
+    if(!res1.pass) return
 
+    const mapSearchData = res1.data
+    const data2: Partial<LiuAi.HelperAssistantMsgParam> = {
+      funcName: "maps_regeo",
+      funcJson,
+      mapProvider: "amap",
+      mapSearchData,
+    }
+    const assistantChatId = await this._addMsgToChat(data2)
+    if(!assistantChatId) return
+    return mapSearchData
   }
 
   async maps_geo(
@@ -3141,6 +3086,7 @@ class AiHelper {
     const { 
       msg_type,
       text, 
+      location,
       image_url,
       audio_url,
       audio_base64,
@@ -3162,6 +3108,7 @@ class AiHelper {
       wxMediaId: wx_media_id,
       wxMediaId16K: wx_media_id_16k,
       userId,
+      location,
     }
     if(wx_gzh_openid) {
       data1.channel = "wx_gzh"
@@ -3909,6 +3856,7 @@ class ChatIntoPrompter {
       imageUrl,
       audioBase64,
       msgType,
+      location,
     } = v
     const canInputAudio = this._canInputAudio
     const canReadPhoto = this._canReadPhoto
@@ -3950,6 +3898,15 @@ class ChatIntoPrompter {
       if(!c) return audioPrompt
       if(c === "hailuo" && index === 0) {
         return audioPrompt
+      }
+    }
+
+    if(msgType === "location" && location) {
+      let locaStr = "【位置消息】\n"
+      locaStr += valTool.objToStr(location)
+      return {
+        role: "user",
+        content: locaStr,
       }
     }
 

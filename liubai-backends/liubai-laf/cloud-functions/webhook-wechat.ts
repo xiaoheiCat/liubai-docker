@@ -4,6 +4,7 @@
 import cloud from "@lafjs/cloud";
 import * as crypto from "crypto";
 import type { 
+  LiuAi,
   LiuErrReturn, 
   LiuRqReturn,
   Ns_FFmpeg,
@@ -352,10 +353,25 @@ async function  handle_location(
 ) {
   // 1. get openid
   const wx_gzh_openid = msgObj.FromUserName
+  const user = await getUserByWxGzhOpenid(wx_gzh_openid)
+  if(!user) return
 
-  // 2. send unsupported message
-  const msg = _getUnsupportedMsg("location_unsupported")
-  sendText(wx_gzh_openid, msg)
+  // 2. package data
+  const atom: LiuAi.LocationAtom = {
+    latitude: msgObj.Location_Y,
+    longitude: msgObj.Location_X,
+    scale: msgObj.Scale,
+    description: msgObj.Label,
+    format: "gcj02",
+  }
+
+  // 3. get to ai system
+  get_into_ai({
+    user,
+    msg_type: "location",
+    location: atom,
+    wx_gzh_openid,
+  })
 }
 
 async function handle_link(

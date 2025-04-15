@@ -681,7 +681,7 @@ export type AiAbility = "chat" | "text_to_image" | "image_to_text" | "tool_use" 
 // input_audio: user inputs audio and LLM can understand
 // reasoning: Reasoning Models
 
-export type AiMsgType = "text" | "image" | "voice"
+export type AiMsgType = "text" | "image" | "voice" | "location"
 
 export type AiCommandByHuman = "kick" | "add" | "clear_history" 
   | "more_operations" | "continue" | "group_status"
@@ -718,6 +718,7 @@ export interface AiEntry {
   image_url?: string
   audio_url?: string
   audio_base64?: string
+  location?: LiuAi.LocationAtom
 
   // from weixin gzh
   wx_media_id?: string
@@ -1768,6 +1769,7 @@ export interface Table_AiChat extends BaseTable {
   // about human
   userId?: string
   channel?: "wx_gzh"
+  location?: LiuAi.LocationAtom
 
   // specific data about wx gzh
   wxMediaId?: string
@@ -2791,7 +2793,6 @@ export interface Wx_Gzh_ShortVideo extends Wx_Gzh_Base {
   MsgDataId?: string
 }
 
-// TODO: Location
 export interface Wx_Gzh_Location extends Wx_Gzh_Base {
   MsgType: "location"
   Location_X: string  // 纬度, e.g. "26.953295"
@@ -3542,6 +3543,14 @@ export namespace LiuAi {
   export type SearchProvider = "zhipu" | "serper" | "tavily"
   export type MapProvider = "amap"
 
+  export interface LocationAtom {
+    latitude: string
+    longitude: string
+    scale?: string
+    description?: string
+    format: "gcj02"
+  }
+
   export interface SearchResult {
     markdown: string
     provider: SearchProvider
@@ -3651,6 +3660,8 @@ export namespace LiuAi {
     drawPictureUrl?: string
     drawPictureModel?: string
     drawPictureData?: Record<string, any>
+    mapProvider?: LiuAi.MapProvider
+    mapSearchData?: Record<string, any>
   }
 
   export interface ApiEndpoint {

@@ -1035,5 +1035,31 @@ export const aiTools: OaiTool[] = [
     }
   },
 
+
+  /***************************** Maps **************************/
+  /** Re GEO */
+  {
+    type: "function",
+    function: {
+      name: "maps_regeo",
+      description: "逆地理编码。给定一组经纬度，返回该位置的详细地址，以及附近环境。",
+      parameters: {
+        type: "object",
+        properties: {
+          latitude: {
+            type: "string",
+            description: "纬度，gcj02 格式，比如 30.257280",
+          },
+          longitude: {
+            type: "string",
+            description: "经度，gcj02 格式，比如 120.144714",
+          }
+        },
+        required: ["latitude", "longitude"],
+        additionalProperties: false
+      }
+    }
+  },
+
 ]
 

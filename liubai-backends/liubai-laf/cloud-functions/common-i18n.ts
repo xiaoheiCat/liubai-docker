@@ -30,18 +30,21 @@ export const commonLang: LangAtom = {
     "image": "图片",
     "file": "文件",
     "other": "其它",
+    "from_us": "来自留白记事",
   },
   "zh-Hant": {
     "appName": "留白記事",
     "image": "圖片",
     "file": "文件",
     "other": "其它",
+    "from_us": "來自留白記事",
   },
   "en": {
     "appName": "Liubai",
     "image": "Image",
     "file": "File",
     "other": "Other",
+    "from_us": "From Liubai",
   }
 }
 
@@ -246,7 +249,6 @@ export const wechatLang: LangAtom = {
     "success_1": "绑定成功🎉\n\n小诀窍：<a href='https://mp.weixin.qq.com/s/3g1vn8wnps7nKntUKXIJuw'>如何避免漏接提醒</a>",
     "login_first": "尚未登录！\n欢迎使用<a href='{LIU_DOMAIN}/wechat-bind'>微信一键登录</a>",
     "video_unsupported": "[暂不支持发送视频消息]",
-    "location_unsupported": "🚧 暂不支持位置消息",
     "link_unsupported": "🚧 暂不支持链接消息",
     "buy_time": "\n如果你急着需要，可以<a href='{LIU_CUSTOMER_SERVICE}'>与开发者联系</a>。买断他的时间，让他为你开发。",
     "invitation_link": "您已成为留白记事 Premium 会员🎉\n邀请您加入<a href='{link}'>会员限定群聊</a>",
@@ -259,7 +261,6 @@ export const wechatLang: LangAtom = {
     "success_1": "綁定成功🎉\n\n小訣竅：<a href='https://mp.weixin.qq.com/s/3g1vn8wnps7nKntUKXIJuw'>如何避免漏接提醒</a>",
     "login_first": "尚未登入! \n歡迎使用<a href='{LIU_DOMAIN}/wechat-bind'>微信一鍵登入</a>",
     "video_unsupported": "[暫不支援影片訊息]",
-    "location_unsupported": "🚧 暫不支援位置訊息",
     "link_unsupported": "🚧 暫不支援連結訊息",
     "buy_time": "\n如果你急著需要，可以<a href='{LIU_CUSTOMER_SERVICE}'>與開發者聯絡</a>。買斷他的時間，讓他為你開發。",
     "invitation_link": "您已成為留白記事 Premium 會員🎉\n邀請您加入<a href='{link}'>會員限定群組</a>",
@@ -272,7 +273,6 @@ export const wechatLang: LangAtom = {
     "success_1": "Binding successful🎉\n\nTip: <a href='https://mp.weixin.qq.com/s/3g1vn8wnps7nKntUKXIJuw'>How to avoid missing reminders</a>",
     "login_first": "Not logged in yet!\nWelcome to <a href='{LIU_DOMAIN}/wechat-bind'>Login via WeChat</a>",
     "video_unsupported": "[Videos are not supported to send]",
-    "location_unsupported": "🚧 Location message is still in development",
     "link_unsupported": "🚧 Link message is still in development",
     "buy_time": "\nIf you want to use it urgently, you can <a href='{LIU_CUSTOMER_SERVICE}'>contact the developer</a>. Buy his time and let him develop for you.",
     "invitation_link": "You have become a member of Liubai Premium🎉\nWelcome to join our <a href='{link}'>VIP exclusive group!</a>",
@@ -331,8 +331,7 @@ export const aiLang: LangAtom = {
     "continue_bot": "继续{botName}",
     "there_are_3": "聊天室已有 3 个助手，请先踢掉再召唤。",
     "nobody_here": "当前群聊内没有任何助手",
-    "do_not_use_tool": "【请根据以上搜索结果，直接给出你的回复，勿再使用工具调用】",
-    "do_not_use_tool_2": "【请根据以上获取结果，直接给出你的回复，不要使用工具调用】",
+    "do_not_use_tool": "【请根据工具调用结果，直接给出回复，勿再使用工具】",
 
     // the first message when a bot has been called
     "called_1": "我是{botName}，想跟我聊什么呢？",
@@ -392,6 +391,16 @@ export const aiLang: LangAtom = {
 
     // system 2
     "system2_r1": "系统二（R1）",
+
+    // maps
+    "see_map": "{bot}看了一眼地图",
+    "parse_latlng": "{bot}解析了经纬度",
+    "parse_address": "{bot}搜索了地址",
+    "route_plan": "{bot}规划了路线",
+    "location_msg": "【位置消息】",
+    "address_info": "地址: {address}",
+    "open_via_amap": "用高德地图打开",
+    "open_via_baidu": "用百度地图打开",
   },
   "zh-Hant": {
     "privacy_title": "🔓 隱私提示:",
@@ -442,8 +451,7 @@ export const aiLang: LangAtom = {
     "continue_bot": "繼續{botName}",
     "there_are_3": "聊天室已有 3 个助手，請先踢掉再召喚。",
     "nobody_here": "當前群組內沒有任何助手",
-    "do_not_use_tool": "【請根據以上搜尋結果，直接給出你的回覆，勿再使用工具調用】",
-    "do_not_use_tool_2": "【請根據以上檢索結果，請直接給出你的回覆，不要使用工具調用】",
+    "do_not_use_tool": "【請根據以上工具調用結果，直接給出回覆，勿再使用工具】",
 
     // the first message when a bot has been called
     "called_1": "我是{botName}，想跟我聊什麼呢?",
@@ -503,6 +511,16 @@ export const aiLang: LangAtom = {
 
     // system 2
     "system2_r1": "系統二 (R1) ",
+
+    // maps
+    "see_map": "{bot}看了一眼地圖",
+    "parse_latlng": "{bot}解析了經緯度",
+    "parse_address": "{bot}搜尋了地址",
+    "route_plan": "{bot}規劃了路線",
+    "location_msg": "【位置訊息】",
+    "address_info": "地址: {address}",
+    "open_via_amap": "用高德地圖開啟",
+    "open_via_baidu": "用百度地圖開啟",
   },
   "en": {
     "privacy_title": "🔓 Privacy:",
@@ -553,8 +571,7 @@ export const aiLang: LangAtom = {
     "continue_bot": "Continue {botName}",
     "there_are_3": "There are 3 assistants in the group chat. Please kick one first.",
     "nobody_here": "There is no assistant here.",
-    "do_not_use_tool": "[Reply me directly with the above search results please, and do not use tools again]",
-    "do_not_use_tool_2": "[Reply me directly with the above results please, and do not use tools again]",
+    "do_not_use_tool": "[Reply me directly with the above results please, and do not use any tools again]",
 
     // the first message when a bot has been called
     "called_1": "I am {botName}. Let's chat together!",
@@ -614,6 +631,16 @@ export const aiLang: LangAtom = {
 
     // system 2
     "system2_r1": "System 2 (R1)",
+
+    // maps
+    "see_map": "{bot} looked at the map",
+    "parse_latlng": "{bot} parsed the latitude and longitude",
+    "parse_address": "{bot} searched the address",
+    "route_plan": "{bot} planned the route",
+    "location_msg": "[Location Message]",
+    "address_info": "Address: {address}",
+    "open_via_amap": "Open via Amap",
+    "open_via_baidu": "Open via Baidu",
   }
 }
 
