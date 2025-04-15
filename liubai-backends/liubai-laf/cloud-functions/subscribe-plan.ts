@@ -405,6 +405,9 @@ async function handle_info(
     }
   }
 
+  //@ts-ignore original_price
+  let original_price: string | undefined = d[`original_${currency}`]
+
   // check out wxpay
   let wxpay = d.wxpay
   const wx_appid = _env.LIU_WX_GZ_APPID
@@ -435,6 +438,7 @@ async function handle_info(
     price,
     currency,
     symbol: sym,
+    original_price,
   }
   
   return { code: "0000", data: r }

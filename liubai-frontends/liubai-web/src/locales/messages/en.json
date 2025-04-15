@@ -546,7 +546,9 @@
     "subscription_prompt_3": "You can join our VIP group to express your need after getting Liubai Premium.",
     "let_me_see": "Let me see",
     "let_me_see_2": "View",
-    "still_close": "still close"
+    "still_close": "still close",
+    "original_price_1": ", ",
+    "original_price_2": "{originalPrice} original"
   },
   "a2hs": {
     "title": "Add to Home",

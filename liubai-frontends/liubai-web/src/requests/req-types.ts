@@ -147,6 +147,7 @@ export interface Res_SubPlan_Info {
   price: string
   currency: string   // 三位英文大写字符组成
   symbol: string     // 货币符号，比如 "¥"
+  original_price?: string
 }
 
 export interface Res_SubPlan_StripeCheckout {

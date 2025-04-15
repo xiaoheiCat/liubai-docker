@@ -1613,7 +1613,7 @@ export interface Table_Subscription extends BaseTable {
 
   // 以下价格是向用户在前端展示的价格，请使用用户能理解的常用单位
   // 而非最终收费的单位
-  price_AUD?: string        // 比如 "$9.5"
+  price_AUD?: string        // 比如 "$9.5"，填写时不需要货币符号
   price_CNY?: string        // 比如 "￥5"
   price_USD?: string        // 比如 "$5.75"
   price_EUR?: string        // 比如 "€5.50"
@@ -1621,6 +1621,15 @@ export interface Table_Subscription extends BaseTable {
   price_JPY?: string        // 比如 "¥550"
   price_NZD?: string        // 比如 "$5.75"
   price_TWD?: string        // 比如 "150"
+
+  original_AUD?: string     // 原价，比如 "$20"，必须包含货币符号
+  original_CNY?: string
+  original_USD?: string
+  original_EUR?: string
+  original_HKD?: string
+  original_JPY?: string
+  original_NZD?: string
+  original_TWD?: string
 
   amount_CNY?: number       // 人民币价格，单位为“分”，当调用 `payment-order` 且为下单订阅单时，必填
                             // 该值可填 0
@@ -2035,6 +2044,7 @@ export interface Res_SubPlan_Info {
   price: string
   currency: string   // 三位英文 “大写” 字符组成
   symbol: string     // 货币符号，比如 "¥"
+  original_price?: string     // 原价，比如 "¥240"，必须包含货币符号
 }
 
 export interface Res_SubPlan_StripeCheckout {

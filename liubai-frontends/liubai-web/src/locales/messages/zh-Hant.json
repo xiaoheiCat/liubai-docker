@@ -546,7 +546,9 @@
     "subscription_prompt_3": "我們承諾會一直有免費方案，但你的支持是真的、完全、100% 能讓我為你提供更好的服務。\n購買會員後，可以加入群組直接向我提需求。",
     "let_me_see": "我看看",
     "let_me_see_2": "我看看",
-    "still_close": "依然關閉"
+    "still_close": "依然關閉",
+    "original_price_1": "，",
+    "original_price_2": "原價 {originalPrice}"
   },
   "a2hs": {
     "title": "加入到桌面",

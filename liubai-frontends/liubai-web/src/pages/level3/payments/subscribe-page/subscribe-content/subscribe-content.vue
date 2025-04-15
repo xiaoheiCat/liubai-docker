@@ -61,6 +61,14 @@ watch(() => scData.state, (newV) => {
         <span v-else-if="spi.payment_circle === 'yearly'" 
           class="scp-footer"
         >{{ t('payment.per_year', { currency: spi.currency }) }}</span>
+
+        <!-- original price -->
+        <template v-if="spi.original_price">
+          <span class="scp-original">{{ t('payment.original_price_1') }}</span>
+          <span class="scp-original"
+            style="text-decoration: line-through;"
+          >{{ t('payment.original_price_2', { originalPrice: spi.original_price }) }}</span>
+        </template>
         
       </div>
 
@@ -183,6 +191,12 @@ watch(() => scData.state, (newV) => {
   color: var(--main-text);
 }
 
+.scp-original {
+  vertical-align: middle;
+  font-weight: 700;
+  font-size: var(--inline-code-font);
+  color: var(--main-text);
+}
 
 .sc-badge {
   position: relative;
