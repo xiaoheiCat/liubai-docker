@@ -1345,6 +1345,7 @@ export interface Table_LogAi extends BaseTable {
   model?: string
   requestId?: string
   systemFingerprint?: string
+  costDuration?: number      // cost duration in milliseconds
 }
 
 /** User表 */

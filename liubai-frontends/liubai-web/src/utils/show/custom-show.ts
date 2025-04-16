@@ -29,4 +29,7 @@ export function showModelName(
   // QwQ 32B
   if(m.includes("qwq-32b")) return "QwQ 32B"
 
+  // GLM Z1
+  if(m.includes("glm-z1-")) return "GLM Z1"
+
 }

@@ -165,6 +165,7 @@ export class BaseLLM {
       }
     }
 
+    const t1 = getNowStamp()
     try {
       const chatCompletion = await client.chat.completions.create(copiedParams)
       const completion = chatCompletion as OaiStreamCompletion
@@ -202,6 +203,7 @@ export class BaseLLM {
       console.warn("BaseLLM streamChat error: ", err)
       return
     }
+    const t2 = getNowStamp()
 
     if(!usage) {
       console.warn("no usage in streamChat")
@@ -249,7 +251,7 @@ export class BaseLLM {
       usage,
     } as OaiChatCompletion
     _this._tryTimes = 0
-    _this._log(result, opt)
+    _this._log(result, t2 - t1, opt)
     return result
   }
 
@@ -266,9 +268,12 @@ export class BaseLLM {
     const copiedParams = valTool.copyObject(params)
 
     try {
+      const t1 = getNowStamp()
       const chatCompletion = await client.chat.completions.create(copiedParams)
+      const t2 = getNowStamp()
+
       _this._tryTimes = 0
-      _this._log(chatCompletion as any, opt)
+      _this._log(chatCompletion as any, t2 - t1, opt)
       return chatCompletion as OaiChatCompletion
     }
     catch(err) {
@@ -318,6 +323,7 @@ export class BaseLLM {
 
   private _log(
     chatCompletion: Partial<OaiChatCompletion>,
+    costDuration: number,
     opt?: LiuAi.BaseLLMChatOpt,
   ) {
     const usage = chatCompletion?.usage
@@ -335,6 +341,7 @@ export class BaseLLM {
       model: chatCompletion.model,
       requestId: chatCompletion.id,
       systemFingerprint: chatCompletion.system_fingerprint,
+      costDuration,
     }
     logCol.add(aLog)
   }
@@ -502,9 +509,9 @@ export class AiShared {
 
   private static handleContentForReasoning(
     res: OaiChatCompletion,
-    bot: AiBot,
     content: string,
     reasoning_content: string,
+    bot?: AiBot,
   ) {
 
     // 1. extract <think>......</think>
@@ -525,7 +532,7 @@ export class AiShared {
     }
     
     // 3. starts with "好的，" /  "嗯，" / "好，"
-    const thinkingInContent = bot.metaData?.thinkingInContent
+    const thinkingInContent = bot?.metaData?.thinkingInContent
     const finishReason = AiShared.getFinishReason(res)
     const mightHaveReasoningContent = Boolean(finishReason === "length" && !thinkingInContent)
     if(mightHaveReasoningContent) {
@@ -598,9 +605,9 @@ export class AiShared {
     if(!reasoning_content && isReasoning) {
       const res5 = AiShared.handleContentForReasoning(
         res,
-        bot as AiBot,
         content,
         reasoning_content,
+        bot,
       )
       content = res5.content
       reasoning_content = res5.reasoning_content

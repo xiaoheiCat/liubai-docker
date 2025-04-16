@@ -90,7 +90,24 @@ const aiWorkers: LiuAi.AiWorker[] = [
     "computingProvider": "zhipu",
     "model": "glm-4-flash",
     "character": "zhipu",
-  },{
+  },
+  {
+    "computingProvider": "zhipu",
+    "model": "glm-z1-airx",
+    "character": "zhipu",
+  },
+
+  {
+    "computingProvider": "zhipu",
+    "model": "glm-z1-air",
+    "character": "zhipu",
+  },
+  {
+    "computingProvider": "zhipu",
+    "model": "glm-z1-flash",
+    "character": "zhipu",
+  },
+  {
     "computingProvider": "stepfun",
     "model": "step-2-mini",
     "character": "yuewen",
@@ -261,7 +278,7 @@ export class BackupToOthers {
       "Content-Type": "application/json",
     }
     const res2 = await liuReq(link2, body2, { headers })
-    console.log("push to vika: ", res2)
+    // console.log("push to vika: ", res2)
 
     // 3. handle result
     const code3 = res2?.code
@@ -303,7 +320,7 @@ export class BackupToOthers {
     // 2. fetch
     const payload = valTool.copyObject(this._basicData)
     const res2 = await liuReq(webhook_url, payload)
-    console.log("push to dingtalk: ", res2)
+    // console.log("push to dingtalk: ", res2)
 
     // 3. handle result
     const code3 = res2?.code
@@ -584,7 +601,6 @@ class AiCluster {
   private _thread: Table_Content
   private _user: Table_User
   private _decryptedData: DecryptEncData_B
-  private _hasUpdatedThread = false
 
   constructor(
     thread: Table_Content,
@@ -746,12 +762,6 @@ class AiCluster {
       return false
     }
 
-    // 8.3 if the thread has been updated by another worker, just skip
-    if(this._hasUpdatedThread) {
-      return false
-    }
-    this._hasUpdatedThread = true
-
     // 9. to update thread
     const res9 = await this.updateThread(res8.data, aiWorker)
     if(!res9) return false
@@ -821,10 +831,6 @@ class AiCluster {
     const theThread = res2.data
     if(!theThread) return false
     if(theThread.oState !== "OK") return false
-    if(oldThread.editedStamp !== theThread.editedStamp) {
-      console.warn("the thread has already been edited, so do not update it!")
-      return false
-    }
     
     // 3. encrypt data
     const aesKey = getAESKey()
@@ -849,7 +855,7 @@ class AiCluster {
       editedStamp: now4,
       updatedStamp: now4,
     }
-    const res4 = await cCol.doc(threadId).update(newData)
+    await cCol.doc(threadId).update(newData)
     return true
   }
 
