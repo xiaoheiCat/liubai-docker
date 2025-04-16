@@ -24,7 +24,7 @@ export function useTcTopbar(
       if(modelName === "DeepSeek R1") return "ds_r.png"
       if(modelName === "DeepSeek V3") return "deepseek.svg"
       if(modelName === "QwQ 32B") return "tongyi-qwen.svg"
-      if(modelName === "Kimi") return "kimi.png"
+      if(modelName === "GLM Z1") return "zhipu.svg"
     }
 
     // 2. judged by aiCharacter
