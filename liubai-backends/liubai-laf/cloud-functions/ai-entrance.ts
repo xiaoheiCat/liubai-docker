@@ -971,7 +971,7 @@ class BaseBot {
         this._addAiLogsForMap(aiLogs, mapsRes)
       }
       else if(funcName === "maps_geo") {
-        const mapsRes = await toolHandler.maps_regeo(funcJson)
+        const mapsRes = await toolHandler.maps_geo(funcJson)
         if(!mapsRes) continue
         await this._continueAfterMaps(
           postParam,
