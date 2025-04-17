@@ -3853,17 +3853,22 @@ export namespace Ns_FFmpeg {
 
 export namespace Ns_MapTool {
 
-  export const Sch_MapsGeoParam = vbot.object({
+  export const Sch_GeoParam = vbot.object({
     address: sch_string_length(3),
     city: Sch_Opt_Str,
   })
 
-  export const Sch_MapsSearchParam = vbot.object({
+  export const Sch_TextSearchParam = vbot.object({
     keywords: sch_string_length(2),
     region: Sch_Opt_Str,
   })
 
   export const amapSortrule = ["distance", "weight"] as const
   
+  export const Sch_AroundSearchParam = vbot.object({
+    location: sch_string_length(3),
+    radius: Sch_Opt_Str,
+    sortrule: vbot.optional(vbot.picklist(amapSortrule)),
+  })
 
 }

@@ -1303,9 +1303,8 @@ class GeoLocation {
     }
     
     const location = `${res2_2.data},${res2_1.data}`
-    const key = this._amapApiKey
     const url = new URL("https://restapi.amap.com/v3/geocode/regeo")
-    url.searchParams.set("key", key)
+    url.searchParams.set("key", this._amapApiKey)
     url.searchParams.set("location", location)
     url.searchParams.set("extensions", "all")
     const link = url.toString()
@@ -1323,24 +1322,25 @@ class GeoLocation {
   async maps_geo(
     funcJson: Record<string, any>,
   ) {
-    const errRes = checker.getErrResult()
     const err1 = this.preCheck()
     if(err1) return err1
 
-    const res1 = vbot.safeParse(Ns_MapTool.Sch_MapsGeoParam, funcJson)
+    const res1 = vbot.safeParse(Ns_MapTool.Sch_GeoParam, funcJson)
     if(!res1.success) {
       console.warn("cannot parse maps_geo param: ")
       console.log(funcJson)
       console.log(res1.issues)
+      const errRes = checker.getErrResult()
       errRes.err.errMsg = checker.getErrMsgFromIssues(res1.issues)
       return errRes
     }
 
-    const key = this._amapApiKey
     const url = new URL("https://restapi.amap.com/v3/geocode/geo")
-    url.searchParams.set("key", key)
+    url.searchParams.set("key",  this._amapApiKey)
     url.searchParams.set("address", funcJson.address)
-    url.searchParams.set("city", funcJson.city)
+    if(funcJson.city) {
+      url.searchParams.set("city", funcJson.city)
+    }
     const link = url.toString()
     const res3 = await liuReq(link, undefined, { method: "GET" })
 
@@ -1355,6 +1355,8 @@ class GeoLocation {
   async maps_direction_bicycling(
     funcJson: Record<string, any>,
   ) {
+    const err1 = this.preCheck()
+    if(err1) return err1
 
   }
 
@@ -1364,6 +1366,8 @@ class GeoLocation {
   async maps_direction_driving(
     funcJson: Record<string, any>,
   ) {
+    const err1 = this.preCheck()
+    if(err1) return err1
     
   }
 
@@ -1373,6 +1377,8 @@ class GeoLocation {
   async maps_direction_walking(
     funcJson: Record<string, any>,
   ) {
+    const err1 = this.preCheck()
+    if(err1) return err1
 
   }
 
@@ -1383,14 +1389,69 @@ class GeoLocation {
   async maps_text_search(
     funcJson: Record<string, any>,
   ) {
+    const err1 = this.preCheck()
+    if(err1) return err1
 
+    const res1 = vbot.safeParse(Ns_MapTool.Sch_TextSearchParam, funcJson)
+    if(!res1.success) {
+      console.warn("cannot parse maps_text_search param: ")
+      console.log(funcJson)
+      console.log(res1.issues)
+      const errRes = checker.getErrResult()
+      errRes.err.errMsg = checker.getErrMsgFromIssues(res1.issues)
+      return errRes
+    }
+
+    const url = new URL("https://restapi.amap.com/v5/place/text")
+    url.searchParams.set("key", this._amapApiKey)
+    url.searchParams.set("keywords", funcJson.keywords)
+    if(funcJson.region) {
+      url.searchParams.set("region", funcJson.region)
+      url.searchParams.set("city_limit", "true")
+    }
+    const link = url.toString()
+    const res3 = await liuReq(link, undefined, { method: "GET" })
+
+    const res4 = this._afterFetchMaps(res3)
+    return res4
   }
 
   async maps_around_search(
     funcJson: Record<string, any>,
   ) {
-    
+    const err1 = this.preCheck()
+    if(err1) return err1
 
+    const res1 = vbot.safeParse(Ns_MapTool.Sch_AroundSearchParam, funcJson)
+    if(!res1.success) {
+      console.warn("cannot parse maps_around_search param: ")
+      console.log(funcJson)
+      console.log(res1.issues)
+      const errRes = checker.getErrResult()
+      errRes.err.errMsg = checker.getErrMsgFromIssues(res1.issues)
+      return errRes
+    }
+    
+    const url = new URL("https://restapi.amap.com/v5/place/around")
+    const sp = url.searchParams
+    sp.set("key", this._amapApiKey)
+    sp.set("location", funcJson.location)
+    if(funcJson.radius) {
+      const radiusRes = ValueTransform.str2Num(funcJson.radius)
+      if(!radiusRes.pass) {
+        const errRes = checker.getErrResult("radius is not a number")
+        return errRes
+      }
+      sp.set("radius", radiusRes.data.toString())
+    }
+    if(funcJson.sortrule) {
+      sp.set("sortrule", funcJson.sortrule)
+    }
+    const link = url.toString()
+    const res3 = await liuReq(link, undefined, { method: "GET" })
+
+    const res4 = this._afterFetchMaps(res3)
+    return res4
   }
   
 }
@@ -1953,6 +2014,21 @@ export class ToolShared {
     const textToUser = t("see_map", { bot })
     res1.data.textToUser = textToUser
     return res1
+  }
+
+  async maps_text_search(funcJson: Record<string, any>) {
+    // 1. call GeoLocation
+    const geo = new GeoLocation()
+    const res1 = await geo.maps_text_search(funcJson)
+    if(!res1.pass) return res1
+  }
+
+  async maps_around_search(funcJson: Record<string, any>) {
+    // 1. call GeoLocation
+    const geo = new GeoLocation()
+    const res1 = await geo.maps_around_search(funcJson)
+    if(!res1.pass) return res1
+
   }
 
 }

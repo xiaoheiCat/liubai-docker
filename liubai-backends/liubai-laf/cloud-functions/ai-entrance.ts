@@ -2870,6 +2870,12 @@ class ToolHandler {
 
   }
 
+  async maps_around_search(
+    funcJson: Record<string, any>,
+  ) {
+
+  }
+
 }
 
 
