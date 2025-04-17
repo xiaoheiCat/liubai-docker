@@ -65,7 +65,6 @@ import {
   BaseLLM,
   LogHelper,
   Translator,
-  GeoLocation,
 } from "@/ai-shared"
 import { ai_cfg } from "@/common-config"
 
@@ -744,7 +743,7 @@ class BaseBot {
     const theService = `${params.model} on ${apiData.baseURL}`
 
     // print last 5 prompts
-    // LogHelper.printLastItems(params.messages, 10)
+    // LogHelper.printLastItems(params.messages)
     // console.log(`Let's ask ${theService}`)
 
     const llm = new BaseLLM(
@@ -968,6 +967,7 @@ class BaseBot {
           mapsRes,
           tool_call_id,
         )
+        this._addAiLogsForMap(aiLogs, mapsRes)
       }
       else if(funcName === "draw_picture") {
         const drawRes = await toolHandler.draw_picture(funcJson)
@@ -1034,6 +1034,21 @@ class BaseBot {
     }
 
     return aiLogs
+  }
+
+  private _addAiLogsForMap(
+    aiLogs: LiuAi.RunLog[],
+    mapsRes: LiuAi.MapResult,
+  ) {
+    const textToUser = mapsRes.textToUser
+    if(!textToUser) return
+    const mapLog: LiuAi.RunLog = {
+      toolName: "maps_whatever",
+      character: this._character,
+      textToUser,
+      logStamp: getNowStamp(),
+    }
+    aiLogs.push(mapLog)
   }
 
   private _getRestTokensAndPrompts(
@@ -2169,7 +2184,10 @@ class AiController {
       const bool = Boolean(v.toolName === "get_cards" || v.toolName === "get_schedule")
       return bool
     })
-    const workingLogs = all_logs.filter(v => v.toolName === "draw_picture")
+    const workingLogs = all_logs.filter(v => {
+      const bool = Boolean(v.toolName === "draw_picture" || v.toolName === "maps_whatever")
+      return bool
+    })
 
     // 2.2 privacy tips
     if(privacyLogs.length > 0) {
@@ -2780,20 +2798,21 @@ class ToolHandler {
   async maps_regeo(
     funcJson: Record<string, any>,
   ) {
-    const geo = new GeoLocation()
-    const res1 = await geo.maps_regeo(funcJson)
+    const toolShared = this._toolShared
+    const res1 = await toolShared.maps_regeo(funcJson)
     if(!res1.pass) return
 
-    const mapSearchData = res1.data
+    const mapSearchData = res1.data.originalResult
+    const mapProvider = res1.data.provider
     const data2: Partial<LiuAi.HelperAssistantMsgParam> = {
       funcName: "maps_regeo",
       funcJson,
-      mapProvider: "amap",
+      mapProvider,
       mapSearchData,
     }
     const assistantChatId = await this._addMsgToChat(data2)
     if(!assistantChatId) return
-    return mapSearchData
+    return res1.data
   }
 
   async maps_geo(
@@ -3143,6 +3162,8 @@ class AiHelper {
       drawPictureUrl: param.drawPictureUrl,
       drawPictureModel: param.drawPictureModel,
       drawPictureData: param.drawPictureData,
+      mapProvider: param.mapProvider,
+      mapSearchData: param.mapSearchData,
     }
     const chatId = await AiShared.addChat(data1)
     return chatId

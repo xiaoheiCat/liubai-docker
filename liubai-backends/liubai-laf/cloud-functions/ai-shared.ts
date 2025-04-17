@@ -843,6 +843,13 @@ export class AiShared {
         }
       }
     }
+    else if(funcName?.startsWith("maps_") && v.mapSearchData) {
+      toolMsg = {
+        role: "tool",
+        content: valTool.objToStr(v.mapSearchData),
+        tool_call_id,
+      }
+    }
 
     return toolMsg
   }
@@ -951,7 +958,8 @@ export class AiShared {
     msg += (title + "\n")
 
     // 2.2 add address
-    if(address && typeof address === "string") {
+    let hasAddress = Boolean(address && typeof address === "string" && address !== title)
+    if(hasAddress) {
       msg += (address + "\n")
     }
     msg += "\n"
@@ -971,7 +979,7 @@ export class AiShared {
     const baiduSp = baiduUrl.searchParams
     baiduSp.set("location", `${latitude},${longitude}`)
     baiduSp.set("title", title)
-    if(address && typeof address === "string") {
+    if(hasAddress) {
       baiduSp.set("content", address)
     }
     else {
@@ -1096,6 +1104,9 @@ export class TellUser {
     if(wx_gzh_openid) {
       if(gzhType === "subscription_account") {
         console.warn("we cannot send the menu to the user due to subscription_account")
+        console.log("prefixMessage: ", prefixMessage)
+        console.log("menuList: ", menuList)
+        console.log("suffixMessage: ", suffixMessage)
         return
       }
 
@@ -1303,7 +1314,7 @@ export class WebSearch {
 }
 
 /******************** tool for geo / location ************************/
-export class GeoLocation {
+class GeoLocation {
 
   private _amapApiKey: string
 
@@ -1349,7 +1360,6 @@ export class GeoLocation {
     }
     
     const location = `${res2_2.data},${res2_1.data}`
-    console.warn("location: ", location)
     const key = this._amapApiKey
     const url = new URL("https://restapi.amap.com/v3/geocode/regeo")
     url.searchParams.set("key", key)
@@ -1357,7 +1367,6 @@ export class GeoLocation {
     url.searchParams.set("extensions", "all")
     const link = url.toString()
     const res3 = await liuReq(link, undefined, { method: "GET" })
-    console.warn("res3: ", res3)
 
     // 4. handle error
     const err4 = this.postCheck(res3)
@@ -1370,6 +1379,7 @@ export class GeoLocation {
       textToBot: valTool.objToStr(data4),
       originalResult: data4,
     }
+    console.warn("maps_regeo result: ", data4)
 
     return {
       pass: true,
@@ -1960,12 +1970,17 @@ export class ToolShared {
   }
 
   async maps_regeo(funcJson: Record<string, any>) {
+    // 1. call GeoLocation
     const geo = new GeoLocation()
     const res1 = await geo.maps_regeo(funcJson)
     if(!res1.pass) return res1
 
-    
-
+    // 2. add textToUser
+    const bot = this._botName
+    const { t } = useI18n(aiLang, { user: this._user })
+    const textToUser = t("parse_latlng", { bot })
+    res1.data.textToUser = textToUser
+    return res1
   }
 
 }

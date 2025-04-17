@@ -358,8 +358,8 @@ async function  handle_location(
 
   // 2. package data
   const atom: LiuAi.LocationAtom = {
-    latitude: msgObj.Location_Y,
-    longitude: msgObj.Location_X,
+    latitude: msgObj.Location_X,
+    longitude: msgObj.Location_Y,
     scale: msgObj.Scale,
     description: msgObj.Label,
     format: "gcj02",

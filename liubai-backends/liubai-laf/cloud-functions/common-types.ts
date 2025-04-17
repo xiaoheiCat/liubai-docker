@@ -3624,8 +3624,12 @@ export namespace LiuAi {
     toolName: "draw_picture"
     drawResult: LiuAi.PaletteResult
   }
+
+  export interface RunLog_D {
+    toolName: "maps_whatever"
+  }
   
-  export type RunLog = (RunLog_A | RunLog_B | RunLog_C) & {
+  export type RunLog = (RunLog_A | RunLog_B | RunLog_C | RunLog_D) & {
     character: AiCharacter
     textToUser: string
     logStamp: number
