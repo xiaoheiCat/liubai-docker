@@ -5,9 +5,13 @@
 
 ### 1. 搜索
 
+你可以尝试 [点击这个链接](vscode:extension/ptsd.liubai-vscode-extension)，直接在 VS Code 中安装。
+
+如果上述链接无法打开，你可以手动切换至 VS Code 中的 `Extensions: Marketplace`：
+
 ![Marketplace](./assets-vscode/1.png)
 
-将选项卡切换至 `Extensions: Marketplace`，搜索 `Liubai`，并点击 `Install`。
+搜索 `Liubai` 再点击 `Install`。
 
 ### 2. 信任
 
