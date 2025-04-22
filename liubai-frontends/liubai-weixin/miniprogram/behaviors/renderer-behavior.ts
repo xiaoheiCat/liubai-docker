@@ -8,7 +8,6 @@ export const rendererBehavior = Behavior({
 
   lifetimes: {
     attached() {
-      console.log("rendererBehavior attached: ", this.renderer)
       this.setData({ renderer: this.renderer })
     }
   },

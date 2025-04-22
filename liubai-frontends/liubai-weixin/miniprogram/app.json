@@ -8,6 +8,12 @@
     "navigationStyle": "custom",
     "backgroundColor": "#232323"
   },
+  "singlePage": {
+    "navigationBarFit": "float"
+  },
+  "halfPage": {
+    "firstPageNavigationStyle": "custom"
+  },
   "darkmode": true,
   "resizable": true,
   "componentFramework": "glass-easel",

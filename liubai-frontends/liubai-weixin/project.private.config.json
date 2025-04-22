@@ -4,11 +4,18 @@
     "miniprogram": {
       "list": [
         {
-          "name": "pages/showcase/showcase",
+          "name": "showcase",
           "pathName": "pages/showcase/showcase",
           "query": "",
           "scene": null,
-          "launchMode": "embedded"
+          "launchMode": "defaultNativeFunctionalized"
+        },
+        {
+          "name": "index",
+          "pathName": "pages/index/index",
+          "query": "",
+          "launchMode": "defaultNativeFunctionalized",
+          "scene": null
         }
       ]
     }

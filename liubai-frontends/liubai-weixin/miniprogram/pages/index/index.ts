@@ -23,7 +23,7 @@ Component({
       wx.navigateTo({
         url: '/pages/showcase/showcase',
         // wx://bottom-sheet  wx://modal  wx://cupertino-modal  wx://upwards
-        routeType: "wx://upwards",        
+        routeType: "wx://cupertino-modal",        
         routeConfig: {
           barrierColor: "rgba(0, 0, 0, 0.5)",
           barrierDismissible: true,

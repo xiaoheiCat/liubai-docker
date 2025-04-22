@@ -12,8 +12,12 @@ export class LiuApi {
     wx.navigateTo(opt)
   }
 
-  static navigateBack(opt: WechatMiniprogram.NavigateBackOption) {
+  static navigateBack(opt?: WechatMiniprogram.NavigateBackOption) {
     wx.navigateBack(opt)
+  }
+
+  static reLaunch(opt: WechatMiniprogram.ReLaunchOption) {
+    wx.reLaunch(opt)
   }
 
   static getWindowInfo() {
@@ -22,6 +26,10 @@ export class LiuApi {
 
   static getMenuButtonBoundingClientRect() {
     return wx.getMenuButtonBoundingClientRect()
+  }
+
+  static getEnterOptionsSync() {
+    return wx.getEnterOptionsSync()
   }
 
 
