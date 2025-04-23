@@ -2738,6 +2738,7 @@ export class TransformContent {
     // 1. try to structure text first
     const txt1 = this.structureText(text, user)
     if(txt1 !== text) return txt1
+    const originalText = text
 
     /**
      *  2. extract text like:
@@ -2751,16 +2752,38 @@ export class TransformContent {
      * 
      * 这个位置位于浙江省杭州市滨江区的浦沿街道......
      */
-    const idx2_1 = text.indexOf("{")
-    const idx2_2 = text.indexOf("}")
+    const idx2_1 = originalText.indexOf("{")
+    const idx2_2 = originalText.indexOf("}")
     if(idx2_1 < 0 || idx2_2 < 1) return text
     if(idx2_1 > idx2_2) return text
-    const str2 = text.substring(idx2_1, idx2_2 + 1)
+    const str2 = originalText.substring(idx2_1, idx2_2 + 1)
     const txt2 = this.structureText(str2, user)
+
+    // 3.1 如果结构化“失败”，代表文本出现乱码（错误的代码）
+    // 返回 undefined 这样就不会传给用户
+    if(!txt2) return
+
+    // 3.2 如果文本长度前后一致，代表没有进行结构化，返回原文本
+    if(txt2.length === str2.length) return txt2
+
+    // 3.3 如果文本长度前后不一致，看看原文本尾部还有没有消息
+    // 若还存有一些消息量，将消息添加到结构化后的文本后面
+    if(originalText.length > idx2_2 + 1) {
+      const txt3 = originalText.substring(idx2_2 + 1).trim()
+      if(txt3.length > 5) {
+        return txt2 + "\n\n" + txt3
+      }
+    }
     
     return txt2
   }
 
+  /**
+   * 结构化文本:
+   * 如果不是 json 格式，直接返回原文本
+   * 如果是 json 格式，但结构化失败，直接返回 undefined
+   * 如果结构化成功，返回结构化后的文本
+   */
   static structureText(
     text: string,
     user?: Table_User,
