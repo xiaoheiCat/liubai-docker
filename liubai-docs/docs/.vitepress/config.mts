@@ -34,7 +34,33 @@ export default defineConfig({
           items: [
             { text: "简介", link: "/guide/what-is-liubai" },
             { text: "社区", link: "/guide/community" },
-            { text: "AI 说明书", link: "/guide/three-assistants" }
+            { text: "AI 说明书", link: "/guide/three-assistants" },
+            { 
+              text: "亮点",
+              link: "/guide/impressive",
+              items: [
+                {
+                  text: "离线可用",
+                  link: "/guide/offline",
+                },
+                {
+                  text: "Markdown 支持",
+                  link: "/guide/markdown-support",
+                },
+                {
+                  text: "同步和备份",
+                  link: "/guide/sync-and-backup",
+                },
+                {
+                  text: "隐私保护",
+                  link: "/guide/privacy",
+                },
+                {
+                  text: "多设备、全平台",
+                  link: "/guide/multi-devices",
+                }
+              ]
+            }
           ]
         },
         {
