@@ -1,6 +1,6 @@
 // app.ts
 
-App<IAppOption>({
+App({
   
   globalData: {
     appName: "liubai",
