@@ -1,15 +1,17 @@
 {
-  "name": "miniprogram-ts-quickstart",
+  "name": "liubai-weixin",
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "pre-build": "tsx build/pre-build.ts"
   },
   "keywords": [],
   "author": "",
   "license": "",
-  "dependencies": {
-  },
   "devDependencies": {
-    "miniprogram-api-typings": "^4.0.7"
+    "@types/node": "^22.14.1",
+    "dotenv": "^16.5.0",
+    "miniprogram-api-typings": "^4.0.7",
+    "tsx": "^4.19.3"
   }
 }

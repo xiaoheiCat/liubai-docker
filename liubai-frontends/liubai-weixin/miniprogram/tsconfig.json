@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ES2020",
+    "rootDir": ".",
+    "types": ["miniprogram-api-typings"]
+  },
+  "include": [
+    "./**/*.ts"
+  ]
+}

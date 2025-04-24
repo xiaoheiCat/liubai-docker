@@ -22,7 +22,7 @@
   },
   "projectname": "liubai-weixin",
   "setting": {
-    "urlCheck": true,
+    "urlCheck": false,
     "coverView": false,
     "lazyloadPlaceholderEnable": false,
     "skylineRenderEnable": true,

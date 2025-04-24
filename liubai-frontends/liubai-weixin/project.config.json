@@ -46,5 +46,10 @@
     "ignore": [],
     "include": []
   },
-  "appid": "wx07b7b80fa022b132"
+  "appid": "wx07b7b80fa022b132",
+  "scripts": {
+    "beforeCompile": "pnpm pre-build",
+    "beforePreview": "pnpm pre-build",
+    "beforeUpload": "pnpm pre-build --production"
+  }
 }

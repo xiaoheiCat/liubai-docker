@@ -15,3 +15,6 @@ dev-dist
 !.vscode/settings.json
 !.vscode/README.md
 !.vscode/i18n-ally-reviews.yml
+
+# custom ignore files
+miniprogram/config/pre_config.ts
