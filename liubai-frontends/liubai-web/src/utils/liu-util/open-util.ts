@@ -208,6 +208,24 @@ function openLink(
   return "inner"
 }
 
+function visualizeCode(
+  srcdoc: string, 
+  opt: RrOpt,
+) {
+  // 1. check if we're in the same code
+  const { route, router } = opt.rr
+  const vStore = useVvLinkStore()
+  const nowSrcdoc = vStore.getCurrentSrcDoc(route)
+  if(nowSrcdoc === srcdoc) return "inner"
+
+  // 2. add code into store
+  const vcode = vStore.addCode(srcdoc)
+  const newQ = { vcode }
+  if(opt.replace) router.replaceWithNewQuery(route, newQ)
+  else router.pushCurrentWithNewQuery(route, newQ)
+  return "inner"
+}
+
 
 export default {
   toWhatDetail,
@@ -229,4 +247,5 @@ export default {
   getGithubSearchLink,
   openExternalGithub,
   openLink,
+  visualizeCode,
 }

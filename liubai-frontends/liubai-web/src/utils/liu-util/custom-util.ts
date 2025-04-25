@@ -62,12 +62,18 @@ export function getDefaultRouteQuery(
 /** 是否该打开侧边栏 vice-view */
 export function needToOpenViceView(query: LocationQuery) {
   if(!query) return false
-  const { cid, vlink, cid2, vfile } = query
+  const { cid, vlink, cid2, vfile, vcode } = query
   if(cid || cid2) return true
 
   if(valTool.isStringWithVal(vlink)) {
     const vvLinkStore = useVvLinkStore()
     const url = vvLinkStore.getUrlById(vlink)
+    return Boolean(url)
+  }
+
+  if(valTool.isStringWithVal(vcode)) {
+    const vvCodeStore = useVvLinkStore()
+    const url = vvCodeStore.getSrcDocById(vcode)
     return Boolean(url)
   }
 

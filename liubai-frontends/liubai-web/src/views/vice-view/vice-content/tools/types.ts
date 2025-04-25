@@ -3,10 +3,11 @@ import type { RouteLocationNormalizedLoaded } from "vue-router";
 import type { LiuRouter } from "~/routes/liu-router"
 import type { BasicView } from "~/types/types-view"
 
-export type VcState = "thread" | "comment" | "iframe" | "third" | ""
+export type VcState = "thread" | "comment" | "iframe" | "srcdoc" | "third" | ""
 
-// iframe vs. third 的区别
+// iframe vs. third vs. srcdoc
 //   third: 不是用 iframe 打开的，而是用了 script
+//   srcdoc: 是特指使用 iframe 的 srcdoc 可视化代码
 
 export type VcThirdParty = ParticularScript
 

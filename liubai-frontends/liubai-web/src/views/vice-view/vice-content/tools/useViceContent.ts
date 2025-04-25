@@ -2,13 +2,13 @@ import { onActivated, watch, reactive, onMounted } from "vue";
 import type { LocationQuery } from "vue-router";
 import { useRouteAndLiuRouter } from '~/routes/liu-router';
 import valTool from "~/utils/basic/val-tool";
-import liuApi from "~/utils/liu-api";
 import type { VcState, VcCtx, VcData, VcThirdParty, VcEmits } from "./types"
 import thirdLink from "~/config/third-link";
 import liuUtil from "~/utils/liu-util";
 import { useVvLinkStore } from "~/hooks/stores/useVvLinkStore";
 import { useVvFileStore } from "~/hooks/stores/useVvFileStore";
 import liuEnv from "~/utils/liu-env";
+import cui from "~/components/custom-ui"
 
 const _hasVal = valTool.isStringWithVal
 
@@ -78,11 +78,20 @@ export function useViceContent(
     window.open(tmp, "_blank")
   }
 
+  const onTapExpand = () => {
+    cui.showModal({ 
+      iconName: "emojis-construction_color", 
+      content_key: "common.under_construction",
+      showCancel: false,
+    })
+  }
+
   return {
     vcData,
     onTapBack,
     onTapClose,
     onTapOpenInNew,
+    onTapExpand,
   }
 }
 
@@ -181,10 +190,17 @@ function listenRouteChange(
     const embedData = vvLinkStore.getEmbedData(url)
     if(embedData) url = embedData.link
 
-    // console.log("iframe url: ")
-    // console.log(url)
-    // console.log(" ")
     setNewIframeSrc(url, embedData?.otherData)
+  }
+
+  const tryToOpenCode = () => {
+    const vvLinkStore = useVvLinkStore()
+    const srcdoc = vvLinkStore.getCurrentSrcDoc(route)
+    if(!srcdoc) {
+      ctx.router.naviBackUntilNoSpecificQuery(route, "vcode")
+      return
+    }
+    showView(ctx, "srcdoc", srcdoc)
   }
   
   const checkRouteChange = (newQuery: LocationQuery) => {
@@ -196,6 +212,7 @@ function listenRouteChange(
       github, 
       bing, 
       vlink,
+      vcode,
       vfile,
     } = newQuery
 
@@ -210,6 +227,9 @@ function listenRouteChange(
     }
     else if(_hasVal(vlink)) {
       tryToOpenLink()
+    }
+    else if(_hasVal(vcode)) {
+      tryToOpenCode()
     }
     else if(_hasVal(vfile)) {
       tryToOpenFile()

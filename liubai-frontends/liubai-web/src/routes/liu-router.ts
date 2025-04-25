@@ -363,6 +363,7 @@ const _judgeInitiativeJump = (
   // console.log("_judgeInitiativeJump 111:")
   // console.log(operation)
   // console.log(delta)
+  // console.log(valTool.copyObject(stack))
 
   if(operation) {
     if(delta === 1) stack.push(to)
@@ -393,6 +394,11 @@ const _judgeBrowserJump = (
 ): void => {
   // 1. get currentRoute
   const { current, back } = state
+
+  // console.warn("_judgeBrowserJump 111: ")
+  // console.log(valTool.copyObject(state))
+  // console.log(valTool.copyObject(back))
+
   if(!current) {
     console.warn("current is undefined!!!")
     return
@@ -432,33 +438,27 @@ const _judgeBrowserJump = (
   // 5. check out `current` with `lastItem` from stack 
   const len5 = stack.length
   if(len5 < 1) {
-    // console.log("len5 < 1")
     stack.push(currentRoute)
   }
   else {
     const lastItem = stack[len5 - 1]
     const isSame5 = isSameRoute(currentRoute, lastItem)
-    // console.log("isSame5: ", isSame5)
     if(!isSame5) stack.push(currentRoute)
   }
 
   // 6. check out `back` with previous stack item
   if(back) {
     const backRoute = vueRouter.resolve(back)
-    // console.log("backRoute: ")
-    // console.log(valTool.copyObject(backRoute))
-
     const len6 = stack.length
     if(len6 <= 1) {
-      // console.log("len6 <= 1")
-      stack.unshift(backRoute)
+      const isSame6_1 = isSameRoute(currentRoute, backRoute)
+      if(!isSame6_1) stack.unshift(backRoute)
     }
     else {
       const prevIdx = len6 - 2
       const prevItem = stack[prevIdx]
-      const isSame6 = isSameRoute(backRoute, prevItem)
-      // console.log("isSame6: ", isSame6)
-      if(!isSame6) stack[prevIdx] = backRoute
+      const isSame6_2 = isSameRoute(backRoute, prevItem)
+      if(!isSame6_2) stack[prevIdx] = backRoute
     }
   }
 

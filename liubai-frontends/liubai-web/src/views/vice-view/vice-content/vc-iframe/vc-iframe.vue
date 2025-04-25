@@ -10,6 +10,9 @@ const props = defineProps({
   iframeSrc: {
     type: String
   },
+  srcDoc: {
+    type: String
+  },
   vcHeight: {
     type: Number,
     default: 0,
@@ -44,6 +47,18 @@ const {
     class="vcliu-iframe"
     :class="{ 'vcliu-iframe_card': isCard }"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+    frameborder="0"
+    framespacing="0"
+  ></iframe>
+
+  <iframe
+    v-else-if="srcDoc"
+    :width="styles.width" 
+    :height="styles.height"
+    :srcdoc="srcDoc"
+    class="vcliu-iframe"
+    sandbox=""
     allowfullscreen
     frameborder="0"
     framespacing="0"

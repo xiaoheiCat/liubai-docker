@@ -13,7 +13,7 @@
         <span>{{ t("editor.leave_codeBlock", { tip: leaveTip }) }}</span>
       </div>
 
-      <select contenteditable="false" v-model="showLanguage">
+      <select contenteditable="false" v-model="langDisplayed">
         <option :value="null">
           Auto
         </option>
@@ -29,11 +29,24 @@
 
     <!-- 阅读模式 -->
     <div v-else class="cb-right-top_read">
-      <div class="liu-no-user-select cbrt-tip">
-        <span v-if="showLanguage">{{ showLanguage }}</span>
+
+      <!-- Language, for example, TypeScript -->
+      <div v-if="!showVisualize" class="liu-no-user-select cbrt-tip">
+        <span v-if="langDisplayed">{{ langDisplayed }}</span>
         <span v-else>Auto</span>
       </div>
-      <div v-if="canInteract" class="cbrt-line" />
+      <div v-if="!showVisualize && canInteract" class="cbrt-line" />
+
+      <!-- Visualize -->
+      <div v-if="showVisualize && canInteract" 
+        class="liu-hover cbrt-tip cbrt-visualize"
+        @click.stop="onTapVisualize"
+      >
+        <span>{{ t('editor.one_click') }}</span>
+      </div>
+      <div v-if="showVisualize && canInteract" class="cbrt-line" />
+
+      <!-- Copy Button -->
       <div v-if="canInteract"
         class="cbrt-btn" 
         :class="{ 'cbrt-btn_no_pointer': showCopied }"
@@ -78,6 +91,7 @@ import type {
 import liuApi from '~/utils/liu-api'
 import type { LiuTimeout } from '~/utils/basic/type-tool'
 import { editorCanInteractKey } from "~/utils/provide-keys"
+import { useRouteAndLiuRouter } from '~/routes/liu-router'
 
 export default {
   components: {
@@ -95,7 +109,7 @@ export default {
       isMobile,
       isSafari,
     } = liuApi.getCharacteristic()
-    
+    const rr = useRouteAndLiuRouter()
 
     const selectedLanguage = computed(() => {
       const _lang = props.node.attrs.language as CbcLang
@@ -104,7 +118,7 @@ export default {
       return lang
     })
 
-    const showLanguage = computed({
+    const langDisplayed = computed({
       get: () => {
         const s = selectedLanguage.value
         if(!s) return s
@@ -117,13 +131,23 @@ export default {
       }
     })
 
+    const showVisualize = computed(() => {
+      const lang = langDisplayed.value
+      return Boolean(lang === "HTML")
+    })
 
     let copiedTimeout: LiuTimeout
     const showCopied = ref(false)
-    const onTapCopyCode = () => {
+
+    const _getCodePlainText = () => {
       //@ts-ignore
       const c = liuUtil.toRawData(props.node.content) as CbcFragment
       const text = c?.content?.[0].text
+      return text
+    }
+
+    const onTapCopyCode = () => {
+      const text = _getCodePlainText()
       if(!text) return
       liuApi.copyToClipboard(text)
       showCopied.value = true
@@ -132,6 +156,12 @@ export default {
         copiedTimeout = undefined
         showCopied.value = false
       }, 2000)
+    }
+
+    const onTapVisualize = () => {
+      const text = _getCodePlainText()
+      if(!text) return
+      liuUtil.open.visualizeCode(text, { rr })
     }
 
     const canInteract = inject(editorCanInteractKey, ref(true))
@@ -143,8 +173,10 @@ export default {
       isSafari,
       leaveTip, 
       selectedLanguage,
-      showLanguage,
+      langDisplayed,
+      showVisualize,
       onTapCopyCode,
+      onTapVisualize,
       showCopied,
       canInteract,
     }
@@ -219,7 +251,17 @@ export default {
       font-size: var(--mini-font);
       font-family: inherit;
       color: #606060;
-      margin-inline-end: 12px;
+      padding-inline: 6px;
+      margin-inline-end: 6px;
+    }
+
+    .cbrt-visualize {
+      --visualize-angle: 45deg;
+      background: linear-gradient(var(--visualize-angle), var(--inverse-primary), var(--primary-color) 70%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
     }
 
     .cbrt-line {
@@ -254,6 +296,10 @@ export default {
     }
 
     @media(hover: hover) {
+      .cbrt-visualize:hover {
+        --visualize-angle: -15deg;
+      }
+
       .cbrt-btn:hover {
         background-color: #2f2f2f;
       }

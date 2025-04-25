@@ -13,9 +13,15 @@ interface VvLinkAtom {
   url: string
 }
 
+interface VvCodeAtom {
+  id: string
+  srcdoc: string
+}
+
 export const useVvLinkStore = defineStore("vvlink", () => {
 
   const list = ref<VvLinkAtom[]>([])
+  const codeList = ref<VvCodeAtom[]>([])
 
   // 获取当前路由下所对应的链接
   const getCurrentLink = (
@@ -28,10 +34,27 @@ export const useVvLinkStore = defineStore("vvlink", () => {
     return data.url
   }
 
+  // get the srcdoc under the current route
+  const getCurrentSrcDoc = (
+    route: RouteLocationNormalizedLoaded
+  ) => {
+    const { vcode } = route.query
+    if(!valTool.isStringWithVal(vcode)) return
+    const data = codeList.value.find(v => v.id === vcode)
+    if(!data) return
+    return data.srcdoc
+  }
+
   const getUrlById = (id: string) => {
     const data = list.value.find(v => v.id === id)
     if(!data) return
     return data.url
+  }
+
+  const getSrcDocById = (id: string) => {
+    const data = codeList.value.find(v => v.id === id)
+    if(!data) return
+    return data.srcdoc
   }
 
   // 添加链接至对队列里，并返回其 id
@@ -45,11 +68,24 @@ export const useVvLinkStore = defineStore("vvlink", () => {
     return id
   }
 
+  const addCode = (srcdoc: string) => {
+    const tmp = codeList.value
+    const data = tmp.find(v => v.srcdoc === srcdoc)
+    if(data) return data.id
+    const num = tmp.length + 1
+    const id = valTool.format0(num)
+    tmp.push({ id, srcdoc })
+    return id
+  }
+
 
   return {
     getCurrentLink,
+    getCurrentSrcDoc,
     getUrlById,
+    getSrcDocById,
     addLink,
+    addCode,
     canAdd,
     isInAllowedList,
     getEmbedData,

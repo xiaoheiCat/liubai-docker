@@ -371,9 +371,9 @@ async function initFromCloudDraft(
   }
 
   // 2. to merge
-  console.log("initFromCloudDraft opt: ")
-  console.log(opt)
-  console.log(" ")
+  // console.log("initFromCloudDraft opt: ")
+  // console.log(opt)
+  // console.log(" ")
 
   const res = await CloudMerger.request(opt, { delay, maxStackNum: 4 })
 

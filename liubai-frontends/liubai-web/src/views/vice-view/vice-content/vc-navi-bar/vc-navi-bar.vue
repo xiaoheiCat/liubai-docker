@@ -16,13 +16,14 @@ defineEmits<{
   (event: "tapback"): void
   (event: "tapclose"): void
   (event: "tapopeninnew"): void
+  (event: "tapexpand"): void
 }>()
 
 const { isMobile } = liuApi.getCharacteristic()
 const naviWidth = computed(() => {
   if(isMobile) return `100%`
   const state = props.vcState
-  if(state === 'third' || state === 'iframe') return `100%`
+  if(state === 'third' || state === 'iframe' || state === 'srcdoc') return `100%`
   return 'calc(100% - 10px)'
 })
 const iconColor = "var(--main-normal)"
@@ -36,21 +37,36 @@ const {
 
   <div class="liu-frosted-glass vcliu-navi-bar">
 
-    <!-- 返回键 -->
-    <div class="liu-hover vcliu-navi-btn" @click="$emit('tapback')">
+    <!-- Button to go back -->
+    <div class="liu-hover vcliu-navi-btn" @click.stop="$emit('tapback')">
       <svg-icon class="vcliu-navi-icon" name="arrow-back" :color="iconColor"></svg-icon>
     </div>
 
-    <!-- 关闭按钮 -->
-    <div class="liu-hover vcliu-navi-btn" @click="$emit('tapclose')"
+    <!-- Button to close -->
+    <div class="liu-hover vcliu-navi-btn" 
+      @click.stop="$emit('tapclose')"
       v-show="vnbData.showCloseBtn"
     >
       <svg-icon class="vcliu-navi-icon" name="close" :color="iconColor"></svg-icon>
     </div>
 
-    <div class="vcliu-navi-footer">
-      <!-- 用新分页打开 -->
-      <div class="liu-hover vcliu-navi-btn" @click="$emit('tapopeninnew')"
+
+    <!-- Expand the iframe in center peek while it's a srcdoc -->
+    <div v-if="vcState === 'srcdoc'" class="vcliu-navi-footer">
+      <div v-if="!isMobile"
+        class="liu-hover vcliu-navi-btn vcliu-nv-open" 
+        @click.stop="$emit('tapexpand')"
+      >
+        <svg-icon class="vcn-expand" 
+          name="editor-open_fullscreen" :color="iconColor"
+        ></svg-icon>
+      </div>
+    </div>
+
+    <!-- Open with a new tab -->
+    <div v-else class="vcliu-navi-footer">
+      <div class="liu-hover vcliu-navi-btn" 
+        @click.stop="$emit('tapopeninnew')"
         :class="{ 'vcliu-nv-open': !isMobile }"
       >
         <svg-icon class="vcn-open-new" name="open_in_new" :color="iconColor"></svg-icon>
@@ -59,7 +75,9 @@ const {
 
   </div>
 
-  <div v-if="vcState === 'iframe'" class="vcliu-virtual"></div>
+  <div v-if="vcState === 'iframe' || vcState === 'srcdoc'" 
+    class="vcliu-virtual"
+  ></div>
 
 </template>
 <style lang="scss" scoped>
@@ -106,6 +124,11 @@ const {
   .vcn-open-new {
     width: 40%;
     height: 40%;
+  }
+
+  .vcn-expand {
+    width: 48%;
+    height: 48%;
   }
 }
 

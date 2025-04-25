@@ -389,8 +389,8 @@ async function loadCloud(
   }
 
   // 3. request
-  console.log("loadCloud opt3: ")
-  console.log(opt3)
+  // console.log("loadCloud opt3: ")
+  // console.log(opt3)
   const res1 = await CloudMerger.request(opt3, { delay, maxStackNum: 4 })
   if(!res1) return
 

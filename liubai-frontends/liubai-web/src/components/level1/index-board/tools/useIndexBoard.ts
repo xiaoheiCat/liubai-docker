@@ -156,11 +156,11 @@ function listenToIdleAndUpdate(
 
     const { 
       vlink, 
-      vfile, 
+      vfile,
+      vcode,
     } = ctx.rr.route.query
 
-    if(vlink || vfile) {
-      console.log("cancel update sw because vlink or vfile exists")
+    if(vlink || vfile || vcode) {
       return
     }
 
