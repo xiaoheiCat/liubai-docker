@@ -104,7 +104,8 @@
     "copy": "复制",
     "mail": "写信",
     "call": "拨号",
-    "try_to_open": "尝试打开"
+    "try_to_open": "尝试打开",
+    "one_click": "一键可视化"
   },
   "cui": {
     "plz_input_txt": "请输入文字"

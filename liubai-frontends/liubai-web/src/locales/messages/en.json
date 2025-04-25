@@ -104,7 +104,8 @@
     "copy": "Copy",
     "mail": "Mail",
     "call": "Call",
-    "try_to_open": "Try to Open"
+    "try_to_open": "Try to Open",
+    "one_click": "Visualize"
   },
   "cui": {
     "plz_input_txt": "Text here"
