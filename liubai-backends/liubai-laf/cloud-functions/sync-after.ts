@@ -83,6 +83,11 @@ const aiWorkers: LiuAi.AiWorker[] = [
   },
   {
     "computingProvider": "aliyun-bailian",
+    "model": "qwen-plus-2025-01-25",
+    "character": "tongyi-qwen",
+  },
+  {
+    "computingProvider": "aliyun-bailian",
     "model": "deepseek-r1",
     "character": "ds-reasoner",
   },

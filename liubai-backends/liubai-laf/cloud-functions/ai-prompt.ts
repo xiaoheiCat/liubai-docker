@@ -196,7 +196,7 @@ export const aiBots: AiBot[] = [
     name: "通义千问",
     character: "tongyi-qwen",
     provider: "aliyun-bailian",
-    model: "qwen-plus",
+    model: "qwen-plus-2025-04-28",
     abilities: ["chat", "tool_use"],
     alias: ["通义", "千问", "qwen", "qwq", "tongyi", "ty"],
     maxWindowTokenK: 128,
