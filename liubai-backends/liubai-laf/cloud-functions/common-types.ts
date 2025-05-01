@@ -1724,6 +1724,7 @@ export interface Table_AiRoom extends BaseTable {
   owner: string           // corresponds to userId
   characters: AiCharacter[]
   needSystem2Stamp?: number
+  voicePreference?: "male" | "female"
 }
 
 /********* AI Chat *********/
@@ -3744,6 +3745,11 @@ export namespace LiuAi {
     computingProvider: ComputingProvider
     model: string
     character?: AiCharacter
+  }
+
+
+  export interface TextToSpeechOpt {
+    room?: Table_AiRoom
   }
 
 }

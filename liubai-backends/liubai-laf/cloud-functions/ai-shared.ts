@@ -2595,6 +2595,62 @@ export class Palette {
 
 }
 
+
+/******************** tool for text-to-speech ************************/
+
+
+
+export class TextToSpeech {
+
+
+
+  async runByMiniMax(
+    text: string,
+  ) {
+
+
+  }
+
+  async runByStepfun(
+    text: string,
+    opt?: LiuAi.TextToSpeechOpt,
+  ) {
+    // 1. get api key and base url
+    const _env = process.env
+    const apiKey = _env.LIU_STEPFUN_API_KEY
+    const baseUrl = _env.LIU_STEPFUN_BASE_URL
+    if(!apiKey || !baseUrl) {
+      console.warn("there is no apiKey or baseUrl of stepfun in Palette")
+      return
+    }
+
+    // 2. get voice
+    const voicePreference = opt?.room?.voicePreference ?? "female"
+    // 深沉男音 vs. 温柔女声
+    const voice = voicePreference === "male" ? "shenchennanyin" : "wenrounvsheng"
+
+
+    // 3. to request
+    const client = new OpenAI({ apiKey, baseURL: baseUrl })
+    const body = {
+      model: "step-tts-mini",
+      input: text,
+      voice,
+    }
+    const mp3 = await client.audio.speech.create(body)
+    
+
+
+
+    
+
+  }
+
+}
+
+
+/******************** tool for translation ************************/
+
 export class Translator {
 
   private _bot?: AiBot
