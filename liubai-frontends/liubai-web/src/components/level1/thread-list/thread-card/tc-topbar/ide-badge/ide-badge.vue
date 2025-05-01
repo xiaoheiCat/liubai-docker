@@ -47,7 +47,7 @@ const ideName = computed(() => {
       <svg-icon v-if="ideType === 'windsurf'"
         class="ib-icon ib-icon_windsurf"
         name="logos-windsurf"
-        :color="theme === 'dark' ? '#58E5BB' : fontColor"
+        :color="fontColor"
       ></svg-icon>
 
       <!-- icon for github.dev -->
