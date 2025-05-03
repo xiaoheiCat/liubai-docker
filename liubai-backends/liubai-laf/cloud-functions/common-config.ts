@@ -1,5 +1,6 @@
 // Function Name: common-config
 // put some configs here
+import type { AiCharacter } from "@/common-types"
 
 /********************* empty functions ****************/
 export async function main(ctx: FunctionContext) {
@@ -64,4 +65,6 @@ export const ai_cfg = {
 
   // 用在混元模型里，当 tool 角色后，只能跟 assistant 或者 tool 或者什么都不接
   i_got_it: "知道了",
+
+  retired_ai: ["baixiaoying", "wanzhi"] as AiCharacter[],
 }

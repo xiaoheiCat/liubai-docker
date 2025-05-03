@@ -329,7 +329,6 @@ export const aiLang: LangAtom = {
     "already_exist": "{botName}已在群聊中",
     "already_left": "{botName}并不在群聊内",
     "continue_bot": "继续{botName}",
-    "there_are_3": "聊天室已有 3 个助手，请先踢掉再召唤。",
     "nobody_here": "当前群聊内没有任何助手",
     "do_not_use_tool": "【请根据工具调用结果，直接给出回复，勿再使用工具】",
 
@@ -450,7 +449,6 @@ export const aiLang: LangAtom = {
     "already_exist": "{botName}已在群聊中",
     "already_left": "{botName}並不在群聊內",
     "continue_bot": "繼續{botName}",
-    "there_are_3": "聊天室已有 3 个助手，請先踢掉再召喚。",
     "nobody_here": "當前群組內沒有任何助手",
     "do_not_use_tool": "【請根據以上工具調用結果，直接給出回覆，勿再使用工具】",
 
@@ -571,7 +569,6 @@ export const aiLang: LangAtom = {
     "already_exist": "{botName} has already joined in the group chat",
     "already_left": "{botName} is not in the group chat",
     "continue_bot": "Continue {botName}",
-    "there_are_3": "There are 3 assistants in the group chat. Please kick one first.",
     "nobody_here": "There is no assistant here.",
     "do_not_use_tool": "[Reply me directly with the above results please, and do not use any tools again]",
 

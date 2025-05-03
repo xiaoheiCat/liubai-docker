@@ -482,7 +482,7 @@ class AiDirective {
     const prefix2 = [
       "群聊状态", "查看群聊状态", "群聊有谁", "群聊还有谁", "群里还有谁",
       "群聊狀態", "檢視群聊狀態", "群組裡有誰", "群組還有誰", "群組中還有誰",
-      "Status", "Group Status",
+      "Status", "Group Status", "群状态", "状态"
     ]
     const res2 = this._areTheyMatched(prefix2, text, true)
     return res2
@@ -546,17 +546,6 @@ class AiDirective {
     return res3
   }
 
-  private static async _showThereAre3(
-    entry: AiEntry,
-    characters: AiCharacter[],
-  ) {
-    const { t } = useI18n(aiLang, { user: entry.user })
-    let prefixMessage = t("there_are_3") + `\n\n` + t("operation_title")
-    const menuList: LiuAi.MenuItem[] = []
-    characters.forEach(v => menuList.push({ operation: "kick", character: v }))
-    TellUser.menu(entry, prefixMessage, menuList, "")
-  }
-
   private static async toAddBot(entry: AiEntry, bot: AiBot) {
     const user = entry.user
 
@@ -584,8 +573,22 @@ class AiDirective {
 
     // 3. check out if the room has reached the max bots
     if(characters.length >= MAX_CHARACTERS) {
-      this._showThereAre3(entry, characters)
-      return
+      // get ai coming to retire
+      let idx3 = -1
+      for(let i=0; i<characters.length; i++) {
+        const v = characters[i]
+        const isRetired = ai_cfg.retired_ai.includes(v)
+        if(isRetired) {
+          idx3 = i
+          break
+        }
+      }
+      if(idx3 >= 0) {
+        characters.splice(idx3, 1)
+      }
+      else {
+        characters.shift()
+      }
     }
 
     // 4. add the bot to the room
