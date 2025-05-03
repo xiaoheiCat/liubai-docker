@@ -684,7 +684,7 @@ export type AiAbility = "chat" | "text_to_image" | "image_to_text" | "tool_use" 
 export type AiMsgType = "text" | "image" | "voice" | "location"
 
 export type AiCommandByHuman = "kick" | "add" | "clear_history" 
-  | "more_operations" | "continue" | "group_status"
+  | "more_operations" | "continue" | "group_status" | "bot_not_available"
 
 export type AiFinishReason = "stop" | "length" | "tool_calls"
 

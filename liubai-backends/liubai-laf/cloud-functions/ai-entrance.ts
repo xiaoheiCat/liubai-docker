@@ -343,11 +343,18 @@ class AiDirective {
       return { theCommand: "kick", theBot: botKicked }
     }
 
-    // 3. is it an adding directive?
+    // 3.1 is it an adding directive?
     const botAdded = this.isAddBot(text2)
     if(botAdded) {
       this.toAddBot(entry, botAdded)
       return { theCommand: "add", theBot: botAdded }
+    }
+
+    // 3.2 is it a bot not available?
+    const botNotAvailable = this.isBotNotAvailable(text2)
+    if(botNotAvailable) {
+      this.toShowItIsNotAvailable(entry, botNotAvailable)
+      return { theCommand: "bot_not_available" }
     }
 
     // 4. is it clear directive?
@@ -415,6 +422,16 @@ class AiDirective {
     })
 
     return res2
+  }
+
+  private static toShowItIsNotAvailable(
+    entry: AiEntry,
+    botName: string,
+  ) {
+    const user = entry.user
+    const { t } = useI18n(aiLang, { user })
+    const msg = t("bot_not_available", { botName })
+    TellUser.text(entry, msg)
   }
 
   private static isContinue(text: string): AiDirectiveCheckRes | undefined {
@@ -626,16 +643,31 @@ class AiDirective {
     return botMatched 
   }
 
+  private static addPrefixs = [
+    "召唤", "召喚", "Summon", "summon",
+    "我要", "我要", "I want", "i want",
+    "添加", "新增", "Add", "add",
+    "呼叫", "Call", "call",
+    "@",
+  ]
+
+  private static isBotNotAvailable(text: string) {
+    const prefixMatched = this.addPrefixs.find(v => text.startsWith(v))
+    if(!prefixMatched) return
+
+    const txt1 = text.substring(prefixMatched.length).trim()
+    const txt2 = txt1.toLowerCase()
+    const botsNotAvailable = ["ChatGPT", "GPT", "豆包", "Claude"]
+    const botNameMatched = botsNotAvailable.find(v => {
+      const name = v.toLowerCase()
+      return Boolean(name === txt2)
+    })
+    return botNameMatched
+  }
+
   private static isAddBot(text: string) {
     // 1. use prefix
-    const prefix = [
-      "召唤", "召喚", "Summon", "summon",
-      "我要", "我要", "I want", "i want",
-      "添加", "新增", "Add", "add",
-      "呼叫", "Call", "call",
-      "@",
-    ]
-    const botMatched = this._getCommandedBot(prefix, text)
+    const botMatched = this._getCommandedBot(this.addPrefixs, text)
     if(botMatched) return botMatched
     
     // 2. text match completed
