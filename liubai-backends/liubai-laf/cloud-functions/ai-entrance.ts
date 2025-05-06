@@ -66,6 +66,7 @@ import {
   LogHelper,
   Translator,
   TransformContent,
+  TextToSpeech,
 } from "@/ai-shared"
 import { ai_cfg } from "@/common-config"
 
@@ -133,6 +134,7 @@ interface ReplyToUserParam {
   textToUser: string
   assistantChatId?: string
   showCoT: boolean
+  room: Table_AiRoom
 }
 
 
@@ -1358,6 +1360,7 @@ class BaseBot {
         bot,
         textToUser,
         showCoT,
+        room: aiParam.room,
       })
     }
     
@@ -1385,6 +1388,7 @@ class BaseBot {
         textToUser,
         assistantChatId,
         showCoT,
+        room: aiParam.room,
       })
     }
 
@@ -1420,6 +1424,7 @@ class BaseBot {
   }
 
   private _replyToUser(param: ReplyToUserParam) {
+    // 1. get params
     const {
       chatCompletion,
       entry,
@@ -1434,6 +1439,8 @@ class BaseBot {
     const gzhType = AiShared.getGzhType()
 
     let text = textToUser
+
+    // 2. handle CoT
     if(assistantChatId && showCoT) {
       const user = entry.user
       const { t } = useI18n(aiLang, { user })
@@ -1443,6 +1450,7 @@ class BaseBot {
       text += `\n\n` + view_thinking
     }
 
+    // 3. handle length
     if(finishReason === "length" && gzhType === "service_account") {
       TellUser.menu(
         entry, 
@@ -1451,10 +1459,48 @@ class BaseBot {
         "",
         character,
       )
+      return
     }
-    else {
+
+    // 4. handle audio
+    const audioCharacters: AiCharacter[] = ["hailuo", "yuewen"]
+    const isAudioCharacter = audioCharacters.includes(character)
+    if(isAudioCharacter && !showCoT && text.length <= 60) {
+      this._replyWithAudio(param)
+      return
+    }
+
+    // n. fallback, reply with text
+    TellUser.text(entry, text, { fromBot: bot })
+  }
+
+
+  private async _replyWithAudio(
+    param: ReplyToUserParam,
+  ) {
+    const { entry, room, bot } = param
+    const character = bot.character
+    const text = param.textToUser
+
+    // 1. get audio
+    let res: Response | undefined
+    const tts = new TextToSpeech({ room })
+    if(character === "yuewen") {
+      console.log("start to run by stepfun......")
+      res = await tts.runByStepfun(text)
+    }
+    else if(character === "hailuo") {
+      
+    }
+
+    // 2. text user if we cannot get audio
+    if(!res) {
       TellUser.text(entry, text, { fromBot: bot })
+      return
     }
+
+    // 3. reply with audio
+    TellUser.audio(entry, res, { fromBot: bot })
   }
 
   /** remove the last line if we receive `finish_reason` with value `length` */
@@ -2246,8 +2292,8 @@ class AiController {
         hasEverSucceeded = true
         if(v.toolName) hasEverUsedTool = true
         if(v.logs) {
-          console.log("see logs in ai controller:::")
-          LogHelper.printLastItems(v.logs)
+          // console.log("see logs in ai controller:::")
+          // LogHelper.printLastItems(v.logs)
           aiLogs.push(...v.logs)
         }
       }

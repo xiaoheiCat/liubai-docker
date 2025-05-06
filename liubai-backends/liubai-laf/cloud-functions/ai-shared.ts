@@ -38,6 +38,7 @@ import {
   type OaiStreamChoiceDelta,
   type OaiChatCompletionChunk,
   type LiuRqReturn,
+  type Table_AiRoom,
   Ns_MapTool,
 } from "@/common-types"
 import { LiuReporter, WxGzhSender } from "@/service-send"
@@ -930,6 +931,36 @@ export class AiShared {
 }
 
 export class TellUser {
+
+  static async audio(
+    entry: AiEntry,
+    audioResponse: Response,
+    opt?: LiuAi.TellUserOpt,
+  ) {
+
+    const { wx_gzh_openid } = entry
+
+    // 1. for weixin
+    if(wx_gzh_openid) {
+      // 1.1 upload file to weixin server
+      const res1_1 = await WxGzhUploader.mediaByResponse(audioResponse, {
+        type: "voice",
+        filename: "upload.mp3"
+      })
+      const media_id = res1_1?.media_id
+      console.log("let me see audio media_id: ", media_id)
+      if(!media_id) return
+
+      const obj1: Wx_Gzh_Send_Msg = {
+        msgtype: "voice",
+        voice: { media_id },
+      }
+      this._fillWxGzhKf(obj1, opt)
+      const res1 = await this._sendToWxGzh(wx_gzh_openid, obj1)
+      return res1
+    }
+    
+  }
 
   static async text(
     entry: AiEntry, 
@@ -2602,7 +2633,13 @@ export class Palette {
 
 export class TextToSpeech {
 
+  private _room: Table_AiRoom | undefined
 
+  constructor(
+    opt?: LiuAi.TextToSpeechOpt
+  ) {
+    this._room = opt?.room
+  }
 
   async runByMiniMax(
     text: string,
@@ -2613,7 +2650,6 @@ export class TextToSpeech {
 
   async runByStepfun(
     text: string,
-    opt?: LiuAi.TextToSpeechOpt,
   ) {
     // 1. get api key and base url
     const _env = process.env
@@ -2625,25 +2661,22 @@ export class TextToSpeech {
     }
 
     // 2. get voice
-    const voicePreference = opt?.room?.voicePreference ?? "female"
+    const voicePreference = this._room?.voicePreference ?? "female"
     // 深沉男音 vs. 温柔女声
     const voice = voicePreference === "male" ? "shenchennanyin" : "wenrounvsheng"
-
-
+    
     // 3. to request
     const client = new OpenAI({ apiKey, baseURL: baseUrl })
     const body = {
       model: "step-tts-mini",
       input: text,
       voice,
+      extra_body: {
+        volume: 1.5,
+      },
     }
     const mp3 = await client.audio.speech.create(body)
-    
-
-
-
-    
-
+    return mp3
   }
 
 }

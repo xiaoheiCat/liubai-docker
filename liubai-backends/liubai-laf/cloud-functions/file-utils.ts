@@ -97,6 +97,12 @@ interface RTFD_Opt {
   filename?: string     // default: `upload.${ext}`
 }
 
+interface WxGzhMediaOpt extends RTFD_Opt {
+  isMaterial?: boolean
+  type?: "image" | "voice"
+}
+
+
 export async function blobToFormData(
   fileBlob: Blob,
   opt?: RTFD_Opt,
@@ -108,6 +114,11 @@ export async function blobToFormData(
   const contentType = fileBlob.type
   const formKey = opt?.formKey ?? "media"
   let filename = opt?.filename
+
+  // console.log("contentType: ", contentType)
+  // console.log("formKey: ", formKey)
+  // console.log("filename: ", filename)
+
   if(!filename) {
     let suffix = getMimeTypeSuffix(contentType)
     if(!suffix) suffix = "jpg"
@@ -393,6 +404,7 @@ export function qiniuCallBackBody(
 
 /********************* qiniu ends ****************/
 
+
 // uploader for wx-gzh
 export class WxGzhUploader {
 
@@ -400,36 +412,27 @@ export class WxGzhUploader {
   static API_MEDIA_UPLOAD = "https://api.weixin.qq.com/cgi-bin/media/upload"
   static API_MATERIAL_ADD = "https://api.weixin.qq.com/cgi-bin/material/add_material"
 
-  // temporary media
-  static async mediaByUrl(
-    file_url: string,
-    isMaterial: boolean = false,
+  static async mediaByResponse(
+    response: Response,
+    opt?: WxGzhMediaOpt,
   ) {
-    // 0. get access token
+    // 1. transform response to form data
+    const { form } = await responseToFormData(response, { 
+      filename: opt?.filename,
+    })
+
+    // 2. get access token 
     const access_token = await checkAndGetWxGzhAccessToken()
     if(!access_token) {
       console.warn("no access token for wx gzh in mediaByUrl")
       return
     }
 
-    // 1. download file
-    const res1 = await downloadFile(file_url)
-    const { code, data, errMsg } = res1
-    if(code !== "0000" || !data) {
-      console.warn("download file err in mediaByUrl")
-      console.log(code)
-      console.log(errMsg)
-      return
-    }
-
-    // 2. transfrom response into formData
-    const res2 = data.res
-    const { form } = await responseToFormData(res2)
-
     // 3. construct request
+    const isMaterial = opt?.isMaterial ?? false
     const url3 = isMaterial ? this.API_MATERIAL_ADD : this.API_MEDIA_UPLOAD
     let link3 = `${url3}?access_token=${access_token}`
-    link3 += `&type=image`
+    link3 += `&type=${opt?.type ?? "image"}`
 
     // 4. upload
     try {
@@ -451,7 +454,27 @@ export class WxGzhUploader {
       console.warn("failed to upload media......")
       console.log(err)
     }
+  }
 
+  // temporary media
+  static async mediaByUrl(
+    file_url: string,
+    opt?: WxGzhMediaOpt,
+  ) {
+    // 1. download file
+    const res1 = await downloadFile(file_url)
+    const { code, data, errMsg } = res1
+    if(code !== "0000" || !data) {
+      console.warn("download file err in mediaByUrl")
+      console.log(code)
+      console.log(errMsg)
+      return
+    }
+
+    // 2. transfrom response into formData
+    const res2 = data.res
+    const res3 = await this.mediaByResponse(res2, opt)
+    return res3
   }
 
 }
