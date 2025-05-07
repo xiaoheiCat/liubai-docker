@@ -1,5 +1,5 @@
 // 存放所有接口返回的 data 类型
-import type { LiuAppType, LocalTheme } from "~/types/types-atom"
+import type { GenderType, LiuAppType, LocalTheme } from "~/types/types-atom"
 import type { LocalLocale } from "~/types/types-locale"
 import type { 
   OState_Order,
@@ -125,6 +125,11 @@ export namespace UserSettingsAPI {
     operateType: "auth-agree"
     code: string
     redirectUri: string
+  }
+
+  export interface Res_AiConsoleGet {
+    operateType: "ai-console-get"
+    voicePreference?: GenderType
   }
 
 }

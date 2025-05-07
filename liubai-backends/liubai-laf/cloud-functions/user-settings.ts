@@ -28,6 +28,7 @@ import {
   type UserSettingsAPI,
   Sch_LocalTheme,
   Sch_LocalLocale,
+  Sch_GenderType,
   type LiuErrReturn,
   type Table_Member,
   type DataPass,
@@ -35,13 +36,21 @@ import {
   type Partial_Id,
   type LiuAppType,
   type Table_BlockList,
+  type Table_AiRoom,
+  type GenderType,
 } from '@/common-types'
-import { getNowStamp, DAY, MINUTE, getBasicStampWhileAdding } from "@/common-time"
+import { 
+  getNowStamp, 
+  DAY, 
+  MINUTE, 
+  getBasicStampWhileAdding,
+} from "@/common-time"
 import * as vbot from "valibot"
 import { getCurrentLocale } from '@/common-i18n'
 import { handle_avatar, addVerifyNum } from '@/user-login'
 import { createAuthCode, createSmsCode } from '@/common-ids'
 import { SmsController } from '@/service-send'
+import { AiShared } from '@/ai-shared'
 
 const db = cloud.database()
 const _ = db.command
@@ -100,12 +109,77 @@ export async function main(ctx: FunctionContext) {
   else if(oT === "unbind-wx_gzh") {
     res = await handle_unbind(vRes, "wx_gzh")
   }
+  else if(oT === "ai-console-get") {
+    res = await ai_console_get(vRes)
+  }
+  else if(oT === "ai-console-set") {
+    res = await ai_console_set(vRes, body) 
+  }
 
   // const stamp2 = getNowStamp()
   // const diffS = stamp2 - stamp1
   // console.log(`调用 user-settings for ${oT} 耗时: ${diffS}ms`)
 
   return res
+}
+
+
+async function ai_console_set(
+  vRes: VerifyTokenRes_B,
+  body: Record<string, any>,
+) {
+  // 0. check out entry
+  const Sch_Set = vbot.object({
+    voicePreference: Sch_GenderType,
+  })
+  const res0 = vbot.safeParse(Sch_Set, body)
+  if(!res0.success) {
+    const errMsg = checker.getErrMsgFromIssues(res0.issues)
+    return { code: "E4000", errMsg }
+  }
+
+  // 1. get room
+  const userId = vRes.userData._id
+  const rCol = db.collection("AiRoom")
+  const res1 = await rCol.where({ owner: userId }).getOne<Table_AiRoom>()
+  let room = res1.data
+  if(!room) {
+    const newRoom = await toCreateDefaultAiRoom(userId)
+    if(!newRoom) {
+      return { code: "E5001", errMsg: "fail to create an ai room" }
+    }
+    room = newRoom
+  }
+
+  // 2. check if it is identical
+  const newVoicePreference = body.voicePreference as GenderType
+  if(newVoicePreference === room.voicePreference) {
+    return { code: "0001" }
+  }
+
+  // 3. to update
+  const u3: Partial<Table_AiRoom> = {
+    voicePreference: newVoicePreference,
+    updatedStamp: getNowStamp(),
+  }
+  const res3 = await rCol.doc(room._id).update(u3)
+  console.log("res3: ", res3)
+  return { code: "0000" }
+}
+
+
+async function ai_console_get(
+  vRes: VerifyTokenRes_B,
+): Promise<LiuRqReturn<UserSettingsAPI.Res_AiConsoleGet>> {
+  const userId = vRes.userData._id
+  const rCol = db.collection("AiRoom")
+  const res1 = await rCol.where({ owner: userId }).getOne<Table_AiRoom>()
+  const room = res1.data
+  const result: UserSettingsAPI.Res_AiConsoleGet = {
+    operateType: "ai-console-get",
+    voicePreference: room?.voicePreference,
+  }
+  return { code: "0000", data: result }
 }
 
 
@@ -1047,5 +1121,24 @@ function pixelatePhone(phone?: string) {
   }
 
   return prefix + pixels + suffix
+}
+
+
+async function toCreateDefaultAiRoom(
+  userId: string,
+) {
+  const b1 = getBasicStampWhileAdding()
+  const characters = AiShared.fillCharacters()
+  const newRoom: Partial_Id<Table_AiRoom> = {
+    ...b1,
+    owner: userId,
+    characters,
+  }
+  const rCol = db.collection("AiRoom")
+  const res1 = await rCol.add(newRoom)
+  const roomId = getDocAddId(res1)
+  if(!roomId) return
+  newRoom._id = roomId
+  return newRoom as Table_AiRoom
 }
 

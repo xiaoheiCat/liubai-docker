@@ -177,6 +177,11 @@ export const localThemes = [...supportedThemes, "system", "auto"] as const
 export type LocalTheme = typeof localThemes[number]
 export const Sch_LocalTheme = vbot.picklist(localThemes)
 
+// type of gender
+export const genderTypes = ["male", "female"] as const
+export type GenderType = typeof genderTypes[number]
+export const Sch_GenderType = vbot.picklist(genderTypes)
+
 export const threadListViewTypes = [
   "TRASH", 
   "TAG", 
@@ -1724,7 +1729,7 @@ export interface Table_AiRoom extends BaseTable {
   owner: string           // corresponds to userId
   characters: AiCharacter[]
   needSystem2Stamp?: number
-  voicePreference?: "male" | "female"
+  voicePreference?: GenderType
 }
 
 /********* AI Chat *********/
@@ -2036,6 +2041,11 @@ export namespace UserSettingsAPI {
     operateType: "auth-agree"
     code: string
     redirectUri: string
+  }
+
+  export interface Res_AiConsoleGet {
+    operateType: "ai-console-get"
+    voicePreference?: GenderType
   }
 
 }

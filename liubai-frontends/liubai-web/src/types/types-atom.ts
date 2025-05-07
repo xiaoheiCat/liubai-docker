@@ -277,3 +277,6 @@ export type LiuIDEType = typeof liuIDETypes[number]
 
 export const liuAppTypes = [...liuIDETypes] as const
 export type LiuAppType = typeof liuAppTypes[number]
+
+export const genderTypes = ["male", "female"] as const
+export type GenderType = typeof genderTypes[number]

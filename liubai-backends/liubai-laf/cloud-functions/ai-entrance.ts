@@ -67,6 +67,8 @@ import {
   Translator,
   TransformContent,
   TextToSpeech,
+  MAX_CHARACTERS,
+  charactersTakingARest,
 } from "@/ai-shared"
 import { ai_cfg } from "@/common-config"
 
@@ -74,7 +76,6 @@ const db = cloud.database()
 const _ = db.command
 
 /********************* constants ***********************/
-const MAX_CHARACTERS = 3
 const MIN_RESERVED_TOKENS = 1600
 const TOKEN_NEED_COMPRESS = 6000
 const MAX_WX_TOKEN = 360  // wx gzh will send 45002 error if we send too many words once
@@ -92,12 +93,6 @@ const MIN_3 = MINUTE * 3
 const HOUR_12 = HOUR * 12
 const INDEX_TO_PRESERVE_IMAGES = 12     // the images which appears in the first INDEX_TO_PRESERVE_IMAGES will be preserved rather than compressed to text like [image]
 const MAX_WORDS_TTS = 180
-
-// characters which take a rest will not be filled whle users launch a new chat
-const charactersTakingARest: AiCharacter[] = [
-  "ds-reasoner",
-  "deepseek",
-]
 
 /************************** types ************************/
 
@@ -332,7 +327,7 @@ class AiDirective {
   static check(
     entry: AiEntry
   ): AiDirectiveCheckRes | undefined {
-    this._bots = AiHelper.getAvailableBots()
+    this._bots = AiShared.getAvailableBots()
 
     // 1. get text
     const text = entry.text
@@ -3209,7 +3204,7 @@ class AiHelper {
   
     // 2.1 get available characters
     const b2 = getBasicStampWhileAdding()
-    const characters = this.fillCharacters()
+    const characters = AiShared.fillCharacters()
 
     // 2.2 try to add bot user wants
     if(botUserWannaAdd) {
@@ -3240,62 +3235,6 @@ class AiHelper {
     // 3. return room
     const newRoom: Table_AiRoom = { _id: roomId, ...room2 }
     return newRoom
-  }
-
-  private static fillCharacters() {
-    const all_characters = this.getAvailableCharacters()
-    if(all_characters.length <= MAX_CHARACTERS) {
-      return all_characters
-    }
-    const copied_characters = [...all_characters].splice(0, MAX_CHARACTERS)
-
-    let tryTimes = 0
-    const my_characters: AiCharacter[] = []
-    for(let i=0; i<MAX_CHARACTERS; i++) {
-      // 1. to avoid dead loop
-      tryTimes++
-      if(tryTimes > 10) break
-
-      // 2. get a random character
-      const r = Math.floor(Math.random() * all_characters.length)
-      const c = all_characters[r]
-
-      // 3. to skip a bot taking a rest
-      if(charactersTakingARest.includes(c)) {
-        i--
-        continue
-      }
-
-      my_characters.push(c)
-      all_characters.splice(r, 1)
-    }
-
-    // return copied characters if my_characters is empty
-    if(my_characters.length < 1) {
-      return copied_characters
-    }
-
-    return my_characters
-  }
-
-  private static getAvailableCharacters() {
-    const bots = AiHelper.getAvailableBots()
-    const characters = bots.map(v => v.character)
-    return characters
-  }
-
-  static getAvailableBots() {
-    const bots: AiBot[] = []
-    for(let i=0; i<aiBots.length; i++) {
-      const bot = aiBots[i]
-      const existedBot = bots.find(v => v.character === bot.character)
-      if(existedBot) continue
-      const apiData = AiShared.getApiEndpointFromBot(bot)
-      if(apiData) {
-        bots.push(bot)
-      }
-    }
-    return bots
   }
 
   static async addUserMsg(
@@ -3683,7 +3622,7 @@ class AiHelper {
     if(cLength >= MAX_CHARACTERS) return []
     
     // 1. get available characters
-    const availableCharacters = this.getAvailableCharacters()
+    const availableCharacters = AiShared.getAvailableCharacters()
     for(let i=0; i<availableCharacters.length; i++) {
       const v = availableCharacters[i]
       if(characters.includes(v)) {
@@ -3835,7 +3774,7 @@ class AiHelper {
     })
 
     // 2. get availableCharacters
-    const availableCharacters = this.getAvailableCharacters()
+    const availableCharacters = AiShared.getAvailableCharacters()
     for(let i=0; i<availableCharacters.length; i++) {
       const v = availableCharacters[i]
       if(everExistedCharacters.includes(v)) {
