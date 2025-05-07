@@ -1,10 +1,19 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
+import cui from '~/components/custom-ui';
 
 const voicePreference = defineModel("voicePreference")
 
 const { t } = useI18n()
-
+const onTapVoiceInfo = () => {
+  cui.showModal({
+    title: "🗣️",
+    content_key: "ai_console.voice_tip",
+    isTitleEqualToEmoji: true,
+    showCancel: false,
+    confirm_key: "tip.got_it",
+  })
+}
 
 </script>
 <template>
@@ -18,7 +27,7 @@ const { t } = useI18n()
 
       <div class="ac-title">
         <span class="liu-no-user-select">{{ t('ai_console.voice_preference') }}</span>
-        <div class="ac-info-box">
+        <div class="ac-info-box" @click.stop="onTapVoiceInfo">
           <SvgIcon name="info" class="ac-info-icon"
             color="var(--main-note)"
           ></SvgIcon>
@@ -100,7 +109,7 @@ const { t } = useI18n()
   margin: 0.1rem;
   border: 1px solid var(--line-default);
   border-radius: 0.3rem;
-  padding: 4px 16px;
+  padding: 6px 18px;
   background: var(--card-bg);
   accent-color: var(--main-text);
   user-select: none;

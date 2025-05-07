@@ -23,4 +23,5 @@ export default {
   SERVICE_POLY: d + `service-poly`,
   BIND_DATA: d + `user-settings`,
   AUTHORIZE: d + `user-settings`,
+  AI_CONSOLE: d + `user-settings`,
 }
