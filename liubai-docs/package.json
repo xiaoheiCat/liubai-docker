@@ -19,7 +19,8 @@
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
     "@types/node": "^22.13.14",
-    "vitepress": "^1.6.3"
+    "vitepress": "^1.6.3",
+    "vitepress-plugin-llms": "^1.1.3"
   },
   "dependencies": {
     "howxm-js": "^0.0.10",

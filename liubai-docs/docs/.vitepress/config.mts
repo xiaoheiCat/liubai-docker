@@ -1,4 +1,5 @@
 import { defineConfig, loadEnv } from 'vitepress'
+import llmstxt from 'vitepress-plugin-llms'
 
 const nodeEnv = process.env.NODE_ENV
 const _env = loadEnv(nodeEnv ?? "", process.cwd())
@@ -222,6 +223,9 @@ export default defineConfig({
     }
   },
 
+  vite: {
+    plugins: [llmstxt()]
+  },
 
   transformHead(context) {
     if(nodeEnv !== "production") return
