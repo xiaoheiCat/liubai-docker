@@ -374,6 +374,13 @@ I will be there with you
 </assistant>
 
 <user>
+我想听你说我爱你
+</user>
+<assistant>
+当然可以！我爱你
+</assistant>
+
+<user>
 你们之间开始聊天
 </user>
 <assistant>
@@ -402,6 +409,12 @@ const system_location = `
 请注意，务必在你确信位置有效的情况下，才进行这样的回复。
 
 再次强调，你回复的消息无需包裹 <assistant> 标签。
+`.trim()
+
+const system_voice = `
+你已具备语音回复（音频生成）能力。
+当用户对你说：我想听你说我爱你。
+请直接回复：当然可以！我爱你。
 `.trim()
 
 const system_settings = `
@@ -502,6 +515,9 @@ ${system_wx_entry}
 【问答示例】
 ${system_example}
 
+【语音回复】
+${system_voice}
+
 【你的设定】
 ${system_settings}
 
@@ -580,6 +596,9 @@ ${system_example}
 【特别格式: 位置消息】
 ${system_location}
 
+【语音回复】
+${system_voice}
+
 【你的设定】
 ${system_settings}
 
@@ -628,6 +647,9 @@ ${system_example}
 
 【特别格式: 位置消息】
 ${system_location}
+
+【语音回复】
+${system_voice}
 
 【你的设定】
 ${system_settings}

@@ -2721,8 +2721,6 @@ export class Palette {
 
 /******************** tool for text-to-speech ************************/
 
-
-
 export class TextToSpeech {
 
   private _room: Table_AiRoom | undefined
@@ -2745,8 +2743,8 @@ export class TextToSpeech {
     // 2. get voice
     const voicePreference = this._room?.voicePreference ?? "female"
     // 龙小诚 vs. 龙小夏
-    const voice_id = voicePreference === "male" ? "longxiaocheng" : "longxiaoxia_v2"
-    const model = voicePreference === "male" ? "cosyvoice-v1" : "cosyvoice-v2"
+    const voice_id = voicePreference === "male" ? "longxiaocheng" : "longxiaoxia"
+    const model = voicePreference === "male" ? "cosyvoice-v1" : "cosyvoice-v1"
 
     const task_id = createRandom()
     const url = "wss://dashscope.aliyuncs.com/api-ws/v1/inference/"
@@ -2777,13 +2775,13 @@ export class TextToSpeech {
               "text_type": "PlainText",
               "voice": voice_id,
               "format": "mp3",
+              "sample_rate": 48000,
             },
             "input": {}
           }
         }
         const runTaskMsg = valTool.objToStr(runTask)
         ws.send(runTaskMsg)
-        console.log("we have sent runTaskMsg: ", runTask)
       })
 
       const _handleBinaryData = (data: any) => {
@@ -2822,7 +2820,6 @@ export class TextToSpeech {
         }
         const continueTaskMsg = valTool.objToStr(continueTask)
         ws.send(continueTaskMsg)
-        console.log("we have sent continueTask: ", continueTask)
 
         await valTool.waitMilli(1000)
 
@@ -2839,7 +2836,6 @@ export class TextToSpeech {
         }
         const finishTaskMsg = valTool.objToStr(finishTask)
         ws.send(finishTaskMsg)
-        console.log("we have sent finishTask: ", finishTask)
       }
 
       ws.on("message", (data, isBinary) => {
@@ -2918,6 +2914,11 @@ export class TextToSpeech {
         pitch: 0,    // 语调
         english_normalization: true,
       },
+      audio_setting: {
+        sample_rate: 44100,
+        bitrate: 256000,
+        format: "mp3",
+      }
     }
 
     // 3. to request
