@@ -20,27 +20,33 @@
 
 <img src="./assets-three-assistants/just-speak.png" width="450">
 
+目前，部分 AI 也会说话啦！它们分别为 `通义千问`, `跃问` 和 `海螺`。
+
 ## 支持哪些 AI {#supported-ai}
 
 目前支持的 AI 有:
 
 - 百小应（来自[百川智能](https://www.baichuan-ai.com/home)）
 - DeepSeek ([V3](https://api-docs.deepseek.com/zh-cn/news/news1226) 和 [R1](https://api-docs.deepseek.com/zh-cn/news/news250120))
-- 海螺 (来自 [MiniMax](https://minimaxi.com/))
+- 海螺 (来自 [MiniMax](https://minimaxi.com/))，已支持语音回复你。
 - 混元 (来自[腾讯](https://hunyuan.tencent.com/))
 - Kimi（来自[月之暗面](https://www.moonshot.cn/)）
-- 通义千问（来自[阿里巴巴](https://tongyi.aliyun.com/welcome)）
+- 通义千问（来自[阿里巴巴](https://tongyi.aliyun.com/welcome)），已支持语音回复你。
 - 万知（来自[零一万物](https://www.01.ai/cn)）
-- 跃问（来自[阶跃星辰](https://www.stepfun.com/)）
+- 跃问（来自[阶跃星辰](https://www.stepfun.com/)），已支持语音回复你。
 - 智谱（来自[智谱华章](https://bigmodel.cn/)）
 
-除了 DeepSeek 因其官方资源紧张的原因，留白使用到了来自腾讯云、七牛云、硅基流动、Gitee AI 等第三方云厂商的服务。
+DeepSeek 因其官方资源紧张 + 开源的原因，我们使用到了来自腾讯云、七牛云、硅基流动、Gitee AI 等第三方云厂商的服务。
 
-其他 AI 的输出皆来自对应大模型厂商的官方开放平台。我们让你无需切换 APP，直接在微信里去比较各个 AI 的异同，由你来决定谁比较好用！
+其它 AI 的输出，则皆来自对应大模型厂商的官方开放平台。
+
+我们让你无需切换 APP，直接在微信里一次性体验世界顶尖大模型！
 
 ## 玩法 {#how-to-play}
 
-你可以在对话框中回复:
+### 召唤... {#call}
+
+你可以在对话框中回复
 
 `召唤百小应`: 使用来自百川智能的 AI 大模型。
 
@@ -62,15 +68,23 @@
 
 `召唤智谱`: 使用来自智谱华章的 AI 大模型。
 
+### 踢掉... {#kick}
+
 在服务号内，你最多能同时跟 3 名 AI 聊天。当你想召唤其他 AI 但服务号内已有 3 名助手时，你可以回复
 
 `踢掉xx`: 其中 `xx` 替换成对应的 AI 名称，即可踢掉你不想再使用的 AI。
 
-另外，你还可以回复
+### 一些操作和设置 {#ai-settings}
+
+`控制台`: 打开 AI 控制台，去设置 AI 回复你时的声音，目前有“男声”和“女声”可以选择。
 
 `群聊状态` 或 `额度`: 查看当前服务号内已有的 AI 以及使用额度。
 
 `清空上文`: 清空之前的会话，从头跟 AI 开始聊。
+
+::: info 💡 小提示
+`清空上文` 指令可以有效避免 AI 参考到之前已经过时的对话，并且能加快它的回复速度。
+:::
 
 ## 置顶 {#pin}
 

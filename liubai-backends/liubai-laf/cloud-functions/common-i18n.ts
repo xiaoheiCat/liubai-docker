@@ -657,21 +657,17 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
       text: {
         content: `【指路牌🪧】
 
-🤖 <a href='{LIU_DOCS_DOMAIN}/guide/three-assistants'>AI使用说明书</a>
+🤖 <a href='{LIU_DOCS_DOMAIN}/guide/three-assistants'>AI 使用说明书</a>
+
+🎮 <a href='{LIU_DOMAIN}/ai-console'>AI 控制台</a>
 
 📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">开发者的小红书</a>
 
-🌐 <a href="https://github.com/yenche123/liubai">开源地址</a>
-
 📦 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">提问箱</a>
 
-📨 <a href="{LIU_DOMAIN}/">收件箱</a>
+🌐 <a href="https://github.com/yenche123/liubai">开源地址</a>
 
-📆 <a href="{LIU_DOMAIN}/schedule">我的日程</a>
-
-⭐ <a href="{LIU_DOMAIN}/favorite">我的收藏</a>
-
-📂 <a href="{LIU_DOMAIN}/state">我的看板</a>
+🧘 <a href="{LIU_DOMAIN}/mine">我的</a>
 `,
       }
     }
@@ -714,21 +710,17 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
       text: {
         content: `【指路牌🪧】
 
-🤖 <a href='{LIU_DOCS_DOMAIN}/guide/three-assistants'>AI使用說明書</a>
+🤖 <a href='{LIU_DOCS_DOMAIN}/guide/three-assistants'>AI 使用說明書</a>
+
+🎮 <a href='{LIU_DOMAIN}/ai-console'>AI 控制中心</a>
 
 📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">開發者的小紅書</a>
 
-🌐 <a href="https://github.com/yenche123/liubai">開源網址</a>
-
 📦 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">提問箱</a>
 
-📨 <a href="{LIU_DOMAIN}/">收件匣</a>
+🌐 <a href="https://github.com/yenche123/liubai">開源網址</a>
 
-📆 <a href="{LIU_DOMAIN}/schedule">我的行程</a>
-
-⭐ <a href="{LIU_DOMAIN}/favorite">我的收藏</a>
-
-📂 <a href="{LIU_DOMAIN}/state">我的看板</a>
+🧘 <a href="{LIU_DOMAIN}/mine">我的</a>
 `,
       }
     }
@@ -773,19 +765,15 @@ export const wxClickReplies: Record<string, Wx_Gzh_Send_Msg[]> = {
 
 🤖 <a href='{LIU_DOCS_DOMAIN}/guide/three-assistants'>AI Instructions</a>
 
-📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">Follow me on RED</a>
+🎮 <a href='{LIU_DOMAIN}/ai-console'>AI Console</a>
 
-🌐 <a href="https://github.com/yenche123/liubai">Open Source</a>
+📕 <a href="https://www.xiaohongshu.com/user/profile/5d1642d80000000011033c24">Follow me on RED</a>
 
 📦 <a href="{LIU_DOCS_DOMAIN}/guide/faq/">AMA</a>
 
-📨 <a href="{LIU_DOMAIN}/">My Inbox</a>
+🌐 <a href="https://github.com/yenche123/liubai">Open Source</a>
 
-📆 <a href="{LIU_DOMAIN}/schedule">My Schedule</a>
-
-⭐ <a href="{LIU_DOMAIN}/favorite">My Favorite</a>
-
-📂 <a href="{LIU_DOMAIN}/state">My Board</a>
+🧘 <a href="{LIU_DOMAIN}/mine">Mine</a>
 `,
       }
     }
@@ -909,6 +897,39 @@ export const wxTextRepliesItems: WxTextReplyItem[] = [
         msgtype: "image",
         image: {
           media_id: "{LIU_WX_GZ_MEDIA_ID_FOR_CONTACT}"
+        }
+      }
+    ]
+  },
+  {
+    keywords: ["AI 控制台", "控制台"],
+    replies: [
+      {
+        msgtype: "text",
+        text: {
+          content: "🎮 <a href='{LIU_DOMAIN}/ai-console'>点击进入 AI 控制台</a>"
+        }
+      }
+    ]
+  },
+  {
+    keywords: ["AI 控制中心", "控制中心"],
+    replies: [
+      {
+        msgtype: "text",
+        text: {
+          content: "🎮 <a href='{LIU_DOMAIN}/ai-console'>輕觸進入 AI 控制中心</a>"
+        }
+      }
+    ]
+  },
+  {
+    keywords: ["AI Console", "Console"],
+    replies: [
+      {
+        msgtype: "text",
+        text: {
+          content: "🎮 <a href='{LIU_DOMAIN}/ai-console'>Click to enter AI Console</a>"
         }
       }
     ]

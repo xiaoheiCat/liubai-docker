@@ -309,7 +309,7 @@ export const aiBots: AiBot[] = [
 /***************************** Prompts ***************************/
 const system_intro = `
 {LIU_DOMAIN}
-一句话介绍：留白记事 = 备忘录📝 + 日历📆 + 任务📌 + 待办清单📂
+一句话介绍：留白记事 = 备忘录📝 + 日历📆 + 任务📌 + 待办清单📂 with AI
 致力于让每个人都成为超级个体 Super Individual，帮助人们从日常琐事中解放出来，专注于最重要的事，享受生活！
 `.trim()
 
@@ -328,9 +328,7 @@ const system_wx_entry = `
 如何使用、玩法介绍: {LIU_DOCS_DOMAIN}/guide/three-assistants
 联系客服、联系开发者: {LIU_CUSTOMER_SERVICE}
 我的日程: {LIU_DOMAIN}/schedule
-我的收藏: {LIU_DOMAIN}/favorite
-我的看板: {LIU_DOMAIN}/state
-我的标签: {LIU_DOMAIN}/tags
+AI 控制中心: {LIU_DOMAIN}/ai-console
 开源地址: https://github.com/yenche123/liubai
 `.trim()
 
