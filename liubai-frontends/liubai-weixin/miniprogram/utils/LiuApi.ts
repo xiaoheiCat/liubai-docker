@@ -40,5 +40,14 @@ export class LiuApi {
     return wx.getDeviceInfo()
   }
 
+  static getAppBaseInfo() {
+    return wx.getAppBaseInfo()
+  }
+
+
+  static request(opt: WechatMiniprogram.RequestOption) {
+    return wx.request(opt)
+  }
+
 
 }

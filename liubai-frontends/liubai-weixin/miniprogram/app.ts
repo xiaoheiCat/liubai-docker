@@ -1,5 +1,5 @@
 // app.ts
-import { LiuApi } from "./utils/LiuApi"
+import { useApp } from "./utils/useApp"
 
 App({
   
@@ -8,10 +8,6 @@ App({
   },
 
   onLaunch() {
-
-    const skylineInfo = LiuApi.getSkylineInfoSync()
-    console.log("skyline info: ")
-    console.log(skylineInfo)
-    
+    useApp()
   },
 })

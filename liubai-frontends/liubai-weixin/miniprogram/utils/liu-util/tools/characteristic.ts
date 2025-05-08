@@ -8,24 +8,56 @@ export const handleCharacteristic = () => {
 
   // 1.1 get device info
   const deviceInfo = LiuApi.getDeviceInfo()
-  const { platform } = deviceInfo
+  const { platform, system } = deviceInfo
+  console.log("deviceInfo: ", deviceInfo)
+
+  // 1.2 get app base info
+  const appBaseInfo = LiuApi.getAppBaseInfo()
+  const { SDKVersion } = appBaseInfo
 
   // 2. define default platform
   result = {
     isPC: false,
     isMobile: true,
+    isMac: false,
+    isWindows: false,
+    isHarmonyOS: platform === "ohos",
+    isIOS: system.includes("iOS"),
+    SDKVersion,
   }
 
   // 3. for PC
   if(platform === "mac") {
     result.isPC = true
     result.isMobile = false
+    result.isMac = true
   }
   else if(platform.includes("windows")) {
     result.isPC = true
     result.isMobile = false
+    result.isWindows = true
   }
   
   return result
+}
+
+
+export const handleDeviceString = () => {
+  const cha = handleCharacteristic()
+  let str = ""
+
+  if(cha.isMobile) str = "Mobile "
+  else if(cha.isPC) str = "PC "
+
+  str += "WeChat "
+
+  if(cha.isHarmonyOS) str += "HarmonyOS "
+  else if(cha.isIOS) str += "iOS "
+  else if(cha.isMac) str += "Mac "
+  else if(cha.isWindows) str += "Windows "
+
+  str += `WeixinMiniProgram v${cha.SDKVersion}`
+  
+  return str
 }
 

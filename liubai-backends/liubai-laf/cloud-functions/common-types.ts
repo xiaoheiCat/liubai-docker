@@ -194,6 +194,7 @@ export const Sch_ThreadListViewType = vbot.picklist(threadListViewTypes)
 export const supportedClients = [
   "web",
   "ide-extension",
+  "weixin-miniprogram",
 ] as const
 export type SupportedClient = typeof supportedClients[number]
 export const Sch_SupportedClient = vbot.picklist(supportedClients)
@@ -202,6 +203,7 @@ export const Sch_SupportedClient = vbot.picklist(supportedClients)
 export const clientMaximum: Record<SupportedClient, number> = {
   "web": 9,
   "ide-extension": 5,
+  "weixin-miniprogram": 3,
 }
 
 export const liuIDETypes = [

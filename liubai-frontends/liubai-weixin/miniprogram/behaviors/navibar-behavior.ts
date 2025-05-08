@@ -28,7 +28,6 @@ export const navibarBehavior = Behavior({
       }
       this.data.lastResizeTimeout = setTimeout(() => {
         _this.data.lastResizeTimeout = 0
-        console.warn("resize invoked!")
         _this.calculateHeight()
       }, 450)
     }

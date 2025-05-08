@@ -29,9 +29,19 @@ function handleEnv() {
 }
 
 
+function handlePackageJSON() {
+  const path1 = path.resolve(__dirname, "../package.json")
+  const pkg = JSON.parse(fs.readFileSync(path1, "utf-8"))
+  const version = pkg.version ?? "0.0.1"
+  return { LIU_VERSION: version }
+}
+
+
 function main() {
   const envCfg = handleEnv()
-  const strEnvCfg = JSON.stringify(envCfg, null, 2)
+  const pkgCfg = handlePackageJSON()
+  const totalCfg = { ...envCfg, ...pkgCfg }
+  const strEnvCfg = JSON.stringify(totalCfg, null, 2)
   const preCfgStr = `export default ${strEnvCfg}`
   const preCfgPath = path.resolve(__dirname, "../miniprogram/config/pre_config.ts")
   fs.writeFileSync(preCfgPath, preCfgStr)
