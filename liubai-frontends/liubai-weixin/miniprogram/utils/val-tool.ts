@@ -255,6 +255,14 @@ const objHasAnyKey = (obj: Record<string, any>) => {
   return Object.keys(obj).length > 0
 }
 
+const getValFromObj = (
+  obj: Record<string, any>, 
+  key: string,
+) => {
+  if(!obj) return ""
+  return obj[key]
+}
+
 export default {
   waitMilli,
   copyObject,
@@ -278,4 +286,5 @@ export default {
   hasValue,
   isStringWithVal,
   objHasAnyKey,
+  getValFromObj,
 }

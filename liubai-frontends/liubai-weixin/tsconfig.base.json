@@ -2,7 +2,6 @@
   "compilerOptions": {
     "strictNullChecks": true,
     "noImplicitAny": true,
-    "allowJs": true,
     "experimentalDecorators": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,

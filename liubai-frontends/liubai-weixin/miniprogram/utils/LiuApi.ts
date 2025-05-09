@@ -53,5 +53,8 @@ export class LiuApi {
     return wx.getFileSystemManager()
   }
 
+  static getEnv() {
+    return wx.env
+  }
 
 }

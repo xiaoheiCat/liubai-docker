@@ -1,0 +1,6 @@
+{
+  "i18n-ally.localesPaths": [
+    "miniprogram/locales/messages"
+  ],
+  "i18n-ally.keystyle": "nested"
+}

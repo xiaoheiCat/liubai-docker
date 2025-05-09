@@ -8,6 +8,10 @@ export type SupportedLocale = typeof supportedLocales[number]
 
 export type LocalLocale = SupportedLocale | "system"
 
+export type T_I18N = (
+  fullKey: string, opt2?: Record<string, string | number>
+) => string
+
 export const isSupportedLocale = (val: string): val is SupportedLocale => {
   return supportedLocales.includes(val as SupportedLocale)
 }

@@ -1,6 +1,7 @@
 // index.ts
 
 import { i18nBehavior } from "../../behaviors/i18n-behavior"
+import { useI18n } from "../../locales/index"
 
 Component({
 
@@ -19,6 +20,9 @@ Component({
         console.log("boundingClientRect res: ", res)
       }).exec()
 
+      const { t } = useI18n()
+      const title = t("hello.appName")
+      console.log("title: ", title)
     },
 
   },
