@@ -6,6 +6,7 @@
 >
 
   <view class="liu-container" style="background-color: var(--liu-blue)"></view>
+  <text class="liu-tttt">{{ t.appName }}</text>
   <view class="liu-container" style="background-color: var(--liu-red)"></view>
   <button catchtap="goToShowcase">跳转到 showcase</button>
   <view class="liu-container" style="background-color: var(--liu-green)"></view>

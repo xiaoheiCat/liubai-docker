@@ -1,8 +1,14 @@
 // index.ts
 
+import { i18nBehavior } from "../../behaviors/i18n-behavior"
+
 Component({
 
   data: {},
+
+  behaviors: [
+    i18nBehavior("hello")
+  ],
 
   lifetimes: {
 

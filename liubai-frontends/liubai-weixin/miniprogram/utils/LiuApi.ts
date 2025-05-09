@@ -49,5 +49,9 @@ export class LiuApi {
     return wx.request(opt)
   }
 
+  static getFileSystemManager() {
+    return wx.getFileSystemManager()
+  }
+
 
 }
