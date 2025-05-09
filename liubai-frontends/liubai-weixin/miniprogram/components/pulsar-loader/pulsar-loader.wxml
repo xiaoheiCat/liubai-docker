@@ -1,0 +1,4 @@
+<view class="pulsar-container" style="--uib-color: {{color}};">
+  <view class="pulsar-one" />
+  <view class="pulsar-two" />
+</view>

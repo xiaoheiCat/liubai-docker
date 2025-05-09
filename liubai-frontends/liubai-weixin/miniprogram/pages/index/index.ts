@@ -1,28 +1,21 @@
 // index.ts
 
 import { i18nBehavior } from "../../behaviors/i18n-behavior"
-import { useI18n } from "../../locales/index"
+import { navibarBehavior } from "../../behaviors/navibar-behavior"
 
 Component({
 
   data: {},
 
   behaviors: [
-    i18nBehavior("hello")
+    i18nBehavior("hello"),
+    navibarBehavior,
   ],
 
   lifetimes: {
 
     attached() {
 
-      const nodesRef = this.createSelectorQuery().select(".liu-scroll-view")
-      nodesRef.boundingClientRect(res => {
-        console.log("boundingClientRect res: ", res)
-      }).exec()
-
-      const { t } = useI18n()
-      const title = t("hello.appName")
-      console.log("title: ", title)
     },
 
   },

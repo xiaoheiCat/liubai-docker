@@ -1,0 +1,42 @@
+
+.pulsar-container {
+  --uib-size: 40px;
+  --uib-speed: 1.5s;
+  --uib-speed-half: 0.75s;
+  --uib-color: yellow;
+  position: relative;
+  height: var(--uib-size);
+  width: var(--uib-size);
+}
+
+.pulsar-one, .pulsar-two {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  border-radius: 50%;
+  background-color: var(--uib-color);
+  animation-name: pulse;
+  animation-duration: var(--uib-speed);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  transform: scale(0);
+}
+
+.pulsar-two {
+  animation-delay: var(--uib-speed-half);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 0.25;
+  }
+}

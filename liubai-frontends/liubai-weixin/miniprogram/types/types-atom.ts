@@ -1,0 +1,20 @@
+
+// 页面状态
+/**
+ * -1: 正常
+ * 0: 加载中
+ * 1: 切换中（比如已有内容）
+ * 50: 查无内容（404）
+ * 51: 没有权限
+ * 52: 网络不佳（需要联网才能查看）
+ * 53: 该页面需要后端方可访问
+ */
+export type PageState = -1 | 0 | 1 | 50 | 51 | 52 | 53 | 54
+export type PageStateKey = "OK" 
+  | "LOADING"
+  | "SWITCHING"
+  | "NO_DATA"
+  | "NO_AUTH"
+  | "NETWORK_ERR"
+  | "NEED_BACKEND"
+

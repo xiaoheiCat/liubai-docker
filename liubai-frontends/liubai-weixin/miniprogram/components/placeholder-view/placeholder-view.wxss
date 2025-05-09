@@ -1,0 +1,30 @@
+
+
+.pv-shell {
+  width: 100%;
+  height: 1px;
+  position: relative;
+}
+
+.pv-container {
+  width: 100%;
+  height: calc(100vh - 80px);
+  top: 0;
+  left: 0;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pv-container_hidden {
+  opacity: 0;
+}
+
+.pv-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+

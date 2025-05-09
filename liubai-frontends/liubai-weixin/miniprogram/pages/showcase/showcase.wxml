@@ -7,7 +7,7 @@
   associative-container="pop-gesture"
 >
   <virtual-navibar height1="{{height1}}" height2="{{height2}}"></virtual-navibar>
+  <placeholder-view height3="{{height3}}" p-state="{{pState}}"></placeholder-view>
   <button catchtap="onTapBack">返回</button>
-  <view class="showcase-text">当前渲染模式: {{renderer}}</view>
 </scroll-view>
 <custom-navibar height1="{{height1}}" height2="{{height2}}"></custom-navibar>

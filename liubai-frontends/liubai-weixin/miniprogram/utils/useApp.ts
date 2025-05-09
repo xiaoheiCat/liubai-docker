@@ -7,7 +7,6 @@ export async function useApp() {
 
   // 1. time calibrate
   await timeCalibrate()
-  
 
 }
 
@@ -24,7 +23,6 @@ async function timeCalibrate() {
   const clientStamp = Math.round((t2 + t1) / 2)
   const serverStamp = data.stamp
   const diff = clientStamp - serverStamp
-  console.log("diff: ", diff)
   LiuTime.setDiff(diff)
 
   return true

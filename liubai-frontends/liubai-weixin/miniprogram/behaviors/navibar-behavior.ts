@@ -4,11 +4,14 @@ import type { BoundingClientRectResolver } from "../types"
 import type { NbData } from "./tools/types"
 import { LiuUtil } from "../utils/liu-util/index"
 
+const defaultHeight3 = 600
+
 export const navibarBehavior = Behavior({
 
   data: {
-    height1: 0,     // 通常指状态栏的高度
+    height1: 0,      // 通常指状态栏的高度
     height2: 33,     // 通常指胶囊的高度
+    height3: defaultHeight3,    // 通常指 页面高度 - 状态栏高度 - 胶囊高度
     lastResizeTimeout: 0,
     showTitle: true,
   },
@@ -39,26 +42,24 @@ export const navibarBehavior = Behavior({
   
         // 1. get window and screen info
         const sizeInfo = LiuApi.getWindowInfo()
-        console.log("sizeInfo: ", sizeInfo)
+        // console.log("sizeInfo: ", sizeInfo)
   
         // 2. get menu button info
         const menuButtonInfo = LiuApi.getMenuButtonBoundingClientRect()
-        console.log("menuButtonInfo: ", menuButtonInfo)
+        // console.log("menuButtonInfo: ", menuButtonInfo)
 
         // 3.1 get enter options
         const enterData = LiuApi.getEnterOptionsSync()
         const apiCategory = enterData.apiCategory
         const mode = enterData.mode
-        console.log("enterData: ", enterData)
+        // console.log("enterData: ", enterData)
 
         // 3.2 get our characteristic
         const cha = LiuUtil.getCharacteristic()
-        console.log("cha: ", cha)
 
         // 4. get scroll view info
         const pageInfo = await this.getSvBoundingClientRect()
-        
-        console.log("pageInfo: ", pageInfo)
+        // console.log("pageInfo: ", pageInfo)
 
         // 5. get default heigh1 & height2
         const safeArea = sizeInfo.safeArea ?? {}
@@ -67,6 +68,8 @@ export const navibarBehavior = Behavior({
         const mbHeight = menuButtonInfo.height ?? 0
         let height1 = Math.max(safeTop, mbTop)
         let height2 = mbHeight
+        let height3 = pageInfo?.height ?? defaultHeight3
+
 
         // 6. check if we need to consider status bar
         const windowHeight = sizeInfo.windowHeight
@@ -82,7 +85,7 @@ export const navibarBehavior = Behavior({
           }
         }
 
-        console.log("considerStatusBar: ", considerStatusBar)
+        // console.log("considerStatusBar: ", considerStatusBar)
         
 
         // 7.1 consider status bar or not
@@ -99,8 +102,17 @@ export const navibarBehavior = Behavior({
   
         // 8. get to set data
         const newData: Partial<NbData> = {}
-        if(height1 >= 0) newData.height1 = height1
-        if(height2 >= 0) newData.height2 = height2
+        if(height1 >= 0) {
+          newData.height1 = height1
+          height3 -= height1
+        }
+        if(height2 >= 0) {
+          newData.height2 = height2
+          height3 -= height2
+        }
+        height3 = Math.max(0, height3)
+        newData.height3 = height3
+
         if(apiCategory === "browseOnly") {
           newData.showTitle = false
         }

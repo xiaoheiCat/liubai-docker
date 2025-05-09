@@ -14,12 +14,4 @@ Component({
       value: 0
     }
   },
-
-  lifetimes: {
-
-  },
-
-  methods: {
-
-  },
 })

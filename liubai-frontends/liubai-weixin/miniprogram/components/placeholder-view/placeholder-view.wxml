@@ -1,0 +1,8 @@
+
+<view class="pv-shell" wx:if="{{enable}}">
+  <view class="pv-container {{show ? '' : 'pv-container_hidden'}}"
+    style="height: {{height3}}px; transition: {{TRANSITION_MS}}ms;"
+  >
+    <pulsar-loader></pulsar-loader>
+  </view>
+</view>

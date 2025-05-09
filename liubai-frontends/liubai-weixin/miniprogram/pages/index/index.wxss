@@ -4,8 +4,3 @@
   width: 100%;
   height: 750rpx;
 }
-
-.liu-tttt {
-  font-size: 20px;
-  color: #333;
-}

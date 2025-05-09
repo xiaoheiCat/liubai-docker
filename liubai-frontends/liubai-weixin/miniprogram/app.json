@@ -3,6 +3,9 @@
     "pages/index/index",
     "pages/showcase/showcase"
   ],
+  "usingComponents": {
+    "placeholder-view": "/components/placeholder-view/placeholder-view"
+  },
   "style": "v2",
   "window": {
     "navigationStyle": "custom",
