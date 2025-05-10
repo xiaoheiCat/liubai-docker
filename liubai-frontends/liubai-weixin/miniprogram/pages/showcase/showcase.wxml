@@ -8,7 +8,7 @@
 >
   <virtual-navibar height1="{{height1}}" height2="{{height2}}"></virtual-navibar>
   <placeholder-view height3="{{height3}}" p-state="{{pState}}"></placeholder-view>
-  <button catchtap="onTapBack">返回</button>
+  <button catchtap="onTapBack">Back</button>
 </scroll-view>
 <custom-navibar 
   height1="{{height1}}" height2="{{height2}}" showTitle="{{showTitle}}"

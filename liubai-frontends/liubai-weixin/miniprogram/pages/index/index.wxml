@@ -4,11 +4,39 @@
   scroll-y 
   type="list"
 >
+  
+  <view class="index-scroll-view {{renderer}}">
 
-  <view class="liu-container" style="background-color: var(--liu-blue)"></view>
-  <text>{{ t1.appName }}</text>
-  <view class="liu-container" style="background-color: var(--liu-red)"></view>
-  <button catchtap="goToShowcase">跳转到 showcase</button>
-  <view class="liu-container" style="background-color: var(--liu-green)"></view>
+    <view class="liu-virtual index-virtual-one"></view>
 
+    <!-- Logo --> 
+    <view class="index-logo-box">
+      <image src="/images/shared/logo_256x256_v3.png" class="index-logo" />
+    </view>
+
+    <!-- Title -->
+    <view class="index-title">
+      <text>{{t1.title}}</text>
+    </view>
+
+    <!-- Description -->
+    <view class="index-desc">
+      <text>{{t1.desc}}</text>
+    </view>
+
+    <!-- Buttons -->
+    <view class="index-btns">
+      <view class="index-btn" hover-class="index-btn_hover">
+        <text class="liu-pointer">{{t1.add_my_wechat}}</text>
+      </view>
+
+      <view class="index-btn index-transparent-btn"
+        hover-class="index-transparent-btn_hover"
+      >
+        <text class="liu-pointer">{{t1.follow_us}}</text>
+      </view>
+    </view> 
+
+    <view class="liu-virtual"></view>
+  </view>
 </scroll-view>

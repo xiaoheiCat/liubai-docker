@@ -20,6 +20,12 @@ page {
   --main-note: #ababab;
   --main-tip: #bfbfbf;
 
+  --head-font: 28px;
+  --title-font: 22px;
+  --desc-font: 20px;
+  --inline-code-font: 18px;
+  --btn-font: 17px;
+
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -32,6 +38,15 @@ page {
   width: 100%;
   height: 100%;
   background-color: var(--bg-color);
+}
+
+.liu-virtual {
+  width: 100%;
+  height: 16px;
+}
+
+.liu-pointer {
+  cursor: pointer;
 }
 
 @media (prefers-color-scheme: dark) {

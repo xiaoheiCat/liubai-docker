@@ -2,14 +2,16 @@
 
 import { i18nBehavior } from "../../behaviors/i18n-behavior"
 import { navibarBehavior } from "../../behaviors/navibar-behavior"
+import { sharedBehavior } from "../../behaviors/shared-behavior"
 
 Component({
 
   data: {},
 
   behaviors: [
-    i18nBehavior("hello"),
+    i18nBehavior("index"),
     navibarBehavior,
+    sharedBehavior(),
   ],
 
   lifetimes: {
