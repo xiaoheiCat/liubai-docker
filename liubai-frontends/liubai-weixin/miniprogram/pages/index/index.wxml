@@ -30,8 +30,10 @@
         <text class="liu-pointer">{{t1.add_my_wechat}}</text>
       </view>
 
-      <view class="index-btn index-transparent-btn"
-        hover-class="index-transparent-btn_hover"
+      <view wx:if="{{showFollowUs}}"
+        class="index-btn index-transparent-btn"
+        hover-class="index-btn_hover index-transparent-btn_hover"
+        catchtap="onTapFollowUs"
       >
         <text class="liu-pointer">{{t1.follow_us}}</text>
       </view>

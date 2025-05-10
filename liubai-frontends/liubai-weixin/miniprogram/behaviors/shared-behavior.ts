@@ -1,18 +1,12 @@
-import { LiuUtil } from "../utils/liu-util/index"
 import { LiuApi } from "../utils/LiuApi"
 
-
-
 export function sharedBehavior() {
-
-  const cha = LiuUtil.getCharacteristic()
   
   const behavior = Behavior({
 
     data: {
       renderer: "webview",
       pageLength: 1,
-      isPC: cha.isPC,
     },
 
     lifetimes: {

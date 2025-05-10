@@ -5,6 +5,7 @@ export type LiuCfg = {
   frame_duration_2: number
   LIU_VERSION: string
   API_DOMAIN?: string
+  GZH_USERNAME?: string
 }
 
 export const cfg: LiuCfg = {

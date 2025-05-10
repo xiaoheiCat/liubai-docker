@@ -86,6 +86,7 @@
 
 .webview .index-btn:active {
   background-color: var(--primary-active);
+  transform: scale(0.98);
 }
 
 .webview .index-transparent-btn:active {
@@ -95,6 +96,7 @@
 
 .skyline .index-btn_hover {
   background-color: var(--primary-hover);
+  transform: scale(0.98);
 }
 
 .skyline .index-transparent-btn_hover {
