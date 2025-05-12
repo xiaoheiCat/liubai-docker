@@ -1,6 +1,6 @@
 // Function Name: common-config
 // put some configs here
-import type { AiCharacter } from "@/common-types"
+import type { AiCharacter, GenderType } from "@/common-types"
 
 /********************* empty functions ****************/
 export async function main(ctx: FunctionContext) {
@@ -68,4 +68,5 @@ export const ai_cfg = {
 
   retired_ai: ["baixiaoying", "wanzhi"] as AiCharacter[],
   speaking_characters: ["hailuo", "yuewen", "tongyi-qwen"] as AiCharacter[],
+  default_voice: "female" as GenderType,
 }

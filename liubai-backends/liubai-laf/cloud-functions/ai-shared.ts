@@ -73,6 +73,7 @@ import * as vbot from "valibot"
 import { addDays, set as date_fn_set } from "date-fns"
 import { WebSocket } from "ws"
 import { createRandom } from "@/common-ids"
+import { ai_cfg } from "@/common-config"
 
 const db = cloud.database()
 const _ = db.command
@@ -2741,7 +2742,7 @@ export class TextToSpeech {
     }
 
     // 2. get voice
-    const voicePreference = this._room?.voicePreference ?? "female"
+    const voicePreference = this._room?.voicePreference ?? ai_cfg.default_voice
     // 龙小诚 vs. 龙小夏
     const voice_id = voicePreference === "male" ? "longxiaocheng" : "longxiaoxia"
     const model = voicePreference === "male" ? "cosyvoice-v1" : "cosyvoice-v1"
@@ -2891,7 +2892,7 @@ export class TextToSpeech {
     }
 
     // 2. get voice
-    const voicePreference = this._room?.voicePreference ?? "female"
+    const voicePreference = this._room?.voicePreference ?? ai_cfg.default_voice
     // 霸道少爷 vs. 甜心小玲
     const voice_id = voicePreference === "male" ? "badao_shaoye" : "tianxin_xiaoling"
 
@@ -2945,7 +2946,7 @@ export class TextToSpeech {
     }
 
     // 2. get voice
-    const voicePreference = this._room?.voicePreference ?? "female"
+    const voicePreference = this._room?.voicePreference ?? ai_cfg.default_voice
     // 深沉男音 vs. 爽快姐姐
     const voice = voicePreference === "male" ? "shenchennanyin" : "shuangkuaijiejie"
     

@@ -3665,6 +3665,7 @@ export namespace LiuAi {
     chatCompletion?: OaiChatCompletion
     toolName?: string
     logs?: LiuAi.RunLog[]
+    hasVoiceReplied?: boolean
   }
 
   export type RunResults = Array<RunSuccess | undefined>

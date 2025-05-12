@@ -752,6 +752,7 @@ class BaseBot {
   protected _aiLogs: LiuAi.RunLog[] = []
   protected _chatTimes = 0
   protected MAX_CHAT_TIMES = 3
+  protected _hasVoiceReplied = false
   private _fromUser: Table_User | undefined
 
   constructor(
@@ -1487,6 +1488,7 @@ class BaseBot {
         TellUser.text(entry, text, { fromBot: bot })
         return
       }
+      this._hasVoiceReplied = true
       TellUser.audio(entry, { response: res2_1 }, { fromBot: bot })
       return
     }
@@ -1499,6 +1501,7 @@ class BaseBot {
         TellUser.text(entry, text, { fromBot: bot })
         return
       }
+      this._hasVoiceReplied = true
       TellUser.audio(entry, { hex: hex2_2 }, { fromBot: bot })
       return
     }
@@ -1510,6 +1513,7 @@ class BaseBot {
         TellUser.text(entry, text, { fromBot: bot })
         return
       }
+      this._hasVoiceReplied = true
       TellUser.audio(entry, { buffer: res2_3 }, { fromBot: bot })
       return
     }
@@ -1599,6 +1603,7 @@ class BaseBot {
       chatCompletion, 
       assistantChatId,
       logs: [...this._aiLogs],
+      hasVoiceReplied: this._hasVoiceReplied,
     }
   }
 
@@ -2298,12 +2303,14 @@ class AiController {
     const res4 = await Promise.all(promises)
     let hasEverSucceeded = false
     let hasEverUsedTool = false
+    let hasEverUsedVoice = false
     const aiLogs: LiuAi.RunLog[] = []
     for(let i=0; i<res4.length; i++) {
       const v = res4[i]
       if(v && v.replyStatus === "yes") {
         hasEverSucceeded = true
         if(v.toolName) hasEverUsedTool = true
+        if(v.hasVoiceReplied) hasEverUsedVoice = true
         if(v.logs) {
           // console.log("see logs in ai controller:::")
           // LogHelper.printLastItems(v.logs)
@@ -2313,15 +2320,44 @@ class AiController {
     }
     if(!hasEverSucceeded) return
 
-    // 5. add quota for user
+    // 5. add quota
     const num5 = AiHelper.addQuotaForUser(entry, room)
+
+    // 5.1 popup tip for ai voice
+    if(hasEverUsedVoice) {
+      if(!room.voicePreference) {
+        this.popupTipForAiVoice(aiParam)
+        return
+      }
+    }
+
+    // 5.2 add quota for user    
     if(aiLogs.length > 0) {
       this.sendFallbackMenu(aiParam, res4, aiLogs) 
     }
     else if((num5 % 3) === 2 && !hasEverUsedTool) {
       this.sendFallbackMenu(aiParam, res4, aiLogs)
     }
+  }
 
+  private async popupTipForAiVoice(
+    aiParam: LiuAi.RunParam,
+  ) {
+    const { room, entry } = aiParam
+
+    // 1. send text to user
+    const user = entry.user
+    const { t } = useI18n(aiLang, { user })
+    const msg = t("hello_ai_voice")
+    TellUser.text(entry, msg)
+
+    // 2. update room for ai voice preference
+    const rCol = db.collection("AiRoom")
+    const u2: Partial<Table_AiRoom> = {
+      voicePreference: ai_cfg.default_voice,
+      updatedStamp: getNowStamp(),
+    }
+    rCol.doc(room._id).update(u2)
   }
 
   private async sendFallbackMenu(

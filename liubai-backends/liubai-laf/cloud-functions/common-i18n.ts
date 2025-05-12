@@ -402,6 +402,9 @@ export const aiLang: LangAtom = {
     "address_info": "地址: {address}",
     "open_via_amap": "用高德地图打开",
     "open_via_baidu": "用百度地图打开",
+
+    // ai console
+    "hello_ai_voice": "你已触发语音回复！\n你可以在 <a href='{LIU_DOMAIN}/ai-console'>AI 控制台</a> 管理助手们的声音。",
   },
   "zh-Hant": {
     "privacy_title": "🔓 隱私提示:",
@@ -523,6 +526,9 @@ export const aiLang: LangAtom = {
     "address_info": "地址: {address}",
     "open_via_amap": "用高德地圖開啟",
     "open_via_baidu": "用百度地圖開啟",
+
+    // ai console
+    "hello_ai_voice": "你已觸發 AI 回覆！\n你可以在 <a href='{LIU_DOMAIN}/ai-console'>AI 控制台</a> 管理助手們的聲音。",
   },
   "en": {
     "privacy_title": "🔓 Privacy:",
@@ -644,6 +650,9 @@ export const aiLang: LangAtom = {
     "address_info": "Address: {address}",
     "open_via_amap": "Open via Amap",
     "open_via_baidu": "Open via Baidu",
+
+    // ai console
+    "hello_ai_voice": "You've invoked voice reply!\nYou can manage assistants' voice at <a href='{LIU_DOMAIN}/ai-console'>AI Console</a>.",
   }
 }
 
