@@ -39,11 +39,6 @@
 .showcase-footer-box {
   width: 80%;
   max-width: 450px;
-  font-size: var(--btn-font);
-  color: var(--main-note);
-  text-align: center;
-  display: inline;
-  text-wrap: balance;
 }
 
 .showcase-virtual {

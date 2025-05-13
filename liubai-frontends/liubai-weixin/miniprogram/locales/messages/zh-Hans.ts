@@ -9,4 +9,7 @@ export default {
     "follow_us": "关注我们",
     "slogan": "去掉中间商，直连你的微信",
   },
+  "shared": {
+    "copied": "已复制",
+  },
 }

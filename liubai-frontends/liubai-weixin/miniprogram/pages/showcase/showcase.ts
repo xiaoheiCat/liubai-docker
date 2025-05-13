@@ -19,7 +19,7 @@ Component({
       operateType:"get-showcase",
       title: "留白记事作者",
       imageUrl: "/images/shared/my-wecom.jpg",
-      footer: "添加微信时，请备注“公司+怎么称呼你”",
+      footer: "添加时请备注 {公司+怎么称呼你} 若添加的人稍多，还需要您耐心等待，感谢理解！",
     } as HappySystemAPI.Res_GetShowcase | undefined,
   },
 

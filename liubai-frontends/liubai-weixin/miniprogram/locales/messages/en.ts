@@ -11,4 +11,7 @@ export default {
     "follow_us": "Follow us",
     "slogan": "Connect your WeChat without middlemen",
   },
+  "shared": {
+    "copied": "Copied",
+  },
 }

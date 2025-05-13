@@ -32,7 +32,7 @@
 
     <!-- footer -->
     <view class="showcase-footer-box" wx:if="{{showcase.footer}}">
-      <text>{{showcase.footer}}</text>
+      <footer-box content="{{showcase.footer}}"></footer-box>
     </view>
 
     <view class="showcase-virtual"></view>
