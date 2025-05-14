@@ -1784,6 +1784,21 @@ export interface Table_AiChat extends BaseTable {
   wxMediaId16K?: string
 }
 
+export interface Table_Showcase extends BaseTable {
+  key?: string
+  title: string
+  imageUrl?: string
+  imageH2W?: string
+  footer?: string
+  copyBox?: CopyBox
+  isOn: BaseIsOn
+}
+
+export interface CopyBox {
+  title?: string
+  content: string
+}
+
 
 export interface Table_Coupon extends BaseTable {
   owner?: string
@@ -2437,7 +2452,7 @@ export namespace HappySystemAPI {
     operateType: "get-showcase"
     title: string
     imageUrl?: string
-    imageH2W?: number
+    imageH2W?: string
     footer?: string
   }
 }

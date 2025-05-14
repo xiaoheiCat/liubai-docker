@@ -26,6 +26,7 @@ const ALLOW_WITHOUT_TOKEN = [
   "hello-world",
   "user-login",
   "payment-order",
+  "happy-system"
 ]
 
 /****************** 函数组成 *****************/

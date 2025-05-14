@@ -1,6 +1,6 @@
-import { cfg } from "../config/index"
+import { envData } from "../config/env-data"
 
-const d = cfg.API_DOMAIN ?? "/"
+const d = envData.API_DOMAIN ?? "/"
 
 export default {
   TIME: d + "hello-world",

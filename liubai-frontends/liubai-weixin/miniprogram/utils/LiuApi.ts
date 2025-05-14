@@ -154,4 +154,28 @@ export class LiuApi {
     wx.openOfficialAccountArticle(opt)
   }
 
+  static async setClipboardData(
+    opt: WechatMiniprogram.SetClipboardDataOption,
+  ) {
+    const res = await wx.setClipboardData(opt)
+    return res
+  }
+
+  static async showToast(opt: WechatMiniprogram.ShowToastOption) {
+    const res = await wx.showToast(opt)
+    return res
+  }
+
+  static async showModal(opt: WechatMiniprogram.ShowModalOption) {
+    const res = await wx.showModal(opt)
+    return res
+  }
+
+  static async previewImage(
+    opt: WechatMiniprogram.PreviewImageOption,
+  ) {
+    const res = await wx.previewImage(opt)
+    return res
+  }
+
 }

@@ -19,20 +19,16 @@
     <view wx:if="{{showcase.imageUrl}}"
       class="showcase-image-container"
     >
-      <view class="showcase-image-box"
-        hover-class="showcase-image-box_hover"
-      >
-        <image 
-          src="{{showcase.imageUrl}}" 
-          mode="aspectFit" class="showcase-image" 
-          show-menu-by-longpress
-        />
-      </view>
+      <custom-image 
+        image-url="{{showcase.imageUrl}}"
+        h2w="{{showcase.imageH2W}}"
+        bind:tap="onTapShowcaseImage"
+      />
     </view>
 
     <!-- footer -->
     <view class="showcase-footer-box" wx:if="{{showcase.footer}}">
-      <text>{{showcase.footer}}</text>
+      <footer-box content="{{showcase.footer}}"></footer-box>
     </view>
 
     <view class="showcase-virtual"></view>

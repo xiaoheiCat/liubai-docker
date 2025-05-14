@@ -1,0 +1,67 @@
+
+.footer-box {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  line-height: 1.75;
+  position: relative;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  font-size: var(--btn-font);
+  color: var(--main-note);
+}
+
+.fb-copy {
+  color: var(--primary-color);
+  vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  transition: .1s;
+}
+
+.fb-copy::before {
+  top: 0;
+  left: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  content: "";
+  transition: .1s;
+  opacity: 0;
+  background-color: var(--primary-color);
+}
+
+@media (hover: hover) {
+  .fb-copy:hover {
+    opacity: .75;
+  }
+}
+
+.fb-copy:active::before {
+  opacity: .06;
+}
+
+.skyline .fb-copy_hovered {
+  color: var(--primary-active);
+}
+
+.webview .fb-copy {
+  transform: translateY(-2px);
+}
+
+
+.fb-copy-image {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+  margin-right: 2px;
+}
+
+.fb-copy-text {
+  vertical-align: middle;
+}

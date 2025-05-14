@@ -1,10 +1,8 @@
-import { defaultData } from "../config/default-data";
+import { LiuUtil } from "~/utils/liu-util/index";
 import { getImagePath } from "../images/index";
-import { LiuApi } from "../utils/LiuApi";
 
 export function themeBehavior() {
-  const appBaseInfo = LiuApi.getAppBaseInfo()
-  const theme = appBaseInfo?.theme ?? defaultData.theme
+  const theme = LiuUtil.getCurrentTheme()
   const imagePath = getImagePath()
 
   const behavior = Behavior({
@@ -15,13 +13,27 @@ export function themeBehavior() {
 
     pageLifetimes: {
       show() {
-        const newAppBaseInfo = LiuApi.getAppBaseInfo()
-        const newTheme = newAppBaseInfo?.theme ?? defaultData.theme
+        this.calculateTheme()
+      }
+    },
+
+    lifetimes: {
+      attached() {
+        this.calculateTheme()
+      }
+    },
+
+
+    methods: {
+      calculateTheme() {
+        const newTheme = LiuUtil.getCurrentTheme()
         if(newTheme === this.data.theme) return
         const newImagePath = getImagePath()
         this.setData({ theme: newTheme, imagePath: newImagePath })
       }
-    }
+    },
+
+
   })
 
   return behavior

@@ -1,7 +1,7 @@
 import type { LiuReqOptions, LiuRqReturn } from "./tools/types"
 import { LiuTime } from "../utils/LiuTime"
 import { LiuApi } from "../utils/LiuApi"
-import { cfg } from "../config/index"
+import { envData } from "../config/env-data"
 import { LiuUtil } from "../utils/liu-util/index"
 import { defaultData } from "../config/default-data"
 
@@ -25,7 +25,7 @@ function _getBody<U extends Record<string, any>>(
   const b: Record<string, any> = {
     x_liu_language: language,
     x_liu_theme: theme,
-    x_liu_version: cfg.LIU_VERSION,
+    x_liu_version: envData.LIU_VERSION,
     x_liu_stamp: LiuTime.getTime(),
     x_liu_timezone: LiuTime.getTimezone().toFixed(1),
     x_liu_client: "weixin-miniprogram",

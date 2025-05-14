@@ -2,28 +2,21 @@
 
 
 page {
-  --liu-red: #f13333;
-  --liu-green: #39d739;
-  --liu-blue: #2270f1;
-
   --primary-color: #2a6885;   /** 皇家蓝 #00416A */
   --on-primary: #fafafa;
   --primary-hover: #1c5671;
   --primary-active: #15455e;
-  --inverse-primary: #88d1ff;
 
   --card-bg: #eaecef;
   --bg-color: #fff;
   --main-text: #1f2429;
   --main-normal: #3f4549;
-  --main-code: #686868;
   --main-note: #ababab;
-  --main-tip: #bfbfbf;
+  --skeleton-bg: linear-gradient(135deg, #fff 27%, #eaecef 38%, #fff 63%);
 
   --head-font: 28px;
   --title-font: 22px;
   --desc-font: 20px;
-  --inline-code-font: 18px;
   --btn-font: 17px;
 
   height: 100vh;
@@ -55,14 +48,12 @@ page {
     --on-primary: #003354;
     --primary-hover: #68c4f3;
     --primary-active: #48abdd;
-    --inverse-primary: #2a6885;
 
     --card-bg: #2a2c2e;
     --bg-color: #232323;
     --main-text: #e7e9ea;
     --main-normal: #c7c9ca;
-    --main-code: #ababab;
     --main-note: #686868;
-    --main-tip: #4e4e4e;
+    --skeleton-bg: linear-gradient(135deg, #232323 27%, #2a2c2e 38%, #232323 63%);
   }
 }

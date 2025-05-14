@@ -4,7 +4,7 @@ import { i18nBehavior } from "~/behaviors/i18n-behavior"
 import { navibarBehavior } from "~/behaviors/navibar-behavior"
 import { sharedBehavior } from "~/behaviors/shared-behavior"
 import { defaultData } from "~/config/default-data"
-import { cfg } from "~/config/index"
+import { envData } from "~/config/env-data"
 import { useI18n } from "~/locales/index"
 import { LiuUtil } from "~/utils/liu-util/index"
 import { LiuApi } from "~/utils/LiuApi"
@@ -41,7 +41,8 @@ Component({
 
     goToShowcase() {
       LiuApi.vibrateShort({ type: "medium" })
-      LiuUtil.navigateWithPopup("/pages/showcase/showcase")
+      const url = "/pages/showcase/showcase?key=cuiyanzhe"
+      LiuUtil.navigateWithPopup(url)
     },
 
     onTapFollowUs() {
@@ -83,7 +84,7 @@ Component({
     },
 
     toOpenWzh() {
-      const username = cfg.GZH_USERNAME
+      const username = envData.GZH_USERNAME
       if(!username) {
         console.warn("GZH_USERNAME is not set")
         return

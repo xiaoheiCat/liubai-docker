@@ -132,7 +132,7 @@ export interface TagView {
  * 53: 该页面需要后端方可访问
  * 54: 当前环境不在微信里（请在微信内打开）
  */
-export type PageState = -1 | 0 | 1 | 50 | 51 | 52 | 53 | 54
+export type PageState = -1 | 0 | 1 | 50 | 51 | 52 | 53 | 54 | 55
 export type PageStateKey = "OK" 
   | "LOADING"
   | "SWITCHING"
@@ -141,6 +141,7 @@ export type PageStateKey = "OK"
   | "NETWORK_ERR"
   | "NEED_BACKEND"
   | "NOT_IN_WECHAT"
+  | "TOO_HOT"
 
 // 方案限制
 export type LiuLimit = "pin" // 置顶数

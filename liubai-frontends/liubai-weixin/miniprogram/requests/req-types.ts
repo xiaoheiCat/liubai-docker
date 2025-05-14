@@ -13,7 +13,7 @@ export namespace HappySystemAPI {
     operateType: "get-showcase"
     title: string
     imageUrl?: string
-    imageH2W?: number
+    imageH2W?: string
     footer?: string
   }
 }

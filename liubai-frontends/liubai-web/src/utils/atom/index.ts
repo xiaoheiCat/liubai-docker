@@ -9,4 +9,5 @@ export const pageStates: Record<PageStateKey, PageState> = {
   NETWORK_ERR: 52,
   NEED_BACKEND: 53,
   NOT_IN_WECHAT: 54,
+  TOO_HOT: 55,
 }

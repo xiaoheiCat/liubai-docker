@@ -3,6 +3,7 @@ import { pvProps } from "./tools/types"
 import { useI18n } from 'vue-i18n';
 import PulsarLoader from '~/components/loaders/pulsar-loader/pulsar-loader.vue';
 import { usePlaceholderView, TRANSITION_MS } from "./tools/usePlaceholderView"
+import { pageStates } from "~/utils/atom";
 
 const { t } = useI18n()
 
@@ -25,19 +26,19 @@ const { enable, show } = usePlaceholderView(props)
     <div v-else-if="pState >= 50" class="pv-err-box">
       <div class="liu-no-user-select pv-emoji-box">
         <svg-icon 
-          v-if="pState === 52"
+          v-if="pState === pageStates.NETWORK_ERR"
           name="emojis-crying_face_color" 
           class="pv-emoji"
           :cover-fill-stroke="false"
         ></svg-icon>
         <svg-icon 
-          v-else-if="pState === 53"
+          v-else-if="pState === pageStates.NEED_BACKEND"
           name="emojis-face_with_peeking_eye_color" 
           class="pv-emoji"
           :cover-fill-stroke="false"
         ></svg-icon>
 
-        <div v-else-if="pState === 54" 
+        <div v-else-if="pState === pageStates.NOT_IN_WECHAT" 
           class="pv-image pv-wechat"
         ></div>
 
@@ -50,10 +51,10 @@ const { enable, show } = usePlaceholderView(props)
       </div>
       <div class="liu-no-user-select pv-err-title">
         <span v-if="errTitle">{{ errTitle }}</span>
-        <span v-else-if="pState === 51">{{ t('err.no_auth') }}</span>
-        <span v-else-if="pState === 52">{{ t('err.network') }}</span>
-        <span v-else-if="pState === 53">{{ t('err.backend_required') }}</span>
-        <span v-else-if="pState === 54">{{ t('err.not_in_wechat') }}</span>
+        <span v-else-if="pState === pageStates.NO_AUTH">{{ t('err.no_auth') }}</span>
+        <span v-else-if="pState === pageStates.NETWORK_ERR">{{ t('err.network') }}</span>
+        <span v-else-if="pState === pageStates.NEED_BACKEND">{{ t('err.backend_required') }}</span>
+        <span v-else-if="pState === pageStates.NOT_IN_WECHAT">{{ t('err.not_in_wechat') }}</span>
         <span v-else>{{ t('err.no_data') }}</span>
       </div>
       <div class="pv-err-msg" v-if="errMsg">

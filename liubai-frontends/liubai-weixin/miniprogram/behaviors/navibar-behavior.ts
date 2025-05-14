@@ -42,21 +42,21 @@ export const navibarBehavior = Behavior({
   
         // 1. get window and screen info
         const sizeInfo = LiuApi.getWindowInfo()
-        console.log("sizeInfo: ", sizeInfo)
+        // console.log("sizeInfo: ", sizeInfo)
   
         // 2. get menu button info
         const menuButtonInfo = LiuApi.getMenuButtonBoundingClientRect()
-        console.log("menuButtonInfo: ", menuButtonInfo)
+        // console.log("menuButtonInfo: ", menuButtonInfo)
 
         // 3. get enter options & api category
         const enterData = LiuApi.getEnterOptionsSync()
         const apiCategory = LiuApi.getApiCategory()
         const mode = enterData.mode
-        console.log("apiCategory: ", apiCategory)
+        // console.log("apiCategory: ", apiCategory)
 
         // 4. get scroll view info
         const pageInfo = await this.getSvBoundingClientRect()
-        console.log("pageInfo: ", pageInfo)
+        // console.log("pageInfo: ", pageInfo)
 
         // 5. get default heigh1 & height2
         const statusBarHeight = sizeInfo?.statusBarHeight ?? 0
@@ -122,7 +122,7 @@ export const navibarBehavior = Behavior({
         height3 = Math.max(0, height3)
         newData.height3 = height3
 
-        console.log("see new data: ", newData)
+        // console.log("see new data: ", newData)
 
         if(valTool.objHasAnyKey(newData)) {
           this.setData(newData)

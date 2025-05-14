@@ -28,3 +28,35 @@
   justify-content: center;
 }
 
+.pv-emoji-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.pv-emoji-image {
+  width: 80px;
+  height: 80px;
+}
+
+.pv-err-title {
+  color: var(--main-normal);
+  font-weight: 700;
+  font-size: var(--title-font);
+  line-height: 1.5;
+  text-align: center;
+  width: 75%;
+}
+
+.pv-err-tip {
+  margin-top: 10px;
+  color: var(--main-normal);
+  font-size: var(--btn-font);
+  line-height: 1.5;
+  text-align: center;
+  width: 75%;
+}
+
+
+
