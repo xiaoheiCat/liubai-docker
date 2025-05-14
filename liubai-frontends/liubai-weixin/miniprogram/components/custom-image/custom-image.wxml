@@ -1,0 +1,10 @@
+<view class="image-box"
+  hover-class="image-box_hover"
+  style="padding-bottom: {{percentH2W}}"
+>
+  <image 
+    src="{{imageUrl}}" 
+    mode="{{imageMode}}" class="the-image" 
+    show-menu-by-longpress
+  />
+</view>

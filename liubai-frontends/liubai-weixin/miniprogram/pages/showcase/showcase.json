@@ -2,6 +2,7 @@
   "usingComponents": {
     "custom-navibar": "../../components/custom-navibar/custom-navibar",
     "virtual-navibar": "../../components/virtual-navibar/virtual-navibar",
-    "footer-box": "../../components/footer-box/footer-box"
+    "footer-box": "../../components/footer-box/footer-box",
+    "custom-image": "../../components/custom-image/custom-image"
   }
 }

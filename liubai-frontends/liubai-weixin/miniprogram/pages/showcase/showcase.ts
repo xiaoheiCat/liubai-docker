@@ -5,8 +5,7 @@ import { sharedBehavior } from "~/behaviors/shared-behavior"
 import { pageStates } from "~/utils/atom-util"
 import type { ShowcaseData } from "./tools/types"
 import { fetchShowcaseByKey } from "./tools/useShowcase"
-import { HappySystemAPI } from "~/requests/req-types"
-import valTool from "~/utils/val-tool"
+import type { HappySystemAPI } from "~/requests/req-types"
 
 Component({
 
@@ -68,13 +67,8 @@ Component({
       let showcase: ShowcaseData = {
         title: res.title,
         imageUrl: res.imageUrl,
-        percentH2W: undefined,
+        imageH2W: res.imageH2W,
         footer: res.footer,
-      }
-      const imageH2W = res.imageH2W
-      if(imageH2W && valTool.isStringAsNumber(imageH2W)) {
-        const h2w = Math.round(Number(imageH2W) * 100)
-        showcase.percentH2W = `${h2w}%` 
       }
       this.setData({ showcase, pState: pageStates.OK })
     },

@@ -19,16 +19,10 @@
     <view wx:if="{{showcase.imageUrl}}"
       class="showcase-image-container"
     >
-      <view class="showcase-image-box"
-        hover-class="showcase-image-box_hover"
-        style="{{showcase.percentH2W ? 'padding-bottom: ' + showcase.percentH2W : ''}}"
-      >
-        <image 
-          src="{{showcase.imageUrl}}" 
-          mode="aspectFit" class="showcase-image" 
-          show-menu-by-longpress
-        />
-      </view>
+      <custom-image 
+        image-url="{{showcase.imageUrl}}"
+        h2w="{{showcase.imageH2W}}"
+      />
     </view>
 
     <!-- footer -->
