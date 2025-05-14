@@ -6,6 +6,8 @@ import { pageStates } from "~/utils/atom-util"
 import type { ShowcaseData } from "./tools/types"
 import { fetchShowcaseByKey } from "./tools/useShowcase"
 import type { HappySystemAPI } from "~/requests/req-types"
+import { LiuUtil } from "~/utils/liu-util/index"
+import { LiuApi } from "~/utils/LiuApi"
 
 Component({
 
@@ -32,6 +34,21 @@ Component({
         this.data._key = query.key
         this.getShowcaseByKey()
       }
+    },
+
+    onTapShowcaseImage() {
+      const cha = LiuUtil.getCharacteristic()
+      if(cha.isPC) {
+        const url = this.data.showcase?.imageUrl
+        if(!url) return
+        LiuApi.previewImage({ urls: [url] })
+        return
+      }
+      
+      LiuUtil.showCustomModal({ 
+        content_key: "shared.long_press", 
+        showCancel: false,
+      })
     },
 
     async getShowcaseByKey() {

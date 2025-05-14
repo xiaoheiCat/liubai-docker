@@ -22,6 +22,7 @@
       <custom-image 
         image-url="{{showcase.imageUrl}}"
         h2w="{{showcase.imageH2W}}"
+        bind:tap="onTapShowcaseImage"
       />
     </view>
 

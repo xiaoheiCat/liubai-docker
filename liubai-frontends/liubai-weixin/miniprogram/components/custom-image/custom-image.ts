@@ -39,6 +39,10 @@ Component({
 
   methods: {
 
+    onTapImage() {
+      this.triggerEvent("tap")
+    },
+
     calculatePercentH2W() {
       const h2w = this.properties.h2w
       const res1 = valTool.isStringAsNumber(h2w)

@@ -166,4 +166,16 @@ export class LiuApi {
     return res
   }
 
+  static async showModal(opt: WechatMiniprogram.ShowModalOption) {
+    const res = await wx.showModal(opt)
+    return res
+  }
+
+  static async previewImage(
+    opt: WechatMiniprogram.PreviewImageOption,
+  ) {
+    const res = await wx.previewImage(opt)
+    return res
+  }
+
 }

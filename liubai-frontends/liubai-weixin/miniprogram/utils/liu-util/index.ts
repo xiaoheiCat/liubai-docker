@@ -1,6 +1,16 @@
 import { defaultData } from "~/config/default-data";
 import { LiuApi } from "../LiuApi";
 import { handleCharacteristic, handleDeviceString } from "./tools/characteristic";
+import { useI18n } from "~/locales/index";
+
+
+export interface CustomModalOpt extends WechatMiniprogram.ShowModalOption {
+  title_key?: string
+  content_key?: string
+  confirm_key?: string
+  cancel_key?: string
+}
+
 
 export class LiuUtil {
 
@@ -62,6 +72,61 @@ export class LiuUtil {
       },
     }
     LiuApi.navigateTo(opt) 
+  }
+
+  static async showCustomModal(opt: CustomModalOpt) {
+    // 1. handle confirm color
+    if(!opt.confirmColor) {
+      const appBaseInfo = LiuApi.getAppBaseInfo()
+      const theme = appBaseInfo?.theme ?? defaultData.theme
+      let confirmColor = defaultData.light_primary_color
+      if(theme === "dark") {
+        confirmColor = defaultData.dark_primary_color
+      }
+      opt.confirmColor = confirmColor
+    }
+
+    const { t } = useI18n()
+    // 2.1 handle title
+    if(opt.title_key) {
+      if(!opt.title) {
+        opt.title = t(opt.title_key)
+      }
+      delete opt.title_key
+    }
+
+    // 2.2 handle content
+    if(opt.content_key) {
+      if(!opt.content) {
+        opt.content = t(opt.content_key)
+      }
+      delete opt.content_key
+    }
+
+    // 2.3 handle confirm text
+    if(opt.confirm_key) {
+      if(!opt.confirmText) {
+        opt.confirmText = t(opt.confirm_key)
+      }
+      delete opt.confirm_key
+    }
+    else if(!opt.confirmText) {
+      opt.confirmText = t("shared.confirm")
+    }
+
+    // 2.4 handle cancel text
+    if(opt.cancel_key) {
+      if(!opt.cancelText) {
+        opt.cancelText = t(opt.cancel_key)
+      }
+      delete opt.cancel_key
+    }
+    else if(!opt.cancelText && opt.showCancel !== false) {
+      opt.cancelText = t("shared.cancel")
+    }
+    
+    const res = await LiuApi.showModal(opt)
+    return res
   }
 
 }
