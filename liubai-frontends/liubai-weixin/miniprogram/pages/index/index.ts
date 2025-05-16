@@ -12,9 +12,14 @@ import valTool from "~/utils/val-tool"
 
 Component({
 
+  options: {
+    pureDataPattern: /^_/,
+  },
+
   data: {
     showFollowUs: true,
     pageName: "index",
+    _key1: "",
   },
 
   behaviors: [
@@ -93,12 +98,29 @@ Component({
       LiuApi.openOfficialAccountProfile({ username }) 
     },
 
+    onLoad(query: Record<string, string>) {
+      if(query?.key1) {
+        this.data._key1 = query.key1
+      }
+    },
+
+    onReady() {
+      const key1 = this.data._key1
+      if(key1) {
+        const url = `/pages/showcase/showcase?key=${key1}`
+        LiuUtil.navigateWithPopup(url)
+      }
+    },
+
+    onUnload() {
+      // reset 
+      this.data._key1 = ""
+    },
+
     onShareAppMessage() {
       const { t } = useI18n()
       const title = t("index.slogan")
-      return {
-        title,
-      }
+      return { title }
     }
 
   },
