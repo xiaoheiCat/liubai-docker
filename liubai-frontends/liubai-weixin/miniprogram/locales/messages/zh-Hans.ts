@@ -8,6 +8,10 @@ export default {
     "add_my_wechat": "加我微信",
     "follow_us": "关注我们",
     "slogan": "去掉中间商，直连你的微信",
+    "flow": "🧑‍💻 打造心流",
+    "connect": "🖇️ 连接外部",
+    "map": "🗺️ 路线规划",
+    "dm_me": "💬 加我微信"
   },
   "shared": {
     "copied": "已复制",

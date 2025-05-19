@@ -10,6 +10,10 @@ export default {
     "add_my_wechat": "DM me",
     "follow_us": "Follow us",
     "slogan": "Connect your WeChat without middlemen",
+    "flow": "🧑‍💻 Flow",
+    "connect": "🖇️ Connect",
+    "map": "🗺️ Map",
+    "dm_me": "💬 DM me"
   },
   "shared": {
     "copied": "Copied",

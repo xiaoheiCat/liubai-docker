@@ -35,7 +35,7 @@ Component({
       // 1. 检查当前版本是否支持打开微信公众号主页
       const cha = LiuUtil.getCharacteristic()
       const res1 = valTool.compareVersion(cha.SDKVersion, "3.4.8")
-      const showFollowUs = res1 >= 0
+      const showFollowUs = Boolean(res1 >= 0 && cha.isMobile)
       this.setData({ showFollowUs })
 
     },
@@ -86,6 +86,15 @@ Component({
           console.error("openOfficialAccountArticle fail", err)
         }
       })
+    },
+
+    onTapArticle(e: any) {
+      LiuApi.vibrateShort({ type: "medium" })
+      const dataset = e.currentTarget.dataset
+      const type = dataset.type
+      if(!type) return
+      const url = `/pages/article/article?type=${type}`
+      LiuApi.navigateTo({ url })
     },
 
     toOpenWzh() {

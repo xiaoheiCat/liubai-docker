@@ -1,7 +1,8 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/showcase/showcase"
+    "pages/showcase/showcase",
+    "pages/article/article"
   ],
   "usingComponents": {
     "placeholder-view": "/components/placeholder-view/placeholder-view"

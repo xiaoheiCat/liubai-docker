@@ -7,7 +7,7 @@
   
   <view class="index-scroll-view {{renderer}}">
 
-    <view class="liu-virtual index-virtual-one"></view>
+    <view class="index-virtual-one"></view>
 
     <!-- Logo --> 
     <view class="index-logo-box">
@@ -26,11 +26,46 @@
 
     <!-- Buttons -->
     <view class="index-btns">
-      <view class="index-btn" 
+      <!-- <view class="index-btn" 
         hover-class="index-btn_hover"
         catchtap="goToShowcase"
       >
         <text class="liu-pointer">{{t1.add_my_wechat}}</text>
+      </view> -->
+
+      <!-- flow -->
+      <view class="index-btn index-normal-btn" 
+        hover-class="index-normal-btn_hover"
+        data-type="flow"
+        catchtap="onTapArticle"
+      >
+        <text class="liu-pointer">{{t1.flow}}</text>
+      </view>
+
+      <!-- connect -->
+      <view class="index-btn index-normal-btn" 
+        hover-class="index-normal-btn_hover"
+        data-type="connect"
+        catchtap="onTapArticle"
+      >
+        <text class="liu-pointer">{{t1.connect}}</text>
+      </view>
+
+      <!-- map -->
+      <view class="index-btn index-normal-btn" 
+        hover-class="index-normal-btn_hover"
+        data-type="map"
+        catchtap="onTapArticle"
+      >
+        <text class="liu-pointer">{{t1.map}}</text>
+      </view>
+
+      <!-- DM me -->
+      <view class="index-btn index-normal-btn" 
+        hover-class="index-normal-btn_hover"
+        catchtap="goToShowcase"
+      >
+        <text class="liu-pointer">{{t1.dm_me}}</text>
       </view>
 
       <view wx:if="{{showFollowUs}}"
@@ -42,6 +77,6 @@
       </view>
     </view> 
 
-    <view class="liu-virtual"></view>
+    <view class="index-virtual-two"></view>
   </view>
 </scroll-view>

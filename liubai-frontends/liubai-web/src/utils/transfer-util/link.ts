@@ -6,6 +6,7 @@ import { ALLOW_DEEP_TYPES } from "~/config/atom"
 import reg_exp from "~/config/regular-expressions"
 import liuUtil from "../liu-util"
 import usefulTool from "../basic/useful-tool"
+import { commonFileSuffix } from "~/config/file-suffix"
 
 // 装载 link
 export function equipLink(list: TipTapJSONContent[]) {
@@ -306,6 +307,7 @@ function _handleSocialLink(text: string) {
 
 // 自定义检查 text 是否为一个链接
 function _checkUrl_1(text: string) {
+  // 1. get URL
   let url = valTool.getURL(text)
   if(!url) {
     url = valTool.getURL(`https://${text}`)
@@ -316,21 +318,35 @@ function _checkUrl_1(text: string) {
     }
   }
 
+  // 2. check out first char
   const firstChar = text[0]
   if(firstChar === "/" || firstChar === ":") return false
   if(firstChar === "-" || firstChar === ".") return false
 
-  const reg = /^[^a-zA-Z]{2,}$/   // 避免字符串里 全是: 数字 . - 的情况
-  if(reg.test(text)) {
+  // 3. Avoid cases where the string only contains numbers, dots and hyphens
+  const reg3 = /^[^a-zA-Z]{2,}$/   
+  if(reg3.test(text)) {
     // console.log("正则检测失败....")
     // console.log(" ")
     return false
   }
+
+  // 4. check out eng num
   const engNum = _howManyLowerCase(text)
   if(engNum < 3) return false
-  if(text.startsWith("http")) return true
+
+  // 5. if it is a http link
+  const isHttp = text.startsWith("http")
+  if(isHttp) return true
+
+  // 6. to avoid cases which are local file names, like xxxx.js / .ts / .css ......
+  const hasSlash = text.includes("/")
+  const hasFileSuffix = commonFileSuffix.some(v => text.endsWith(v))
+  if(hasFileSuffix && !hasSlash) return false
+
+  // 7. check out chinese char
   const manNum = valTool.getChineseCharNum(text)
-  if(manNum > 2 && !text.includes("/")) return false
+  if(manNum > 2 && !hasSlash) return false
   return true
 }
 

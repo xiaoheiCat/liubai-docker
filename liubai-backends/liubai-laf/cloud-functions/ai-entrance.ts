@@ -4353,9 +4353,13 @@ class TransformText {
     const res4 = this._turnIntoTool_3(choice, originalText)
     if(res4) return true
 
-    // 5. remove <assistant></assistant>
-    const res5 = this._removeAssistantTag(choice, originalText)
-    return res5
+    // 5. for shape 4
+    const res5 = this._turnIntoTool_4(choice, originalText)
+    if(res5) return true
+
+    // 6. remove <assistant></assistant>
+    const res6 = this._removeAssistantTag(choice, originalText)
+    return res6
   }
 
 
@@ -4399,6 +4403,35 @@ class TransformText {
     choice.message.tool_calls = [toolCall]
     choice.finish_reason = "tool_calls"
     return toolCall
+  }
+
+  /**
+   * change shape like:
+   * 
+   * {
+   *   "prompt": "....",
+   *   "sizeType": "....",
+   * }
+   * 
+   * into a tool call for draw_picture
+   */
+  private static _turnIntoTool_4(
+    choice: OaiChoice,
+    text: string,
+  ) {
+    // 1. check out the start and the end str
+    if(!text.startsWith("{")) return
+    if(!text.endsWith("}")) return
+
+    // 2. check out prompt and sizeType
+    const argObj = valTool.strToObj(text)
+    if(!valTool.isStringWithVal(argObj.prompt)) return
+    if(!valTool.isStringWithVal(argObj.sizeType)) return
+
+    const toolCall = this._fillChoiceWithToolCall(choice, "draw_picture", text)
+    console.warn("success to turnIntoTool_4: ")
+    console.log(toolCall)
+    return true
   }
 
   /**
@@ -4539,8 +4572,6 @@ class TransformText {
 
     
     const toolCall = this._fillChoiceWithToolCall(choice, toolName, toolArgs)
-    console.warn("success to turnIntoTool_2: ")
-    console.log(toolCall)
     return true
   }
 
