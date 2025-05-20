@@ -11,7 +11,7 @@ import usefulTool from "~/utils/basic/useful-tool"
 import { whenCommentUpdated } from "./whenCommentUpdated"
 import { scrollViewKey } from "~/utils/provide-keys"
 import type { SvProvideInject } from "~/types/components/types-scroll-view"
-import type { CommentShow } from "~/types/types-content";
+import type { CommentShow } from "~/types/types-content"
 import type { ValueComment } from "~/utils/other/comment-related"
 import liuEnv from "~/utils/liu-env"
 import type { 
@@ -26,6 +26,9 @@ import {
   addChildrenIntoValueComments, 
   fetchChildrenComments,
 } from "../../utils/tackle-comments"
+import time from "~/utils/basic/time"
+
+const SEC_30 = time.SECONED * 30
 
 export function useCommentArea(
   props: CommentAreaProps,
@@ -81,7 +84,6 @@ async function preloadComments(
 
   // 1. if it's reached bottom
   if(!reload && caData.hasReachedBottom) {
-    console.log("已经触底........")
     return
   }
 
@@ -198,6 +200,18 @@ function listenScoll(
 ) {
   const svData = inject(scrollViewKey, { type: "", triggerNum: 0 }) as SvProvideInject
   const svTrigger = toRef(svData, "triggerNum")
+
+  let lastRefreshStamp = time.getLocalTime()
+  const _pullDownRefresh = () => {
+    const cLength = caData.comments.length
+    const within30s = time.isWithinMillis(lastRefreshStamp, SEC_30, true)
+    if(cLength > 9 || !within30s) {
+      lastRefreshStamp = time.getLocalTime()
+      caData.hasReachedBottom = false
+      preloadComments(caData, true)
+    }
+  }
+
   watch(svTrigger, (newV) => {
     const svType = svData.type
 
@@ -207,14 +221,10 @@ function listenScoll(
       return
     }
 
-    // 触顶时，若个数大于 19 （一轮9个，所以至少触底 3 次过）
-    // 允许重新加载
+    // 重新加载
     if(svType === "to_start") {
-      if(caData.comments.length > 19) {
-        caData.hasReachedBottom = false
-        preloadComments(caData, true)
-        return
-      }
+      _pullDownRefresh()
+      return
     }
 
   })
