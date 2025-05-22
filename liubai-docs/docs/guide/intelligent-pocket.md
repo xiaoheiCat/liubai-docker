@@ -12,7 +12,7 @@
 
 现在你可以随时在微信列表里找到它，随时记录、随时询问 AI 任何事！
 
-## 浮窗
+## 浮窗 {#float-window}
 
 扫描上方二维码关注服务号，点击 `服务`，再点击 `打开留白`:
 
@@ -33,3 +33,13 @@
 <img src="./assets-intelligent-pocket/04.png" width="250" />
 
 :::
+
+## 侧边栏 {#slidepad}
+
+如果你是 macOS 用户，可以安装 [Slidepad](https://slidepad.app/)（免费的），添加 `my.liubai.cc`，就可以在全局电脑中，鼠标右滑展开留白。
+
+<img src="./assets-intelligent-pocket/05.gif" />
+
+超丝滑～
+
+随手记就这么简单。
