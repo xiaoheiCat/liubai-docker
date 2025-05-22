@@ -4,6 +4,8 @@
 
 <img src="./assets-community/weixin.png" alt="留白记事微信公众号" width="330">
 
+如果你是 macOS 用户，还可以搭配 [全局侧边栏](#slidepad)，鼠标右划展开留白！
+
 ## 置顶服务号
 
 扫描上方二维码关注服务号，点击右上角的 `...` → `置顶服务号`：
@@ -34,9 +36,9 @@
 
 :::
 
-## 侧边栏 {#slidepad}
+## 全局侧边栏 {#slidepad}
 
-如果你是 macOS 用户，可以安装 [Slidepad](https://slidepad.app/)（免费的），添加 `my.liubai.cc`，就可以在全局电脑中，鼠标右滑展开留白。
+如果你是 macOS 用户，安装 [Slidepad](https://slidepad.app/)（免费的），添加 `my.liubai.cc`，即可在电脑上，鼠标右滑（移动到屏幕边缘）展开留白。
 
 <img src="./assets-intelligent-pocket/05.gif" />
 
