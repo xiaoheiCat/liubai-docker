@@ -1376,7 +1376,7 @@ async function handle_wx_gzh_oauth(
   const thirdData: UserThirdData = { wx_gzh }
 
   // 7. try to sign in with wx_gzh_openid
-  const opt7 = { client_key, thirdData }
+  const opt7 = { client_key, thirdData, wx_unionid: data5.unionid }
   const res7 = await tryToSignInWithWxGzhOpenId(ctx, body, wx_gzh_openid, opt7)
   if(res7) return res7
 
@@ -1562,6 +1562,7 @@ interface SignInOpt {
   client_key?: string
   thirdData?: UserThirdData
   justSignUp?: boolean           // 若为 undefined 当 false 处理
+  wx_unionid?: string
 }
 
 async function sign_in(
@@ -1590,8 +1591,9 @@ async function sign_in(
   
   // 4. 检查 user 是否 "DEACTIVATED" 或 "REMOVED"，若是，恢复至 "NORMAL"
   //    检查 是否要用当前用户本地传来的 theme 或 language
-  //    更新 lastEnterStamp
-  user = await handleUserWhileSigningIn(user, body, opt.thirdData)
+  //    update lastEnterStamp
+  //    update wx_unionid
+  user = await handleUserWhileSigningIn(user, body, opt)
 
   // 5. 去创建 token，并存到缓存里
   const workspaces = spaceMemberList.map(v => v.spaceId)
@@ -1791,7 +1793,7 @@ async function checkIfTooManyTokens(
 async function handleUserWhileSigningIn(
   user: Table_User,
   body: Record<string, any>,
-  thirdData?: UserThirdData,
+  opt: SignInOpt,
 ) {
   const u: Partial<Table_User> = {}
   const { oState, _id } = user
@@ -1802,6 +1804,7 @@ async function handleUserWhileSigningIn(
 
   const oldThirdData = user.thirdData ?? {}
   const oldWxGzh = oldThirdData?.wx_gzh
+  const thirdData = opt.thirdData
   const newGoogle = thirdData?.google
   const newGitHub = thirdData?.github
   const newWxGzh = thirdData?.wx_gzh
@@ -1816,6 +1819,11 @@ async function handleUserWhileSigningIn(
   if(newWxGzh) {
     oldThirdData.wx_gzh = { ...oldWxGzh, ...newWxGzh }
     u.thirdData = oldThirdData
+  }
+  const oldWxUnionid = user.wx_unionid
+  const newWxUnionid = opt.wx_unionid
+  if(newWxUnionid && oldWxUnionid !== newWxUnionid) {
+    u.wx_unionid = newWxUnionid
   }
   
   const bTheme = normalizeToLocalTheme(body.theme)
@@ -2125,6 +2133,10 @@ export async function init_user(
   }
   if(typeof github_id === "number" && github_id > 0) {
     user.github_id = github_id
+  }
+  const wx_unionid = param2.wx_gzh_userinfo?.unionid
+  if(wx_unionid) {
+    user.wx_unionid = wx_unionid
   }
 
   // 2. create the user

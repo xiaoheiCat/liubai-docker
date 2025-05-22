@@ -829,6 +829,12 @@ async function make_user_subscribed(
     needUpdate = true
     wx_gzh.subscribe_time = newSubTime
   }
+  const oldUnionid = user.wx_unionid
+  const newUnionid = userInfo?.unionid
+  if(newUnionid && newUnionid !== oldUnionid) {
+    needUpdate = true
+  }
+
   if(!needUpdate) {
     console.warn("there is no need to update user in make_user_subscribed")
     console.log(user)
@@ -843,12 +849,14 @@ async function make_user_subscribed(
     thirdData,
     updatedStamp: now,
   }
+  if(newUnionid) u3.wx_unionid = newUnionid
   const res3 = await uCol.doc(userId).update(u3)
 
   // 4. update cache
   user.wx_gzh_openid = wx_gzh_openid
   user.thirdData = thirdData
   user.updatedStamp = now
+  if(newUnionid) user.wx_unionid = newUnionid
   updateUserInCache(userId, user)
 
   return true
