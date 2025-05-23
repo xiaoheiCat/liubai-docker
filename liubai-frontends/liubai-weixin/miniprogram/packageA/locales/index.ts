@@ -2,14 +2,14 @@ import {
   type T_I18N, 
   type SupportedLocale,
   type UseI18nOpt,
-} from "../types/types-locale"
-import { getLocale, i18nFill } from "../utils/i18n-util"
-import valTool from "../utils/val-tool"
+} from "../../types/types-locale"
+import { getLocale, i18nFill } from "../../utils/i18n-util"
+import valTool from "../../utils/val-tool"
 import zhHans from "./messages/zh-Hans"
 import zhHant from "./messages/zh-Hant"
 import en from "./messages/en"
 
-export function getMessages(
+export function getMessagesA(
   locale: SupportedLocale,
 ): Record<string, Record<string, string>> {
   if(locale === "zh-Hant") return zhHant
@@ -18,11 +18,11 @@ export function getMessages(
 }
 
 /** 返回一个翻译函数 t */
-export function useI18n(
+export function useI18nA(
   opt1?: UseI18nOpt,
 ) {
   const locale = opt1?.locale ?? getLocale()
-  const messages = getMessages(locale)
+  const messages = getMessagesA(locale)
 
   const _getVal = (key: string) => {
     if(!messages) return ""

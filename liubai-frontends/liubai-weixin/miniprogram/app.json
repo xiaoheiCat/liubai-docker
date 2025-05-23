@@ -4,6 +4,15 @@
     "pages/showcase/showcase",
     "pages/article/article"
   ],
+  "subPackages": [
+    {
+      "root": "packageA",
+      "name": "packageA",
+      "pages": [
+        "pages/watch-video/watch-video"
+      ]
+    }
+  ],
   "usingComponents": {
     "placeholder-view": "/components/placeholder-view/placeholder-view"
   },

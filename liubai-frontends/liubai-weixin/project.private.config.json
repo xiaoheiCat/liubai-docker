@@ -4,11 +4,18 @@
     "miniprogram": {
       "list": [
         {
+          "name": "video",
+          "pathName": "packageA/pages/watch-video/watch-video",
+          "query": "",
+          "scene": null,
+          "launchMode": "default"
+        },
+        {
           "name": "showcase",
           "pathName": "pages/showcase/showcase",
           "query": "",
-          "scene": null,
-          "launchMode": "embedded"
+          "launchMode": "embedded",
+          "scene": null
         },
         {
           "name": "index",

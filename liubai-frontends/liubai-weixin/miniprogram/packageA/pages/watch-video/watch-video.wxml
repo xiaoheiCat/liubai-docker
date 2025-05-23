@@ -1,0 +1,3 @@
+<view class="wv-container">
+  <text>{{t1.watch}}</text>
+</view>
