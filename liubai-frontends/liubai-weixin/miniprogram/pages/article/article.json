@@ -1,3 +1,4 @@
 {
-  "renderer": "webview"
+  "renderer": "webview",
+  "usingComponents": {}
 }

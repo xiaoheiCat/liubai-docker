@@ -1,0 +1,6 @@
+<view 
+  class="{{renderer}} cb-btn {{btnType === 'normal' ? 'cb-normal-btn' : ''}} {{btnType === 'transparent' ? 'cb-transparent-btn' : ''}}" 
+  hover-class="cb-btn_hover {{btnType === 'normal' ? 'cb-normal-btn_hover' : ''}} {{btnType === 'transparent' ? 'cb-transparent-btn_hover' : ''}}"
+>
+  <slot />
+</view>

@@ -1,12 +1,12 @@
 {
-  "libVersion": "3.4.10",
+  "libVersion": "3.8.5",
   "condition": {
     "miniprogram": {
       "list": [
         {
           "name": "video",
           "pathName": "packageA/pages/watch-video/watch-video",
-          "query": "r=abc",
+          "query": "r=67ab7836f1028b7bcc3d7776",
           "scene": null,
           "launchMode": "default"
         },
