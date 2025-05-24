@@ -185,4 +185,10 @@ export class LiuApi {
     return res
   }
 
+  static openCustomerServiceChat(
+    opt: WechatMiniprogram.OpenCustomerServiceChatOption,
+  ) {
+    wx.openCustomerServiceChat(opt)
+  }
+
 }

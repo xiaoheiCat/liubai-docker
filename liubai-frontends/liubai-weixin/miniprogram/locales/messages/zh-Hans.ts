@@ -36,5 +36,7 @@ export default {
   "watch-video": {
     "rule": "每看完一个视频，可获得 {conversationToAd} 轮对话次数",
     "tip_1": "你还没有看完视频",
+    "tip_2": "没有库存了",
+    "tip_3": "去休息一下吧🧘",
   },
 }

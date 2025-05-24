@@ -36,7 +36,7 @@
         <text class="liu-pointer">{{t1.start_watching}}</text>
       </custom-button>
 
-      <custom-button btn-type="transparent" catchtap="onTapExit">
+      <custom-button wx:if="{{conversationCountFromAd > 0}}" btn-type="transparent" catchtap="onTapExit">
         <text class="liu-pointer">{{t1.back}}</text>
       </custom-button>
 
