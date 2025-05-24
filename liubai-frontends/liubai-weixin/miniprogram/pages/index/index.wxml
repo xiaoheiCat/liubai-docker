@@ -1,6 +1,6 @@
 <!-- index.wxml -->
 <scroll-view 
-  class="liu-scroll-view" 
+  class="liu-{{theme}} liu-scroll-view" 
   scroll-y 
   type="list"
 >

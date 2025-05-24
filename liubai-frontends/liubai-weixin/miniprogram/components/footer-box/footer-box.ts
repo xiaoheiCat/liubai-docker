@@ -3,8 +3,8 @@ import type { TextItem } from "./tools/types"
 import { themeBehavior } from "~/behaviors/theme-behavior"
 import { sharedBehavior } from "~/behaviors/shared-behavior"
 import { LiuApi } from "~/utils/LiuApi"
-import { useI18n } from "~/locales/index"
 import valTool from "~/utils/val-tool"
+import { LiuUtil } from "~/utils/liu-util/index"
 
 Component({
 
@@ -45,9 +45,7 @@ Component({
         await LiuApi.setClipboardData({ data: text })
 
         // 3. toast
-        const { t } = useI18n()
-        const title = t("shared.copied")
-        LiuApi.showToast({ title, icon: "none" })
+        LiuUtil.showCustomToast({ title_key: "shared.copied" })
       }
       catch(err) {
         console.warn("fail to set clipboard")
