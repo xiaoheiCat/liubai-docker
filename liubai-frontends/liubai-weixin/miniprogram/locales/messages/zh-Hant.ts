@@ -19,6 +19,7 @@ export default {
     "long_press": "請長按圖片，識別 QR Code",
     "confirm": "確定",
     "cancel": "取消",
+    "got_it": "了解",
   },
   "err": {
     "no_data": "找不到耶",
@@ -27,5 +28,8 @@ export default {
     "unknown_err": "未知的異常",
     "too_hot": "太火爆了",
     "come_later": "請稍候再來",
-  }
+  },
+  "watch-video": {
+    "rule": "每看完一個影片，可取得 {conversationToAd} 輪對話次數",
+  },
 }

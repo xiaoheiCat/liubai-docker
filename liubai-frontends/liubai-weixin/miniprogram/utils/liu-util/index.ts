@@ -8,6 +8,7 @@ import type { SupportedTheme } from "~/types/types-atom";
 export interface CustomModalOpt extends WechatMiniprogram.ShowModalOption {
   title_key?: string
   content_key?: string
+  content_opt?: Record<string, any>
   confirm_key?: string
   cancel_key?: string
 }
@@ -98,9 +99,10 @@ export class LiuUtil {
     // 2.2 handle content
     if(opt.content_key) {
       if(!opt.content) {
-        opt.content = t(opt.content_key)
+        opt.content = t(opt.content_key, opt.content_opt)
       }
       delete opt.content_key
+      delete opt.content_opt
     }
 
     // 2.3 handle confirm text

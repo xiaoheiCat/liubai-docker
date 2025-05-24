@@ -21,6 +21,7 @@ export default {
     "long_press": "Long press to recognize QR code",
     "confirm": "Confirm",
     "cancel": "Cancel",
+    "got_it": "Got it",
   },
   "err": {
     "no_data": "Nothing Here",
@@ -29,5 +30,8 @@ export default {
     "unknown_err": "Unknown Error",
     "too_hot": "Too Hot",
     "come_later": "Come later please~",
-  }
+  },
+  "watch-video": {
+    "rule": "You can earn {conversationToAd} conversation times by watching a video.",
+  },
 }

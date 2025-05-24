@@ -14,6 +14,7 @@ page {
   --main-note: #ababab;
   --skeleton-bg: linear-gradient(135deg, #fff 27%, #eaecef 38%, #fff 63%);
 
+  --big-word-style: 36px;
   --head-font: 28px;
   --title-font: 22px;
   --desc-font: 20px;
@@ -41,6 +42,16 @@ page {
 .liu-pointer {
   cursor: pointer;
 }
+
+.liu-can-tap {
+  cursor: pointer;
+  transition: .15s;
+}
+
+.liu-can-tap_hovered {
+  opacity: .75;
+}
+
 
 @media (prefers-color-scheme: dark) {
   page {

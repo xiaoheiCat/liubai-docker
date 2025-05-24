@@ -19,6 +19,7 @@ export default {
     "long_press": "请长按图片，识别二维码",
     "confirm": "确定",
     "cancel": "取消",
+    "got_it": "了解",
   },
   "err": {
     "no_data": "找不到耶",
@@ -27,5 +28,8 @@ export default {
     "unknown_err": "未知的异常",
     "too_hot": "太火爆了",
     "come_later": "请稍后再来",
+  },
+  "watch-video": {
+    "rule": "每看完一个视频，可获得 {conversationToAd} 轮对话次数",
   },
 }

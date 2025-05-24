@@ -4,6 +4,8 @@ import { pageStates } from "~/utils/atom-util";
 import { fetchGet } from "./tools/useWatchVideo";
 import { LiuTime } from "~/utils/LiuTime";
 import valTool from "~/utils/val-tool";
+import { themeBehavior } from "~/packageA/behaviors/theme-behavior";
+import { LiuUtil } from "~/utils/liu-util/index";
 
 Component({
 
@@ -14,6 +16,7 @@ Component({
   behaviors: [
     i18nBehavior("watch-video"),
     navibarBehavior,
+    themeBehavior(),
   ],
 
   data: {
@@ -90,6 +93,20 @@ Component({
     toPost() {
 
     },
+
+    onTapLearnMore() {
+      const { conversationToAd } = this.data
+      if(!conversationToAd) return
+      
+      LiuUtil.showCustomModal({
+        title: "📺",
+        content_key: "watch-video.rule",
+        content_opt: { conversationToAd },
+        showCancel: false,
+        confirm_key: "shared.got_it"
+      })
+      
+    }
 
 
 
