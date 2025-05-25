@@ -1,5 +1,5 @@
 {
-  "libVersion": "3.4.10",
+  "libVersion": "3.8.5",
   "condition": {
     "miniprogram": {
       "list": [
@@ -7,8 +7,8 @@
           "name": "showcase",
           "pathName": "pages/showcase/showcase",
           "query": "",
-          "scene": null,
-          "launchMode": "embedded"
+          "launchMode": "embedded",
+          "scene": null
         },
         {
           "name": "index",

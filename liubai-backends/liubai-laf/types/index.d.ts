@@ -94,6 +94,10 @@ declare global {
       LIU_WX_GZ_MEDIA_ID_FOR_CONTACT?: string     // the media id to send, when user tap "商务合作"
       LIU_WECOM_GROUP_LINK?: string        // vip group link
 
+      /** 微信小程序 */
+      LIU_WX_REWARDED_VIDEO_AD?: string    // rewarded video unit ad id
+      
+
       /** 企业微信 企业内部自建应用 */
       LIU_WECOM_QYNB_CORPID?: string
       LIU_WECOM_QYNB_AGENTID?: string

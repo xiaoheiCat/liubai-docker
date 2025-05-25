@@ -4,8 +4,18 @@
     "pages/showcase/showcase",
     "pages/article/article"
   ],
+  "subPackages": [
+    {
+      "root": "packageA",
+      "name": "packageA",
+      "pages": [
+        "pages/watch-video/watch-video"
+      ]
+    }
+  ],
   "usingComponents": {
-    "placeholder-view": "/components/placeholder-view/placeholder-view"
+    "placeholder-view": "/components/placeholder-view/placeholder-view",
+    "custom-button": "/components/custom-button/custom-button"
   },
   "window": {
     "backgroundTextStyle": "dark",

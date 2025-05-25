@@ -8,10 +8,15 @@ import type { SupportedTheme } from "~/types/types-atom";
 export interface CustomModalOpt extends WechatMiniprogram.ShowModalOption {
   title_key?: string
   content_key?: string
+  content_opt?: Record<string, any>
   confirm_key?: string
   cancel_key?: string
 }
 
+export interface CustomToastOpt extends Partial<WechatMiniprogram.ShowToastOption> {
+  title?: string
+  title_key?: string
+}
 
 export class LiuUtil {
 
@@ -98,9 +103,10 @@ export class LiuUtil {
     // 2.2 handle content
     if(opt.content_key) {
       if(!opt.content) {
-        opt.content = t(opt.content_key)
+        opt.content = t(opt.content_key, opt.content_opt)
       }
       delete opt.content_key
+      delete opt.content_opt
     }
 
     // 2.3 handle confirm text
@@ -127,6 +133,20 @@ export class LiuUtil {
     
     const res = await LiuApi.showModal(opt)
     return res
+  }
+
+  static async showCustomToast(opt: CustomToastOpt) {
+    if(opt.title_key) {
+      const { t } = useI18n()
+      if(!opt.title) {
+        opt.title = t(opt.title_key)
+      }
+      delete opt.title_key
+    }
+    if(!opt.icon && !opt.image) {
+      opt.icon = "none"
+    }
+    await LiuApi.showToast(opt as WechatMiniprogram.ShowToastOption)
   }
 
   static getCurrentTheme(): SupportedTheme {

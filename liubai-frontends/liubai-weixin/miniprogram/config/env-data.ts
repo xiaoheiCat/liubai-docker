@@ -4,6 +4,8 @@ export type LiuEnvData = {
   LIU_VERSION: string
   API_DOMAIN?: string
   GZH_USERNAME?: string
+  LIU_CUSTOMER_SERVICE?: string
+  LIU_WECOM_CORPID?: string
 }
 
 export const envData: LiuEnvData = {

@@ -2,13 +2,17 @@ import { defaultData } from "../config/default-data"
 import { 
   isSupportedLocale,
   type SupportedLocale,
+  type GetMessages,
+  type UseI18nOpt,
+  T_I18N,
 } from "../types/types-locale"
 import { LiuApi } from "./LiuApi"
+import valTool from "./val-tool"
 
-export const FALLBACK_LOCALE = "zh-Hans"
+const FALLBACK_LOCALE = "zh-Hans"
 
 /** 归一化语言 */
-export function normalizeLanguage(val: string): SupportedLocale {
+function normalizeLanguage(val: string): SupportedLocale {
   val = val.toLowerCase()
   if(!val) return FALLBACK_LOCALE
 
@@ -45,4 +49,81 @@ export function i18nFill(
     res = res.replace(regexPattern, theVal.toString()) 
   }
   return res
+}
+
+export function getI18nBehavior(
+  key: string,
+  getMessages: GetMessages,
+) {
+let the_t: Record<string, string> | undefined
+
+  let locale = getLocale()
+  let messages = getMessages(locale)
+
+  if(messages && messages[key]) {
+    the_t = messages[key]
+  }
+  else if(locale !== FALLBACK_LOCALE) {
+    locale = FALLBACK_LOCALE
+    messages = getMessages(locale)
+    if(messages && messages[key]) {
+      the_t = messages[key]
+    }
+  }
+
+  // 3. return behavior
+  const behavior = Behavior({
+    data: {
+      locale,
+      t1: the_t ?? {},
+    },
+    pageLifetimes: {
+      show() {
+        const currentLocale = getLocale()
+        if(currentLocale === this.data.locale) return
+
+        locale = currentLocale
+        messages = getMessages(locale)
+        if(messages && messages[key]) {
+          this.setData({ t1: messages[key], locale })
+        }
+      }
+    }
+  })
+
+  return behavior
+}
+
+
+export function initI18n(
+  getMessages: GetMessages,
+  opt1?: UseI18nOpt,
+) {
+  const locale = opt1?.locale ?? getLocale()
+  const messages = getMessages(locale)
+  
+  const _getVal = (key: string) => {
+    if(!messages) return ""
+    const keys = key.split(".")
+    let tmpMessages = messages
+    for(let i=0; i<keys.length; i++) {
+      const k = keys[i]
+      tmpMessages = valTool.getValFromObj(tmpMessages, k)
+      if(!tmpMessages) break
+    }
+    if(typeof tmpMessages !== "string") return ""
+    return tmpMessages
+  }
+
+  const t: T_I18N = (fullKey, opt2) => {
+    if(!messages) return ""
+
+    const res = _getVal(fullKey)
+    if(!res) return ""
+
+    const res2 = i18nFill(res, opt2)
+    return res2
+  }
+
+  return { t }
 }

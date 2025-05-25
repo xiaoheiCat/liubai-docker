@@ -12,4 +12,7 @@ export const defaultData = {
   duration_ms_1: 150,     // 一个常用的等待时间，目前用于刷新图片的间隔
   light_primary_color: "#2a6885",
   dark_primary_color: "#88d1ff",
+
+  // video
+  max_conversation_count_from_ad: 10,
 }

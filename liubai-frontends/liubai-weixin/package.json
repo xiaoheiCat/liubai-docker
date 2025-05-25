@@ -1,13 +1,13 @@
 {
   "name": "liubai-weixin",
-  "version": "0.13.4",
-  "description": "",
+  "version": "0.13.5",
+  "description": "Liubai for Weixin",
   "scripts": {
     "pre-build": "tsx build/pre-build.ts"
   },
   "keywords": [],
-  "author": "",
-  "license": "",
+  "author": "yenche123 <tsuiyenche@outlook.com> (https://github.com/yenche123)",
+  "license": "AGPL-3.0-or-later",
   "devDependencies": {
     "@types/node": "^22.14.1",
     "dotenv": "^16.5.0",

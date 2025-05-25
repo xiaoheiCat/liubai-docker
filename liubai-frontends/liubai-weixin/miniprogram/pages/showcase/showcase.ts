@@ -8,6 +8,7 @@ import { fetchShowcaseByKey } from "./tools/useShowcase"
 import type { HappySystemAPI } from "~/requests/req-types"
 import { LiuUtil } from "~/utils/liu-util/index"
 import { LiuApi } from "~/utils/LiuApi"
+import { themeBehavior } from "~/behaviors/theme-behavior"
 
 Component({
 
@@ -17,13 +18,14 @@ Component({
 
   behaviors: [
     sharedBehavior(), 
-    navibarBehavior
+    navibarBehavior,
+    themeBehavior(),
   ],
 
   data: {
     pState: pageStates.LOADING,
     pageName: "showcase",
-    showcase: undefined as ShowcaseData | undefined,
+    showcase: null as ShowcaseData | null,
     _key: "",
   },
 

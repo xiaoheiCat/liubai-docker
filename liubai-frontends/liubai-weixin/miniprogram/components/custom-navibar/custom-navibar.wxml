@@ -1,6 +1,6 @@
 <!-- custom-navibar.wxml -->
 
-<view class="cn-container">
+<view class="liu-{{theme}} cn-container">
 
   <!-- status bar -->
   <view class="cn-status-bar"

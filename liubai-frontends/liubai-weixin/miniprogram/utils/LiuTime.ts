@@ -3,6 +3,9 @@
 export class LiuTime {
 
   static diff = 0
+  static SECOND = 1000
+  static MINUTE = 60 * this.SECOND
+  static HOUR = 60 * this.MINUTE
 
   static getLocalTime() {
     return new Date().getTime()

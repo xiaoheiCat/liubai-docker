@@ -31,7 +31,8 @@ Component({
     height3: {
       type: Number,
       value: 0,
-    }
+    },
+    errTip: String,
   },
 
   data: {

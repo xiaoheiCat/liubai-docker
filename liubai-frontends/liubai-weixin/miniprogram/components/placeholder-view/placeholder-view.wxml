@@ -41,7 +41,8 @@
 
     <!-- Tip -->
     <view wx:if="{{pState >= 50}}" class="pv-err-tip">
-      <text wx:if="{{pState === pageStates.TOO_HOT}}">{{t1.come_later}}</text>
+      <text wx:if="{{errTip}}">{{errTip}}</text>
+      <text wx:elif="{{pState === pageStates.TOO_HOT}}">{{t1.come_later}}</text>
     </view>
 
   </view>

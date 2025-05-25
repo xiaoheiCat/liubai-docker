@@ -63,9 +63,6 @@ Component({
       LiuUtil.goHome()
     },
 
-    
-
-
 
   }
 

@@ -1,6 +1,6 @@
 <!-- index.wxml -->
 <scroll-view 
-  class="liu-scroll-view" 
+  class="liu-{{theme}} liu-scroll-view" 
   scroll-y 
   type="list"
 >
@@ -26,55 +26,40 @@
 
     <!-- Buttons -->
     <view class="index-btns">
-      <!-- <view class="index-btn" 
-        hover-class="index-btn_hover"
-        catchtap="goToShowcase"
-      >
-        <text class="liu-pointer">{{t1.add_my_wechat}}</text>
-      </view> -->
 
       <!-- flow -->
-      <view class="index-btn index-normal-btn" 
-        hover-class="index-normal-btn_hover"
-        data-type="flow"
-        catchtap="onTapArticle"
+      <custom-button btn-type="normal" 
+        data-type="flow" catchtap="onTapArticle"
       >
         <text class="liu-pointer">{{t1.flow}}</text>
-      </view>
+      </custom-button>
 
       <!-- connect -->
-      <view class="index-btn index-normal-btn" 
-        hover-class="index-normal-btn_hover"
-        data-type="connect"
-        catchtap="onTapArticle"
+      <custom-button btn-type="normal" 
+        data-type="connect" catchtap="onTapArticle"
       >
         <text class="liu-pointer">{{t1.connect}}</text>
-      </view>
+      </custom-button>
 
       <!-- map -->
-      <view class="index-btn index-normal-btn" 
-        hover-class="index-normal-btn_hover"
-        data-type="map"
-        catchtap="onTapArticle"
+      <custom-button btn-type="normal" 
+        data-type="map" catchtap="onTapArticle"
       >
         <text class="liu-pointer">{{t1.map}}</text>
-      </view>
+      </custom-button>
 
       <!-- DM me -->
-      <view class="index-btn index-normal-btn" 
-        hover-class="index-normal-btn_hover"
+      <custom-button btn-type="normal" 
         catchtap="goToShowcase"
       >
         <text class="liu-pointer">{{t1.dm_me}}</text>
-      </view>
+      </custom-button>
 
-      <view wx:if="{{showFollowUs}}"
-        class="index-btn index-transparent-btn"
-        hover-class="index-btn_hover index-transparent-btn_hover"
+      <custom-button wx:if="{{showFollowUs}}" btn-type="transparent" 
         catchtap="onTapFollowUs"
       >
         <text class="liu-pointer">{{t1.follow_us}}</text>
-      </view>
+      </custom-button>
     </view> 
 
     <view class="index-virtual-two"></view>

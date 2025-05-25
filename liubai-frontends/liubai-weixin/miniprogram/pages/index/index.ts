@@ -3,6 +3,7 @@
 import { i18nBehavior } from "~/behaviors/i18n-behavior"
 import { navibarBehavior } from "~/behaviors/navibar-behavior"
 import { sharedBehavior } from "~/behaviors/shared-behavior"
+import { themeBehavior } from "~/behaviors/theme-behavior"
 import { defaultData } from "~/config/default-data"
 import { envData } from "~/config/env-data"
 import { useI18n } from "~/locales/index"
@@ -26,6 +27,7 @@ Component({
     i18nBehavior("index"),
     navibarBehavior,
     sharedBehavior(),
+    themeBehavior(),
   ],
 
   lifetimes: {

@@ -69,4 +69,8 @@ export const ai_cfg = {
   retired_ai: ["baixiaoying", "wanzhi"] as AiCharacter[],
   speaking_characters: ["hailuo", "yuewen", "tongyi-qwen"] as AiCharacter[],
   default_voice: "female" as GenderType,
+
+  max_conversation_count_from_ad: 10,
+  conversation_to_ad: 2,
+
 }
