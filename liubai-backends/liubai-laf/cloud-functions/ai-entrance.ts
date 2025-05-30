@@ -920,9 +920,6 @@ class BaseBot {
     // 4. get system prompt
     const system_1 = this.getFirstSystemPrompt(entry, bot)
 
-    // console.warn("see system_1: ")
-    // console.log(system_1)
-
     const system_1_token = AiShared.calculateTextToken(system_1)
     if(system_1) {
       prompts.push({ role: "system", content: system_1 })
@@ -1639,7 +1636,17 @@ class BaseBot {
     } = LiuDateUtil.getDateAndTime(getNowStamp(), user.timezone)
     const current_provider = AiHelper.getProviderName(bot) ?? "Unknown"
     const { p } = aiI18nChannel({ entry, bot })
-    const system_1 = p("system_1", { 
+
+    // for deepseek reasoner from the official
+    let key = "system_1"
+    if(this._character === "ds-reasoner") {
+      const canUseTool = bot.abilities.includes("tool_use")
+      if(canUseTool) {
+        key = "system_2"
+      }
+    }
+
+    const system_1 = p(key, { 
       current_date, 
       current_time, 
       current_provider,
