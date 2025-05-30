@@ -73,4 +73,6 @@ export const ai_cfg = {
   max_conversation_count_from_ad: 10,
   conversation_to_ad: 2,
 
+  watch_video_path: "packageA/pages/watch-video/watch-video",
+
 }

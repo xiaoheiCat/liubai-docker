@@ -3471,6 +3471,10 @@ export class AiToolUtil {
     if (typeof funcJson.laterHour === "number") {
       funcJson.laterHour = funcJson.laterHour.toString()
     }
+    if(funcJson.title && !funcJson.description) {
+      funcJson.description = funcJson.title
+      funcJson.title = undefined
+    }
 
     // 2. validate in general
     const res2 = vbot.safeParse(Sch_AiToolAddCalendarParam, funcJson)

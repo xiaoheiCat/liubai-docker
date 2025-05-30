@@ -53,7 +53,7 @@ import {
   aiTools,
 } from "@/ai-prompt"
 import cloud from "@lafjs/cloud"
-import { useI18n, aiLang, getCurrentLocale } from "@/common-i18n"
+import { useI18n, aiLang } from "@/common-i18n"
 import { downloadFile, responseToFormData } from "@/file-utils"
 import { createRandom } from "@/common-ids"
 import axios from "axios"
@@ -163,18 +163,19 @@ export async function get_into_ai(
 
   // 2. check out directive
   const theDirective = AiDirective.check(entry)
+  // interrupt non-continue command
   if(theDirective && theDirective.theCommand !== "continue") {
     return
   }
 
-  // 3. check out quota
-  const isQuotaEnough = await UserHelper.checkQuota(entry)
-  if(!isQuotaEnough) return
-
-  // 4. get my ai room
+  // 3. get my ai room
   const room = await AiHelper.getMyAiRoom(entry)
   if(!room) return
   const roomId = room._id
+
+  // 4. check out quota
+  const isQuotaEnough = await UserHelper.checkQuota(entry, room)
+  if(!isQuotaEnough) return
 
   // 4.1 check out if no assistants
   const res4_1 = await AiHelper.checkIfNobodyHere(entry, room)
@@ -468,6 +469,7 @@ class AiDirective {
     const quota = user.quota
     const usedTimes_1 = quota?.aiConversationCount ?? 0
     const usedTimes_2 = quota?.aiClusterCount ?? 0
+    const restTimes_1 = quota?.conversationCountFromAd ?? 0
     const isSubscribed = checkIfUserSubscribed(user)
     const maxTimes = isSubscribed ? MAX_TIMES_MEMBERSHIP : MAX_TIMES_FREE
     const msg3_1 = t("status_conversation", {
@@ -478,12 +480,30 @@ class AiDirective {
       usedTimes: usedTimes_2,
       maxTimes,
     })
+    const msg3_3 = t("conversation_ad", { restTimes: restTimes_1 })
     msg += `${msg3_1}\n`
-    msg += msg3_2
+
+    let hasCluster = false
+    // 3.1 add cluster quota if aiClusterCount > 0
+    if(usedTimes_2 > 0) {
+      hasCluster = true
+      msg += `${msg3_2}\n`
+    }
+
+    // 3.2 add ad quota if aiConversationCount >= MAX_TIMES_FREE && !isSubscribed
+    if(usedTimes_1 >= MAX_TIMES_FREE && !isSubscribed) {
+      msg += `${msg3_3}\n`
+    }
+    else if(!hasCluster) {
+      hasCluster = true
+      msg += `${msg3_2}\n`
+    }
 
     // 4. add subscription link
-    let msg4 = isSubscribed ? t("renew_premium") : t("buy_premium")
-    msg += `\n\n${msg4}`
+    if(isSubscribed) {
+      const msg4 = t("renew_premium")
+      msg += `\n\n${msg4}`
+    }
 
     // 5. text user
     TellUser.text(entry, msg)
@@ -1783,9 +1803,7 @@ class BotDsReasoner extends BaseBot {
       tools,
       temperature: 0.6,  // reference: https://github.com/deepseek-ai/DeepSeek-R1/pull/399/files
     }
-    console.warn("ds reasoner chatParam:", chatParam)
     let chatCompletion = await this.chat(chatParam, bot)
-    console.warn("ds reasoner chatCompletion:", chatCompletion)
 
     // 5.2 try again if needed
     if(!chatCompletion) {
@@ -2324,7 +2342,11 @@ class AiController {
     // 5. add quota
     const num5 = AiHelper.addQuotaForUser(entry, room)
 
-    // 5.1 popup tip for ai voice
+    // 5.1 if num5 === 10 && !isSubscribed, send tip
+    const available = UserHelper.checkQuota(entry, room)
+    if(!available) return
+
+    // 5.2 popup tip for ai voice
     if(hasEverUsedVoice) {
       if(!room.voicePreference) {
         this.popupTipForAiVoice(aiParam)
@@ -2332,7 +2354,7 @@ class AiController {
       }
     }
 
-    // 5.2 add quota for user    
+    // 5.3 send fallback message
     if(aiLogs.length > 0) {
       this.sendFallbackMenu(aiParam, res4, aiLogs) 
     }
@@ -3575,16 +3597,28 @@ class AiHelper {
     entry: AiEntry,
     room: Table_AiRoom,
   ) {
-    // 1. add
+    // 1. handle aiConversationCount & lastWxGzhChatStamp
     const user = entry.user
     const userId = user._id
     const quota = user.quota ?? { aiConversationCount: 0 }
-    quota.aiConversationCount += 1
+    const count1 = quota.aiConversationCount + 1
+    quota.aiConversationCount = count1
     if(entry.wx_gzh_openid) {
       quota.lastWxGzhChatStamp = getNowStamp()
     }
 
-    // 2. update user
+    // 2. minus conversationCountFromAd if exceed MAX_TIMES_FREE
+    if(count1 > MAX_TIMES_FREE) {
+      const isSubscribed = checkIfUserSubscribed(user)
+      if(!isSubscribed) {
+        const count2 = quota.conversationCountFromAd ?? 0
+        if(count2 > 0) {
+          quota.conversationCountFromAd = count2 - 1
+        }
+      }
+    }
+
+    // 3. update user
     const now2 = getNowStamp()
     const u2: Partial<Table_User> = {
       quota,
@@ -3594,11 +3628,16 @@ class AiHelper {
     const uCol = db.collection("User")
     uCol.doc(userId).update(u2)
 
-    // 3. update room for needSystem2Stamp
+    // 4. update room for needSystem2Stamp
     const minRecordNum = ai_cfg.minCoversationsToRecordForSystemTwo
     if(quota.aiConversationCount >= minRecordNum) {
       this._updateNeedSystem2Stamp(room)
     }
+
+    // 5. update user in runtime
+    user.quota = quota
+    user.activeStamp = now2
+    user.updatedStamp = now2
     
     return quota.aiConversationCount
   }
@@ -4135,56 +4174,65 @@ class UserHelper {
 
   static async checkQuota(
     entry: AiEntry,
+    room: Table_AiRoom,
   ) {
     const user = entry.user
     const quota = user.quota
     if(!quota) return true
 
     const count = quota.aiConversationCount
+    const count2 = quota.conversationCountFromAd ?? 0
     const subscriptionManager = new SubscriptionManager(user)
     const isSubscribed = subscriptionManager.getSubscribed()
     const MAX_TIMES = isSubscribed ? MAX_TIMES_MEMBERSHIP : MAX_TIMES_FREE
 
-    const available = count < MAX_TIMES
+    let available = count < MAX_TIMES
     if(!available) {
-      const expireStamp = subscriptionManager.getExpireStamp()
+      available = count2 > 0
+    }
 
-      if(expireStamp) {
-        this.sendQuotaWarning3(entry, expireStamp)
-      }
-      else if(MAX_TIMES === MAX_TIMES_FREE) {
-        this.sendQuotaWarning(entry)
+    if(!available) {
+      if(isSubscribed) {
+        this.sendQuotaWarning2(entry)
       }
       else {
-        this.sendQuotaWarning2(entry)
+        this.sendQuotaWarning4(entry, room)
       }
     }
     return available
   }
 
-  static async sendQuotaWarning3(
+  static async sendQuotaWarning4(
     entry: AiEntry,
-    expireStamp: number,
+    room: Table_AiRoom,
   ) {
-    // 1. get payment link
+    // 1. get some required data
+    const _env = process.env
+    const appid = _env.LIU_WX_MINI_APPID
+    if(!appid) {
+      console.warn("fail to get appid")
+      return false
+    }
+    const roomId = room._id
+    const path = `${ai_cfg.watch_video_path}?r=${roomId}`
+    const gzhType = AiShared.getGzhType()
+    const msgKey = gzhType === "subscription_account" ? "quota_warning_4_mock" : "quota_warning_4"
+
+    // 2. get payment link
     const paymentLink = await this._getPaymentLink(entry)
-    if(!paymentLink) return
+    if(!paymentLink) return false
 
-    // 2. calculate expired date
+    // 3. send
     const { user } = entry
-    const locale = getCurrentLocale({ user })
-    const expiredStr = LiuDateUtil.displayTime(expireStamp, locale, user.timezone)
-
-    // 3. construct message to send
     const { t } = useI18n(aiLang, { user })
-    let msg = t("quota_warning_3", {
-      expiredStr,
+    let msg = t(msgKey, { 
       membershipTimes: MAX_TIMES_MEMBERSHIP,
-      link: paymentLink,
+      link1: paymentLink,
+      appid,
+      path,
     })
-
-    // 4. send
     TellUser.text(entry, msg)
+    return true
   }
 
   static async sendQuotaWarning2(entry: AiEntry) {
@@ -4200,26 +4248,6 @@ class UserHelper {
       link: paymentLink,
     })
 
-    TellUser.text(entry, msg)
-  }
-
-  static async sendQuotaWarning(entry: AiEntry) {
-    // 1. get payment link
-    const paymentLink = await this._getPaymentLink(entry)
-    if(!paymentLink) return
-
-    // 2. i18n
-    const { user } = entry
-    const { t } = useI18n(aiLang, { user })
-    let msg = t("quota_warning", { 
-      freeTimes: MAX_TIMES_FREE,
-      membershipTimes: MAX_TIMES_MEMBERSHIP,
-      link: paymentLink,
-    })
-    msg += "\n\n"
-    msg += t("see_question_box")
-
-    // 3. tell user
     TellUser.text(entry, msg)
   }
 

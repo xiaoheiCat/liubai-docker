@@ -96,6 +96,7 @@ declare global {
 
       /** 微信小程序 */
       LIU_WX_REWARDED_VIDEO_AD?: string    // rewarded video unit ad id
+      LIU_WX_MINI_APPID?: string
       
 
       /** 企业微信 企业内部自建应用 */

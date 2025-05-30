@@ -88,10 +88,10 @@ export const aiBots: AiBot[] = [
     character: "ds-reasoner",
     provider: "deepseek",
     model: "deepseek-reasoner",
-    abilities: ["chat", "reasoning"],
+    abilities: ["chat", "reasoning", "tool_use"],
     alias: ["R1", "r1", "ds r1", "deep seek r1"],
     maxWindowTokenK: 64,
-    priority: 15,
+    priority: 45,
     metaData: {
       onlyOneSystemRoleMsg: true,
     }
