@@ -211,11 +211,13 @@ function handleNewListForTodayAndFuture(
 
   if(oldList.length < 1) {
     tlData.list = newList
+    tlUtil.handleLastItemStamp("TODAY_FUTURE", tlData)
     emit("hasdata")
     return
   }
 
   insertListUsingCalendarStamp(newList, oldList)
+  tlUtil.handleLastItemStamp("TODAY_FUTURE", tlData)
 }
 
 
