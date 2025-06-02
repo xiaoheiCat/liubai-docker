@@ -43,8 +43,6 @@ export function useScTop(emits: ScTopEmits) {
     middleBridge.modifyMemberNickname(value)
   }
 
-  const onTapAvatar = () => {}
-
   const { CONNECTORS } = liuEnv.getEnv()
 
   const onTapPremium = () => {
@@ -59,9 +57,11 @@ export function useScTop(emits: ScTopEmits) {
     MORE_ITEMS,
     onTapMoreMenuItem,
     onTapName,
-    onTapAvatar,
     onTapPremium,
     CONNECTORS,
   }
 }
+
+
+
 

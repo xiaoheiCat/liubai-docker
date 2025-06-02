@@ -22,7 +22,7 @@ const onTapVoiceInfo = () => {
 
   <div class="ac-box">  
 
-    <!-- 语音偏好 -->
+    <!-- Voice Preference -->
     <div class="ac-bar">
 
       <div class="ac-title">

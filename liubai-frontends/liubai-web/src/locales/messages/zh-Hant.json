@@ -73,7 +73,8 @@
     "save": "保存",
     "opened": "已開啟",
     "saved": "已保存",
-    "closed": "已關閉"
+    "closed": "已關閉",
+    "crop": "剪裁"
   },
   "editor": {
     "when": "什麼時候",
@@ -300,7 +301,9 @@
     "fail_to_request": "網路請求失敗",
     "cannot_remind_you": "由於雲端同步已被關閉，提醒功能將只作為裝飾；屆時系統無法彈出通知。",
     "network_required": "該功能需要連線網路才能使用",
-    "save_draft": "保存草稿"
+    "save_draft": "保存草稿",
+    "choose_image_1": "不支援的圖片格式",
+    "choose_image_2": "請重新選擇一張"
   },
   "card_bubble": {
     "copy": "複製",

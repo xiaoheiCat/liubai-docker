@@ -18,7 +18,6 @@ onActivated(() => {
 </script>
 <template>
 
-  <!-- 主视图 -->
   <div class="liu-simple-page">
     <scroll-view>
       <navi-virtual></navi-virtual>

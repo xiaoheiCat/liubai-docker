@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAiConsole } from "./tools/useAiConsole"
-import AiConsole from "./ai-console.vue"
+import AiConsoleView from "./ai-console-view.vue"
 
 const { acData } = useAiConsole()
 
@@ -14,9 +14,9 @@ const { acData } = useAiConsole()
       <PlaceholderView :p-state="acData.pageState"></PlaceholderView>
 
       <div v-if="acData.pageState < 0" class="liu-mc-box">
-        <AiConsole 
+        <AiConsoleView 
           v-model:voice-preference="acData.voicePreference"
-        ></AiConsole>
+        ></AiConsoleView>
       </div>
 
     </div>

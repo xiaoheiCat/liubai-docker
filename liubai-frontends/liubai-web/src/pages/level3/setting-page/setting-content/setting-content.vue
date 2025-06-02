@@ -6,6 +6,7 @@ import { useSettingContent } from "./tools/useSettingContent";
 import { useWindowSize } from '~/hooks/useVueUse';
 import cfg from '~/config';
 import { computed } from 'vue';
+import { chooseAvatar } from '~/hooks/shared/chooseAvatar';
 
 const { t } = useI18n()
 const { width: windowWidth } = useWindowSize()
@@ -39,6 +40,7 @@ const {
   appName,
   hasNewVersion,
 } = useSettingContent()
+const { onTapAvatar } = chooseAvatar()
 
 // 主题字段 i18n 的 key
 const themeTextKey = computed(() => {
@@ -67,7 +69,7 @@ const iconColor = "var(--main-normal)"
 
         <!-- avatar + nickname -->
         <div class="sc-avatar-nickname" v-if="myProfile">
-          <div class="liu-hover sc-avatar-box">
+          <div class="liu-hover sc-avatar-box" @click.stop="onTapAvatar">
             <LiuAvatar 
               :member-show="myProfile" 
               class="sc-avatar"
