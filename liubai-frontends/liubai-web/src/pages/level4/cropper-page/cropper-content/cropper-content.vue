@@ -2,11 +2,14 @@
 import cfg from "~/config";
 import { Cropper } from 'vue-advanced-cropper';
 import 'vue-advanced-cropper/dist/style.css';
+import { ccProps } from "./tools/types";
 import { useCropperContent } from "./tools/useCropperContent";
 
+const props = defineProps(ccProps)
 const {
   tempStore,
-} = useCropperContent()
+  cropperRef,
+} = useCropperContent(props)
 
 </script>
 <template>
@@ -23,6 +26,7 @@ const {
       class="cc-cropper"
       min-width="200"
       min-height="200"
+      ref="cropperRef"
     >
     </Cropper>
 

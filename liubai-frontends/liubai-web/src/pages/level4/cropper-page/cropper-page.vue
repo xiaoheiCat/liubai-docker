@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import ScrollView from "~/components/common/scroll-view/scroll-view.vue";
 import CropperContent from "./cropper-content/cropper-content.vue";
+import { ref } from "vue"
+
+const confirmNum = ref(0)
 
 </script>
 <template>
@@ -10,7 +13,9 @@ import CropperContent from "./cropper-content/cropper-content.vue";
 
       <div class="liu-mc-container">
         <div class="liu-mc-box">
-          <CropperContent></CropperContent>
+          <CropperContent
+            :confirm-num="confirmNum"
+          ></CropperContent>
         </div>
       </div>
 
@@ -18,6 +23,7 @@ import CropperContent from "./cropper-content/cropper-content.vue";
     <navi-bar 
       title-key="common.crop"
       confirm-key="common.confirm"
+      @tapconfirm="() => confirmNum++"
     ></navi-bar>
   </div>
 </template>

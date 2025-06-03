@@ -489,7 +489,7 @@ const iconColor = "var(--main-normal)"
 
 
 .sc-title {
-  font-size: var(--desc-font);
+  font-size: var(--inline-code-font);
   font-weight: 700;
   color: var(--main-normal);
   margin-inline-start: 10px;
