@@ -9,6 +9,7 @@ import { CloudEventBus } from "~/utils/cloud/CloudEventBus";
 import { useSystemStore } from "~/hooks/stores/useSystemStore";
 import liuConsole from "~/utils/debug/liu-console";
 import time from "~/utils/basic/time";
+import { compareSpaceAndMember } from "~/utils/cloud/tools/after-getting-user-data";
 
 interface ToLoginOpt {
   autoRedirect?: boolean  // auto redirect to `index` if success
@@ -98,7 +99,6 @@ async function toLogin(
       rr.router.replace({ name: "index" })
     }
   }
-  
 
   // 10. timer ends
   const t2 = performance.now()
@@ -107,6 +107,12 @@ async function toLogin(
   console.log(msg)
   liuConsole.sendMessage(msg)
 
+  // 11. wait 3s for workspaceStore to load
+  // and then compare space and member
+  setTimeout(() => {
+    compareSpaceAndMember(spaceMemberList, rr)
+  }, time.SECONED * 3)
+  
   return true
 }
 

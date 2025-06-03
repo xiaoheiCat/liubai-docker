@@ -631,6 +631,7 @@ export const Sch_Cloud_ImageStore: BaseSchema<Cloud_ImageStore> = vbot.object(
     url_2: Sch_Opt_Str,
     blurhash: Sch_Opt_Str,
     someExif: vbot.optional(Sch_LiuExif),
+    size: Sch_Opt_Num,
   },
   vbot.never(),
 )
@@ -2065,6 +2066,18 @@ export namespace UserSettingsAPI {
     operateType: "ai-console-get"
     voicePreference?: GenderType
   }
+
+  export interface Param_MemberAvatar {
+    operateType: "member-avatar"
+    memberId: string
+    image: Cloud_ImageStore
+  }
+
+  export const Sch_Param_MemberAvatar = vbot.object({
+    operateType: vbot.literal("member-avatar"),
+    memberId: Sch_Id,
+    image: Sch_Cloud_ImageStore,
+  })
 
 }
 

@@ -44,7 +44,7 @@ export async function afterGettingUserData(
   if(!res2) return false
 
   // 3. update name and avatar with space and member
-  const res3 = await handleSpaceAndMember(d.spaceMemberList, rr)
+  const res3 = await compareSpaceAndMember(d.spaceMemberList, rr)
   if(!res3) return false
 
   // 4. if old open_id is empty, set it
@@ -93,7 +93,7 @@ async function handleUser(
 }
 
 
-async function handleSpaceAndMember(
+export async function compareSpaceAndMember(
   spaceMemberList: LiuSpaceAndMember[],
   rr: RouteAndLiuRouter,
 ) {
@@ -266,14 +266,19 @@ async function handleSpaceAndMember(
     const nameStamp1 = cfg1.lastOperateName ?? 1
     const nameStamp2 = cfg2?.lastOperateName ?? 1
     if(nameStamp2 > nameStamp1) {
-      console.log("update member name 111111111")
       u7.name = v2.member_name
       cfg1.lastOperateName = nameStamp2
       updated = true
     }
 
     // check avatar
+    console.log("cloud avatar: ", v2.member_avatar)
+    console.log("local avatar: ", v1.avatar)
+
     const avatarRes = CloudFiler.imageFromCloudToStore(v2.member_avatar, v1.avatar)
+
+    console.log("avatarRes: ", avatarRes)
+
     if(avatarRes.useCloud) {
       u7.avatar = avatarRes.image
       updated = true

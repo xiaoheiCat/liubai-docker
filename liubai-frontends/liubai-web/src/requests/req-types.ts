@@ -14,6 +14,7 @@ import type {
   SubscriptionWxpay,
   SubscriptionAlipay,
   Wxpay_Jsapi_Params,
+  Cloud_ImageStore,
 } from "~/types/types-cloud"
 import type { BaseIsOn } from "~/types/types-basic"
 
@@ -130,6 +131,12 @@ export namespace UserSettingsAPI {
   export interface Res_AiConsoleGet {
     operateType: "ai-console-get"
     voicePreference?: GenderType
+  }
+
+  export interface Param_MemberAvatar {
+    operateType: "member-avatar"
+    memberId: string
+    image: Cloud_ImageStore
   }
 
 }

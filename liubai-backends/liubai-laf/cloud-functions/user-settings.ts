@@ -25,10 +25,10 @@ import {
   type LiuRqReturn,
   type VerifyTokenRes_B,
   type Table_Token,
-  type UserSettingsAPI,
   Sch_LocalTheme,
   Sch_LocalLocale,
   Sch_GenderType,
+  UserSettingsAPI,
   type LiuErrReturn,
   type Table_Member,
   type DataPass,
@@ -38,6 +38,7 @@ import {
   type Table_BlockList,
   type Table_AiRoom,
   type GenderType,
+  type Cloud_ImageStore,
 } from '@/common-types'
 import { 
   getNowStamp, 
@@ -115,6 +116,9 @@ export async function main(ctx: FunctionContext) {
   else if(oT === "ai-console-set") {
     res = await ai_console_set(vRes, body) 
   }
+  else if(oT === "member-avatar") {
+    res = await member_avatar(vRes, body)
+  }
 
   // const stamp2 = getNowStamp()
   // const diffS = stamp2 - stamp1
@@ -123,6 +127,39 @@ export async function main(ctx: FunctionContext) {
   return res
 }
 
+async function member_avatar(
+  vRes: VerifyTokenRes_B,
+  body: Record<string, any>,
+) {
+  // 1. check out param
+  const res1 = vbot.safeParse(UserSettingsAPI.Sch_Param_MemberAvatar, body)
+  if(!res1.success) {
+    const errMsg = checker.getErrMsgFromIssues(res1.issues)
+    return { code: "E4000", errMsg }
+  }
+  const memberId = body.memberId as string
+  const userId = vRes.userData._id
+  const image = body.image as Cloud_ImageStore
+
+  // 2. get member
+  const mCol = db.collection("Member")
+  const res2 = await mCol.doc(memberId).get<Table_Member>()
+  const member = res2.data
+  if(!member) {
+    return { code: "E4004", errMsg: "member not found" }
+  }
+  if(member.user !== userId) {
+    return { code: "E4003", errMsg: "no permission" }
+  }
+
+  // 3. update member
+  const u3 = {
+    updatedStamp: getNowStamp(),
+    avatar: _.set(image),
+  }
+  const res3 = await mCol.doc(memberId).update(u3)
+  return { code: "0000" }
+}
 
 async function ai_console_set(
   vRes: VerifyTokenRes_B,

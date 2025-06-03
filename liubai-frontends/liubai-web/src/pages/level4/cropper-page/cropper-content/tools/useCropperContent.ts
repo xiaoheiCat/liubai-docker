@@ -1,17 +1,19 @@
 import { onActivated, ref, toRef, watch } from "vue";
 import { useTemporaryStore } from "~/hooks/stores/useTemporaryStore";
-import { useRouteAndLiuRouter } from "~/routes/liu-router";
+import { type RouteAndLiuRouter, useRouteAndLiuRouter } from "~/routes/liu-router";
 import type { ComponentPublicInstance } from "vue"
 import type { CcProps } from "./types";
 import type { CropperResult } from "vue-advanced-cropper"
 import cui from "~/components/custom-ui";
 import imgHelper from "~/utils/files/img-helper";
-import type { FileSetAPI } from "~/requests/req-types"
+import type { FileSetAPI, UserSettingsAPI } from "~/requests/req-types"
 import type { LiuImageStore } from "~/types"
 import APIs from "~/requests/APIs"
 import liuReq from "~/requests/liu-req"
 import { uploadViaQiniu } from "~/utils/cloud/upload-tasks/tools/upload-via-qiniu"
 import ider from "~/utils/basic/ider";
+import transferUtil from "~/utils/transfer-util";
+import { useWorkspaceStore } from "~/hooks/stores/useWorkspaceStore";
 
 
 let isLoading = false
@@ -48,7 +50,7 @@ export function useCropperContent(
     // 4. let canvas create blob
     canvas.toBlob(async (blob) => {
       if(!blob) return
-      compressFile(blob)
+      compressFile(blob, rr)
     }, "image/jpeg")
   })
 
@@ -73,20 +75,21 @@ function hideCropperLoading() {
 
 async function compressFile(
   blob: Blob,
+  rr: RouteAndLiuRouter,
 ) {
   const blobs = await imgHelper.compress([blob], { 
     maxWidth: 256, 
     compressPoint: 33 * 1024,
     convertSize: 32 * 1024,
   })
-  console.log("blobs: ", blobs)
   const firstBlob = blobs[0]
   if(!firstBlob) return
-  uploadFile(firstBlob)
+  uploadFile(firstBlob, rr)
 }
 
 async function uploadFile(
   blob: Blob,
+  rr: RouteAndLiuRouter,
 ) {
   // 1. get token
   const url = APIs.UPLOAD_FILE
@@ -97,7 +100,7 @@ async function uploadFile(
   const tokenRes = await liuReq.request<FileSetAPI.Res_UploadToken>(url, param)
   console.log("tokenRes: ", tokenRes)
   if (tokenRes.code !== "0000" || !tokenRes.data) {
-    console.warn("获取上传 token 失败", tokenRes)
+    console.warn("fail to get token for uploading", tokenRes)
     hideCropperLoading()
     return
   }
@@ -125,7 +128,7 @@ async function uploadFile(
     (fileId, res) => {
       const cloud_url = res?.data?.cloud_url
       if (res.code === "0000" && cloud_url) {
-        uploadAvatar(imgStore, cloud_url)
+        uploadAvatar(imgStore, cloud_url, rr)
       }
       else {
         hideCropperLoading()
@@ -137,8 +140,37 @@ async function uploadFile(
 async function uploadAvatar(
   imgStore: LiuImageStore,
   cloud_url: string,
+  rr: RouteAndLiuRouter,
 ) {
   imgStore.cloud_url = cloud_url
-  
-  
+
+  // 1. transfer local store to cloud store
+  const cloudStores = transferUtil.imagesFromStoreToCloud([imgStore])
+  if(!cloudStores) return
+  const image = cloudStores[0]
+  if(!image) return
+
+  // 2. get memberId
+  const wStore = useWorkspaceStore()
+  const memberId = wStore.memberId
+  if(!memberId) return
+
+  // 3. set new loading
+  showCropperLoading("common.processing")
+
+  // 4. fetch
+  const w4: UserSettingsAPI.Param_MemberAvatar = {
+    operateType: "member-avatar",
+    memberId,
+    image,
+  }
+  const url4 = APIs.USER_SET
+  const res4 = await liuReq.request(url4, w4)
+
+  // 5. storage avatar locally
+  if(res4.code === "0000") {
+    hideCropperLoading()
+    wStore.setAvatar(imgStore)
+    rr.router.goHome()
+  }
 }
