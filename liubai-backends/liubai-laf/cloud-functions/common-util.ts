@@ -84,7 +84,7 @@ import {
 import { 
   getNowStamp, 
   getBasicStampWhileAdding, 
-  SECONED, DAY, MINUTE, HOUR,
+  SECOND, DAY, MINUTE, HOUR,
   localizeStamp,
   isWithinMillis,
   getServerTimezone,
@@ -121,7 +121,7 @@ const db = cloud.database()
 const _ = db.command
 
 /********************* 常量 ****************/
-const SEC_5 = SECONED * 5
+const SEC_5 = SECOND * 5
 const MIN_3 = MINUTE * 3
 const MIN_5 = MINUTE * 5
 const DAY_90 = DAY * 90
@@ -634,7 +634,8 @@ export class LiuDateUtil {
     return `${yyyy}-${mm}-${dd}T${hr}:${min}:${sec}`
   }
 
-  static getYYYYMMDD(stamp: number) {
+  static getYYYYMMDD(stamp?: number) {
+    if(!stamp) stamp = getNowStamp()
     const str = this.transformStampIntoStr(stamp)
     return str.substring(0, 10)
   }
@@ -1445,7 +1446,7 @@ export function canPassByExponentialDoor(
 
   const requiredSec = 3 ** verifiedNum
   const now = getNowStamp()
-  const diffSec = (now - startedStamp) / SECONED
+  const diffSec = (now - startedStamp) / SECOND
   const pass = diffSec > requiredSec
   return { verifiedNum, pass }
 }

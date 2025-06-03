@@ -7,7 +7,7 @@ import type {
 import { db } from "~/utils/db"
 import type { LiuFileAndImage } from "~/types"
 import APIs from "~/requests/APIs"
-import type { Res_FileSet_UploadToken } from "~/requests/req-types"
+import type { FileSetAPI } from "~/requests/req-types"
 import type { LiuUploadTask } from "~/types/types-atom"
 import { uploadViaQiniu } from "./tools/upload-via-qiniu"
 import liuReq from "~/requests/liu-req"
@@ -21,7 +21,7 @@ import type { BoolFunc } from "~/utils/basic/type-tool"
 import uut from "./tools/update-upload-task"
 import { useSyncStore } from "~/hooks/stores/useSyncStore"
 
-let resUploadToken: Res_FileSet_UploadToken | undefined
+let resUploadToken: FileSetAPI.Res_UploadToken | undefined
 
 
 function _seekFileInStores(
@@ -236,7 +236,7 @@ async function _deleteFileFromMember(
 async function handleAnAtom(
   atom: UploadFileAtom,
 ): Promise<UploadFileRes> {
-  const rut = resUploadToken as Res_FileSet_UploadToken
+  const rut = resUploadToken as FileSetAPI.Res_UploadToken
   const cs = rut.cloudService
 
   const files = atom.files
@@ -390,7 +390,7 @@ function packFiles(
 async function getUploadToken() {
   const url = APIs.UPLOAD_FILE
   const param = { operateType: "get-upload-token" }
-  const res = await liuReq.request<Res_FileSet_UploadToken>(url, param)
+  const res = await liuReq.request<FileSetAPI.Res_UploadToken>(url, param)
   if(res.code === "0000" && res.data) {
     resUploadToken = res.data
     return true

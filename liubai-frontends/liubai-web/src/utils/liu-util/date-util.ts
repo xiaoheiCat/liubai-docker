@@ -272,7 +272,7 @@ export function getCountDownStr(
 
   const { t, locale } = i18n.global
   const lang = locale.value
-  const { SECONED, MINUTE, HOUR, DAY } = time
+  const { SECOND, MINUTE, HOUR, DAY } = time
   const DAY_10 = 10 * DAY
   const DAY_31 = 31 * DAY
 
@@ -293,7 +293,7 @@ export function getCountDownStr(
   // 剩下一小时内
   if(diffStamp < HOUR) {
     min_num = Math.floor(diffStamp / MINUTE)
-    sec_num = Math.floor((diffStamp % MINUTE) / SECONED)
+    sec_num = Math.floor((diffStamp % MINUTE) / SECOND)
     min = lang === "en" ? valTool.format0(min_num) : String(min_num)
     sec = lang === "en" ? valTool.format0(sec_num) : String(sec_num)
     return t("date_related.countdown_1", { min, sec })
@@ -390,7 +390,7 @@ export function getEditedStr(
   if(!editedStamp) return
 
   const diff = Math.abs(createdStamp - editedStamp)
-  if(diff < (3 * time.SECONED)) return
+  if(diff < (3 * time.SECOND)) return
 
   return showBasicTime(editedStamp)
 }

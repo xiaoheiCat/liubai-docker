@@ -19,7 +19,7 @@ import { useDateStore } from "~/hooks/stores/useDateStore";
 import { storeToRefs } from "pinia";
 
 const { 
-  SECONED: SEC,
+  SECOND: SEC,
   MINUTE: MIN,
   HOUR,
 } = time

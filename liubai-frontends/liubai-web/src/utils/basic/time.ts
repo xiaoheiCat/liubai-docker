@@ -6,8 +6,8 @@ import {
 } from "./safe-funcs"
 
 // 将 "秒" / "分" / "时" / "天" 转为 毫秒数
-const SECONED = 1000
-const MINUTE = 60 * SECONED
+const SECOND = 1000
+const MINUTE = 60 * SECOND
 const HOUR = 60 * MINUTE
 const DAY = 24 * HOUR
 const WEEK = 7 * DAY
@@ -97,7 +97,7 @@ const setDiff = (
 
   setTimeout(() => {
     location.reload()
-  }, 3 * SECONED)
+  }, 3 * SECOND)
 }
 
 const getDiff = () => diff
@@ -191,7 +191,7 @@ export default {
   getTimezone,
   isWithinMillis,
   getBasicStampWhileAdding,
-  SECONED,
+  SECOND,
   MINUTE,
   HOUR,
   DAY,

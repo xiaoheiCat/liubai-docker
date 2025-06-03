@@ -6,7 +6,7 @@ import { useGlobalStateStore } from "../stores/useGlobalStateStore";
 import liuUtil from "~/utils/liu-util";
 import liuApi from "~/utils/liu-api";
 
-const MAX_WAITING = 3 * time.SECONED
+const MAX_WAITING = 3 * time.SECOND
 
 // listen to document loaded
 // and close the splash screen

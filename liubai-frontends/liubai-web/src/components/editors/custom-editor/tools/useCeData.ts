@@ -34,7 +34,7 @@ let spaceIdRef: Ref<string>
 let spaceTypeRef: Ref<SpaceType>
 let memberIdRef: Ref<string>
 
-const SEC_5 = time.SECONED * 5
+const SEC_5 = time.SECOND * 5
 
 interface CesCtx {
   ceData: CeData

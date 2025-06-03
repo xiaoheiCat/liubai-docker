@@ -4,6 +4,7 @@ import AppLink from "~/components/common/app-link/app-link.vue";
 import LiuAvatar from '~/components/common/liu-avatar/liu-avatar.vue';
 import { useMineContent } from "./tools/useMineContent"
 import { useI18n } from 'vue-i18n';
+import { chooseAvatar } from "~/hooks/shared/chooseAvatar";
 
 const {
   myProfile,
@@ -15,6 +16,7 @@ const {
 const { t } = useI18n()
 
 const iconColor = `var(--main-normal)`
+const { onTapAvatar } = chooseAvatar()
 
 </script>
 <template>
@@ -25,6 +27,7 @@ const iconColor = `var(--main-normal)`
     <!-- avatar -->
     <LiuAvatar v-if="myProfile" :member-show="myProfile"
       class="mc-me-avatar"
+      @click.stop="onTapAvatar"
     ></LiuAvatar>
 
     <!-- name -->
@@ -216,6 +219,7 @@ const iconColor = `var(--main-normal)`
   width: 72px;
   height: 72px;
   margin-block-end: 20px;
+  cursor: pointer;
 }
 
 .mc-me-name {

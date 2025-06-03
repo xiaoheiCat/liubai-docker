@@ -225,7 +225,7 @@ function listenThreadShowChanged(
 
   const _toFetch = useThrottleFn(() => {    
     fetchUserAndRefresh(ctx)
-  }, 50 * time.SECONED)
+  }, 50 * time.SECOND)
 
   watch(awakeNum, (newV) => {
 

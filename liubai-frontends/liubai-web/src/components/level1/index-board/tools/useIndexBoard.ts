@@ -18,7 +18,7 @@ import type { SimpleFunc } from "~/utils/basic/type-tool";
 import { useActiveSyncNum } from "~/hooks/useCommon";
 import { useWorkspaceStore } from "~/hooks/stores/useWorkspaceStore";
 
-const SEC_90 = 90 * time.SECONED
+const SEC_90 = 90 * time.SECOND
 
 interface IbCtx {
   rr: RouteAndLiuRouter
@@ -312,7 +312,7 @@ function handleSubscribePrompt(
   const _wait = () => {
     setTimeout(() => {
       _check()
-    }, time.SECONED * 3)
+    }, time.SECOND * 3)
   }
 
   const stop2 = watch(activeSyncNum, (newV) => {

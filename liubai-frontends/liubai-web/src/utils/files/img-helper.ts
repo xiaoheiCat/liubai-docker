@@ -13,7 +13,8 @@ type FileWithCharacteristic = {
   height?: number
   blurhash?: string
 }
-type CompressResolver = (res: File) => void
+type FileOrBlob = File | Blob
+type CompressResolver<F extends FileOrBlob> = (res: F) => void
 type WidthHeightResolver = (res: FileWithCharacteristic) => void
 
 // 临界值，处于该值以上的 size 才需要压缩
@@ -91,52 +92,74 @@ async function extractExif(files: File[]) {
   return list
 }
 
+export interface CompressOpt {
+  compressPoint?: number    // 临界值，处于该值以上的 size 才需要压缩，单位 byte
+  maxWidth?: number         // 最大宽度
+  convertSize?: number      // 多少 size 以上才去压缩
+}
+
 /**
  * 压缩图片
  * @param files 图片 File 类型
  */
-async function compress(files: File[]) {
-  const list: Array<File> = []
+async function compress<F extends FileOrBlob>(
+  files: F[],
+  opt?: CompressOpt,
+) {
+  const list: Array<F> = []
+  const compressPoint = opt?.compressPoint ?? COMPRESS_POINT
   for(let i=0; i<files.length; i++) {
     const v = files[i]
     const noCompress = NO_COMPRESS_TYPES.includes(v.type)
-    if(v.size < COMPRESS_POINT || noCompress) {
+    if(v.size < compressPoint || noCompress) {
       list.push(v)
       continue
     }
-    const res = await _toCompress(v)
+    const res = await _toCompress(v, opt)
     list.push(res)
   }
   return list
 }
 
-function _toCompress(file: File) {
+function _toCompress<F extends FileOrBlob>(
+  file: F,
+  opt?: CompressOpt,
+) {
   const fileSize = file.size
+
+  // 1. handle maxWidth
   const { width } = useWindowSize()
   let maxWidth = Math.floor(width.value * 2)
   if(maxWidth < 1280) maxWidth = 1280
   else if(maxWidth > 2560) maxWidth = 2560
+  if(opt?.maxWidth) {
+    maxWidth = opt.maxWidth
+  }
 
+  // 2. handle quality
   let quality = 0.9
   if(maxWidth < 1440) quality = 0.86
   else if(maxWidth < 2000) quality = 0.8
   else quality = 0.75
 
-  const _excute = (a: CompressResolver) => {
+  // 3. handle convertSize
+  const convertSize = opt?.convertSize ?? (1 * 1024 * 1024)
+
+  const _excute = (a: CompressResolver<F>) => {
     console.log("ready to compress, so see file size: ")
     console.log(fileSize)
     console.log(" ")
 
     const checkOrientation = fileSize < CHECK_ORIENTATION_POINT
 
-    const opt = {
+    const opt2 = {
       strict: true,
       checkOrientation,
       maxWidth,
       quality,
       convertTypes: 'image/png,image/webp',
-      convertSize: 1 * 1024 * 1024,   // 1mb 以上的 convertTypes 图片，都会被转成 JPEGs
-      success(res: File) {        
+      convertSize,   // 1mb 以上的 convertTypes 图片，都会被转成 JPEGs
+      success(res: F) {        
         a(res)
       },
       error(err: Error) {
@@ -147,7 +170,7 @@ function _toCompress(file: File) {
       }
     }
 
-    new Compressor(file, opt)
+    new Compressor(file, opt2)
   }
 
   return new Promise(_excute)

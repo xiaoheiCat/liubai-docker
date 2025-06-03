@@ -44,7 +44,7 @@ import {
   DAY,
   isWithinMillis,
   MINUTE,
-  SECONED,
+  SECOND,
 } from "@/common-time"
 import { 
   aiBots, 
@@ -88,7 +88,7 @@ const MIN_REASONING_TOKENS = 1024
 const MAX_TIMES_FREE = 10
 const MAX_TIMES_MEMBERSHIP = 200
 
-const SEC_15 = SECONED * 15
+const SEC_15 = SECOND * 15
 const MIN_3 = MINUTE * 3
 const HOUR_12 = HOUR * 12
 const INDEX_TO_PRESERVE_IMAGES = 12     // the images which appears in the first INDEX_TO_PRESERVE_IMAGES will be preserved rather than compressed to text like [image]
@@ -2285,7 +2285,7 @@ class AiController {
     const seconds = this._waitForSeconds(aiParam, newCharacters)
     if(seconds > 0) {
       // console.log(`start to wait ${seconds} seconds`)
-      await valTool.waitMilli(seconds * SECONED)
+      await valTool.waitMilli(seconds * SECOND)
       const res1_2 = await AiHelper.canReply(aiParam)
       if(!res1_2) {
         console.warn("don't reply!")

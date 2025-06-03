@@ -23,6 +23,7 @@
     "tomorrow": "明天",
     "yesterday": "昨天",
     "processing": "处理中",
+    "uploading": "上传中..",
     "checkMore": "查看更多",
     "copied": "已复制",
     "close": "关闭",
@@ -73,7 +74,8 @@
     "save": "保存",
     "opened": "已开启",
     "saved": "已保存",
-    "closed": "已关闭"
+    "closed": "已关闭",
+    "crop": "剪裁"
   },
   "editor": {
     "when": "什么时候",
@@ -300,7 +302,9 @@
     "open_with_browser_2": "获取极致体验！",
     "open_with_browser_3": "点击“...”打开默认浏览器",
     "cannot_remind_you": "由于云端同步已被关闭，提醒功能将只作为装饰；届时系统无法弹出通知。",
-    "network_required": "该功能需要联网才能使用"
+    "network_required": "该功能需要联网才能使用",
+    "choose_image_1": "不支持的图片类型",
+    "choose_image_2": "请重新选择一张"
   },
   "card_bubble": {
     "copy": "复制",

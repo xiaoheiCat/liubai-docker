@@ -3,7 +3,7 @@ import type { RouteAndLiuRouter } from "~/routes/liu-router"
 import time from "~/utils/basic/time"
 import localCache from "~/utils/system/local-cache";
 
-const SEC_3 = 3 * time.SECONED
+const SEC_3 = 3 * time.SECOND
 let lastLogoutStamp = 0
 
 export function logout(

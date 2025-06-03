@@ -264,7 +264,7 @@ function initSubscribeContent(
   timeout1 = setTimeout(() => {
     if(scData.state !== 0) return
     setDataState(scData, pageStates.NETWORK_ERR)
-  }, 7 * time.SECONED)
+  }, 7 * time.SECOND)
 
   // 4. get premium
   const wStore = useWorkspaceStore()

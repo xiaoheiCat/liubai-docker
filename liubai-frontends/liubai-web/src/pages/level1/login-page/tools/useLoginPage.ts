@@ -373,7 +373,7 @@ function canLoginUsingLastLogged(
 ) {
   const s = lpData.lastLogged
   if(!s) return true
-  const isWithin = time.isWithinMillis(s, 6 * time.SECONED)
+  const isWithin = time.isWithinMillis(s, 6 * time.SECOND)
   if(isWithin) return false
   return true
 }
@@ -422,7 +422,7 @@ async function toSubmitEmailAddress(
   if(lpData.isSendingEmail) return
 
   const now = time.getTime()
-  const sec = (now - lastSendEmail) / time.SECONED
+  const sec = (now - lastSendEmail) / time.SECOND
   
   let canSubmit = false
   if(email !== lpData.email) canSubmit = true

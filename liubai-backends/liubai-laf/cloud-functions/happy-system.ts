@@ -11,7 +11,7 @@ import type {
   Table_Showcase,
   Table_User,
 } from "@/common-types"
-import { getBasicStampWhileAdding, getNowStamp, isWithinMillis, MINUTE, SECONED } from "@/common-time"
+import { getBasicStampWhileAdding, getNowStamp, isWithinMillis, MINUTE, SECOND } from "@/common-time"
 import { createAdCredential } from "@/common-ids"
 import { ai_cfg } from "@/common-config"
 
@@ -70,7 +70,7 @@ async function post_weixin_ad(
     return { code: "E4003", errMsg: "the credential has been used too many times" }
   }
   const updatedStamp = cred.updatedStamp
-  const within15s = isWithinMillis(updatedStamp, SECONED * 15)
+  const within15s = isWithinMillis(updatedStamp, SECOND * 15)
   if(within15s) {
     return { code: "E4003", errMsg: "too frequently" }
   }

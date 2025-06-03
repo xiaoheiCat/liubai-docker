@@ -8,6 +8,7 @@ import type { SpaceType } from "~/types/types-basic";
 import type { MemberConfig } from "~/types/other/types-custom";
 import type { UserSubscription } from "~/types/types-cloud";
 import time from "~/utils/basic/time";
+import type { LiuImageStore } from "~/types";
 
 export interface AboutMeOpt {
 
@@ -99,9 +100,19 @@ export const useWorkspaceStore = defineStore("workspace", () => {
   }
 
   const setNickName = async (val: string) => {
-    if(!myMember.value) return
-    const res = await db.members.update(myMember.value._id, { name: val })
+    if(!myMember.value) return false
+    const _id = myMember.value._id
+    const res = await db.members.update(_id, { name: val })
     myMember.value.name = val
+    return true
+  }
+
+  const setAvatar = async (avatar: LiuImageStore) => {
+    if(!myMember.value) return false
+    const _id = myMember.value._id
+    const res = await db.members.update(_id, { avatar })
+    myMember.value.avatar = avatar
+    return true
   }
 
   const setTagList = async (list: TagView[]) => {
@@ -188,6 +199,7 @@ export const useWorkspaceStore = defineStore("workspace", () => {
     getStatesNoInIndex,
     setDataAboutMe,
     setNickName,
+    setAvatar,
     setTagList,
     setMemberConfig,
     setStateConfig,

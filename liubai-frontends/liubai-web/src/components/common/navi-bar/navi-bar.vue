@@ -42,6 +42,13 @@ const { t } = useI18n()
       >
         <SvgIcon class="nb-icon_add" name="add"></SvgIcon>
       </div>
+      <!-- Confirm Button -->
+      <div v-if="confirmKey"
+        class="liu-hover nbb-confirm"
+        @click="$emit('tapconfirm')"
+      >
+        <span>{{ t(confirmKey) }}</span>
+      </div>
 
     </div>
 
@@ -99,6 +106,13 @@ const { t } = useI18n()
   font-weight: 700;
   flex: 1;
   margin-inline-start: 6px;
+}
+
+.nbb-confirm {
+  padding: 8px 16px;
+  font-weight: 700;
+  font-size: var(--btn-font);
+  color: var(--primary-color);
 }
 
 /** the container query below is following `@container liu-mc-container` in style.css */

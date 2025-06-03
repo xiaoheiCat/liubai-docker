@@ -14,7 +14,7 @@ import cloud from "@lafjs/cloud"
 import { 
   getNowStamp,
   getBasicStampWhileAdding,
-  SECONED,
+  SECOND,
 } from "@/common-time"
 import { 
   updateUserInCache,
@@ -26,7 +26,7 @@ const db = cloud.database()
 const _ = db.command
 
 /*************** some constants **********************/
-const SEC_5 = 5 * SECONED
+const SEC_5 = 5 * SECOND
 
 /*************** some types in webhook-stripe ****************/
 interface CofiacParam {

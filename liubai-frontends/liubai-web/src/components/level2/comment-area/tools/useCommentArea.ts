@@ -28,7 +28,7 @@ import {
 } from "../../utils/tackle-comments"
 import time from "~/utils/basic/time"
 
-const SEC_30 = time.SECONED * 30
+const SEC_30 = time.SECOND * 30
 
 export function useCommentArea(
   props: CommentAreaProps,

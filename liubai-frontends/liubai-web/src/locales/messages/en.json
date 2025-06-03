@@ -23,6 +23,7 @@
     "tomorrow": "Tomorrow",
     "yesterday": "Yesterday",
     "processing": "Processing",
+    "uploading": "Uploading..",
     "checkMore": "More",
     "copied": "Copied",
     "close": "Close",
@@ -73,7 +74,8 @@
     "save": "Save",
     "opened": "Turned on",
     "saved": "Saved",
-    "closed": "Turned off"
+    "closed": "Turned off",
+    "crop": "Crop"
   },
   "editor": {
     "when": "When",
@@ -300,7 +302,9 @@
     "fail_to_request": "Network Error",
     "cannot_remind_you": "Liubai will be unable to remind you because you has closed the sync to cloud.",
     "network_required": "This function requires the Internet",
-    "save_draft": "Save"
+    "save_draft": "Save",
+    "choose_image_1": "The image is not supported",
+    "choose_image_2": "Please choose a jpg/png file"
   },
   "card_bubble": {
     "copy": "Copy",

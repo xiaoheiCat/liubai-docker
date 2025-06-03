@@ -33,7 +33,7 @@ import liuConsole from "../debug/liu-console";
 import { useNetworkStore } from "~/hooks/stores/useNetworkStore";
 import { storeToRefs } from "pinia";
 
-const SEC_25 = 25 * time.SECONED
+const SEC_25 = 25 * time.SECOND
 const MIN_5 = 5 * time.MINUTE
 const MIN_25 = 25 * time.MINUTE
 

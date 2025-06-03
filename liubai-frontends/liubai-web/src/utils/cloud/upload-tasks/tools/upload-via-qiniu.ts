@@ -2,7 +2,7 @@ import ider from "~/utils/basic/ider"
 import time from "~/utils/basic/time"
 import valTool from "~/utils/basic/val-tool"
 import fileHelper from "~/utils/files/file-helper"
-import type { Res_FileSet_UploadToken } from "~/requests/req-types"
+import type { FileSetAPI } from "~/requests/req-types"
 import type { LiuFileAndImage } from "~/types"
 import type { UploadProgress } from "qiniu-js/esm/upload"
 import type { 
@@ -68,7 +68,7 @@ function _upload(
 
 
 export async function uploadViaQiniu(
-  resUploadToken: Res_FileSet_UploadToken,
+  resUploadToken: FileSetAPI.Res_UploadToken,
   files: LiuFileAndImage[],
   aFileCompleted: WhenAFileCompleted,
 ): Promise<UploadFileRes> {

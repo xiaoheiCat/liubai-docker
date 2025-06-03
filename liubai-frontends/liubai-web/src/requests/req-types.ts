@@ -14,6 +14,7 @@ import type {
   SubscriptionWxpay,
   SubscriptionAlipay,
   Wxpay_Jsapi_Params,
+  Cloud_ImageStore,
 } from "~/types/types-cloud"
 import type { BaseIsOn } from "~/types/types-basic"
 
@@ -132,6 +133,12 @@ export namespace UserSettingsAPI {
     voicePreference?: GenderType
   }
 
+  export interface Param_MemberAvatar {
+    operateType: "member-avatar"
+    memberId: string
+    image: Cloud_ImageStore
+  }
+
 }
 
 
@@ -220,11 +227,17 @@ export interface Res_PO_AlipayWap {
 
 
 /************************ Uploading File ********************/
+export namespace FileSetAPI {
+  export interface Param {
+    operateType: "get-upload-token"
+    purpose?: "avatar"
+  }
 
-export interface Res_FileSet_UploadToken {
-  cloudService: CloudStorageService
-  uploadToken: string
-  prefix: string
+  export interface Res_UploadToken {
+    cloudService: CloudStorageService
+    uploadToken: string
+    prefix: string
+  }
 }
 
 /************************ Webhook ********************/

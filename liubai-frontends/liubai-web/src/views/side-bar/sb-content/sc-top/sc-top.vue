@@ -10,6 +10,7 @@ import cui from '~/components/custom-ui';
 import liuUtil from '~/utils/liu-util';
 import type { MenuItem } from "~/components/common/liu-menu/tools/types";
 import { type ScTopEmits, scTopProps } from "./tools/types"
+import { chooseAvatar } from '~/hooks/shared/chooseAvatar';
 
 const { t } = useI18n()
 
@@ -27,7 +28,6 @@ const {
   MORE_ITEMS,
   onTapMoreMenuItem,
   onTapName,
-  onTapAvatar,
   onTapPremium,
   CONNECTORS,
 } = useScTop(emits)
@@ -39,10 +39,8 @@ const {
   toolWidth,
 } = useSctLayout(props)
 
-const {
-  sctIndicator
-} = useSctRoute()
-
+const { sctIndicator } = useSctRoute()
+const { onTapAvatar } = chooseAvatar()
 
 const onTapSearch = () => {
   cui.showSearchEditor({ type: "search" })
@@ -50,6 +48,8 @@ const onTapSearch = () => {
 
 const iconColor = "var(--main-normal)"
 const searchTip = `${liuUtil.getHelpTip('Mod')} + K`
+
+
 
 </script>
 <template>
@@ -223,6 +223,9 @@ const searchTip = `${liuUtil.getHelpTip('Mod')} + K`
     margin-inline-start: 17px;
     margin-inline-end: 16px;
     flex: none;
+    cursor: pointer;
+    will-change: opacity;
+    transition: .12s;
   }
 
   .sc-title {
@@ -240,11 +243,11 @@ const searchTip = `${liuUtil.getHelpTip('Mod')} + K`
   }
 
   @media(hover: hover) {
-    .sc-title:hover {
+    .sc-title:hover, .sc-avatar:hover {
       opacity: .8;
     }
 
-    .sc-title:active {
+    .sc-title:active, .sc-avatar:active {
       opacity: .7;
     }
   }

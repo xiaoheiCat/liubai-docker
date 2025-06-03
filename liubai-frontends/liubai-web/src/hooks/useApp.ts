@@ -147,7 +147,7 @@ async function initMobile(
   // 1. lock screen orientation
   setTimeout(() => {
     toLockOrientation(cha)
-  }, time.SECONED)
+  }, time.SECOND)
 
   // 2. open vconsole
   const _open = async () => {

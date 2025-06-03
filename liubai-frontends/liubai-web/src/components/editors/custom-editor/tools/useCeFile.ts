@@ -195,8 +195,8 @@ async function handleImages(
   }
 
   const res0 = await imgHelper.extractExif(imgFiles)
-  const res = await imgHelper.compress(imgFiles)
-  const res2 = await imgHelper.getMetaDataFromFiles(res, res0)
+  const res1 = await imgHelper.compress(imgFiles)
+  const res2 = await imgHelper.getMetaDataFromFiles(res1, res0)
 
   // console.log("liu image store[]: ")
   // console.log(res2)

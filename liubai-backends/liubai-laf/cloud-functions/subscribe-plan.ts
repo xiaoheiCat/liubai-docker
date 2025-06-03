@@ -30,7 +30,7 @@ import {
   MINUTE,
   HOUR,
   WEEK,
-  SECONED,
+  SECOND,
 } from "@/common-time";
 import { createRefundNo } from "@/common-ids";
 import { useI18n, subPlanLang } from "@/common-i18n";
@@ -38,7 +38,7 @@ import { useI18n, subPlanLang } from "@/common-i18n";
 const db = cloud.database()
 
 /** some constants */
-const SEC_5 = SECONED * 5
+const SEC_5 = SECOND * 5
 const MIN_30 = MINUTE * 30
 const HOUR_3 = HOUR * 3
 

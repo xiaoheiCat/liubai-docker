@@ -40,6 +40,7 @@ const SettingMore = () => import("../pages/level3/setting-page/setting-more/sett
 const AuthorizePage = () => import("../pages/level3/authorize-page/authorize-page.vue")
 const CotPage = () => import("../pages/level4/cot-page/cot-page.vue")
 const AiConsolePage = () => import("../pages/level4/ai-console-page/ai-console-page.vue")
+const CropperPage = () => import("../pages/level4/cropper-page/cropper-page.vue")
 
 export const routes: Array<RouteRecordRaw> = [
   /*************** 公共页面（不区分工作区） ***************/
@@ -184,6 +185,14 @@ export const routes: Array<RouteRecordRaw> = [
     path: "/ai-console",
     component: AiConsolePage,
     name: "ai-console",
+    meta: {
+      checkWorkspace: false,
+    }
+  },
+  {
+    path: "/cropper",
+    component: CropperPage,
+    name: "cropper",
     meta: {
       checkWorkspace: false,
     }

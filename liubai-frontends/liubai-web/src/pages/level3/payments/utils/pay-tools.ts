@@ -242,7 +242,7 @@ function jumpToAlipayWap(
       rr.router.push({ name: "payment", params: { order_id } })
     }
 
-  }, 3 * time.SECONED)
+  }, 3 * time.SECOND)
 }
 
 export async function preloadAlipayWap(

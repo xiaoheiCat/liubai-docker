@@ -8,7 +8,7 @@ import { useGlobalStateStore } from '../stores/useGlobalStateStore';
 import cui from '~/components/custom-ui';
 import { db } from '~/utils/db';
 
-const SEC_10 = 10 * time.SECONED
+const SEC_10 = 10 * time.SECOND
 const MIN_15 = 15 * time.MINUTE
 
 let _updateSW: SimplePromise | undefined
@@ -77,7 +77,7 @@ export function initServiceWorker() {
     if(!r) return
     setTimeout(() => {
       _checkSW(r)
-    }, time.SECONED)
+    }, time.SECOND)
     setInterval(() => {
       _checkSW(r)
     }, MIN_15)

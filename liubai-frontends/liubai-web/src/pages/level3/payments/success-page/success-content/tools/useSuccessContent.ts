@@ -13,7 +13,7 @@ import liuApi from "~/utils/liu-api";
 import cui from "~/components/custom-ui";
 import { useQRCode } from "~/hooks/useVueUse";
 
-const SEC_3 = time.SECONED * 3
+const SEC_3 = time.SECOND * 3
 
 export function useSuccessContent() {
   const wStore = useWorkspaceStore()

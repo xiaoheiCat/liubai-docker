@@ -35,8 +35,8 @@ import { LocalToCloud } from "~/utils/cloud/LocalToCloud"
 import valTool from "~/utils/basic/val-tool"
 import type { ComposingData } from "~/types/types-atom"
 
-const SEC_6 = 6 * time.SECONED
-const SEC_30 = 30 * time.SECONED
+const SEC_6 = 6 * time.SECOND
+const SEC_30 = 30 * time.SECOND
 let spaceIdRef: Ref<string>
 
 interface IcsContext {

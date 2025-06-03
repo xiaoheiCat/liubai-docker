@@ -6,7 +6,7 @@ import type {
   LiuRqReturn,
 } from "@/common-types"
 import { Sch_X_Liu, Sch_IP } from "@/common-types"
-import { getNowStamp, SECONED, MINUTE } from "@/common-time"
+import { getNowStamp, SECOND, MINUTE } from "@/common-time"
 import { getIp } from "@/common-util"
 import * as vbot from "valibot"
 
@@ -283,7 +283,7 @@ function checkIp(ip: string) {
     const idx = rLen - (MAXIMUM_IN_ONE_SEC + 1)
     const item = recentVisitStamps[idx]
     const diff3 = now - item
-    if(diff3 < SECONED) {
+    if(diff3 < SECOND) {
       console.warn(`too many requests from ip ${ip} in 1 second`)
       return false
     }

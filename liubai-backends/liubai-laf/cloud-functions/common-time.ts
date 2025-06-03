@@ -10,8 +10,8 @@ export async function main(ctx: FunctionContext) {
 
 /********************* 常量 ****************/
 // 将 "秒" / "分" / "时" / "天" 转为 毫秒数
-export const SECONED = 1000
-export const MINUTE = 60 * SECONED
+export const SECOND = 1000
+export const MINUTE = 60 * SECOND
 export const HOUR = 60 * MINUTE
 export const DAY = 24 * HOUR
 export const WEEK = 7 * DAY

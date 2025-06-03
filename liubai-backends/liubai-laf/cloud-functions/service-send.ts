@@ -138,7 +138,7 @@ export class LiuTencentSES {
     if(!client) {
       return { code: "E5001", errMsg: "no tencent ses client in retrieveEmail" } 
     }
-    const date = LiuDateUtil.getYYYYMMDD(getNowStamp())
+    const date = LiuDateUtil.getYYYYMMDD()
     
     try {
       const res = await client.GetSendEmailStatus({

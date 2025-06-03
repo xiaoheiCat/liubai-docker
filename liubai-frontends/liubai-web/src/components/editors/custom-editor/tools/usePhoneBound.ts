@@ -33,7 +33,7 @@ export function usePhoneBound(
     const updatedStamp = user.updatedStamp
     const now = time.getTime()
     const diff = now - updatedStamp
-    if(diff <= time.SECONED * 3) return
+    if(diff <= time.SECOND * 3) return
 
     // 4. get latest data
     const res4 = await CloudEventBus.getLatestUserInfo()

@@ -6,12 +6,13 @@ import qiniu from "qiniu"
 import { 
   checkIfUserSubscribed, 
   verifyToken,
+  LiuDateUtil,
 } from "@/common-util"
 import type { 
   LiuRqReturn,
   CloudStorageService,
   Table_User,
-  Res_FileSet_UploadToken,
+  FileSetAPI,
 } from "@/common-types"
 import { createFileRandom } from "@/common-ids"
 import { qiniuCallBackBody } from "@/file-utils"
@@ -46,12 +47,13 @@ async function getUploadToken(
   const vRes = await verifyToken(ctx, body)
   if(!vRes.pass) return vRes.rqReturn
   const user = vRes.userData
+  const newBody = body as FileSetAPI.Param
 
   // 3. 选择使用哪个云存储服务
   const res2 = getTheRightService()
   let res: LiuRqReturn = { code: "E4000" }
   if(res2 === "qiniu") {
-    res = getUploadTokenViaQiniu(user)
+    res = getUploadTokenViaQiniu(user, newBody)
   }
   else if(res2 === "aliyun_oss") {
 
@@ -67,19 +69,29 @@ async function getUploadToken(
 
 function getUploadTokenViaQiniu(
   user: Table_User,
-): LiuRqReturn<Res_FileSet_UploadToken> {
+  body: FileSetAPI.Param,
+): LiuRqReturn<FileSetAPI.Res_UploadToken> {
   const hasSubscribed = checkIfUserSubscribed(user)
 
-  // 1. 构造鉴权对象 mac
+  // 1.1 构造鉴权对象 mac
   const _env = process.env
   const qiniu_access_key = _env.LIU_QINIU_ACCESS_KEY ?? ""
   const qiniu_secret_key = _env.LIU_QINIU_SECRET_KEY ?? ""
   const qiniu_bucket = _env.LIU_QINIU_BUCKET ?? ""
   const qiniu_callback_url = _env.LIU_QINIU_CALLBACK_URL ?? ""
   const qiniu_custom_key = _env.LIU_QINIU_CUSTOM_KEY ?? ""
-  const qiniu_folder = _env.LIU_QINIU_FOLDER || "users"
   const mac = new qiniu.auth.digest.Mac(qiniu_access_key, qiniu_secret_key)
 
+
+  // 1.2 handle folder
+  let qiniu_folder = _env.LIU_QINIU_FOLDER || "users"
+  if(body.purpose === "avatar") {
+    const dateStr = LiuDateUtil.getYYYYMMDD()
+    const avatarFolder = _env.LIU_QINIU_AVATAR_FOLDER || "avatars"
+    qiniu_folder = `${avatarFolder}/${dateStr}`
+  }
+
+  // 1.3 generate prefix
   const r = createFileRandom()
   const prefix = `${qiniu_folder}/${user._id}-${r}`
 

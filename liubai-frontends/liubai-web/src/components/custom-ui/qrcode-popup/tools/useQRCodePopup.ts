@@ -32,9 +32,9 @@ import {
   useThrottleFn,
 } from "~/hooks/useVueUse";
 
-const SEC_3 = time.SECONED * 3
-const SEC_4 = time.SECONED * 4
-const SEC_6 = time.SECONED * 6
+const SEC_3 = time.SECOND * 3
+const SEC_4 = time.SECOND * 4
+const SEC_6 = time.SECOND * 6
 
 const TRANSITION_DURATION = 350
 let _resolve: QpResolver | undefined

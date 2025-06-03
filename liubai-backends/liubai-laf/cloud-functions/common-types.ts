@@ -631,6 +631,7 @@ export const Sch_Cloud_ImageStore: BaseSchema<Cloud_ImageStore> = vbot.object(
     url_2: Sch_Opt_Str,
     blurhash: Sch_Opt_Str,
     someExif: vbot.optional(Sch_LiuExif),
+    size: Sch_Opt_Num,
   },
   vbot.never(),
 )
@@ -2066,6 +2067,18 @@ export namespace UserSettingsAPI {
     voicePreference?: GenderType
   }
 
+  export interface Param_MemberAvatar {
+    operateType: "member-avatar"
+    memberId: string
+    image: Cloud_ImageStore
+  }
+
+  export const Sch_Param_MemberAvatar = vbot.object({
+    operateType: vbot.literal("member-avatar"),
+    memberId: Sch_Id,
+    image: Sch_Cloud_ImageStore,
+  })
+
 }
 
 export interface Res_SubPlan_Info {
@@ -2090,10 +2103,18 @@ export interface Res_SubPlan_StripeCheckout {
   checkout_url: string   // stripe 托管的结账地址
 }
 
-export interface Res_FileSet_UploadToken {
-  cloudService: CloudStorageService
-  uploadToken: string
-  prefix: string
+export namespace FileSetAPI {
+
+  export interface Param {
+    operateType: "get-upload-token"
+    purpose?: "avatar"
+  }
+
+  export interface Res_UploadToken {
+    cloudService: CloudStorageService
+    uploadToken: string
+    prefix: string
+  }
 }
 
 export interface Res_WebhookQiniu {

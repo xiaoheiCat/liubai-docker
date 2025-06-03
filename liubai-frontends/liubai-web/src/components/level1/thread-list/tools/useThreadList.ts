@@ -32,7 +32,7 @@ import time from "~/utils/basic/time"
 import { preLoadCreateFirst, preLoadEditFirst } from "./pre-download"
 import cfg from "~/config"
 
-const SEC_15 = time.SECONED * 15
+const SEC_15 = time.SECOND * 15
 const MIN_THREADS = 9      // 最少应该有的个数，若少于这个个数，checkList 会触发重新加载
                                // 加载完成时 hasReachedBottom 会设置为 true
 

@@ -79,6 +79,7 @@ declare global {
       LIU_QINIU_CDN_DOMAIN?: string       // 七牛云的 cdn 域名，结尾不要加 /
       LIU_QINIU_CUSTOM_KEY?: string       // 自定义密钥，用于在 webhook-qiniu 中验证使用
       LIU_QINIU_SMS_TEMP_ID?: string      // 七牛云短信模板 ID
+      LIU_QINIU_AVATAR_FOLDER?: string    // the folder for avatar, don't add "/"
 
       /** 微信公众号 */
       LIU_WX_GZ_APPID?: string
