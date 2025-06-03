@@ -66,10 +66,10 @@ function hideCropperLoading() {
 async function compressFile(
   blob: Blob,
 ) {
-  const files = await imgHelper.compress([blob as File], { 
+  const blobs = await imgHelper.compress([blob], { 
     maxWidth: 256, 
     compressPoint: 33 * 1024,
     convertSize: 32 * 1024,
   })
-  console.log("files: ", files)
+  console.log("blobs: ", blobs)
 }

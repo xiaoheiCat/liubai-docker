@@ -35,8 +35,6 @@ export function chooseAvatar() {
     }
     const res0 = await imgHelper.extractExif(files)
     const res1 = await imgHelper.compress(files)
-    console.log("chooseAvatar res1: ")
-    console.log(res1)
     const res2 = await imgHelper.getMetaDataFromFiles(res1, res0)
     const res3 = liuUtil.createURLsFromStore(res2)
     const imageUrl = res3?.[0]

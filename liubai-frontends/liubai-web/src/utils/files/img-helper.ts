@@ -13,7 +13,8 @@ type FileWithCharacteristic = {
   height?: number
   blurhash?: string
 }
-type CompressResolver = (res: File) => void
+type FileOrBlob = File | Blob
+type CompressResolver<F extends FileOrBlob> = (res: F) => void
 type WidthHeightResolver = (res: FileWithCharacteristic) => void
 
 // 临界值，处于该值以上的 size 才需要压缩
@@ -101,11 +102,11 @@ export interface CompressOpt {
  * 压缩图片
  * @param files 图片 File 类型
  */
-async function compress(
-  files: File[],
+async function compress<F extends FileOrBlob>(
+  files: F[],
   opt?: CompressOpt,
 ) {
-  const list: Array<File> = []
+  const list: Array<F> = []
   const compressPoint = opt?.compressPoint ?? COMPRESS_POINT
   for(let i=0; i<files.length; i++) {
     const v = files[i]
@@ -120,8 +121,8 @@ async function compress(
   return list
 }
 
-function _toCompress(
-  file: File,
+function _toCompress<F extends FileOrBlob>(
+  file: F,
   opt?: CompressOpt,
 ) {
   const fileSize = file.size
@@ -144,7 +145,7 @@ function _toCompress(
   // 3. handle convertSize
   const convertSize = opt?.convertSize ?? (1 * 1024 * 1024)
 
-  const _excute = (a: CompressResolver) => {
+  const _excute = (a: CompressResolver<F>) => {
     console.log("ready to compress, so see file size: ")
     console.log(fileSize)
     console.log(" ")
@@ -158,7 +159,7 @@ function _toCompress(
       quality,
       convertTypes: 'image/png,image/webp',
       convertSize,   // 1mb 以上的 convertTypes 图片，都会被转成 JPEGs
-      success(res: File) {        
+      success(res: F) {        
         a(res)
       },
       error(err: Error) {
