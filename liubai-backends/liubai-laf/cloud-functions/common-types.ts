@@ -1821,12 +1821,34 @@ export interface Table_Coupon extends BaseTable {
   expireStamp?: number
 }
 
-export interface Table_Action extends BaseTable {
+export interface Table_Happy_Coupons extends BaseTable {
+  copytext_vector: number[]
+  image_vector: number[]
+  copytext?: string
+  image_url?: string
+  owner: string
+  oState: "OK" | "REVIEWING" | "DEL_BY_USER" | "DEL_BY_ADMIN" | "DEL_BY_AI"
+  fromType: "official" | "user"
+  emoji?: string
+  brand?: string
+  title?: string
+  gottenNum: number
+  totalNum: number
+  embeddingModel: string
+  expireStamp?: number
+}
+
+export interface Table_Happy_Actions extends BaseTable {
   userId: string
   infoType: "get_coupon"
   couponId?: string
 }
 
+export interface Table_Happy_Topics extends BaseTable {
+  text: string
+  text_vector: number[]
+  userIds: string[]
+}
 
 
 /*********************** 基于 Table 的扩展类型 ***********************/

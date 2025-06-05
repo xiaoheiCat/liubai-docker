@@ -3327,6 +3327,7 @@ export class LiuEmbedding {
 
   private _jina_base_url = "https://api.jina.ai/v1/embeddings"
   private _jina_model = "jina-clip-v2"
+  private _dimensions = 1024
 
   async run(input: LiuAi.EmbeddingInput[]) {
 
@@ -3350,6 +3351,7 @@ export class LiuEmbedding {
     }
     const body = {
       model: this._jina_model,
+      dimensions: this._dimensions,
       input,
     }
 
