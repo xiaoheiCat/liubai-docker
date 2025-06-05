@@ -17,6 +17,7 @@
   "dependencies": {
     "@lafjs/cloud": "1.0.0",
     "@wecom/crypto": "^1.0.1",
+    "@zilliz/milvus2-sdk-node": "^2.5.9",
     "alipay-sdk": "^4.13.0",
     "axios": "^1.8.4",
     "date-fns": "^4.1.0",

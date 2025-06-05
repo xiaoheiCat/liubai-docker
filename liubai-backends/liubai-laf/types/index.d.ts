@@ -224,6 +224,10 @@ declare global {
       /** Jina */ 
       LIU_JINA_APIKEY?: string
 
+      /** Milvus */
+      LIU_MILVUS_ADDRESS?: string
+      LIU_MILVUS_TOKEN?: string
+
     }
   }
 }
