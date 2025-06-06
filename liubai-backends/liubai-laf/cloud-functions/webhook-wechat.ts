@@ -907,6 +907,61 @@ async function getVoiceLink(
   return link
 }
 
+function autoDynamicReply(
+  wx_gzh_openid: string,
+  text: string,
+  user: Table_User,
+) {
+  // 0. trim and lowercase
+  const txt = text.trim().toLowerCase()
+
+  // 1. membership info
+  const keywords1 = [
+    "会员", "會員", "membership", "vip", "premium",
+    "会员群", "會員群", "會員群租", "vip group"
+  ]
+  const existed1 = keywords1.includes(txt)
+  if(existed1) {
+    sendMemberInfo(wx_gzh_openid, user)
+    return true
+  }
+
+  return false
+}
+
+
+function sendMemberInfo(
+  wx_gzh_openid: string,
+  user: Table_User,
+) {
+  const subscribed = checkIfUserSubscribed(user)
+  const { t } = useI18n(wechatLang, { user })
+
+  let msg = ""
+
+  // 1. not subscribed
+  if(!subscribed) {
+    msg = t("membership_1")
+    sendText(wx_gzh_openid, msg)
+    return
+  }
+
+  // 2.1 calculate expireDate
+  let endDate = "Unknown"
+  const expireStamp = user.subscription?.expireStamp
+  if(expireStamp) {
+    const { date } = LiuDateUtil.getDateAndTime(expireStamp)
+    endDate = date
+  }
+
+  // 2.2 get invite link
+  const _env = process.env
+  const groupLink = _env.LIU_WECOM_GROUP_LINK ?? ""
+  msg = t("membership_2", { endDate, groupLink })
+  sendText(wx_gzh_openid, msg)
+}
+
+
 // when user sends text, check out if we have to reply automatically
 async function autoReplyAfterReceivingText(
   wx_gzh_openid: string,
