@@ -1832,7 +1832,7 @@ export interface Table_Happy_Coupons extends BaseTable {
   emoji?: string
   brand?: string
   title: string
-  language?: string
+  keywords?: string[]
   gottenNum: number
   totalNum: number
   embeddingModel: string

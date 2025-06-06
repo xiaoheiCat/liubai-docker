@@ -101,7 +101,7 @@ import {
   getFallbackLocale, 
   useI18n,
 } from '@/common-i18n'
-import { wechat_tag_cfg } from '@/common-config'
+import { wechat_tag_cfg, milvus_cfg } from '@/common-config'
 import { 
   wxpay_apiclient_serial_no,
   wxpay_apiclient_key,
@@ -122,7 +122,6 @@ import {
   IndexType as MilvusIndexType,
   MetricType as MilvusMetricType,
   FieldType as MilvusFieldType,
-  FunctionType as MilvusFunctionType,
 } from "@zilliz/milvus2-sdk-node"
 
 const db = cloud.database()
@@ -3632,30 +3631,6 @@ export class LiuMilvus {
     const client = LiuMilvus.getClient()
     if (!client) return
 
-    const multi_analyzer_params = {
-      "analyzers": {
-        "english": {
-          "type": "english"
-        },
-        "chinese": {
-          "type": "chinese"
-        },
-        "default": {
-          "tokenizer": "icu"
-        }
-      },
-      "by_field": "language",
-      "alias": {
-        "zh-hans": "chinese",
-        "zh-hant": "chinese",
-        "zh-cn": "chinese",
-        "zh-tw": "chinese",
-        "en": "english",
-      }
-    }
-    const single_analyzer_params = {
-      "type": "chinese",
-    }
     const schema: MilvusFieldType[] = [
       {
         name: "_id",
@@ -3719,12 +3694,6 @@ export class LiuMilvus {
         enable_match: true,
       },
       {
-        name: "language",
-        data_type: MilvusDataType.VarChar,
-        max_length: 255,
-        nullable: true,
-      },
-      {
         name: "title",
         data_type: MilvusDataType.VarChar,
         max_length: 64,
@@ -3732,10 +3701,12 @@ export class LiuMilvus {
         enable_match: true,
       },
       {
-        name: "title_sparse",
-        data_type: MilvusDataType.SparseFloatVector,
-        enable_analyzer: true,
-        analyzer_params: single_analyzer_params,
+        name: "keywords",
+        data_type: MilvusDataType.Array,
+        element_type: MilvusDataType.VarChar,
+        max_length: 128,
+        max_capacity: milvus_cfg.coupon_keywords_max_capacity,
+        nullable: true,
       },
       {
         name: "gottenNum",
@@ -3753,7 +3724,6 @@ export class LiuMilvus {
       {
         name: "expireStamp",
         data_type: MilvusDataType.Int64,
-        nullable: true,
       },
       {
         name: "insertedStamp",
@@ -3762,17 +3732,6 @@ export class LiuMilvus {
       {
         name: "updatedStamp",
         data_type: MilvusDataType.Int64,
-      }
-    ]
-
-    const functions = [
-      {
-        name: "title_bm25_emb",
-        description: "turn title into title_sparse using bm25",
-        type: MilvusFunctionType.BM25,
-        input_field_names: ["title"],
-        output_field_names: ["title_sparse"],
-        params: {}
       }
     ]
 
@@ -3816,9 +3775,20 @@ export class LiuMilvus {
         index_type: MilvusIndexType.AUTOINDEX,
       },
       {
-        field_name: "title_sparse",
-        metric_type: MilvusMetricType.BM25,
+        field_name: "keywords",
         index_type: MilvusIndexType.AUTOINDEX,
+      },
+      {
+        field_name: "expireStamp",
+        index_type: MilvusIndexType.STL_SORT,
+      },
+      {
+        field_name: "insertedStamp",
+        index_type: MilvusIndexType.STL_SORT,
+      },
+      {
+        field_name: "updatedStamp",
+        index_type: MilvusIndexType.STL_SORT,
       },
     ]
 
@@ -3827,7 +3797,6 @@ export class LiuMilvus {
       collection_name: "happy_coupons",
       schema,
       index_params,
-      functions,
       enableDynamicField: true,
     })
     const t2 = getNowStamp()

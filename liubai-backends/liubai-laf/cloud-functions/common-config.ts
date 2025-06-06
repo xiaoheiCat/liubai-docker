@@ -76,3 +76,9 @@ export const ai_cfg = {
   watch_video_path: "packageA/pages/watch-video/watch-video",
 
 }
+
+
+/********************* milvus config ****************/
+export const milvus_cfg = {
+  coupon_keywords_max_capacity: 16,
+}
