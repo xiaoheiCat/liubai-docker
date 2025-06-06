@@ -122,6 +122,7 @@ import {
   IndexType as MilvusIndexType,
   MetricType as MilvusMetricType,
   FieldType as MilvusFieldType,
+  FunctionType as MilvusFunctionType,
 } from "@zilliz/milvus2-sdk-node"
 
 const db = cloud.database()
@@ -3608,179 +3609,240 @@ export class LiuMilvus {
     const res1 = await client.hasCollection({ collection_name: "happy_coupons" })
     console.log("happy_coupons exists: ", res1.value)
     if(res1.value) {
-      await this._checkHappyCoupons()
+      await this.checkHappyCoupons()
     }
     else {
       await this._createHappyCoupons()
     }
   }
 
-  private async _checkHappyCoupons() {
-      const client = LiuMilvus.getClient()
-      if(!client) return
-      const t1 = getNowStamp()
-      const res1 = await client.listIndexes({ collection_name: "happy_coupons" })
-      const t2 = getNowStamp()
-      const durationStamp = t2 - t1
-      console.log(`_checkHappyCoupons cost ${durationStamp} ms`)
-      console.log("_checkHappyCoupons res1: ", res1)
-    }
+  async checkHappyCoupons() {
+    const client = LiuMilvus.getClient()
+    if (!client) return
+    const t1 = getNowStamp()
+    const res1 = await client.describeIndex({ collection_name: "happy_coupons" })
+    const t2 = getNowStamp()
+    const durationStamp = t2 - t1
+    console.log(`_checkHappyCoupons cost ${durationStamp} ms`)
+    console.log("_checkHappyCoupons res1: ", res1)
+    return res1
+  }
   
-    private async _createHappyCoupons() {
-      const client = LiuMilvus.getClient()
-      if(!client) return
-      
-      const fields: MilvusFieldType[] = [
-        {
-          name: "_id",
-          data_type: MilvusDataType.VarChar,
-          is_primary_key: true,
-          autoID: true,
-          max_length: 64,
+  private async _createHappyCoupons() {
+    const client = LiuMilvus.getClient()
+    if (!client) return
+
+    const multi_analyzer_params = {
+      "analyzers": {
+        "english": {
+          "type": "english"
         },
-        {
-          name: "copytext_vector",
-          data_type: MilvusDataType.FloatVector,
-          dim: 1024,
+        "chinese": {
+          "type": "chinese"
         },
-        {
-          name: "image_vector",
-          data_type: MilvusDataType.FloatVector,
-          dim: 1024,
-        },
-        {
-          name: "copytext",
-          data_type: MilvusDataType.VarChar,
-          max_length: 1024,
-          nullable: true,
-        },
-        {
-          name: "image_url",
-          data_type: MilvusDataType.VarChar,
-          max_length: 512,
-          nullable: true,
-        },
-        {
-          name: "owner",
-          data_type: MilvusDataType.VarChar,
-          max_length: 64,
-          nullable: true,
-        },
-        {
-          name: "oState",
-          data_type: MilvusDataType.VarChar,
-          max_length: 16,
-        },
-        {
-          name: "fromType",
-          data_type: MilvusDataType.VarChar,
-          max_length: 16,
-        },
-        {
-          name: "emoji",
-          data_type: MilvusDataType.VarChar,
-          max_length: 16,
-          nullable: true,
-        },
-        {
-          name: "brand",
-          data_type: MilvusDataType.VarChar,
-          max_length: 32,
-          nullable: true,
-        },
-        {
-          name: "title",
-          data_type: MilvusDataType.VarChar,
-          max_length: 64,
-          nullable: true,
-        },
-        {
-          name: "gottenNum",
-          data_type: MilvusDataType.Int32,
-        },
-        {
-          name: "totalNum",
-          data_type: MilvusDataType.Int32,
-        },
-        {
-          name: "embeddingModel",
-          data_type: MilvusDataType.VarChar,
-          max_length: 64,
-        },
-        {
-          name: "expireStamp",
-          data_type: MilvusDataType.Int64,
-          nullable: true,
-        },
-        {
-          name: "insertedStamp",
-          data_type: MilvusDataType.Int64,
-        },
-        {
-          name: "updatedStamp",
-          data_type: MilvusDataType.Int64,
+        "default": {
+          "tokenizer": "icu"
         }
-      ]
-  
-      const t1 = getNowStamp()
-      const res = await client.createCollection({
-        collection_name: "happy_coupons",
-        fields,
-        index_params: [
-          {
-            field_name: "_id",
-            index_type: MilvusIndexType.AUTOINDEX,
-          },
-          {
-            field_name: "copytext_vector",
-            index_type: MilvusIndexType.AUTOINDEX,
-            metric_type: MilvusMetricType.COSINE,
-          },
-          {
-            field_name: "image_vector",
-            index_type: MilvusIndexType.AUTOINDEX,
-            metric_type: MilvusMetricType.COSINE,
-          },
-          {
-            field_name: "copytext",
-            index_type: MilvusIndexType.AUTOINDEX,
-          },
-          {
-            field_name: "owner",
-            index_type: MilvusIndexType.AUTOINDEX,
-          },
-          {
-            field_name: "oState",
-            index_type: MilvusIndexType.BITMAP,
-          },
-          {
-            field_name: "fromType",
-            index_type: MilvusIndexType.BITMAP,
-          },
-          {
-            field_name: "brand",
-            index_type: MilvusIndexType.AUTOINDEX,
-          },
-          {
-            field_name: "title",
-            index_type: MilvusIndexType.AUTOINDEX,
-          }
-        ]
-      })
-      const t2 = getNowStamp()
-      const durationStamp = t2 - t1
-      console.log(`creating happy coupons cost ${durationStamp} ms`)
-  
-      console.log("creating happy coupons res: ", res)
-  
-      const t3 = getNowStamp()
-      const res2 = await client.getLoadState({
-        collection_name: "happy_coupons",
-      })
-      const t4 = getNowStamp()
-      const durationStamp2 = t4 - t3
-      console.log(`happy_coupons load state cost ${durationStamp2} ms`)
-      console.log("happy_coupons load state res2: ", res2)
+      },
+      "by_field": "language",
+      "alias": {
+        "zh-hans": "chinese",
+        "zh-hant": "chinese",
+        "zh-cn": "chinese",
+        "zh-tw": "chinese",
+        "en": "english",
+      }
     }
+    const single_analyzer_params = {
+      "type": "chinese",
+    }
+    const schema: MilvusFieldType[] = [
+      {
+        name: "_id",
+        data_type: MilvusDataType.VarChar,
+        is_primary_key: true,
+        autoID: true,
+        max_length: 64,
+      },
+      {
+        name: "copytext_vector",
+        data_type: MilvusDataType.FloatVector,
+        dim: 1024,
+      },
+      {
+        name: "image_vector",
+        data_type: MilvusDataType.FloatVector,
+        dim: 1024,
+      },
+      {
+        name: "copytext",
+        data_type: MilvusDataType.VarChar,
+        max_length: 1024,
+        nullable: true,
+        enable_analyzer: true,
+        enable_match: true,
+      },
+      {
+        name: "image_url",
+        data_type: MilvusDataType.VarChar,
+        max_length: 512,
+        nullable: true,
+      },
+      {
+        name: "owner",
+        data_type: MilvusDataType.VarChar,
+        max_length: 64,
+        nullable: true,
+      },
+      {
+        name: "oState",
+        data_type: MilvusDataType.VarChar,
+        max_length: 16,
+      },
+      {
+        name: "fromType",
+        data_type: MilvusDataType.VarChar,
+        max_length: 16,
+      },
+      {
+        name: "emoji",
+        data_type: MilvusDataType.VarChar,
+        max_length: 16,
+        nullable: true,
+      },
+      {
+        name: "brand",
+        data_type: MilvusDataType.VarChar,
+        max_length: 32,
+        nullable: true,
+        enable_analyzer: true,
+        enable_match: true,
+      },
+      {
+        name: "language",
+        data_type: MilvusDataType.VarChar,
+        max_length: 255,
+        nullable: true,
+      },
+      {
+        name: "title",
+        data_type: MilvusDataType.VarChar,
+        max_length: 64,
+        enable_analyzer: true,
+        enable_match: true,
+      },
+      {
+        name: "title_sparse",
+        data_type: MilvusDataType.SparseFloatVector,
+        enable_analyzer: true,
+        analyzer_params: single_analyzer_params,
+      },
+      {
+        name: "gottenNum",
+        data_type: MilvusDataType.Int32,
+      },
+      {
+        name: "totalNum",
+        data_type: MilvusDataType.Int32,
+      },
+      {
+        name: "embeddingModel",
+        data_type: MilvusDataType.VarChar,
+        max_length: 64,
+      },
+      {
+        name: "expireStamp",
+        data_type: MilvusDataType.Int64,
+        nullable: true,
+      },
+      {
+        name: "insertedStamp",
+        data_type: MilvusDataType.Int64,
+      },
+      {
+        name: "updatedStamp",
+        data_type: MilvusDataType.Int64,
+      }
+    ]
+
+    const functions = [
+      {
+        name: "title_bm25_emb",
+        description: "turn title into title_sparse using bm25",
+        type: MilvusFunctionType.BM25,
+        input_field_names: ["title"],
+        output_field_names: ["title_sparse"],
+        params: {}
+      }
+    ]
+
+    const index_params = [
+      {
+        field_name: "_id",
+        index_type: MilvusIndexType.AUTOINDEX,
+      },
+      {
+        field_name: "copytext_vector",
+        index_type: MilvusIndexType.AUTOINDEX,
+        metric_type: MilvusMetricType.COSINE,
+      },
+      {
+        field_name: "image_vector",
+        index_type: MilvusIndexType.AUTOINDEX,
+        metric_type: MilvusMetricType.COSINE,
+      },
+      {
+        field_name: "copytext",
+        index_type: MilvusIndexType.AUTOINDEX,
+      },
+      {
+        field_name: "owner",
+        index_type: MilvusIndexType.AUTOINDEX,
+      },
+      {
+        field_name: "oState",
+        index_type: MilvusIndexType.BITMAP,
+      },
+      {
+        field_name: "fromType",
+        index_type: MilvusIndexType.BITMAP,
+      },
+      {
+        field_name: "brand",
+        index_type: MilvusIndexType.AUTOINDEX,
+      },
+      {
+        field_name: "title",
+        index_type: MilvusIndexType.AUTOINDEX,
+      },
+      {
+        field_name: "title_sparse",
+        metric_type: MilvusMetricType.BM25,
+        index_type: MilvusIndexType.AUTOINDEX,
+      },
+    ]
+
+    const t1 = getNowStamp()
+    const res = await client.createCollection({
+      collection_name: "happy_coupons",
+      schema,
+      index_params,
+      functions,
+      enableDynamicField: true,
+    })
+    const t2 = getNowStamp()
+    const durationStamp = t2 - t1
+    console.log(`creating happy coupons cost ${durationStamp} ms`)
+    console.log("creating happy coupons res: ", res)
+
+    const t3 = getNowStamp()
+    const res2 = await client.getLoadState({
+      collection_name: "happy_coupons",
+    })
+    const t4 = getNowStamp()
+    const durationStamp2 = t4 - t3
+    console.log(`happy_coupons load state cost ${durationStamp2} ms`)
+    console.log("happy_coupons load state res2: ", res2)
+  }
 
 }

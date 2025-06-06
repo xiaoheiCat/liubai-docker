@@ -1831,11 +1831,12 @@ export interface Table_Happy_Coupons extends BaseTable {
   fromType: "official" | "user"
   emoji?: string
   brand?: string
-  title?: string
+  title: string
+  language?: string
   gottenNum: number
   totalNum: number
   embeddingModel: string
-  expireStamp?: number
+  expireStamp: number
 }
 
 export interface Table_Happy_Actions extends BaseTable {
