@@ -7,7 +7,7 @@
 </a>
 
 <a href="./windsurf">
-  <img src="./assets-ide/banner-windsurf.jpg" alt="windsurf" width="330" style="margin-block-end: 10px; border-radius: 10px;">
+  <img src="./assets-ide/banner-windsurf2.jpg" alt="windsurf" width="330" style="margin-block-end: 10px; border-radius: 10px;">
 </a>
 
 <a href="./vscode">
