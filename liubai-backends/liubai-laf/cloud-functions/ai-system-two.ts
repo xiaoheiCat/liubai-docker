@@ -689,7 +689,7 @@ const HR_47 = HOUR * 47
 
 // 最小会话论述，聊天室的轮数必须大于等于该值，才会进入系统二
 const MAX_INPUT_TOKEN_K = 24
-const MAX_OUTPUT_TOKENS = 2000
+const MAX_OUTPUT_TOKENS = 2500
 
 const SYS2_CHARACTER: AiCharacter = "ds-reasoner"
 

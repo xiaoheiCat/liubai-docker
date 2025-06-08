@@ -681,9 +681,6 @@ async function handle_wechat_bind(
   wx_gzh.headimgurl = data4.headimgurl
   thirdData.wx_gzh = wx_gzh
 
-  console.log("thirdData in handle_wechat_bind: ")
-  console.log(thirdData)
-
   const u8: Partial<Table_User> = {
     wx_gzh_openid,
     thirdData,
@@ -692,8 +689,6 @@ async function handle_wechat_bind(
   const res8 = await uCol.doc(userId).update(u8)
   user.thirdData = thirdData
   user.wx_gzh_openid = wx_gzh_openid
-  console.log("update user res8 in handle_wechat_bind: ")
-  console.log(res8)
 
   afterHandleWechatBind(user)
 
@@ -963,8 +958,8 @@ async function afterHandleWechatBind(
   const data1 = await getWxGzhUserInfo(wx_gzh_openid)
   if(!data1) return
 
-  console.log("data1 in afterHandleWechatBind: ")
-  console.log(data1)
+  // console.log("data1 in afterHandleWechatBind: ")
+  // console.log(data1)
 
   // 2. set wx_gzh other data
   const wx_gzh = thirdData.wx_gzh ?? {}
@@ -1009,8 +1004,8 @@ async function afterHandleWechatBind(
     return
   }
 
-  console.log("member in afterHandleWechatBind: ")
-  console.log(member)
+  // console.log("member in afterHandleWechatBind: ")
+  // console.log(member)
 
   // 4. check out wx_gzh_toggle
   const memberId = member._id

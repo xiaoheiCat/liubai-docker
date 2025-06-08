@@ -1041,7 +1041,6 @@ export class TellUser {
       }
       
       const media_id = res0?.media_id
-      console.log("let me see audio media_id: ", media_id)
       if(!media_id) return
 
       const obj1: Wx_Gzh_Send_Msg = {
