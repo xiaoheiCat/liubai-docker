@@ -3865,6 +3865,12 @@ export namespace LiuAi {
     data?: LiuAi.EmbeddingOutput[]
   }
 
+  export interface Res_Embedding {
+    computingProvider: ComputingProvider
+    character?: AiCharacter
+    originalResult?: EmbeddingResult
+  }
+
 }
 
 

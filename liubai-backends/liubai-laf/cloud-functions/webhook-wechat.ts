@@ -61,7 +61,7 @@ import { createCredential2, createIdToIdCredential } from "@/common-ids";
 import { init_user } from "@/user-login";
 import { WxGzhSender } from "@/service-send";
 import { get_into_ai } from "@/ai-entrance";
-import { wx_coupon_keys } from "./common-config";
+import { wx_coupon_keys } from "@/common-config";
 
 const db = cloud.database()
 const _ = db.command

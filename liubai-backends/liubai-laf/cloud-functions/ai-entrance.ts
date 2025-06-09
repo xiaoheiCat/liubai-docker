@@ -36,6 +36,7 @@ import {
   getLiuDoman,
   AiToolUtil,
   SubscriptionManager,
+  CommonShared,
 } from "@/common-util"
 import { 
   getBasicStampWhileAdding, 
@@ -562,7 +563,7 @@ class AiDirective {
 
     // 5. send a message to user
     const msg5 = t("bot_left", { botName: bot.name })
-    const gzhType = AiShared.getGzhType()
+    const gzhType = CommonShared.getGzhType()
     if(gzhType === "service_account" && addedList.length > 0) {
       // 5.1 send menu
       const menuList: LiuAi.MenuItem[] = []
@@ -1450,7 +1451,7 @@ class BaseBot {
 
     const character = bot.character
     const finishReason = AiShared.getFinishReason(chatCompletion)
-    const gzhType = AiShared.getGzhType()
+    const gzhType = CommonShared.getGzhType()
 
     let text = textToUser
 
@@ -4222,7 +4223,7 @@ class UserHelper {
     }
     const roomId = room._id
     const path = `${ai_cfg.watch_video_path}?r=${roomId}`
-    const gzhType = AiShared.getGzhType()
+    const gzhType = CommonShared.getGzhType()
     const msgKey = gzhType === "subscription_account" ? "quota_warning_4_mock" : "quota_warning_4"
 
     // 2. get payment link

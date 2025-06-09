@@ -3817,3 +3817,11 @@ export class LiuMilvus {
   }
 
 }
+
+export class CommonShared {
+  static getGzhType() {
+    const _env = process.env
+    return _env.LIU_WX_GZ_TYPE ?? "subscription_account"
+  }
+}
+

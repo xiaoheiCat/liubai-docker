@@ -57,6 +57,7 @@ import {
   RichTexter,
   valTool,
   ValueTransform,
+  CommonShared,
 } from "@/common-util"
 import { aiBots, aiI18nShared } from "@/ai-prompt"
 import { useI18n, aiLang, getCurrentLocale, commonLang, getAppName } from "@/common-i18n"
@@ -560,11 +561,6 @@ export class AiShared {
     const bot = aiBots.find(v => v.character === character)
     if(bot) name = bot.name
     return name
-  }
-
-  static getGzhType() {
-    const _env = process.env
-    return _env.LIU_WX_GZ_TYPE ?? "subscription_account"
   }
 
   static getAiFinishReason(
@@ -1115,8 +1111,7 @@ export class TellUser {
     suffixMessage: string,
     fromCharacter?: AiCharacter
   ) {
-    const _env = process.env
-    const gzhType = AiShared.getGzhType()
+    const gzhType = CommonShared.getGzhType()
     const { wx_gzh_openid, user } = entry
     const { t } = useI18n(aiLang, { user })
 
@@ -3336,6 +3331,8 @@ export class LiuEmbedding {
   private _tongyi_multi_model = "multimodal-embedding-v1"
   private _tongyi_multi_url = "https://dashscope.aliyuncs.com/api/v1/services/embeddings/multimodal-embedding/multimodal-embedding"
 
+  private _zhipu_model = "embedding-3"
+
   async run(input: LiuAi.EmbeddingInput[]) {
 
     // 1. using jina first
@@ -3406,16 +3403,65 @@ export class LiuEmbedding {
     }
   }
 
+  async runByZhipu(
+    input: LiuAi.EmbeddingInput[],
+    apiEndpoint?: LiuAi.ApiEndpoint,
+  ) {
+    // 0. define total result
+    const totalResult: LiuAi.Res_Embedding = {
+      computingProvider: "zhipu",
+    }
+
+    // 1. get apiEndpoint if not provided
+    if(!apiEndpoint) {
+      apiEndpoint = AiShared.getEndpointFromProvider("zhipu")
+      if(!apiEndpoint) {
+        console.warn("there is no api key and base url for zhipu")
+        return totalResult
+      }
+    }
+
+    // 2. has something out of text
+    let hasOtherOutOfText = false
+    const texts: string[] = []
+    input.forEach(v => {
+      if(v && (v as any).text) {
+        texts.push((v as any).text)
+      }
+      else {
+        hasOtherOutOfText = true
+      }
+    })
+    if(hasOtherOutOfText) {
+      console.warn("zhipu only supports texts for embedding")
+      return totalResult
+    }
+
+    // 3. run
+    const res3 = await this._runWithOpenAICompatible(
+      apiEndpoint,
+      this._zhipu_model,
+      texts,
+    )
+    totalResult.originalResult = res3
+    return totalResult
+  }
+
   async runByTongyi(
     input: LiuAi.EmbeddingInput[],
     apiEndpoint?: LiuAi.ApiEndpoint,
   ) {
+    // 0. define total result
+    const totalResult: LiuAi.Res_Embedding = {
+      computingProvider: "aliyun-bailian",
+    }
+
     // 1. get apiEndpoint if not provided
     if(!apiEndpoint) {
       apiEndpoint = AiShared.getEndpointFromProvider("aliyun-bailian")
       if(!apiEndpoint) {
         console.warn("there is no api key and base url for aliyun-bailian")
-        return
+        return totalResult
       }
     }
 
@@ -3439,7 +3485,8 @@ export class LiuEmbedding {
         this._tongyi_multi_model,
         input,
       )
-      return res3
+      totalResult.originalResult = res3
+      return totalResult
     }
 
     // 4. turn input to all string arr
@@ -3448,25 +3495,30 @@ export class LiuEmbedding {
       this._tongyi_text_model,
       allText,
     )
-    return res4
+    totalResult.originalResult = res4
+    return totalResult
   }
 
   async runByJina(
     input: LiuAi.EmbeddingInput[],
     apiEndpoint?: LiuAi.ApiEndpoint,
   ) {
+    const totalResult: LiuAi.Res_Embedding = {
+      computingProvider: "jina",
+    }
     if(!apiEndpoint) {
       apiEndpoint = AiShared.getEndpointFromProvider("jina")
       if(!apiEndpoint) {
         console.warn("there is no api key and base url for jina")
-        return
+        return totalResult
       }
     }
 
     const { apiKey, baseURL } = apiEndpoint
     const url = `${baseURL}/embeddings`
     const res2 = await this._runWithLiuReq(url, apiKey, this._jina_model, input)
-    return res2
+    totalResult.originalResult = res2
+    return totalResult
   }
 
 }
