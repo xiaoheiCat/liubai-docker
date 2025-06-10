@@ -86,6 +86,8 @@ export const ai_cfg = {
 
   watch_video_path: "packageA/pages/watch-video/watch-video",
 
+  img2text_prompt: "解释一下图中的现象",
+
 }
 
 

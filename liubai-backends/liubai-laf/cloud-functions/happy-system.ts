@@ -237,3 +237,33 @@ async function get_showcase(
   }
   return { code: "0000", data: res3 }
 }
+
+
+/***************************** Coupons *****************************/
+interface CouponAddCheckerOpt {
+  copytext?: string
+  image_url?: string
+}
+
+class CouponAddChecker {
+
+  
+  
+  static image(image_url: string) {
+    
+
+  }
+
+  static text() {
+
+
+
+  }
+
+}
+
+
+
+
+
+

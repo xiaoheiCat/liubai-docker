@@ -89,6 +89,63 @@ export const charactersTakingARest: AiCharacter[] = [
 type BaseChatResolver = (res: OaiChatCompletion | undefined) => void
 type BufferResolver = (res: Buffer | undefined) => void
 
+
+export const txt2TxtAiWorkers: LiuAi.AiWorker[] = [
+
+]
+
+
+export const img2TxtWorkers: LiuAi.AiWorker[] = [
+  {
+    computingProvider: "stepfun",
+    model: "step-r1-v-mini",
+    character: "yuewen",
+  },
+  {
+    computingProvider: "zhipu",
+    model: "glm-4v-plus-0111",
+    character: "zhipu",
+  },
+  {
+    computingProvider: "minimax",
+    model: "MiniMax-Text-01",
+    character: "hailuo",
+  },
+
+  // qwen vl
+  // https://bailian.console.aliyun.com/?tab=model#/model-market/detail/qwen-vl-max?modelGroup=qwen-vl-max
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen-vl-max",
+    character: "tongyi-qwen",
+  },
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen-vl-max-latest",
+    character: "tongyi-qwen",
+  },
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen-vl-max-2025-01-25",
+    character: "tongyi-qwen",
+  },
+
+  // qvq
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qvq-max-2025-03-25",
+    character: "tongyi-qwen",
+    stream: true,
+  },
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qvq-max-latest",
+    character: "tongyi-qwen",
+    stream: true,
+  }
+]
+
+
 export class BaseLLM {
   protected _client: OpenAI | undefined
   protected _baseUrl: string | undefined
@@ -3521,4 +3578,111 @@ export class LiuEmbedding {
     return totalResult
   }
 
+}
+
+
+export class WorkerBase {
+
+  private _workers: LiuAi.AiWorker[] = []
+
+  constructor(type: "txt2txt" | "img2txt") {
+    if(type === "img2txt") {
+      this._workers = valTool.copyObject(img2TxtWorkers)
+    }
+    else {
+      this._workers = valTool.copyObject(txt2TxtAiWorkers)
+    }
+  }
+
+  private _deleteProvider(p: LiuAi.ComputingProvider) {
+    this._workers = this._workers.filter(v => v.computingProvider !== p)
+  }
+
+  getWorker() {
+    const workers = this._workers
+    const len = workers.length
+    if(len <= 0) return
+    const idx = Math.floor(Math.random() * len)
+    const theWorker = workers[idx]
+    this._deleteProvider(theWorker.computingProvider)
+    return theWorker
+  }
+}
+
+
+/*************** Image Parser (Image to Text) ************/
+
+export interface Param_Img2Txt {
+  image_url: string
+  prompt?: string
+}
+
+
+export class Img2Txt {
+  private _image_url: string
+  private _prompt?: string
+
+  constructor(opt: Param_Img2Txt) {
+    this._image_url = opt.image_url
+    this._prompt = opt.prompt
+  }
+
+  async run() {
+
+    // 1. construct prompts
+    const url = this._image_url
+    const messages: OaiPrompt[] = [
+      {
+        role: "user",
+        content: [
+          {
+            type: "image_url",
+            image_url: { url }
+          },
+          { type: "text", 
+            text: this._prompt || ai_cfg.img2text_prompt,
+          },
+        ]
+      },
+    ]
+
+    // 2. get worker
+    const workerBase = new WorkerBase("img2txt")
+    let worker = workerBase.getWorker()
+    if(!worker) return
+    let apiEndpoint = AiShared.getEndpointFromProvider(worker.computingProvider)
+    if(!apiEndpoint) return
+
+    // 3. run BaseLLM
+    const llm3 = new BaseLLM(apiEndpoint.apiKey, apiEndpoint.baseURL)
+    let res3 = await llm3.chat({ 
+      messages, 
+      model: worker.model,
+      stream: worker.stream,
+    })
+
+    // 4. try again
+    if(!res3) {
+      worker = workerBase.getWorker()
+      if(!worker) return
+      apiEndpoint = AiShared.getEndpointFromProvider(worker.computingProvider)
+      if(!apiEndpoint) return
+      const llm4 = new BaseLLM(apiEndpoint.apiKey, apiEndpoint.baseURL)
+      res3 = await llm4.chat({ 
+        messages, 
+        model: worker.model,
+        stream: worker.stream,
+      })
+      if(!res3) return 
+    }
+    
+    // 5. get text
+    const res5 = AiShared.getContentFromLLM(res3)
+    if(!res5.content) return
+
+    return {
+      text: res5.content,
+      worker,
+    }
+  }
 }

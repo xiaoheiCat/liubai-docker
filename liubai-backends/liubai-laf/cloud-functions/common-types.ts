@@ -1822,6 +1822,7 @@ export interface Table_Showcase extends BaseTable {
 export interface Table_HappyCoupon extends BaseTable {
   copytext?: string
   image_url?: string
+  img_to_txt?: string
   owner?: string
   oState: OState_Coupon
   fromType: LiuFromType
@@ -3832,6 +3833,7 @@ export namespace LiuAi {
     computingProvider: ComputingProvider
     model: string
     character?: AiCharacter
+    stream?: boolean
   }
 
 
