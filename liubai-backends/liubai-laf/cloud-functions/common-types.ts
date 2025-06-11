@@ -191,6 +191,11 @@ export const localThemes = [...supportedThemes, "system", "auto"] as const
 export type LocalTheme = typeof localThemes[number]
 export const Sch_LocalTheme = vbot.picklist(localThemes)
 
+// type of role
+export const liuRoles = ["admin", "user"] as const
+export type LiuRole = typeof liuRoles[number]
+export const Sch_LiuRole = vbot.picklist(liuRoles)
+
 // type of gender
 export const genderTypes = ["male", "female"] as const
 export type GenderType = typeof genderTypes[number]
@@ -1411,6 +1416,7 @@ export interface Table_User extends BaseTable {
 
   userAgent?: string
   timezone?: string
+  role?: LiuRole
   
 }
 

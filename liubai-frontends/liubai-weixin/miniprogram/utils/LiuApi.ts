@@ -261,4 +261,15 @@ export class LiuApi {
     )
   }
 
+  static downloadFile(
+    opt: WechatMiniprogram.DownloadFileOption,
+  ) {
+    return wx.downloadFile(opt)
+  }
+  
+  static showShareImageMenu(
+    opt: WechatMiniprogram.ShowShareImageMenuOption,
+  ) {
+    return wx.showShareImageMenu(opt)
+  }
 }
