@@ -196,6 +196,13 @@ export const liuRoles = ["admin", "user"] as const
 export type LiuRole = typeof liuRoles[number]
 export const Sch_LiuRole = vbot.picklist(liuRoles)
 
+// typeo of functionality
+export const liuFunctionalitys = [
+  "note", "coupon"
+] as const
+export type LiuFunctionality = typeof liuFunctionalitys[number]
+export const Sch_LiuFunctionality = vbot.picklist(liuFunctionalitys)
+
 // type of gender
 export const genderTypes = ["male", "female"] as const
 export type GenderType = typeof genderTypes[number]
@@ -1417,6 +1424,7 @@ export interface Table_User extends BaseTable {
   userAgent?: string
   timezone?: string
   role?: LiuRole
+  blockedFuncs?: LiuFunctionality[]
   
 }
 
