@@ -196,7 +196,6 @@ export class LiuApi {
       wx.login({
         timeout: 5000,
         success(res) {
-          console.log("login success: ", res)
           a(res.code)
         },
         fail(err) {
@@ -211,8 +210,7 @@ export class LiuApi {
   static checkSession() {
     const _wait = (a: BoolFunc) => {
       wx.checkSession({
-        success(res) {
-          console.log("checkSession success: ", res)
+        success() {
           a(true)
         },
         fail(err) {
@@ -229,13 +227,38 @@ export class LiuApi {
     return wx.setStorage(opt)
   }
 
-  static getStorage(opt: WechatMiniprogram.GetStorageOption) {
+  static async getStorage(opt: WechatMiniprogram.GetStorageOption) {
     opt.key = `liu_${opt.key}`
-    return wx.getStorage(opt)
+    try {
+      const res = await wx.getStorage(opt)
+      return res
+    }
+    catch(err) {
+      return null
+    }
+  }
+
+  static removeStorage(opt: WechatMiniprogram.RemoveStorageOption) {
+    opt.key = `liu_${opt.key}`
+    return wx.removeStorage(opt)
   }
 
   static getLaunchOptionsSync() {
     return wx.getLaunchOptionsSync()
+  }
+
+  static onNetworkStatusChange(
+    listener: WechatMiniprogram.OnNetworkStatusChangeCallback
+  ) {
+    wx.onNetworkStatusChange(listener)
+  }
+
+  static offNetworkStatusChange(
+    listener?: WechatMiniprogram.OnNetworkStatusChangeCallback
+  ) {
+    wx.offNetworkStatusChange(
+      listener as unknown as WechatMiniprogram.OffNetworkStatusChangeCallback
+    )
   }
 
 }

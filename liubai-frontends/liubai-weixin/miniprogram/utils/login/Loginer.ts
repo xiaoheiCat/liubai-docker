@@ -1,10 +1,14 @@
-import { LiuLoginData } from "~/types";
+import type { LiuLoginData } from "~/types/index";
 import { LiuApi } from "../LiuApi";
+import { fetchEnter, fetchLogin } from "./tools/fetch-user";
+import { getLoginLocally, removeLoginLocally, setLoginLocally } from "./tools/local-login";
 import { LiuTime } from "../LiuTime";
-import { fetchLogin } from "./tools/handle-login";
+import type { LiuSpaceAndMember } from "~/types/types-cloud";
 
 
 export class Loginer {
+
+  static hasFetched = false
 
   static canILogin() {
     const res = LiuApi.getApiCategory()
@@ -12,48 +16,32 @@ export class Loginer {
     return true
   }
 
-  private static _loginData: LiuLoginData | undefined
-  private static _lastGetLoginDataStamp = 0
-
   static async getLoginData(
     checkingSession = false,
   ) {
-    // 0. get storage from variable
-    if(this._loginData && !checkingSession) {
-      const stamp0 = this._lastGetLoginDataStamp
-      const within = LiuTime.isWithinMillis(stamp0, LiuTime.MINUTE, true)
-      if(within) {
-        return this._loginData
-      }
-    }
-
-    // 1. get storage
-    const res1 = await LiuApi.getStorage({ 
-      key: "login-data",
-      encrypt: true,
-    })
-    const data1 = res1?.data as LiuLoginData | null
-    if(!data1) return
-    this._loginData = data1
-    this._lastGetLoginDataStamp = LiuTime.getLocalTime()
+    // 1. get login data
+    const res1 = await getLoginLocally()
+    if(!res1) return
+    if(!checkingSession) return res1
 
     // 2. check session
-    if(checkingSession) {
-      const res2 = await LiuApi.checkSession()
-      if(!res2) return
-    }
+    const res2 = await LiuApi.checkSession()
+    if(!res2) return
 
-    return data1
+    return res1
   }
 
   static async run() {
+    // 1. get login data
     const res1 = await this.getLoginData(true)
     if(res1) {
-      this.toRefresh()
+      const res1_2 = await this.toRefresh()
+      return res1_2
     }
-    else {
-      this.toLogin()
-    }
+
+    // 2. to login
+    const res2 = await this.toLogin()
+    return res2
   }
 
   private static async toLogin() {
@@ -64,21 +52,88 @@ export class Loginer {
     // 2. get credential
     const res2 = LiuApi.getLaunchOptionsSync()
     const credential = res2?.query?.cred as string | undefined
-    console.log("credential: ", credential)
+    console.log("toLogin credential: ", credential)
 
     // 3. fetch login
     const res3 = await fetchLogin(js_code, credential)
     if(!res3) return
 
-    // 4. 
+    console.log("fetch login res: ", res3)
 
-
+    // 4. handle data
+    const data4 = res3.data
+    if(!data4) return
+    if(!data4.serial_id || !data4.token) return
+    
+    // 5. get avatar & nickname
+    const avaNick = this._getAvatarAndNickname(data4.spaceMemberList)
+    const newLoginData: LiuLoginData = {
+      theme: data4.theme,
+      language: data4.language,
+      token: data4.token,
+      serial: data4.serial_id,
+      subscription: data4.subscription,
+      nickname: avaNick.nickname,
+      avatarUrl: avaNick.avatarUrl,
+      wx_mini_openid: data4.wx_mini_openid,
+      lastSetStamp: LiuTime.getTime(),
+    }
+    
+    // 6. to set login data
+    await setLoginLocally(newLoginData)
+    this.hasFetched = true
+    return true
   }
 
   private static async toRefresh() {
+    // 1. fetch
+    const res1 = await fetchEnter()
+    if(!res1) return
+    const code1 = res1.code
+    console.log("toRefresh res1: ", res1)
 
+    // 2. if the login state has been expired
+    if(code1 === "E4003" || code1 === "E4004") {
+      removeLoginLocally()
+      const res2 = await this.toLogin()
+      return res2
+    }
+    const data1 = res1.data
+    if(!data1) return
+
+    // 3. merge login data
+    const oldData = await this.getLoginData()
+    const avaNick = this._getAvatarAndNickname(data1.spaceMemberList)
+    const newData: LiuLoginData = {
+      ...oldData,
+      theme: data1.theme,
+      language: data1.language,
+      subscription: data1.subscription,
+      nickname: avaNick.nickname,
+      avatarUrl: avaNick.avatarUrl,
+      lastSetStamp: LiuTime.getTime(),
+    }
+    if(data1.new_serial && data1.new_token) {
+      newData.serial = data1.new_serial
+      newData.token = data1.new_token
+    }
+    
+    // 4. to update
+    await setLoginLocally(newData)
+    this.hasFetched = true
+    return true
   }
 
+
+  private static _getAvatarAndNickname(
+    spaceMemberList?: LiuSpaceAndMember[],
+  ) {
+    if(!spaceMemberList) return {}
+    const spaceMember = spaceMemberList[0]
+    const avatarUrl = spaceMember.member_avatar?.url
+    const nickname = spaceMember.member_name
+    return { avatarUrl, nickname }
+  }
 
 
 }

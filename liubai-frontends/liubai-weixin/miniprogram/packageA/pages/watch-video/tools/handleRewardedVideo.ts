@@ -1,5 +1,5 @@
 import { LiuApi } from "~/utils/LiuApi"
-import type { MiniProgramContext } from "~/types"
+import type { MiniProgramContext } from "~/types/index"
 import { WatchVideoData } from "./types"
 import { LiuUtil } from "~/utils/liu-util/index"
 import { fetchPost } from "./useWatchVideo"
@@ -25,6 +25,15 @@ function toContactUs() {
       console.error("openCustomerServiceChat fail: ", err)
     }
   })
+}
+
+async function tryToLoad() {
+  if(!rewardedVideoAd) return
+  try {
+    const res3 = await rewardedVideoAd.load()
+    console.log("rewardedVideoAd load res: ", res3)
+  }
+  catch(err) {}
 }
 
 
@@ -108,11 +117,7 @@ export async function initRewardedVideoAd(
   })
 
   // 3. load
-  try {
-    const res3 = await rewardedVideoAd.load()
-    console.log("rewardedVideoAd load res: ", res3)
-  }
-  catch(err) {}
+  tryToLoad()
 }
 
 
@@ -125,12 +130,20 @@ export function destroyRewardedVideoAd() {
 
 export async function showRewardedVideoAd() {
   if(!rewardedVideoAd) return
+
+  let errMsg = ""
   try {
     const res = await rewardedVideoAd.show()
     console.log("showRewardedVideoAd res: ", res)
+    return
   }
   catch(err) {
     console.warn("showRewardedVideoAd err: ")
     console.log(err)
+    errMsg = (err as any)?.errMsg ?? ""
+  }
+
+  if(errMsg.includes("please invoke load()")) {
+    tryToLoad()
   }
 }

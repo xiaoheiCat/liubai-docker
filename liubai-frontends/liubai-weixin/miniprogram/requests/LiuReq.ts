@@ -4,17 +4,15 @@ import { LiuApi } from "../utils/LiuApi"
 import { envData } from "../config/env-data"
 import { LiuUtil } from "../utils/liu-util/index"
 import { defaultData } from "../config/default-data"
+import { getLoginLocally } from "~/utils/login/tools/local-login"
 
 export type NetworkResolver<T> = (res: LiuRqReturn<T>) => void
 
-function _getBody<U extends Record<string, any>>(
+async function _getBody<U extends Record<string, any>>(
   body?: U,
 ) {
-
-  // 1.1 encrypt some data in body
-  if(body) {
-    
-  }
+  // 1.1 get serial & token
+  const loginData = await getLoginLocally()
 
   // 1.2 get language
   const appBaseInfo = LiuApi.getAppBaseInfo()
@@ -30,6 +28,8 @@ function _getBody<U extends Record<string, any>>(
     x_liu_timezone: LiuTime.getTimezone().toFixed(1),
     x_liu_client: "weixin-miniprogram",
     x_liu_device: LiuUtil.getDeviceString(),
+    x_liu_token: loginData?.token,
+    x_liu_serial: loginData?.serial,
     ...body,
   }
 
@@ -41,7 +41,7 @@ function _getBody<U extends Record<string, any>>(
 
 export class LiuReq {
 
-  static request<
+  static async request<
     T extends Record<string, any>,
     U extends Record<string, any> = Record<string, any>,
   >(
@@ -49,7 +49,7 @@ export class LiuReq {
     body?: U,
     options?: LiuReqOptions,
   ) {
-    const newBody = _getBody(body)
+    const newBody = await _getBody(body)
     const timeout = options?.timeout ?? 10000
     const method = options?.method ?? "POST"
 

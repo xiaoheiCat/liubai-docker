@@ -1,6 +1,6 @@
 import APIs from "~/requests/APIs";
 import { LiuReq } from "~/requests/LiuReq";
-import { UserLoginAPI } from "~/requests/req-types";
+import { UserLoginAPI, UserSettingsAPI } from "~/requests/req-types";
 
 export async function fetchLogin(
   js_code: string,
@@ -17,9 +17,15 @@ export async function fetchLogin(
 }
 
 export async function fetchEnter() {
-
+  const w1 = { operateType: "enter" }
+  const url1 = APIs.USER_SETTINGS
+  const res1 = await LiuReq.request<UserSettingsAPI.Res_Enter>(url1, w1)
+  return res1
 }
 
 export async function fetchLatest() {
-  
+  const w1 = { operateType: "latest" }
+  const url1 = APIs.USER_SETTINGS
+  const res1 = await LiuReq.request<UserSettingsAPI.Res_Latest>(url1, w1)
+  return res1
 }

@@ -1307,7 +1307,6 @@ async function handle_wx_mini_session(
     console.log(res3)
     return { code: "E5004", errMsg: "no login data from wx mini" }
   }
-  console.warn("wx mini login data: ", data3)
 
   // 4. find user
   let userRes: FindUserRes = { type: 3 }

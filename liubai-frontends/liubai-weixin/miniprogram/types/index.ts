@@ -17,8 +17,9 @@ export interface LiuLoginData {
   language?: LocalLocale
   token?: string
   serial?: string
-  nickName?: string
+  nickname?: string
   avatarUrl?: string
   subscription?: UserSubscription
+  wx_mini_openid?: string
   lastSetStamp: number
 }
