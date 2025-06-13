@@ -1626,7 +1626,7 @@ export interface Table_Config extends BaseTable {
 /** 临时凭证表的类型 */
 export type Table_Credential_Type =  "sms-code" | "email-code" | "wx-gzh-scan"
   | "users-select" | "stripe-checkout-session" | "bind-wecom" | "bind-wechat" 
-  | "bind-phone" | "auth-code" | "weixin-ad"
+  | "bind-phone" | "auth-code" | "weixin-ad" | "coupon-auth"
 
 /** 临时凭证表 */
 export interface Table_Credential extends BaseTable {
@@ -2546,6 +2546,17 @@ export namespace HappySystemAPI {
     operateType: "post-weixin-ad"
     conversationCountFromAd: number
   }
+
+  export type OperateType = "get-showcase"
+    | "get-weixin-ad"
+    | "post-weixin-ad"
+    | "coupon-status"
+    | "coupon-check"
+    | "coupon-post"
+    | "coupon-get"
+    | "coupon-update"
+    | "coupon-delete"
+    | "coupon-search"
 }
 
 /****************** sync-operate api ***************/

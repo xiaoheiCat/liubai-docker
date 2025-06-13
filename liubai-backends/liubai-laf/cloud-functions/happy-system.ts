@@ -1,7 +1,7 @@
 // Function Name: happy-system
 
 import cloud from "@lafjs/cloud"
-import { getDocAddId, valTool } from "@/common-util"
+import { getDocAddId, valTool, verifyToken } from "@/common-util"
 import type { 
   HappySystemAPI,
   LiuRqReturn,
@@ -10,8 +10,16 @@ import type {
   Table_Credential,
   Table_Showcase,
   Table_User,
+  VerifyTokenRes,
+  VerifyTokenRes_B,
 } from "@/common-types"
-import { getBasicStampWhileAdding, getNowStamp, isWithinMillis, MINUTE, SECOND } from "@/common-time"
+import { 
+  getBasicStampWhileAdding, 
+  getNowStamp, 
+  isWithinMillis, 
+  MINUTE, 
+  SECOND,
+} from "@/common-time"
 import { createAdCredential } from "@/common-ids"
 import { ai_cfg } from "@/common-config"
 import { Img2Txt } from "@/ai-shared"
@@ -23,9 +31,15 @@ export async function main(ctx: FunctionContext) {
 
   // 1. verify token
   const body = ctx.request?.body ?? {}
+  const oT = body.operateType as HappySystemAPI.OperateType
+  const isCoupon = oT.startsWith("coupon-")
+  let vRes: VerifyTokenRes | undefined
+  if(isCoupon) {
+    vRes = await verifyToken(ctx, body)
+    if(!vRes.pass) return vRes.rqReturn
+  }
 
   // 2. decide which path to go
-  const oT = body.operateType
   let res: LiuRqReturn = { code: "E4000" }
   if(oT === "get-showcase") {
     res = await get_showcase(body)
@@ -35,6 +49,27 @@ export async function main(ctx: FunctionContext) {
   }
   else if(oT === "post-weixin-ad") {
     res = await post_weixin_ad(body)
+  }
+  else if(oT === "coupon-status" && vRes?.pass) {
+
+  }
+  else if(oT === "coupon-check") {
+
+  }
+  else if(oT === "coupon-post" && vRes?.pass) {
+    coupon_post(body, vRes)
+  }
+  else if(oT === "coupon-get") {
+
+  }
+  else if(oT === "coupon-update") {
+
+  }
+  else if(oT === "coupon-delete") {
+
+  }
+  else if(oT === "coupon-search") {
+
   }
   
   return res
@@ -242,38 +277,79 @@ async function get_showcase(
 
 /***************************** Coupons *****************************/
 
+async function coupon_post(
+  body: Record<string, any>,
+  vRes: VerifyTokenRes_B,
+) {
+  // 1.1 check out days
+  const availableDays = body.availableDays ?? 7
+  if(typeof availableDays !== "number") {
+    return { code: "E4000", errMsg: "Invalid availableDays" }
+  }
+  // 1.2 copytext & image_url
+  const copytext = body.copytext
+  const image_url = body.image_url
+  if(!copytext && !image_url) {
+    return { code: "E4000", errMsg: "copytext or image_url is required" }
+  }
+  // 1.3 image_h2w
+  const image_h2w = body.image_h2w
+  if(image_h2w && !valTool.isStringAsNumber(image_h2w)) {
+    return { code: "E4000", errMsg: "Invalid image_h2w" }
+  }
+
+
+  // 2. check out credential
+  const credential = body.credential
+  if(!valTool.isStringWithVal(credential)) {
+    return { code: "E4000", errMsg: "Invalid credential" }
+  }
+  const cCol = db.collection("Credential")
+  const res1 = await cCol.where({ credential }).getOne()
+  const data1 = res1.data
+  if(!data1 || data1.infoType !== "coupon-auth") {
+    return { code: "E4003", errMsg: "no credential found" }
+  }
+  
+
+
+  
+
+
+
+
+}
+
+
 export interface CouponAddManagerOpt {
   user: Table_User
   copytext?: string
   image_url?: string
+  image_h2w?: string
+  availableDays: number
 }
 
 class CouponAddManager {
 
-  private _user?: Table_User
-  private _copytext?: string
-  private _image_url?: string
+  private _opt: CouponAddManagerOpt
 
   constructor(
     opt: CouponAddManagerOpt,
   ) {
-    this._user = opt.user
-    this._copytext = opt.copytext
-    this._image_url = opt.image_url
+    this._opt = opt
   }
 
   async run() {
     // 1. get required params
-    const copytext = this._copytext
-    const image_url = this._image_url
-    if(!copytext && !image_url) {
-      console.warn("there is no copytext or image_url")
-      return
-    }
+    const copytext = this._opt.copytext
+    const image_url = this._opt.image_url
 
     // 2. try to add data into document db
     if(copytext) {
 
+    }
+    else if(image_url) {
+      await this.addImageIntoDocDB()
     }
     
   }
@@ -283,7 +359,7 @@ class CouponAddManager {
   }
 
   async addImageIntoDocDB() {
-    const image_url = this._image_url as string
+    const image_url = this._opt.image_url as string
     const res1 = await CouponAddChecker.image(image_url)
     const img_to_txt = res1?.text?.trim?.()
     if(!img_to_txt || img_to_txt === "0") {
