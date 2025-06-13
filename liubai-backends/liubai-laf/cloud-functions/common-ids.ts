@@ -184,10 +184,6 @@ export function createAdCredential() {
   return "hp0" + createRandom(17)
 }
 
-export function createIdToIdCredential() {
-  return "i2i" + createRandom(17)
-}
-
 export function createPaymentNonce() {
   return createRandom(32, "UppercaseAndNumber")
 }
