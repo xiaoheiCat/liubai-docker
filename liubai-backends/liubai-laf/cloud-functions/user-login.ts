@@ -1277,7 +1277,6 @@ async function handle_wx_mini_session(
 ): Promise<LiuRqReturn<UserLoginAPI.Res_WxMiniSession>> {
   // 1. check out params
   const js_code = body.js_code
-  const credential = body.credential
   if(!valTool.isStringWithVal(js_code)) {
     return { code: "E4000", errMsg: "no js_code" }
   }
@@ -1326,25 +1325,6 @@ async function handle_wx_mini_session(
   if(userRes.type === 3) {
     userRes = await findUserByWxMiniOpenId(wx_mini_openid)
   }
-  
-  // 5. find wx_gzh_openid
-  let wx_gzh_openid: string | undefined
-  if(credential) {
-    const cCol = db.collection("Credential")
-    const res6 = await cCol.where({ credential }).getOne<Table_Credential>()
-    const cData = res6.data
-    if(cData && cData.infoType === "bind-wxmini") {
-      if(cData.wx_gzh_openid) {
-        wx_gzh_openid = cData.wx_gzh_openid
-        cCol.doc(cData._id).remove()
-      }
-    }
-  }
-
-  // 6. find user by wx_gzh_openid
-  if(userRes.type === 3 && wx_gzh_openid) {
-    userRes = await findUserByWxGzhOpenId(wx_gzh_openid)
-  }
 
   // 7. return error if it occured
   if(userRes.type === 1) {
@@ -1361,7 +1341,6 @@ async function handle_wx_mini_session(
     const res8_1 = await sign_in(ctx, body, [userInfo], {
       thirdData,
       wx_unionid,
-      wx_gzh_openid,
       wx_mini_openid,
     })
     if(res8_1.code !== "0000") return res8_1 as LiuErrReturn
@@ -1375,7 +1354,6 @@ async function handle_wx_mini_session(
 
   // 9. sign up
   const arg9: SignUpParam2 = { 
-    wx_gzh_openid, 
     wx_unionid,
     wx_mini_openid,
   }

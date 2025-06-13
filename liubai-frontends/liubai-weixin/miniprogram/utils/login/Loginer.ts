@@ -49,37 +49,30 @@ export class Loginer {
     const js_code = await LiuApi.login()
     if(!js_code) return
 
-    // 2. get credential
-    const res2 = LiuApi.getLaunchOptionsSync()
-    const credential = res2?.query?.cred as string | undefined
-    console.log("toLogin credential: ", credential)
+    // 2. fetch login
+    const res2 = await fetchLogin(js_code)
+    if(!res2) return
 
-    // 3. fetch login
-    const res3 = await fetchLogin(js_code, credential)
-    if(!res3) return
-
-    console.log("fetch login res: ", res3)
-
-    // 4. handle data
-    const data4 = res3.data
-    if(!data4) return
-    if(!data4.serial_id || !data4.token) return
+    // 3. handle data
+    const data3 = res2.data
+    if(!data3) return
+    if(!data3.serial_id || !data3.token) return
     
-    // 5. get avatar & nickname
-    const avaNick = this._getAvatarAndNickname(data4.spaceMemberList)
+    // 4. get avatar & nickname
+    const avaNick = this._getAvatarAndNickname(data3.spaceMemberList)
     const newLoginData: LiuLoginData = {
-      theme: data4.theme,
-      language: data4.language,
-      token: data4.token,
-      serial: data4.serial_id,
-      subscription: data4.subscription,
+      theme: data3.theme,
+      language: data3.language,
+      token: data3.token,
+      serial: data3.serial_id,
+      subscription: data3.subscription,
       nickname: avaNick.nickname,
       avatarUrl: avaNick.avatarUrl,
-      wx_mini_openid: data4.wx_mini_openid,
+      wx_mini_openid: data3.wx_mini_openid,
       lastSetStamp: LiuTime.getTime(),
     }
     
-    // 6. to set login data
+    // 5. to set login data
     await setLoginLocally(newLoginData)
     this.hasFetched = true
     return true

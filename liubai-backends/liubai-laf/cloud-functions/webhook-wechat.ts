@@ -205,14 +205,6 @@ async function handle_click(
   const { EventKey, FromUserName: wx_gzh_openid } = msgObj
   if(!EventKey) return false
 
-  // 1.2 handle special events, like "coupon"
-  const couponEvents = wx_coupon_keys.clicks
-  if(couponEvents.includes(EventKey)) {
-    const lang = EventKey.split("=")?.[1]
-    handle_coupon(wx_gzh_openid, lang as SupportedLocale)
-    return
-  }
-
   // 2. get replies and the domain
   const replies = wxClickReplies[EventKey]
   if(!replies || replies.length < 1) return false
@@ -250,19 +242,11 @@ async function handle_text(
   // 1. get openid
   const wx_gzh_openid = msgObj.FromUserName
 
-  // 2.1 check if we get to auto-reply
+  // 2. check if we get to auto-reply
   const userText = msgObj.Content
   const trimText = userText.trim()
   const res2 = await autoReplyAfterReceivingText(wx_gzh_openid, trimText)
   if(res2) return
-
-  // 2.2 handle coupon
-  const couponKeywords = wx_coupon_keys.texts
-  const existed2 = couponKeywords.includes(trimText)
-  if(existed2) {
-    handle_coupon(wx_gzh_openid)
-    return
-  }
 
   // 3. get user
   const user = await getUserByWxGzhOpenid(wx_gzh_openid)
@@ -920,59 +904,6 @@ async function make_user_subscribed(
   return true
 }
 
-
-async function handle_coupon(
-  wx_gzh_openid: string,
-  lang?: SupportedLocale,
-) {
-
-  // 1. define a function to get credential
-  const _getCredential = async () => {
-    const cCol = db.collection("Credential")
-    const cred = createIdToIdCredential()
-    const b1 = getBasicStampWhileAdding()
-    const w1: Partial_Id<Table_Credential> = {
-      ...b1,
-      credential: cred,
-      infoType: "bind-wxmini",
-      wx_gzh_openid,
-      expireStamp: b1.insertedStamp + MINUTE * 5,
-    }
-    const res1 = await cCol.add(w1)
-    return cred
-  }
-
-  // 2. define a function to send text
-  const _send = async (cred?: string, user?: Table_User) => {
-    const opt2: GetLangValOpt = { user }
-    if(!user) opt2.lang = lang
-    const { t } = useI18n(wechatLang, opt2)
-    
-    const _env = process.env
-    const appid = _env.LIU_WX_MINI_APPID
-    if(!appid) {
-      console.warn("fail to get appid in handle_coupon")
-      return false
-    }
-    let path = wx_coupon_keys.mini_path
-    if(cred) path += `?cred=${cred}`
-    const msg = t("find_coupon", { appid, path })
-    console.log("msg: ", msg)
-    sendText(wx_gzh_openid, msg)
-    return true
-  }
-
-  // 3. get user
-  const user = await getUserByWxGzhOpenid(wx_gzh_openid)
-  const wx_unionid = user?.wx_unionid
-
-  // 4. decide whether to get credential
-  let cred3: string | undefined
-  if(!wx_unionid) {
-    cred3 = await _getCredential()
-  }
-  _send(cred3, user)  
-}
 
 
 
