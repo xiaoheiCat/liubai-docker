@@ -1,11 +1,12 @@
 // Function Name: happy-system
 
 import cloud from "@lafjs/cloud"
-import { getDocAddId, SubscriptionManager, valTool, verifyToken, WxMiniHandler } from "@/common-util"
+import { getDocAddId, LiuDateUtil, SubscriptionManager, valTool, ValueTransform, verifyToken, WxMiniHandler } from "@/common-util"
 import type { 
   HappySystemAPI,
   LiuAi,
   LiuRqReturn,
+  OaiPrompt,
   OState_Coupon,
   Partial_Id,
   Table_AiRoom,
@@ -26,7 +27,8 @@ import {
 } from "@/common-time"
 import { createAdCredential } from "@/common-ids"
 import { ai_cfg } from "@/common-config"
-import { Img2Txt } from "@/ai-shared"
+import { AiShared, Img2Txt, WorkerBase } from "@/ai-shared"
+import { i18nFill } from "@/common-i18n"
 
 const db = cloud.database()
 const _ = db.command
@@ -442,14 +444,24 @@ class CouponAddManager {
     return deletedReason
   }
 
+  private async _saveData(u: Partial<Table_HappyCoupon>) {
+    const couponId = this._couponId as string
+    if(!u.updatedStamp) {
+      u.updatedStamp = getNowStamp()
+    }
+    const hcCol = db.collection("HappyCoupon")
+    const res1 = await hcCol.doc(couponId).update(u)
+    console.log("_saveData res1: ", res1)
+  }
+
   private async imageFlow() {
     // 1. check image security
     const image_url = this._opt.image_url as string
     const res1 = await CouponAddChecker.image(image_url)
 
     // 2. check out result from CouponAddChecker
-    const txt2 = res1?.text?.trim?.()
-    if(txt2 === "0") {
+    const img_to_txt = res1?.text?.trim?.()
+    if(img_to_txt === "0") {
       const deletedReason = this._getReason(
         "delete by coupon_add_checker ", 
         res1?.worker
@@ -458,6 +470,19 @@ class CouponAddManager {
       return
     }
 
+    // 3. save img_to_txt
+    if(img_to_txt) {
+      const u3: Partial<Table_HappyCoupon> = {
+        img_to_txt,  
+      }
+      if(res1?.worker) {
+        u3.extraData = {
+          imgToTxtModel: res1.worker.model,
+          imgToTxtProvider: res1.worker.computingProvider,
+        }
+      }
+      this._saveData(u3)
+    }
 
 
 
@@ -603,6 +628,8 @@ const coupon_add_checker_user1 = `
 `.trim()
 
 class CouponAddChecker {
+
+  private static MAX_RUN_TIMES = 2
   
   static async image(image_url: string) {
     const prompt1 = "请提取图中的优惠券、折扣、商品等信息。"
@@ -613,14 +640,67 @@ class CouponAddChecker {
     return res1
   }
 
-  static text(copytext: string) {
+  static async text(copytext: string) {
+    // 1. get required params
+    const {
+      date: current_date,
+      time: current_time,
+    } = LiuDateUtil.getDateAndTime(getNowStamp())
+    const userPrompt = i18nFill(coupon_add_checker_user1, {
+      current_date,
+      current_time,
+      current_input: copytext,
+    })
 
+    // 2. messages
+    const messages: OaiPrompt[] = [
+      {
+        role: "system",
+        content: coupon_add_checker_system1,
+      },
+      {
+        role: "user",
+        content: userPrompt,
+      }
+    ]
 
+    // 3. do it by ai worker
+    let worker: LiuAi.AiWorker | undefined
+    let score: number | undefined
+    const workerBase = new WorkerBase("txt2txt")
+    for(let i=0; i<this.MAX_RUN_TIMES; i++) {
+      // 3.1 just do it
+      const res3_1 = await workerBase.justDoIt(messages)
+      console.log("res3_1: ", res3_1)
+      if(!res3_1 || !res3_1.result) continue
+      
+      // 3.2 get content
+      const res3_2 = AiShared.getContentFromLLM(res3_1.result)
+      console.log("res3_2: ", res3_2)
+      if(!res3_2.content) continue
+      
+      // 3.3 check out content
+      let txt3 = res3_2.content.trim()
+      txt3 = AiShared.fixOutputForLLM(txt3)
+      
+      // 3.4 parse content
+      const res3_4 = await AiShared.turnOutputIntoObject(txt3)
+      console.log("res3_4: ", res3_4)
+      if(!res3_4) continue
 
+      // 3.5 handle score
+      const scoreRes = ValueTransform.str2Num(res3_4.score)
+      if(!scoreRes.pass) continue
+      score = scoreRes.data
+      worker = res3_1.worker
+      break
+    }
+
+    return { score, worker }
   }
 
-}
 
+}
 
 
 

@@ -75,6 +75,7 @@ import { addDays, set as date_fn_set } from "date-fns"
 import { WebSocket } from "ws"
 import { createRandom } from "@/common-ids"
 import { ai_cfg } from "@/common-config"
+import xml2js from "xml2js"
 
 const db = cloud.database()
 const _ = db.command
@@ -91,7 +92,41 @@ type BufferResolver = (res: Buffer | undefined) => void
 
 
 export const txt2TxtAiWorkers: LiuAi.AiWorker[] = [
-
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen-plus-2025-04-28",
+    character: "tongyi-qwen",
+    stream: true,
+  },
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen-plus-2025-01-25",
+    character: "tongyi-qwen",
+  },
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen3-235b-a22b",
+    character: "tongyi-qwen",
+    stream: true,
+  },
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen-turbo",
+    character: "tongyi-qwen",
+    stream: true,
+  },
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen-turbo-latest",
+    character: "tongyi-qwen",
+    stream: true,
+  },
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen-turbo-2025-04-28",
+    character: "tongyi-qwen",
+    stream: true,
+  }
 ]
 
 
@@ -221,6 +256,12 @@ export class BaseLLM {
     _this._tryTimes++
     const copiedParams = valTool.copyObject(params)
     copiedParams.stream_options = { include_usage: true }
+
+    // special case for qwen: enable_thinking
+    if(copiedParams.model.startsWith("qwen")) {
+      //@ts-expect-error enable_thinking
+      copiedParams.enable_thinking = true
+    }
 
     let usage: LiuAi.Usage | undefined
     let id = ""
@@ -1051,6 +1092,42 @@ export class AiShared {
     if(model === "deepseek-reasoner") return "deepseek-r1"
 
     return model
+  }
+
+  static fixOutputForLLM(content: string) {
+    const res1 = content.startsWith("<output>")
+    if(!res1) content = "<output>\n" + content
+    const res2 = content.endsWith("</output>")
+    if(!res2) content += "\n</output>"
+    return content
+  }
+
+  static async turnOutputIntoObject<T = Record<string, any>>(
+    content: string,
+  ) {
+    // 1. replace <output> and </output> with <xml> and </xml>
+    const outputStr1 = "<output>"
+    const outputStr2 = "</output>"
+    const len1 = outputStr1.length
+    const len2 = outputStr2.length
+    const tmpLength = content.length
+    if(tmpLength <= len1 + len2) return
+    
+    content = "<xml>" + content.substring(len1)
+    content = content.substring(0, content.length - len2) + "</xml>"
+
+    // 2. turn into object using xml2js
+    let res2 = {} as T
+    const parser = new xml2js.Parser({ explicitArray: false })
+    try {
+      const { xml } = await parser.parseStringPromise(content)
+      res2 = xml
+    }
+    catch(err) {
+      console.warn("AiCluster xml2js.Parser parse error: ", content)
+      return
+    }
+    return res2
   }
 
 }
@@ -3398,6 +3475,10 @@ export class LiuEmbedding {
 
     // 2. using tongyi
     res = await this.runByTongyi(input)
+    if(res) return res
+
+    // 3. using zhipu
+    res = await this.runByZhipu(input)
     return res
   }
 
@@ -3607,6 +3688,26 @@ export class WorkerBase {
     this._deleteProvider(theWorker.computingProvider)
     return theWorker
   }
+
+  async justDoIt(messages: OaiPrompt[]) {
+    // 1. get a worker
+    const worker = this.getWorker()
+    if(!worker) return
+    let apiEndpoint = AiShared.getEndpointFromProvider(worker.computingProvider)
+    if(!apiEndpoint) return
+
+    // 2. run by BaseLLM
+    const llm = new BaseLLM(apiEndpoint.apiKey, apiEndpoint.baseURL)
+    const result = await llm.chat({ 
+      messages, 
+      model: worker.model,
+      stream: worker.stream,
+    })
+
+    return { worker, result }
+  }
+
+
 }
 
 
