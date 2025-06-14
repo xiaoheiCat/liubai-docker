@@ -298,26 +298,32 @@ async function coupon_post(
     return { code: "E4000", errMsg: "Invalid image_h2w" }
   }
 
-
   // 2. check out credential
   const credential = body.credential
   if(!valTool.isStringWithVal(credential)) {
     return { code: "E4000", errMsg: "Invalid credential" }
   }
   const cCol = db.collection("Credential")
-  const res1 = await cCol.where({ credential }).getOne()
+  const q1 = cCol.where({ credential })
+  const res1 = await q1.getOne<Table_Credential>()
   const data1 = res1.data
   if(!data1 || data1.infoType !== "coupon-auth") {
     return { code: "E4003", errMsg: "no credential found" }
   }
-  
+  cCol.doc(data1._id).remove()
 
+  // 3. start to run
+  const addManagerOpt: CouponAddManagerOpt = {
+    user: vRes.userData,
+    copytext,
+    image_url,
+    image_h2w,
+    availableDays,
+  }
+  const addManager = new CouponAddManager(addManagerOpt)
+  addManager.run()
 
-  
-
-
-
-
+  return { code: "0000" }
 }
 
 

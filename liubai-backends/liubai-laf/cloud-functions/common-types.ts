@@ -1850,7 +1850,9 @@ export interface Table_Showcase extends BaseTable {
 export interface Table_HappyCoupon extends BaseTable {
   copytext?: string
   image_url?: string
+  image_h2w?: string
   img_to_txt?: string
+  img_trace_id?: string
   owner?: string
   oState: OState_Coupon
   fromType: LiuFromType

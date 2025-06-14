@@ -2635,6 +2635,11 @@ export class WxMiniHandler {
 
   private static _accessToken = ""
   private static _lastGetTokenStamp = 0
+  private static idToUrl = {
+    TEXT_CHECK: "https://api.weixin.qq.com/wxa/msg_sec_check",
+    IMG_CHECK: "https://api.weixin.qq.com/wxa/media_check_async",
+    USER_RISK: "https://api.weixin.qq.com/wxa/getuserriskrank",
+  }
 
   static async getAccessToken() {
     if(this._accessToken) {
@@ -2653,6 +2658,96 @@ export class WxMiniHandler {
     }
     return accessToken
   }
+
+  private static async resetAccessToken() {
+    this._accessToken = ""
+  }
+
+  private static async toRequest<T = any>(
+    link: string,
+    data: any,
+  ): Promise<DataPass<T>> {
+    const accessToken = await this.getAccessToken()
+    if(!accessToken) {
+      return { pass: false, err: { code: "E5001", errMsg: "no access token" } }
+    }
+    const url = new URL(link)
+    url.searchParams.set("access_token", accessToken)
+    link = url.toString()
+    const res = await liuReq(link, data)
+    if(res.code !== "0000") {
+      return { pass: false, err: res }
+    }
+
+    // handle error from wx mini
+    const data2 = res.data
+    const errcode = data2.errcode
+    if(typeof errcode === "number" && errcode !== 0) {
+      let errMsg = data2.errmsg ?? "fail to request wx mini"
+      if(errcode === 40001) {
+        this.resetAccessToken()
+      }
+      return {
+        pass: false,
+        err: { code: "E5001", errMsg }
+      }
+    }
+
+    return { pass: true, data: res.data }
+  }
+
+  // https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/sec-center/sec-check/msgSecCheck.html
+  static async msgSecCheck(
+    text: string,
+    openid: string,
+  ) {
+    const obj = {
+      content: text,
+      version: 2,
+      scene: 4,
+      openid,
+    }
+    const url = this.idToUrl.TEXT_CHECK
+    const res = await this.toRequest(url, obj)
+    return res
+  }
+
+  // https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/sec-center/sec-check/mediaCheckAsync.html
+  static async mediaCheckAsync(
+    media_url: string,
+    openid: string,
+  ) {
+    const obj = {
+      media_url,
+      media_type: 2,
+      version: 2,
+      scene: 4,
+      openid,
+    }
+    const url = this.idToUrl.IMG_CHECK
+    const res = await this.toRequest(url, obj)
+    return res
+  }
+
+  // https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/sec-center/safety-control-capability/getUserRiskRank.html
+  static async getUserRiskRank(
+    openid: string,
+    client_ip: string,
+  ) {
+    const _env = process.env
+    const appid = _env.LIU_WX_MINI_APPID
+    const obj = {
+      appid,
+      openid,
+      client_ip,
+    }
+    const url = this.idToUrl.USER_RISK
+    const res = await this.toRequest(url, obj)
+    return res
+  }
+
+
+
 }
 
 
