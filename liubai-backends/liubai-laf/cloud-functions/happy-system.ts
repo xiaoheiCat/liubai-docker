@@ -14,6 +14,7 @@ import type {
   Table_HappyCoupon,
   Table_Showcase,
   Table_User,
+  Vector_happy_coupons,
   VerifyTokenRes,
   VerifyTokenRes_B,
 } from "@/common-types"
@@ -27,7 +28,7 @@ import {
 } from "@/common-time"
 import { createAdCredential } from "@/common-ids"
 import { ai_cfg } from "@/common-config"
-import { AiShared, Img2Txt, WorkerBase } from "@/ai-shared"
+import { AiShared, Img2Txt, LiuEmbedding, WorkerBase } from "@/ai-shared"
 import { i18nFill } from "@/common-i18n"
 
 const db = cloud.database()
@@ -403,7 +404,7 @@ class CouponAddManager {
 
   private async _downgradeOState(
     oState: OState_Coupon,
-    deletedReason?: string,
+    aiReason?: string,
   ) {
     // 1. get coupon
     const couponId = this._couponId as string
@@ -425,8 +426,8 @@ class CouponAddManager {
       oState,
       updatedStamp: getNowStamp(),
     }
-    if(deletedReason) {
-      u3.extraData = { deletedReason }
+    if(aiReason) {
+      u3.extraData = { aiReason }
     }
     const res3 = await hcCol.doc(couponId).update(u3)
     console.log("downgrade oState res3: ", res3)
@@ -438,10 +439,10 @@ class CouponAddManager {
   ) {
     const computingProvider2 = worker?.computingProvider
     const model2 = worker?.model
-    let deletedReason = prefixMsg
-    if(model2) deletedReason += `using ${model2} `
-    if(computingProvider2) deletedReason += `from ${computingProvider2} `
-    return deletedReason
+    let aiReason = prefixMsg
+    if(model2) aiReason += `using ${model2} `
+    if(computingProvider2) aiReason += `from ${computingProvider2} `
+    return aiReason
   }
 
   private async _saveData(u: Partial<Table_HappyCoupon>) {
@@ -462,11 +463,11 @@ class CouponAddManager {
     // 2. check out result from CouponAddChecker
     const img_to_txt = res1?.text?.trim?.()
     if(img_to_txt === "0") {
-      const deletedReason = this._getReason(
+      const aiReason = this._getReason(
         "delete by coupon_add_checker ", 
         res1?.worker
       )
-      this._downgradeOState("DEL_BY_AI", deletedReason)
+      this._downgradeOState("DEL_BY_AI", aiReason)
       return
     }
 
@@ -484,11 +485,59 @@ class CouponAddManager {
       this._saveData(u3)
     }
 
+    // 4. start to embedding
+
+
 
 
   }
 
   private async textFlow() {
+    // 1. get score by CouponAddChecker
+    const copytext = this._opt.copytext as string
+    const res1 = await CouponAddChecker.text(copytext)
+
+    // 2. handle score
+    const score = res1.score
+    if(score === 0) {
+      const aiReason1 = this._getReason(
+        "delete by coupon_add_checker", 
+        res1.worker
+      )
+      this._downgradeOState("DEL_BY_AI", aiReason1)
+      return
+    }
+    if(score === 0.5) {
+      const aiReason2 = this._getReason(
+        "decided by coupon_add_checker",
+        res1.worker
+      )
+      this._downgradeOState("REVIEWING", aiReason2)
+    }
+
+
+    // 3. generate title, keywords, emoji......
+
+
+
+    // start to embedding
+    const inputEmbedding: LiuAi.EmbeddingInput[] = [
+      {
+        text: copytext,
+      }
+    ]
+    const liuEmb = new LiuEmbedding()
+    const res3 = await liuEmb.runByTongyi(inputEmbedding)
+    console.log("liuEmb.runByTongyi res3: ", res3)
+
+    // handle embedding result
+    const outputs = liuEmb.getOutputs(res3)
+    if(!outputs) {
+      console.warn("no embedding result in text flow: ", res3)
+      return
+    }
+
+    
 
   }
 
@@ -703,6 +752,75 @@ class CouponAddChecker {
 }
 
 
+const coupon_add_parser_system1 = `
+你是一个专业的优惠券/吱口令文本解析器，任务是将用户复制的文本（会被包裹在 <input> 标签内）解析成结构化数据。
 
+## 输入规则
 
+<input>用户复制粘贴的文本会被放在这里</input>
+
+## 你的输出规则
+
+<output>
+  <errmsg>必填，为 "ok" 时表示成功，否则表示用户传入的非营销优惠信息，在这里存放你觉得的错误原因</errmsg>
+  <title>当 errmsg == "ok" 时必填，你总结的核心优惠描述，能让其他用户一眼就看懂</title>
+  <emoji>当 errmsg == "ok" 时必填，仅 1 个强相关的表情</emoji>
+  <brand>选填，你能看出其明确提及的品牌名</brand>
+</output>
+
+## 案例
+
+<input>#小程序://京东购物丨点外卖领国补/tIw8IALEoylybqK</input>
+<output>
+  <errmsg>fail to read the title from the input</errmsg>
+</output>
+
+<input>【曼玲粥店全国品牌日】\nmp://mL40fkRVjs5iEqH</input>
+<output>
+  <errmsg>ok</errmsg>
+  <title>吃粥</title>
+  <emoji>🍚</emoji>
+  <brand>曼玲粥铺</brand>
+</output>
+
+<input>香薰智能自动喷香房间持久留香卧室厕所除臭空气加湿清新剂香氛机
+原价：10.8
+券后价：9.8
+商品链接：#小程序://拼多多福利券/MaeqhcQ6eIZmplt</input>
+<output>
+  <errmsg>ok</errmsg>
+  <title>智能无火香氛机</title>
+  <emoji>🕯️</emoji>
+</output>
+
+<input>666復至🔐Ai3hVHP9kgO₤去>盒碼<查看【盒马烘焙 榴莲爆浆蛋糕 70g】</input>
+<output>
+  <errmsg>ok</errmsg>
+  <title>榴莲爆浆蛋糕</title>
+  <emoji>🍰</emoji>
+  <brand>盒马</brand>
+</output>
+`.trim()
+
+const coupon_add_parser_user1 = `
+## 当前环境
+
+系统名称: 优惠券系统
+当前日期: {current_date}
+当前时间: {current_time}
+
+## 用户输入
+
+以下为当前用户的输入：
+
+<input>{current_input}</input>
+
+请你凭借上述描述的规则进行回复，再次提醒：你只能以 <output> 开始输出，以 </output> 结尾你的回复。
+`.trim()
+
+class CouponAddParser {
+
+  
+
+}
 

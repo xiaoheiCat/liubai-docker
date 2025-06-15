@@ -1865,7 +1865,7 @@ export interface Table_HappyCoupon extends BaseTable {
   embeddingModel?: string
   expireStamp: number
   extraData?: {
-    deletedReason?: string
+    aiReason?: string
     imgToTxtModel?: string
     imgToTxtProvider?: string
   }

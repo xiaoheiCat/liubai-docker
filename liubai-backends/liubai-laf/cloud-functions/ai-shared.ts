@@ -3659,6 +3659,12 @@ export class LiuEmbedding {
     return totalResult
   }
 
+  async getOutputs(res: LiuAi.Res_Embedding) {
+    const data = res?.originalResult?.data
+    if(!data || data.length < 1) return
+    return data
+  }
+
 }
 
 
@@ -3747,42 +3753,24 @@ export class Img2Txt {
       },
     ]
 
-    // 2. get worker
+    // 2. just do it!
     const workerBase = new WorkerBase("img2txt")
-    let worker = workerBase.getWorker()
-    if(!worker) return
-    let apiEndpoint = AiShared.getEndpointFromProvider(worker.computingProvider)
-    if(!apiEndpoint) return
-
-    // 3. run BaseLLM
-    const llm3 = new BaseLLM(apiEndpoint.apiKey, apiEndpoint.baseURL)
-    let res3 = await llm3.chat({ 
-      messages, 
-      model: worker.model,
-      stream: worker.stream,
-    })
-
-    // 4. try again
-    if(!res3) {
-      worker = workerBase.getWorker()
-      if(!worker) return
-      apiEndpoint = AiShared.getEndpointFromProvider(worker.computingProvider)
-      if(!apiEndpoint) return
-      const llm4 = new BaseLLM(apiEndpoint.apiKey, apiEndpoint.baseURL)
-      res3 = await llm4.chat({ 
-        messages, 
-        model: worker.model,
-        stream: worker.stream,
-      })
-      if(!res3) return 
+    let chatRes: OaiChatCompletion | undefined
+    let worker: LiuAi.AiWorker | undefined
+    let res2 = await workerBase.justDoIt(messages)
+    if(!res2 || !res2.result) {
+      res2 = await workerBase.justDoIt(messages)
     }
+    worker = res2?.worker
+    chatRes = res2?.result
+    if(!chatRes) return
     
-    // 5. get text
-    const res5 = AiShared.getContentFromLLM(res3)
-    if(!res5.content) return
+    // 3. get text
+    const res3 = AiShared.getContentFromLLM(chatRes)
+    if(!res3.content) return
 
     return {
-      text: res5.content,
+      text: res3.content,
       worker,
     }
   }
