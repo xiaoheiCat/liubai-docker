@@ -3671,6 +3671,7 @@ export class LiuEmbedding {
 export class WorkerBase {
 
   private _workers: LiuAi.AiWorker[] = []
+  private _current: LiuAi.AiWorker | undefined
 
   constructor(type: "txt2txt" | "img2txt") {
     if(type === "img2txt") {
@@ -3692,7 +3693,12 @@ export class WorkerBase {
     const idx = Math.floor(Math.random() * len)
     const theWorker = workers[idx]
     this._deleteProvider(theWorker.computingProvider)
+    this._current = theWorker
     return theWorker
+  }
+
+  getCurrent() {
+    return this._current
   }
 
   async justDoIt(messages: OaiPrompt[]) {

@@ -458,9 +458,9 @@ class CouponAddManager {
   private async imageFlow() {
     // 1. check image security
     const image_url = this._opt.image_url as string
-    const res1 = await CouponAddChecker.image(image_url)
+    const res1 = await CouponChecker.image(image_url)
 
-    // 2. check out result from CouponAddChecker
+    // 2. check out result from CouponChecker
     const img_to_txt = res1?.text?.trim?.()
     if(img_to_txt === "0") {
       const aiReason = this._getReason(
@@ -493,9 +493,9 @@ class CouponAddManager {
   }
 
   private async textFlow() {
-    // 1. get score by CouponAddChecker
+    // 1. get score by CouponChecker
     const copytext = this._opt.copytext as string
-    const res1 = await CouponAddChecker.text(copytext)
+    const res1 = await CouponChecker.text(copytext)
 
     // 2. handle score
     const score = res1.score
@@ -516,26 +516,34 @@ class CouponAddManager {
     }
 
 
-    // 3. generate title, keywords, emoji......
+    // 3. generate title, emoji......
+    const res3 = await CouponParser.text(copytext)
+    const errmsg3 = res3.result?.errmsg
+    if(errmsg3 !== "ok" && errmsg3 !== "OK") {
+      console.warn("CouponParser text flow failed: ", res3.result)
+      return
+    }
+
+
 
 
 
     // start to embedding
-    const inputEmbedding: LiuAi.EmbeddingInput[] = [
-      {
-        text: copytext,
-      }
-    ]
-    const liuEmb = new LiuEmbedding()
-    const res3 = await liuEmb.runByTongyi(inputEmbedding)
-    console.log("liuEmb.runByTongyi res3: ", res3)
+    // const inputEmbedding: LiuAi.EmbeddingInput[] = [
+    //   {
+    //     text: copytext,
+    //   }
+    // ]
+    // const liuEmb = new LiuEmbedding()
+    // const res3 = await liuEmb.runByTongyi(inputEmbedding)
+    // console.log("liuEmb.runByTongyi res3: ", res3)
 
     // handle embedding result
-    const outputs = liuEmb.getOutputs(res3)
-    if(!outputs) {
-      console.warn("no embedding result in text flow: ", res3)
-      return
-    }
+    // const outputs = liuEmb.getOutputs(res3)
+    // if(!outputs) {
+    //   console.warn("no embedding result in text flow: ", res3)
+    //   return
+    // }
 
     
 
@@ -591,7 +599,7 @@ class CouponAddManager {
 }
 
 
-const coupon_add_checker_system1 = `
+const coupon_checker_system1 = `
 你是一个优惠券系统安全网关，严格判断用户消息的性质。
 
 ## 输出规则
@@ -676,7 +684,7 @@ const coupon_add_checker_user1 = `
 请你凭借上述描述的规则进行回复，再次提醒：你只能以 <output> 开始输出，以 </output> 结尾你的回复。
 `.trim()
 
-class CouponAddChecker {
+class CouponChecker {
 
   private static MAX_RUN_TIMES = 2
   
@@ -705,7 +713,7 @@ class CouponAddChecker {
     const messages: OaiPrompt[] = [
       {
         role: "system",
-        content: coupon_add_checker_system1,
+        content: coupon_checker_system1,
       },
       {
         role: "user",
@@ -720,12 +728,12 @@ class CouponAddChecker {
     for(let i=0; i<this.MAX_RUN_TIMES; i++) {
       // 3.1 just do it
       const res3_1 = await workerBase.justDoIt(messages)
-      console.log("res3_1: ", res3_1)
+      console.log("CouponChecker res3_1: ", res3_1)
       if(!res3_1 || !res3_1.result) continue
       
       // 3.2 get content
       const res3_2 = AiShared.getContentFromLLM(res3_1.result)
-      console.log("res3_2: ", res3_2)
+      console.log("CouponChecker res3_2: ", res3_2)
       if(!res3_2.content) continue
       
       // 3.3 check out content
@@ -734,7 +742,7 @@ class CouponAddChecker {
       
       // 3.4 parse content
       const res3_4 = await AiShared.turnOutputIntoObject(txt3)
-      console.log("res3_4: ", res3_4)
+      console.log("CouponChecker res3_4: ", res3_4)
       if(!res3_4) continue
 
       // 3.5 handle score
@@ -752,7 +760,7 @@ class CouponAddChecker {
 }
 
 
-const coupon_add_parser_system1 = `
+const coupon_parser_system1 = `
 你是一个专业的优惠券/吱口令文本解析器，任务是将用户复制的文本（会被包裹在 <input> 标签内）解析成结构化数据。
 
 ## 输入规则
@@ -802,7 +810,7 @@ const coupon_add_parser_system1 = `
 </output>
 `.trim()
 
-const coupon_add_parser_user1 = `
+const coupon_parser_user1 = `
 ## 当前环境
 
 系统名称: 优惠券系统
@@ -818,9 +826,147 @@ const coupon_add_parser_user1 = `
 请你凭借上述描述的规则进行回复，再次提醒：你只能以 <output> 开始输出，以 </output> 结尾你的回复。
 `.trim()
 
-class CouponAddParser {
+const coupon_parser_user2 = `
+上方图片为当前用户上传的图片，经过图片解析器处理有以下结果：
 
-  
+## 用户输入
+
+<input>{current_input}</input>
+
+图片解析结果可能有误，需要你结合真实图片谨慎判别。
+
+## 最后提醒
+
+你的输出结果只能以 <output> 开始输出，以 </output> 结尾你的回复。
+`.trim()
+
+interface Res_CouponParser {
+  errmsg: string
+  title?: string
+  emoji?: string
+  brand?: string
+}
+
+class CouponParser {
+
+  private static MAX_RUN_TIMES = 2
+
+  static async text(copytext: string) {
+    // 1. get required params
+    const {
+      date: current_date,
+      time: current_time,
+    } = LiuDateUtil.getDateAndTime(getNowStamp())
+    const userPrompt = i18nFill(coupon_parser_user1, {
+      current_date,
+      current_time,
+      current_input: copytext,
+    })
+
+    // 2. messages
+    const messages: OaiPrompt[] = [
+      {
+        role: "system",
+        content: coupon_parser_system1,
+      },
+      {
+        role: "user",
+        content: userPrompt,
+      }
+    ]
+
+    // 3. do it by ai worker
+    let worker: LiuAi.AiWorker | undefined
+    let result: Res_CouponParser | undefined
+    const workerBase = new WorkerBase("txt2txt")
+    for(let i=0; i<this.MAX_RUN_TIMES; i++) {
+      result = await this.doIt(messages, workerBase)
+      if(!result) continue
+      worker = workerBase.getCurrent()
+    }
+
+    return { result, worker }
+  }
+
+  static async image(
+    image_url: string,
+    img_to_txt?: string,
+  ) {
+    // 1. handle user prompt
+    const userPrompt = i18nFill(coupon_parser_user2, {
+      current_input: img_to_txt ?? "UNKNOWN",
+    })
+
+    // 2. messages
+    const messages: OaiPrompt[] = [
+      {
+        role: "system",
+        content: coupon_parser_system1,
+      },
+      {
+        role: "user",
+        content: [
+          {
+            type: "image_url",
+            image_url: { url: image_url }
+          },
+          {
+            type: "text",
+            text: userPrompt,
+          }
+        ],
+      }
+    ]
+
+    // 3. do it by ai worker
+    let worker: LiuAi.AiWorker | undefined
+    let result: Res_CouponParser | undefined
+    const workerBase = new WorkerBase("img2txt")
+    for(let i=0; i<this.MAX_RUN_TIMES; i++) {
+      result = await this.doIt(messages, workerBase)
+      if(!result) continue
+      worker = workerBase.getCurrent()
+    }
+    return { result, worker }
+  }
+
+
+  private static async doIt(
+    messages: OaiPrompt[],
+    workerBase: WorkerBase,
+  ) {
+    // 3.1 just do it
+    const res3_1 = await workerBase.justDoIt(messages)
+    console.log("CouponParser res3_1: ", res3_1)
+    if(!res3_1 || !res3_1.result) return
+
+    // 3.2 get content
+    const res3_2 = AiShared.getContentFromLLM(res3_1.result)
+    console.log("CouponParser res3_2: ", res3_2)
+    if(!res3_2.content) return
+    
+    // 3.3 check out content
+    let txt3 = res3_2.content.trim()
+    txt3 = AiShared.fixOutputForLLM(txt3)
+    
+    // 3.4 parse content
+    const res3_4 = await AiShared.turnOutputIntoObject(txt3)
+    console.log("res3_4: ", res3_4)
+    if(!res3_4) return
+
+    // 3.5 check out error
+    const errmsg = res3_4.errmsg
+    if(!errmsg) return
+    if(errmsg === "ok" || errmsg === "OK") {
+      const title = res3_4.title
+      const emoji = res3_4.emoji
+      if(!title && !emoji) {
+        return
+      }
+    }
+
+    return res3_4 as Res_CouponParser
+  }
 
 }
 
