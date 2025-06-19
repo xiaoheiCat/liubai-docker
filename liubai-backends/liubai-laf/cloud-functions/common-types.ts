@@ -2571,6 +2571,18 @@ export namespace HappySystemAPI {
     | "coupon-update"
     | "coupon-delete"
     | "coupon-search"
+
+  export interface Param_CouponSearch {
+    mode: "fast" | "deep"
+    texts?: string[]
+    image_url?: string
+  }
+
+  export const Sch_Param_CouponSearch = vbot.object({
+    mode: vbot.picklist(["fast", "deep"]),
+    texts: sch_opt_arr(vbot.string(), [vbot.maxLength(9)]),
+    image_url: vbot.optional(vbot.string()),
+  })
 }
 
 /****************** sync-operate api ***************/

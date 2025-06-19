@@ -2,6 +2,7 @@
 
 import cloud from "@lafjs/cloud"
 import { 
+  checker,
   getDocAddId, 
   LiuDateUtil, 
   LiuMilvus, 
@@ -12,7 +13,6 @@ import {
   WxMiniHandler,
 } from "@/common-util"
 import type { 
-  HappySystemAPI,
   LiuAi,
   LiuRqReturn,
   OaiPrompt,
@@ -27,6 +27,7 @@ import type {
   VerifyTokenRes,
   VerifyTokenRes_B,
 } from "@/common-types"
+import { HappySystemAPI } from "@/common-types"
 import { 
   DAY,
   getBasicStampWhileAdding, 
@@ -43,6 +44,7 @@ import {
   type RowData as MilvusRowData,
 } from "@zilliz/milvus2-sdk-node"
 import { LiuReporter } from "@/service-send"
+import * as vbot from "valibot"
 
 const db = cloud.database()
 const _ = db.command
@@ -88,8 +90,8 @@ export async function main(ctx: FunctionContext) {
   else if(oT === "coupon-delete") {
 
   }
-  else if(oT === "coupon-search") {
-
+  else if(oT === "coupon-search" && vRes?.pass) {
+    coupon_search(body, vRes)
   }
   
   return res
@@ -296,6 +298,59 @@ async function get_showcase(
 
 
 /***************************** Coupons *****************************/
+
+async function coupon_search(
+  body: Record<string, any>,
+  vRes: VerifyTokenRes_B,
+) {
+  // 1. check out params
+  const res1 = vbot.safeParse(HappySystemAPI.Sch_Param_CouponSearch, body)
+  if(!res1.success) {
+    const errMsg = checker.getErrMsgFromIssues(res1.issues)
+    return { code: "E4000", errMsg }
+  }
+
+  // 2. fast or deep
+  const mode = body.mode
+  let res: LiuRqReturn = { code: "E4000", errMsg: "Invalid params in coupon_search" }
+  if(mode === "fast") {
+    const fastSearch = new CouponFastSearch()
+    if(body.texts) {
+      fastSearch.texts(body.texts)
+    }
+    else if(body.image_url) {
+      fastSearch.image(body.image_url)
+    }
+  }
+  else if(mode === "deep") {
+
+  }
+  
+  return res
+}
+
+
+export class CouponFastSearch {
+
+  private _keywords: string[] = []
+  private _image_url = ""
+
+  async texts(keywords: string[]) {
+    this._keywords = keywords
+
+  }
+
+  async image(image_url: string) {
+    this._image_url = image_url
+
+    // only search in cache!
+
+  }
+
+
+}
+
+
 
 async function coupon_post(
   body: Record<string, any>,
