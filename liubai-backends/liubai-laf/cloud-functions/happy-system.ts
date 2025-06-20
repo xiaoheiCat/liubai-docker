@@ -367,11 +367,75 @@ export class CouponFastSearch {
       oState: "OK",
       expireStamp: _.gt(getNowStamp()),
     }
-    const res2 = await hcCol.where(w2).get<Table_HappyCoupon>()
+    const q2 = hcCol.where(w2).limit(10)
+    const res2 = await q2.orderBy("insertedStamp", "desc").get<Table_HappyCoupon>()
+    const titleList = res2.data
+    const tLength = titleList.length
+    if(tLength > 4) {
+      return this._returnQueryData(titleList)
+    }
+
+    // 3. search copytext
+    const w3 = {
+      copytext: new RegExp(`${safeWord}`, "i"),
+      oState: "OK",
+      expireStamp: _.gt(getNowStamp()),
+    }
+    const q3 = hcCol.where(w3).limit(10)
+    const res3 = await q3.orderBy("insertedStamp", "desc").get<Table_HappyCoupon>()
+    const copytextList = res3.data
+    const cLength = copytextList.length
+    if(tLength + cLength > 4) {
+      return this._returnQueryData([...titleList, ...copytextList])
+    }
+
+    // 4. search keywords
+    const keywords = safeWord.split(" ")
+    const w4 = {
+      keywords: _.in(keywords),
+      oState: "OK",
+      expireStamp: _.gt(getNowStamp()),
+    }
+    const q4 = hcCol.where(w4).limit(10)
+    const res4 = await q4.orderBy("insertedStamp", "desc").get<Table_HappyCoupon>()
+    const keywordsList = res4.data
     
+    return this._returnQueryData([...titleList, ...copytextList, ...keywordsList])
+  }
 
+  private _returnQueryData(list: Table_HappyCoupon[]) {
+    list = this._sortList(list)
+    this._setMaxLength(list)
+    const ids = list.map(v => v._id)
+    const results2 = this._packageList(ids, list)
+    return { 
+      code: "0000", 
+      data: { 
+        fromType: "query",
+        queryList: results2,
+      },
+    }
+  }
 
+  private _sortList(list: Table_HappyCoupon[]) {
+    const list1: Table_HappyCoupon[] = []
+    const list2: Table_HappyCoupon[] = []
+    for(let i=0; i<list.length; i++) {
+      const v = list[i]
+      if(v.fromType === "official" && list1.length < 2) {
+        list1.push(v)
+      }
+      else {
+        list2.push(v)
+      }
+    }
+    return [...list1, ...list2]
+  }
 
+  private _setMaxLength(list: Table_HappyCoupon[]) {
+    const maxLength = 5
+    if(list.length < maxLength) return
+    list.slice(0, maxLength)
   }
 
   async image(
