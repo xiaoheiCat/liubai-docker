@@ -341,7 +341,9 @@ export class CouponFastSearch {
     return true
   }
 
-  async texts(strs: string[]) {
+  async texts(
+    strs: string[]
+  ): Promise<LiuRqReturn<HappySystemAPI.Res_FastSearch>> {
     const sLength = strs.length
     if(sLength < 1) {
       return { code: "E4000", errMsg: "strs is empty" }
@@ -370,8 +372,10 @@ export class CouponFastSearch {
     const q2 = hcCol.where(w2).limit(10)
     const res2 = await q2.orderBy("insertedStamp", "desc").get<Table_HappyCoupon>()
     const titleList = res2.data
-    const tLength = titleList.length
-    if(tLength > 4) {
+    let ids = titleList.map(v => v._id)
+    let totalLength = ids.length
+    console.log("titleList: ", valTool.copyObject(titleList))
+    if(totalLength > 4) {
       return this._returnQueryData(titleList)
     }
 
@@ -384,8 +388,12 @@ export class CouponFastSearch {
     const q3 = hcCol.where(w3).limit(10)
     const res3 = await q3.orderBy("insertedStamp", "desc").get<Table_HappyCoupon>()
     const copytextList = res3.data
-    const cLength = copytextList.length
-    if(tLength + cLength > 4) {
+    console.log("copytextList: ", valTool.copyObject(copytextList))
+    ids.push(...copytextList.map(v => v._id))
+    ids = valTool.uniqueArray(ids)
+    totalLength = ids.length
+    console.log("totalLength: ", totalLength)
+    if(totalLength > 4) {
       return this._returnQueryData([...titleList, ...copytextList])
     }
 
@@ -399,14 +407,17 @@ export class CouponFastSearch {
     const q4 = hcCol.where(w4).limit(10)
     const res4 = await q4.orderBy("insertedStamp", "desc").get<Table_HappyCoupon>()
     const keywordsList = res4.data
+    console.log("keywordsList: ", valTool.copyObject(keywordsList))
     
     return this._returnQueryData([...titleList, ...copytextList, ...keywordsList])
   }
 
-  private _returnQueryData(list: Table_HappyCoupon[]) {
+  private _returnQueryData(
+    list: Table_HappyCoupon[]
+  ): LiuRqReturn<HappySystemAPI.Res_FastSearch> {
     list = this._sortList(list)
     this._setMaxLength(list)
-    const ids = list.map(v => v._id)
+    const ids = valTool.uniqueArray(list.map(v => v._id))
     const results2 = this._packageList(ids, list)
     return { 
       code: "0000", 
