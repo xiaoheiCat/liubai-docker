@@ -55,9 +55,12 @@ export async function main(ctx: FunctionContext) {
   // 1. verify token
   const body = ctx.request?.body ?? {}
   const oT = body.operateType as HappySystemAPI.OperateType
-  const isCoupon = oT.startsWith("coupon-")
+  let needLogin = oT.startsWith("coupon-")
   let vRes: VerifyTokenRes | undefined
-  if(isCoupon) {
+  if(oT === "coupon-detail") {
+    needLogin = false
+  } 
+  if(needLogin) {
     vRes = await verifyToken(ctx, body)
     if(!vRes.pass) return vRes.rqReturn
   }
@@ -74,15 +77,18 @@ export async function main(ctx: FunctionContext) {
     res = await post_weixin_ad(body)
   }
   else if(oT === "coupon-status" && vRes?.pass) {
-
+    res = await coupon_status(body, vRes)
   }
   else if(oT === "coupon-check") {
 
   }
   else if(oT === "coupon-post" && vRes?.pass) {
-    coupon_post(body, vRes)
+    res = await coupon_post(body, vRes)
   }
-  else if(oT === "coupon-get") {
+  else if(oT === "coupon-detail") {
+
+  }
+  else if(oT === "coupon-mine") {
 
   }
   else if(oT === "coupon-update") {
@@ -299,6 +305,62 @@ async function get_showcase(
 
 
 /***************************** Coupons *****************************/
+
+async function coupon_status(
+  body: Record<string, any>,
+  vRes: VerifyTokenRes_B,
+): Promise<LiuRqReturn<HappySystemAPI.Res_CouponStatus>> {
+  // 1. check if i can use the coupon system
+  const userId = vRes.userData._id
+  const uCol = db.collection("User")
+  const res1 = await uCol.doc(userId).get<Table_User>()
+  const user = res1.data
+  if(!user) {
+    return { code: "E4004", errMsg: "no user found" }
+  }
+  if(user.oState !== "NORMAL") {
+    return { code: "E4003", errMsg: "user is not normal" }
+  }
+  const blockedFuncs = user.blockedFuncs ?? []
+  const can_i_use = blockedFuncs.includes("coupon")
+  const subManager = new SubscriptionManager(user)
+  const isSubscribed = subManager.getSubscribed()
+  const _env = process.env
+  const tmpl_id_1 = _env.LIU_WX_MINI_TMPL_ID_1
+  const tmpl_id_2 = _env.LIU_WX_MINI_TMPL_ID_2
+
+  // 2. define result
+  const result: HappySystemAPI.Res_CouponStatus = {
+    can_i_use,
+    membership: isSubscribed ? "premium" : "free",
+    tmpl_id_1,
+    tmpl_id_2,
+  }
+  if(!can_i_use) {
+    return { code: "0000", data: result }
+  }
+  
+  // 3. get my coupons
+  const hcCol = db.collection("HappyCoupon")
+  const w3 = {
+    owner: userId,
+    oState: _.or(_.eq("OK"), _.eq("REVIEWING")),
+  }
+  const res3 = await hcCol.where(w3).count()
+  const posted_coupons = res3.total ?? 0
+  let max_coupons = happy_coupon_cfg.free_max_coupons
+  if(isSubscribed) {
+    max_coupons = happy_coupon_cfg.premium_max_coupons
+  }
+  if(user.role === "admin") {
+    max_coupons = happy_coupon_cfg.admin_max_coupons
+  }
+
+  result.posted_coupons = posted_coupons
+  result.max_coupons = max_coupons
+  return { code: "0000", data: result }
+}
+
 
 async function coupon_search(
   body: Record<string, any>,
@@ -560,7 +622,7 @@ export class CouponFastSearch {
 async function coupon_post(
   body: Record<string, any>,
   vRes: VerifyTokenRes_B,
-) {
+): Promise<LiuRqReturn<HappySystemAPI.Res_CouponPost>> {
   // 1.1 check out days
   const availableDays = body.availableDays ?? 7
   if(typeof availableDays !== "number") {
@@ -1370,7 +1432,6 @@ class CouponParser {
     
     // 3.4 parse content
     const res3_4 = await AiShared.turnOutputIntoObject(txt3)
-    console.log("res3_4: ", res3_4)
     if(!res3_4) return
 
     // 3.5 check out error

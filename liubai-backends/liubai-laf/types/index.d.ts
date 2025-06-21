@@ -99,6 +99,8 @@ declare global {
       LIU_WX_REWARDED_VIDEO_AD?: string    // rewarded video unit ad id
       LIU_WX_MINI_APPID?: string
       LIU_WX_MINI_APPSECRET?: string
+      LIU_WX_MINI_TMPL_ID_1?: string       // 优惠券即将过期通知
+      LIU_WX_MINI_TMPL_ID_2?: string       // 如果有相似的优惠券，要发送的通知
       
 
       /** 企业微信 企业内部自建应用 */

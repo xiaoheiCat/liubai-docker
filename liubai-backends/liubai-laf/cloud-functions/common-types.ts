@@ -2573,7 +2573,8 @@ export namespace HappySystemAPI {
     | "coupon-status"
     | "coupon-check"
     | "coupon-post"
-    | "coupon-get"
+    | "coupon-detail"
+    | "coupon-mine"
     | "coupon-update"
     | "coupon-delete"
     | "coupon-search"
@@ -2607,7 +2608,18 @@ export namespace HappySystemAPI {
     searchList?: CouponItem[]
   }
 
+  export interface Res_CouponPost {
+    couponId?: string
+  }
 
+  export interface Res_CouponStatus {
+    can_i_use: boolean
+    membership: "free" | "premium"
+    tmpl_id_1?: string
+    tmpl_id_2?: string
+    max_coupons?: number
+    posted_coupons?: number
+  }
 
 }
 

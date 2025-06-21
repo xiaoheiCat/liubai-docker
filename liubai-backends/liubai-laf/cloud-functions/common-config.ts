@@ -89,4 +89,9 @@ export const milvus_cfg = {
 /********************* happy coupon config ****************/
 export const happy_coupon_cfg = {
   cache_mins: 10, 
+
+  free_max_coupons: 2,
+  premium_max_coupons: 9,
+  admin_max_coupons: 30,
+
 }
