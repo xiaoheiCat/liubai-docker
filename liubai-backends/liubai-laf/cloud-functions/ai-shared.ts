@@ -3520,7 +3520,7 @@ export class LiuEmbedding {
   private async _runWithOpenAICompatible(
     apiEndpoint: LiuAi.ApiEndpoint,
     model: string,
-    input: string[],
+    input: string[] | string,
   ) {
     try {
       const client = new OpenAI(apiEndpoint)
@@ -3699,9 +3699,31 @@ export class LiuEmbedding {
     input: LiuAi.EmbeddingInput[],
     apiEndpoint?: LiuAi.ApiEndpoint,
   ) {
+    
+    // 1. check out if we can use gitee ai
+    const allText: string[] = []
+    let usingMulti = false
+    input.forEach(v => {
+      if(v && (v as any).text) {
+        allText.push((v as any).text)
+      }
+      else {
+        usingMulti = true
+      }
+    })
+    if(!usingMulti) {
+      const res2 = await this.runByGiteeAI(allText)
+      if(res2?.originalResult?.data) {
+        return res2
+      }
+    }
+
+    // 2. define total result for jina provider
     const totalResult: LiuAi.Res_Embedding = {
       computingProvider: "jina",
     }
+
+    // 3. using Provider Jina
     if(!apiEndpoint) {
       apiEndpoint = AiShared.getEndpointFromProvider("jina")
       if(!apiEndpoint) {
@@ -3716,6 +3738,33 @@ export class LiuEmbedding {
     totalResult.originalResult = res2
     return totalResult
   }
+
+  async runByGiteeAI(
+    input: string[],
+    apiEndpoint?: LiuAi.ApiEndpoint,
+  ) {
+    // 1. define total result & get apiEndpoint if not provided
+    const totalResult: LiuAi.Res_Embedding = {
+      computingProvider: "gitee-ai",
+    }
+    if(!apiEndpoint) {
+      apiEndpoint = AiShared.getEndpointFromProvider("gitee-ai")
+      if(!apiEndpoint) {
+        console.warn("there is no api key and base url for gitee ai")
+        return totalResult
+      }
+    }
+
+    // 2. to request
+    const res2 = await this._runWithOpenAICompatible(
+      apiEndpoint,
+      this._jina_model,
+      input,
+    )
+    totalResult.originalResult = res2
+    return totalResult
+  }
+  
 
   getOutputs(res: LiuAi.Res_Embedding) {
     const data = res?.originalResult?.data
