@@ -96,8 +96,8 @@ export async function main(ctx: FunctionContext) {
   else if(oT === "coupon-update") {
 
   }
-  else if(oT === "coupon-delete") {
-
+  else if(oT === "coupon-delete" && vRes?.pass) {
+    res = await coupon_delete(body, vRes)
   }
   else if(oT === "coupon-search" && vRes?.pass) {
     coupon_search(body, vRes)
@@ -298,6 +298,51 @@ async function get_showcase(
 
 
 /***************************** Coupons *****************************/
+
+async function coupon_delete(
+  body: Record<string, any>,
+  vRes: VerifyTokenRes_B,
+) {
+  // 1. get params
+  const couponId = body.couponId
+  if(!valTool.isStringWithVal(couponId)) {
+    return { code: "E4000", errMsg: "coupon id is required" }
+  }
+
+  // 2. get coupon
+  const hcCol = db.collection("HappyCoupon")
+  const res2 = await hcCol.doc(couponId).get<Table_HappyCoupon>()
+  const coupon = res2.data
+  if(!coupon) {
+    return { code: "E4004" }
+  }
+  
+  // 3. check out auth
+  const oState = coupon.oState
+  if(oState.startsWith("DEL")) {
+    return { code: "0000" }
+  }
+  const user = vRes.userData
+  const userId = user._id
+  const myRole = user.role
+  let newOState: OState_Coupon | undefined
+  if(userId === coupon.owner) newOState = "DEL_BY_USER"
+  else if(myRole === "admin") newOState = "DEL_BY_ADMIN"
+  if(!newOState) {
+    return { code: "E4003", errMsg: "no permission" }
+  }
+
+  // 4. get to update
+  const u4: Partial<Table_HappyCoupon> = {
+    oState: newOState,
+    updatedStamp: getNowStamp()
+  }
+  const res4 = await hcCol.doc(couponId).update(u4)
+  console.log("coupon delete res4: ", res4)
+
+  return { code: "0000" }
+}
+
 
 async function coupon_detail(
   ctx: FunctionContext,
