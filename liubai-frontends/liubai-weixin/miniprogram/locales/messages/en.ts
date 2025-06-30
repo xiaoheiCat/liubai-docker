@@ -14,6 +14,8 @@ export default {
     "try_2": '"Luckin Coffee"\n"Chagee Tea"\n......',
     "got_it": "Got it",
     "search": "Search",
+    "open_mini_1": "Open MiniProgram",
+    "open_mini_2": "Please click \"前往小程序\" on the bottom right corner",
   },
   "shared": {
     "copied": "Copied",

@@ -6,12 +6,14 @@ export default {
     "slogan": "找优惠，用留小白的抽屉！",
     "title": "找优惠👇",
     "powered_by": "用留白记事，探索无限可能",
-    "placeholder": "输入商品或品牌名称",
+    "placeholder": "输入商品或品牌名",
     "share_mine": "分享我的优惠",
     "try_1": "试试看，输入",
     "try_2": "“瑞幸”\n“霸王茶姬”\n......",
     "got_it": "知道了",
     "search": "找找看",
+    "open_mini_1": "前往小程序",
+    "open_mini_2": "请点击右下角“前往小程序”",
   },
   "shared": {
     "copied": "已复制",
@@ -40,5 +42,6 @@ export default {
     "tip_3": "去休息一下吧🧘",
     "tip_4": "看太多啦🤯",
     "tip_5": "赶紧去聊天吧！",
+    
   },
 }

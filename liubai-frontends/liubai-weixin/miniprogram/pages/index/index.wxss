@@ -86,7 +86,7 @@
   align-items: center;
   width: 92%;
   max-width: var(--max-mobile);
-  --iam-height: 66px;
+  --iam-height: 72px;
 }
 
 .index-add {
@@ -97,7 +97,7 @@
   position: relative;
   padding-left: 36px;
   box-sizing: border-box;
-  border-radius: 40px;
+  border-radius: 24px;
   overflow: hidden;
   background-color: var(--card-bg);
 }

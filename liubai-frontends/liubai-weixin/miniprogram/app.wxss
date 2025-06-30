@@ -24,7 +24,7 @@ page {
   --primary-hover: #1c5671;
   --primary-active: #15455e;
 
-  --card-bg: #eaecef;
+  --card-bg: #f1f3f6;
   --bg-color: #fff;
   --main-text: #1f2429;
   --main-normal: #3f4549;

@@ -4,24 +4,24 @@
     "miniprogram": {
       "list": [
         {
+          "name": "index",
+          "pathName": "pages/index/index",
+          "query": "",
+          "scene": null,
+          "launchMode": "singlePage"
+        },
+        {
           "name": "视频",
           "pathName": "packageA/pages/watch-video/watch-video",
           "query": "r=67ab7836f1028b7bcc3d7776",
-          "scene": null,
-          "launchMode": "default"
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "showcase",
           "pathName": "pages/showcase/showcase",
           "query": "",
           "launchMode": "embedded",
-          "scene": null
-        },
-        {
-          "name": "index",
-          "pathName": "pages/index/index",
-          "query": "",
-          "launchMode": "defaultNativeFunctionalized",
           "scene": null
         }
       ]

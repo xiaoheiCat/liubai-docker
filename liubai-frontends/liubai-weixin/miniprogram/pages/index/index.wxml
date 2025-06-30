@@ -16,7 +16,16 @@
 
     <!-- search box -->
     <view class="index-search-box">
-      <input class="index-search-input" 
+
+      <!-- mock input for browseOnly -->
+      <view wx:if="{{isBrowseOnly}}" 
+        class="index-search-input input-search-placeholder"
+        catchtap="toOpenMiniProgram"
+      >
+        <text>{{t1.placeholder}}</text>
+      </view>
+
+      <input wx:else class="index-search-input" 
         placeholder-class="input-search-placeholder"
         placeholder="{{t1.placeholder}}" 
         cursor-spacing="20"

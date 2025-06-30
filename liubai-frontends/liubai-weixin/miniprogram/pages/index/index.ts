@@ -11,6 +11,7 @@ import { LiuUtil } from "~/utils/liu-util/index"
 import { LiuApi } from "~/utils/LiuApi"
 import valTool from "~/utils/val-tool"
 import { handleImageSearch } from "./tools/useIndexPage"
+import { Loginer } from "~/utils/login/Loginer"
 
 Component({
 
@@ -23,6 +24,7 @@ Component({
     light_primary_color: defaultData.light_primary_color,
     dark_primary_color: defaultData.dark_primary_color,
     canSearch: false,
+    isBrowseOnly: false,
     _key1: "",
     _searchValue: "",
   },
@@ -123,9 +125,22 @@ Component({
       console.log("to search: ", searchValue)
     },
 
+    toOpenMiniProgram() {
+      LiuUtil.showCustomModal({
+        title_key: "index.open_mini_1",
+        content_key: "index.open_mini_2",
+        confirm_key: "index.got_it",
+        showCancel: false,
+      })
+    },
+
     onLoad(query: Record<string, string>) {
       if(query?.key1) {
         this.data._key1 = query.key1
+      }
+      const canLogin = Loginer.canILogin()
+      if(!canLogin) {
+        this.setData({ isBrowseOnly: true })
       }
     },
 
