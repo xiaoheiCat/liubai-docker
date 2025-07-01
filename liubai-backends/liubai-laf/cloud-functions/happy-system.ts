@@ -1130,9 +1130,39 @@ class CouponUpdateManager {
     // 1. get vector data
     const vectorData = await this._getVectorData()
     if(!vectorData) return false
+    const baseManager = this._baseManager
 
-    
+    // 2. get score by CouponChecker
+    const res2 = await CouponChecker.text(copytext)
+    const score = res2.score
+    if(score === 0) {
+      const reason2_1 = baseManager.getReason(
+        "delete by coupon_update_checker",
+        res2.worker,
+      )
+      baseManager.downgradeOState("DEL_BY_AI", reason2_1)
+      return false
+    }
+    if(score === 0.5) {
+      const reason2_2 = baseManager.getReason(
+        "decided by coupon_update_checker",
+        res2.worker,
+      )
+      baseManager.downgradeOState("REVIEWING", reason2_2)
+    }
 
+    // 3. start to embedding
+    const res3 = await CouponEmbedding.text(copytext)
+    if(!res3) return
+
+    // 4. to insert for update
+    vectorData.copytext = copytext
+    vectorData.copytext_vector = res3.copytext_vector
+    vectorData.textEmbeddingModel = res3.model
+    vectorData.updatedStamp = getNowStamp()
+    await this._setVectorData(vectorData)
+
+    return true
   }
 
   async addAvailableDays(): Promise<LiuRqReturn> {
@@ -2065,7 +2095,7 @@ class CouponEmbedding {
 
   static async text(
     copytext: string,
-    parsedRes: Res_CouponParser,
+    parsedRes?: Res_CouponParser,
   ): Promise<Res_CouponEmbedding1 | undefined> {
     // 1. construct inputs
     const inputs: LiuAi.EmbeddingInput[] = [
@@ -2073,7 +2103,7 @@ class CouponEmbedding {
         text: copytext,
       }
     ]
-    if(parsedRes.title) {
+    if(parsedRes?.title) {
       inputs.push({ text: parsedRes.title })
     }
 
