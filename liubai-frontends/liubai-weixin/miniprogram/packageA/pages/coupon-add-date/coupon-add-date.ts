@@ -1,5 +1,4 @@
 import { navibarBehavior } from "~/behaviors/navibar-behavior"
-import { sharedBehavior } from "~/behaviors/shared-behavior"
 import { i18nBehavior } from "~/packageA/behaviors/i18n-behavior"
 import { themeBehavior } from "~/packageA/behaviors/theme-behavior"
 import { LiuApi } from "~/utils/LiuApi"
@@ -12,7 +11,6 @@ Component({
 
   behaviors: [
     i18nBehavior("coupon-add-date"),
-    sharedBehavior(),
     navibarBehavior(),
     themeBehavior(),
   ],
@@ -26,14 +24,15 @@ Component({
   methods: {
 
     goToSuccess() {
+      this.data._justPosted = true
       LiuApi.navigateTo({
         url: "/packageA/pages/coupon-add-success/coupon-add-success",
         routeType: "wx://modal-navigation",
         routeConfig: {
-          barrierColor: "rgba(0, 0, 0, 0.6)",
-          barrierDismissible: true,
+          allowEnterRouteSnapshotting: true,
+          allowExitRouteSnapshotting: true,
         },
-      })
+      }, this.router)
     },
 
     onShow() {

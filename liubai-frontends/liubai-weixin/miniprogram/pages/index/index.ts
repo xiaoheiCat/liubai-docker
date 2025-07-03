@@ -144,6 +144,8 @@ Component({
           barrierDismissible: true,
           popGestureDirection: "multi",
           fullscreenDrag: false,
+          allowEnterRouteSnapshotting: true,
+          allowExitRouteSnapshotting: true,
         },
       })
     },

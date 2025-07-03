@@ -26,9 +26,9 @@
 }
 
 .cn-close-box {
-  padding-left: 3px;
-  width: 30px;
-  height: 30px;
+  padding-left: 9px;
+  width: 40px;
+  height: 40px;
   position: relative;
   display: flex;
   align-items: center;

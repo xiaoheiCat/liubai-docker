@@ -9,7 +9,14 @@ export class LiuApi {
     return pages
   }
 
-  static navigateTo(opt: WechatMiniprogram.NavigateToOption) {
+  static navigateTo(
+    opt: WechatMiniprogram.NavigateToOption,
+    router?: WechatMiniprogram.Component.Router,
+  ) {
+    if(router) {
+      router.navigateTo(opt)
+      return
+    }
     wx.navigateTo(opt)
   }
 

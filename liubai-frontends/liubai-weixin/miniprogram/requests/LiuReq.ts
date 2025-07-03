@@ -60,6 +60,7 @@ export class LiuReq {
         data: newBody,
         timeout,
         method,
+        useHighPerformanceMode: true,
         success(res) {
           // console.log("wx.request success: ")
           // console.log(res)

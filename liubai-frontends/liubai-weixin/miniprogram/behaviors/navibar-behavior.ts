@@ -90,8 +90,8 @@ export function navibarBehavior() {
           // 7.1 consider status bar or not
           if(considerStatusBar) {
             if(height1 > 10) {
-              height1 -= 5
-              height2 += 10
+              height1 -= 6
+              height2 += 12
             }
           }
           else {
@@ -99,8 +99,8 @@ export function navibarBehavior() {
             height2 = mbTop + mbHeight
             height2 = Math.max(height1, height2)
             if(mbTop <= 12) height2 += mbTop
-            height2 = Math.min(72, height2)
-            height1 = 0
+            height2 = Math.min(52, height2)
+            height1 = 9
           }
   
           // 7.2 consider visibility
