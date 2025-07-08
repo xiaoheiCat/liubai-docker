@@ -55,14 +55,7 @@ Component({
       // 4. save image
       CouponAddManager.addPoster(res2)
 
-      LiuApi.navigateTo({
-        url: "/packageA/pages/coupon-add-date/coupon-add-date",
-        routeType: "wx://modal-navigation",
-        routeConfig: {
-          allowEnterRouteSnapshotting: true,
-          allowExitRouteSnapshotting: true,
-        },
-      }, this.router)
+      this.goToAddDate()
     },
 
     async onTapClipboard() {
@@ -99,6 +92,19 @@ Component({
         return
       }
 
+      CouponAddManager.addCopytext(txt2)
+      this.goToAddDate()
+    },
+
+    goToAddDate() {
+      LiuApi.navigateTo({
+        url: "/packageA/pages/coupon-add-date/coupon-add-date",
+        routeType: "wx://modal-navigation",
+        routeConfig: {
+          allowEnterRouteSnapshotting: true,
+          allowExitRouteSnapshotting: true,
+        },
+      }, this.router)
     },
 
     showClipboardErr(err?: any) {
