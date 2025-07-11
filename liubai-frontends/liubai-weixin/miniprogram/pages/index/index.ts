@@ -12,6 +12,7 @@ import { LiuApi } from "~/utils/LiuApi"
 import valTool from "~/utils/val-tool"
 import { Loginer } from "~/utils/login/Loginer"
 import { ShowTip } from "~/utils/managers/ShowTip"
+import { handleGroupInfo } from "./tools/useIndexPage"
 
 Component({
 
@@ -115,6 +116,7 @@ Component({
       LiuApi.openChatTool({
         url: "/packageB/pages/task-create/task-create",
         fail(err) {
+          if(err?.errMsg?.includes?.("cancel")) return
           console.warn("openChatTool fail", err)
           ShowTip.showErrMsg("fail to open chat tool", err)
         }
@@ -151,6 +153,8 @@ Component({
         this.toCreateTask()
         return
       }
+      
+      handleGroupInfo()
     },
 
     onUnload() {

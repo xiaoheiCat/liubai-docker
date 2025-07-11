@@ -450,5 +450,9 @@ export class LiuApi {
     }
   }
 
+  static getGroupEnterInfo(opt: WechatMiniprogram.GetGroupEnterInfoOption) {
+    wx.getGroupEnterInfo(opt)
+  }
+
 
 }

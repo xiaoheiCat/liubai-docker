@@ -4284,13 +4284,13 @@ export namespace WxMiniAPI {
   })
 
   export interface ChatInfo {
-    opengid?: string              // 多聊群下返回的群唯一标识
-    open_single_roomid?: string   // 单聊下的房间唯一标识
-    group_openid: string          // 用户在当前聊天室的唯一标识
-    chat_type: 1 | 2 | 3 | 4      // 1: 单聊, 
-                                  // 2: 企业微信联系人
-                                  // 3: 普通微信群聊
-                                  // 4: 企业微信互通群聊
+    opengid?: string               // 多聊群下返回的群唯一标识
+    open_single_roomid?: string    // 单聊下的房间唯一标识
+    group_openid?: string          // 用户在当前聊天室的唯一标识
+    chat_type?: 1 | 2 | 3 | 4      // 1: 单聊, 
+                                   // 2: 企业微信联系人
+                                   // 3: 普通微信群聊
+                                   // 4: 企业微信互通群聊
   }
 
 }

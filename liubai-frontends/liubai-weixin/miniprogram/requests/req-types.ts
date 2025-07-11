@@ -1,3 +1,4 @@
+
 import type { LocalTheme } from "~/types/types-atom"
 import type { 
   CloudStorageService, 
@@ -5,6 +6,7 @@ import type {
   UserSubscription,
 } from "~/types/types-cloud"
 import type { LocalLocale } from "~/types/types-locale"
+import type { WxMiniAPI } from "~/types/types-wx"
 
 /********************** Hello World *******************/
 export interface Res_HelloWorld {
@@ -158,4 +160,13 @@ export namespace FileSetAPI {
   export interface Res_QiniuUploaded {
     cloud_url: string
   }
+}
+
+/************************ people tasks ********************/
+export namespace PeopleTasksAPI {
+  export interface Res_EnterWxChatTool {
+    operateType: "enter-wx-chat-tool"
+    chatInfo: WxMiniAPI.ChatInfo
+  }
+
 }
