@@ -2,6 +2,7 @@ import { ALLOW_DEEP_TYPES } from "~/config/atom";
 import type { LiuContent, LiuNodeType } from "~/types/types-atom";
 import valTool from "~/utils/basic/val-tool";
 import reg_exp from "~/config/regular-expressions";
+import type { HandleCodeBlockRes } from "./types";
 
 type ParseType = "phone" | "url_scheme" | ""
 
@@ -18,6 +19,18 @@ export function addSomethingWhenBrowsing(
       v.content = _parseTextsForLink(content)
       continue
     }
+    if(type === "codeBlock" && content) {
+      const tmp = _handleCodeBlock(content)
+      if(tmp.originalText) {
+        v.content = tmp.items
+        v.attrs = {
+          ...v.attrs,
+          originalText: tmp.originalText,
+          needFold: true,
+        }
+      }
+      continue
+    }
     
     // 检查当前节点是否允许再嵌套其他节点
     const allowDeep = ALLOW_DEEP_TYPES.includes(type)
@@ -28,6 +41,34 @@ export function addSomethingWhenBrowsing(
 
   return list
 }
+
+
+function _handleCodeBlock(
+  items: LiuContent[],
+): HandleCodeBlockRes {
+  const v = items[0]
+  const codeText = v?.text
+  if(items.length !== 1 || !codeText) return { items }
+  const cLength = codeText.length
+  if(cLength < 150) return { items }
+
+  const lines = codeText.split("\n")
+  const lineLength = lines.length
+  if(lineLength < 10) {
+    if(lineLength === 1 && cLength > 600) {
+      const newText2 = codeText.slice(0, 500)
+      const newV2 = { ...v, text: newText2 }
+      return { items: [newV2], originalText: codeText }
+    }
+    return { items }
+  }
+  const newLines = lines.slice(0, 5)
+  const newText = newLines.join("\n")
+  const newV = { ...v, text: newText }
+  return { items: [newV], originalText: codeText }
+}
+
+
 
 /**
  * 在浏览时，装载一些 link，比如 tel

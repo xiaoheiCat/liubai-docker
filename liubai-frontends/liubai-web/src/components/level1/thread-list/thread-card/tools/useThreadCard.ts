@@ -1,4 +1,4 @@
-import { computed, onMounted, ref, shallowRef, watch } from 'vue';
+import { computed, onMounted, provide, ref, shallowRef, watch } from 'vue';
 import type EditorCore from "~/components/editors/editor-core/editor-core.vue"
 import type { TipTapEditor } from "~/types/types-editor"
 import type { TcEmits, TcProps } from "./types"
@@ -11,6 +11,7 @@ import type {
 } from "~/hooks/stores/useGlobalStateStore"
 import liuUtil from '~/utils/liu-util';
 import cui from '~/components/custom-ui';
+import { editorBriefingKey } from '~/utils/provide-keys';
 
 interface TcCtx {
   props: TcProps
@@ -41,6 +42,7 @@ export function useThreadCard(
 
   const { threadData, displayType } = props
   const isBriefing = ref(Boolean(threadData.briefing))
+  provide(editorBriefingKey, isBriefing)
   if(displayType === "detail") isBriefing.value = false
 
   const onTapBriefing = (e: MouseEvent) => {

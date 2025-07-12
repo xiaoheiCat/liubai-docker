@@ -98,8 +98,8 @@
     "expand": "Expand",
     "restore": "Restore",
     "tag": "Tag",
-    "copy_code": "Copy code",
-    "copy_text": "Copy text",
+    "copy_code": "Copy",
+    "copy_text": "Copy",
     "format_clear": "Clear format",
     "attachment": "File",
     "cannot_sync": "It's not supported to sync with cloud on the pure local mode.",
@@ -107,7 +107,8 @@
     "mail": "Mail",
     "call": "Call",
     "try_to_open": "Try to Open",
-    "one_click": "Visualize"
+    "one_click": "Visualize",
+    "expand_code": "Expand Code"
   },
   "cui": {
     "plz_input_txt": "Text here"

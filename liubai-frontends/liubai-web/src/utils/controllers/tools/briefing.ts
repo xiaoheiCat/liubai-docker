@@ -2,6 +2,7 @@
 import type { LiuContent } from "~/types/types-atom";
 import type { TipTapJSONContent } from "~/types/types-editor";
 import type { PackThreadOpt } from "~/utils/show/tools/types";
+import type { HandleCodeBlockRes } from "./types";
 import { listToText, getRowNum } from "~/utils/transfer-util/text";
 import valTool from "~/utils/basic/val-tool";
 
@@ -44,56 +45,16 @@ export function getBriefing(
   const magicNum = getMagicNum(opt)
   _magicNum = magicNum
 
-  let requiredBrief = false
-  const len = newLiuDesc.length
-
-  // 行数大于 3 行
-  if(len > MAX_ROW) requiredBrief = true
-
-  // 查找文字很多的情况
-  // 为什么不直接把 newLiuDesc 带入 listToText() 去计算字符呢？因为要考虑代码块的情况
-  // 可能卡片的前半段全是代码，很容易就超过 MAGICNUM 和 特定的行数
-  let charNum = 0
-  let rowNum = 0
-  if(!requiredBrief) {
-    for(let i=0; i<len; i++) {
-      const v = newLiuDesc[i]
-      const { type, content } = v
-      const isCodeBlock = type === "codeBlock"
-      if(content && content.length) {
-        const tmpText = listToText(content)
-        charNum += valTool.getTextCharNum(tmpText)
-        const tmpRow = getRowNum([v])
-        rowNum += tmpRow
-      }
-      if(charNum > (magicNum * 2 + TOLERANT_NUM * 2)) {
-        if(!isCodeBlock) requiredBrief = true
-        if(i < (len - 1)) requiredBrief = true
-      }
-      if(rowNum > MAX_ROW) {
-        if(isCodeBlock) {
-          if(rowNum > MAX_ROW + 1) {
-            requiredBrief = true
-          }
-        }
-        else {
-          requiredBrief = true
-        }
-
-        if(i < (len - 1)) requiredBrief = true
-      }
-      if(requiredBrief) break
-    }
-  }
-
+  let requiredBrief = _isRequiredBriefing(newLiuDesc)
   if(!requiredBrief) return
 
   // 开始计算 briefing
   const briefing: LiuContent[] = []
   let prevCharNum = 0
   let prevRowNum = 0
-  charNum = 0
-  rowNum = 0
+  let charNum = 0
+  let rowNum = 0
+  const len = newLiuDesc.length
   for(let i=0; i<len; i++) {
     const v = newLiuDesc[i]
     const { content } = v
@@ -131,6 +92,61 @@ export function getBriefing(
   
   return { type: "doc", content: briefing }
 }
+
+function _isRequiredBriefing(
+  newLiuDesc: LiuContent[],
+) {
+  const len = newLiuDesc.length
+  if(len > MAX_ROW) return true
+
+  let charNum = 0
+  let rowNum = 0
+  for (let i = 0; i < len; i++) {
+    const v = newLiuDesc[i]
+    const { type, content } = v
+    const isCodeBlock = type === "codeBlock"
+    if (content && content.length) {
+
+      // 计算字数
+      const tmpText = listToText(content)
+      const tmpCharNum = valTool.getTextCharNum(tmpText)
+      if (isCodeBlock && charNum > 50) {
+        charNum += 50
+      }
+      else {
+        charNum += tmpCharNum
+      }
+
+      // 计算行数
+      const tmpRow = getRowNum([v])
+      if (isCodeBlock && tmpRow > 3) {
+        rowNum += 2
+      }
+      else {
+        rowNum += tmpRow
+      }
+    }
+
+    // decide whether to return true
+    if (charNum > (_magicNum * 2 + TOLERANT_NUM * 2)) {
+      if (!isCodeBlock) return true
+      if (i < (len - 1)) return true
+    }
+    if (rowNum > MAX_ROW) {
+      if (isCodeBlock) {
+        if (rowNum > MAX_ROW + 1) return true
+      }
+      else {
+        return true
+      }
+
+      if (i < (len - 1)) return true
+    }
+  }
+  return false
+}
+
+
 
 // 在该节点的尾巴添加 ...
 function _addPoint3x(node: LiuContent) {
@@ -180,11 +196,6 @@ function _getBreakPoint(
   }
 
   return newNode
-}
-
-interface HandleCodeBlockRes {
-  items: LiuContent[]
-  originalText?: string
 }
 
 function _handleCodeBlock(

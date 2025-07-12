@@ -71,6 +71,17 @@
     </div>
 
     <pre spellcheck="false"><code><node-view-content /></code></pre>
+
+    <div v-if="!isBriefing && node.attrs?.needFold" class="cb-fold-container">
+      <div class="cb-fold-box">
+        <div class="cb-fold-text">
+          <span>{{ t('editor.expand_code') }}</span>
+        </div>
+        <div class="cb-fold-circle">
+          <svg-icon name="arrow-right2" color="#a0a0a0" class="cb-fold-svg"></svg-icon>
+        </div>
+      </div>
+    </div>
   </node-view-wrapper>
 </template>
 
@@ -90,7 +101,7 @@ import type {
 } from "./tools/types"
 import liuApi from '~/utils/liu-api'
 import type { LiuTimeout } from '~/utils/basic/type-tool'
-import { editorCanInteractKey } from "~/utils/provide-keys"
+import { editorBriefingKey, editorCanInteractKey } from "~/utils/provide-keys"
 import { useRouteAndLiuRouter } from '~/routes/liu-router'
 import { deviceChaKey } from '~/utils/provide-keys'
 
@@ -108,6 +119,8 @@ export default {
     const languages = showProgrammingLanguages()
     const cha = inject(deviceChaKey)
     const rr = useRouteAndLiuRouter()
+
+    const isBriefing = inject(editorBriefingKey, ref(false))
 
     const selectedLanguage = computed(() => {
       const _lang = props.node.attrs.language as CbcLang
@@ -172,6 +185,7 @@ export default {
     return { 
       t, 
       languages, 
+      isBriefing,
       isMobile: cha?.isMobile,
       isSafari: cha?.isSafari,
       leaveTip, 
@@ -342,6 +356,58 @@ export default {
     .cbrt-copied_show {
       visibility: visible;
       opacity: 1;
+    }
+
+  }
+
+  .cb-fold-container {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 0.5rem;
+    display: flex;
+    justify-content: center;
+    width: calc(100% - 1rem);
+    background: var(--code-block-gradient);
+
+    .cb-fold-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: .15s;
+      padding: 20px 8px 4px;
+    }
+
+    @media(hover: hover) {
+      .cb-fold-box:hover {
+        opacity: .8;
+      }
+    }
+
+    .cb-fold-text {
+      margin-inline-end: 8px;
+      color: #a0a0a0;
+      font-size: var(--mini-font);
+      font-weight: 600;
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: pointer;
+    }
+
+    .cb-fold-circle {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.6px solid #a0a0a0;
+    }
+
+    .cb-fold-svg {
+      width: 12px;
+      height: 12px;
+      transform: rotate(90deg);
     }
 
   }

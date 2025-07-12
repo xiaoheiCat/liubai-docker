@@ -107,7 +107,8 @@
     "mail": "寫信",
     "call": "撥號",
     "try_to_open": "嘗試開啟",
-    "one_click": "一鍵視覺化"
+    "one_click": "一鍵視覺化",
+    "expand_code": "展開程式"
   },
   "cui": {
     "plz_input_txt": "請輸入文字"

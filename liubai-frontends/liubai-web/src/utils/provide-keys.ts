@@ -39,6 +39,9 @@ export const editorSetKey = Symbol() as InjectionKey<Ref<number>>
 // 用于确认在浏览态时，editor 是否可交互
 export const editorCanInteractKey = Symbol() as InjectionKey<Ref<boolean>>
 
+// 向 code-block 传递当前是否处于 briefing 状态
+export const editorBriefingKey = Symbol() as InjectionKey<Ref<boolean>>
+
 // compose-page 向 custom-editor 传递外部或 ai 生成的数据
 export const composingDataKey = Symbol() as InjectionKey<ShallowRef<ComposingData | undefined>>
 

@@ -99,6 +99,10 @@ export function initExtensions(
         originalText: {
           type: "string",
           default: "",
+        },
+        needFold: {
+          type: "boolean",
+          default: false,
         }
       }
     },
