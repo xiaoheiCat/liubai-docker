@@ -22,6 +22,8 @@
       <view class="tc-box">
         <view class="tc-first-bar"
           hover-class="tc-hover"
+          catchtap="onTapAsignees"
+          hover-stay-time="300"
         >
           <image src="{{imagePath}}group.png" class="tcfb-icon" />
           <view class="tcfb-text">
@@ -34,7 +36,39 @@
           </view>
         </view>
 
+        <!-- Assignees -->
+        <view class="tc-assignees" wx:if="{{assignees.length > 0}}">
+          <open-data-list type="groupMembers" members="{{assignees}}">
+            <view class="tc-assignee" slot:index>
+              <open-data-item class="tc-assignee-avatar" type="userAvatar" index="{{index}}" />
+              <open-data-item class="tc-assignee-name" type="userNickName" index="{{index}}" />
+              <view class="tc-assignee-clear" hover-class="liu-hover-class"
+                catchtap="onTapClearAssignee"
+                data-idx="{{index}}"
+                hover-stay-time="200"
+              >
+                <image src="{{imagePath}}close.png" class="tc-assignee-clear-icon" />
+              </view>
+            </view>
+          </open-data-list>
+        </view>
+        
       </view>
+
+      <!-- Bug Tip -->
+      <view class="tc-issue-box">
+        <view class="tc-issue" hover-class="liu-hover-class"
+          catchtap="onTapIssue"
+        >
+          <image src="{{imagePath}}warning.png" class="tc-issue-icon" />
+          <text>{{t1.meet_issue}}</text>
+        </view>
+      </view>
+
+      <!-- Done Button -->
+      <custom-button catchtap="onTapPost" disabled="{{true}}">
+        <text>{{t1.done}}</text>
+      </custom-button>
 
 
     </view>

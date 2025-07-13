@@ -30,6 +30,7 @@ export default {
     "placeholder": "Say something...",
     "add_photo": "Add photo",
     "assign_to": "Assign to",
-    "done": "Done",
+    "done": "That's it",
+    "meet_issue": "Run into issue?",
   },
 }

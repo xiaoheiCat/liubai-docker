@@ -24,7 +24,8 @@
       "name": "packageB",
       "pages": [
         "pages/task-create/task-create",
-        "pages/task-detail/task-detail"
+        "pages/task-detail/task-detail",
+        "pages/article/article"
       ],
       "independent": true,
       "entry": "entry.js",

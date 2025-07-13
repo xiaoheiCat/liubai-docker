@@ -28,5 +28,6 @@ export default {
     "add_photo": "新增照片",
     "assign_to": "指派給",
     "done": "就這樣",
+    "meet_issue": "遇到問題？",
   },
 }

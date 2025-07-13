@@ -29,7 +29,7 @@ Component({
   },
 
   methods: {
-    async onTapCopy(e: any) {
+    async onTapCopy(e: WechatMiniprogram.BaseEvent) {
       const dataset = e.currentTarget.dataset
       const text = dataset.text
       if(!text) return

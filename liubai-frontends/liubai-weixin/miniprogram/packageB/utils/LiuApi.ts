@@ -434,6 +434,10 @@ export class LiuApi {
     }
   }
 
+  static async selectGroupMembers(opt: WechatMiniprogram.SelectGroupMembersOption) {
+    wx.selectGroupMembers(opt)
+  }
+
   
 
 }

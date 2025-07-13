@@ -7,8 +7,12 @@
           "name": "创建任务",
           "pathName": "packageB/pages/task-create/task-create",
           "query": "",
-          "scene": null,
-          "launchMode": "default"
+          "scene": 1158,
+          "launchMode": "default",
+          "groupInfo": {
+            "groupIdx": 1,
+            "groupName": "测试模拟群1"
+          }
         },
         {
           "name": "index",

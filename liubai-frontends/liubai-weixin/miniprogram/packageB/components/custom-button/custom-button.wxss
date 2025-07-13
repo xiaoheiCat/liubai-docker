@@ -19,6 +19,10 @@
   transition: .15s;
 }
 
+.cb-disabled.cb-btn {
+  opacity: .5;
+}
+
 .cb-normal-btn {
   background-color: var(--card-bg);
   color: var(--main-text);
@@ -43,6 +47,18 @@
     background-color: transparent;
     opacity: .75;
   }
+
+  .cb-disabled.cb-btn:hover {
+    background-color: var(--primary-color);
+  }
+
+  .cb-disabled.cb-normal-btn:hover {
+    opacity: .5;
+  }
+
+  .cb-disabled.cb-transparent-btn:hover {
+    opacity: .5;
+  }
 }
 
 .webview.cb-btn:active {
@@ -60,6 +76,12 @@
   opacity: .5;
 }
 
+.cb-disabled.cb-btn:active {
+  background-color: var(--primary-color);
+  transform: scale(1);
+}
+
+
 .skyline.cb-btn_hover {
   background-color: var(--primary-hover);
   transform: scale(0.98);
@@ -74,3 +96,19 @@
   background-color: transparent;
   opacity: .75;
 }
+
+.cb-disabled.cb-btn_hover {
+  background-color: var(--primary-color);
+  transform: scale(1);
+}
+
+.cb-disabled.cb-normal-btn_hover {
+  background-color: var(--card-bg);
+  opacity: .5;
+}
+
+.cb-disabled.cb-transparent-btn_hover {
+  background-color: transparent;
+  opacity: .5;
+}
+
