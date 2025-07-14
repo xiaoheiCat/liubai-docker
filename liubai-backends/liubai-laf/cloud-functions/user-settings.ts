@@ -119,12 +119,52 @@ export async function main(ctx: FunctionContext) {
   else if(oT === "member-avatar") {
     res = await member_avatar(vRes, body)
   }
+  else if(oT === "member-name") {
+    res = await member_name(vRes, body)
+  }
 
   // const stamp2 = getNowStamp()
   // const diffS = stamp2 - stamp1
   // console.log(`调用 user-settings for ${oT} 耗时: ${diffS}ms`)
 
   return res
+}
+
+async function member_name(
+  vRes: VerifyTokenRes_B,
+  body: Record<string, any>,
+) {
+  // 1. check out param
+  const res1 = vbot.safeParse(UserSettingsAPI.Sch_Param_MemberName, body)
+  if(!res1.success) {
+    const errMsg = checker.getErrMsgFromIssues(res1.issues)
+    return { code: "E4000", errMsg }
+  }
+  const memberId = body.memberId as string
+  const userId = vRes.userData._id
+  const name = body.name as string
+
+  // 2. get member
+  const mCol = db.collection("Member")
+  const res2 = await mCol.doc(memberId).get<Table_Member>()
+  const member = res2.data
+  if(!member) {
+    return { code: "E4004", errMsg: "member not found" }
+  }
+  if(member.user !== userId) {
+    return { code: "E4003", errMsg: "no permission" }
+  }
+  if(name === member.name) {
+    return { code: "0000" }
+  }
+
+  // 3. update member
+  const u3: Partial<Table_Member> = {
+    name,
+    updatedStamp: getNowStamp(),
+  }
+  await mCol.doc(memberId).update(u3)
+  return { code: "0000" }
 }
 
 async function member_avatar(

@@ -31,6 +31,12 @@ export namespace UserLoginAPI {
     operateType: "wx_mini_session"
     wx_mini_openid: string
   }
+
+  export interface Res_WxGzhForMini {
+    operateType: "wx_gzh_for_mini"
+    nickname: string
+    headimgurl?: string
+  }
 }
 
 export namespace UserSettingsAPI {

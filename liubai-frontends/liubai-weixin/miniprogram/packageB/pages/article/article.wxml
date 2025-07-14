@@ -1,1 +1,1 @@
-<web-view src="{{url}}" />
+<web-view wx:if="{{url}}" src="{{url}}" bindmessage="onWebViewMessage" />

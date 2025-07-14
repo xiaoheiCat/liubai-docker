@@ -2157,16 +2157,16 @@ export namespace UserSettingsAPI {
     voicePreference?: GenderType
   }
 
-  export interface Param_MemberAvatar {
-    operateType: "member-avatar"
-    memberId: string
-    image: Cloud_ImageStore
-  }
-
   export const Sch_Param_MemberAvatar = vbot.object({
     operateType: vbot.literal("member-avatar"),
     memberId: Sch_Id,
     image: Sch_Cloud_ImageStore,
+  })
+
+  export const Sch_Param_MemberName = vbot.object({
+    operateType: vbot.literal("member-name"),
+    memberId: Sch_Id,
+    name: Sch_String_WithLength,
   })
 
 }
