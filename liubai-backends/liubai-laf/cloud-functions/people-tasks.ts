@@ -36,11 +36,60 @@ export async function main(ctx: FunctionContext) {
   else if(oT === "create-wx-task") {
     res = await create_wx_task(body, vRes)
   }
+  else if(oT === "get-wx-task") {
+    res = await get_wx_task(body, vRes)
+  }
 
   return res
 }
 
 
+async function get_wx_task(
+  body: Record<string, any>,
+  vRes: VerifyTokenRes_B,
+) {
+  // 1. check out params
+  const res1 = vbot.safeParse(PeopleTasksAPI.Sch_Param_GetWxTask, body)
+  if(!res1.success) {
+    const errMsg = checker.getErrMsgFromIssues(res1.issues)
+    return { code: "E4000", errMsg }
+  }
+  const id = body.id as string
+  const chatInfo = body.chatInfo as WxMiniAPI.ChatInfo
+
+  // 2. get the task
+  const wtCol = db.collection("WxTask")
+  const res2 = await wtCol.doc(id).get<Table_WxTask>()
+  const data2 = res2.data
+  if(!data2 || data2.oState !== "OK") {
+    return { code: "E4004", errMsg: "no such task" }
+  }
+  if(data2.open_single_roomid) {
+    if(data2.open_single_roomid !== chatInfo.open_single_roomid) {
+      return { code: "PT001", errMsg: "open_single_roomid is not matched" }
+    }
+  }
+  if(data2.opengid) {
+    if(data2.opengid !== chatInfo.opengid) {
+      return { code: "PT001", errMsg: "opengid is not matched" }
+    }
+  }
+
+  // 3. package data
+  const data3: PeopleTasksAPI.Res_GetWxTask = {
+    operateType: "get-wx-task",
+    id: data2._id,
+    activity_id: data2.activity_id,
+    desc: data2.desc,
+    owner_openid: data2.owner_openid,
+    opengid: data2.opengid,
+    open_single_roomid: data2.open_single_roomid,
+    chat_type: data2.chat_type,
+    assigneeList: data2.assigneeList,
+    endStamp: data2.endStamp,
+  }
+  return { code: "0000", data: data3 }
+}
 
 async function create_wx_task(
   body: Record<string, any>,
@@ -81,10 +130,16 @@ async function create_wx_task(
     endStamp = endStamp * 1000
   }
 
-  // 5. calculate related_openids
+  // 5. calculate related_openids & assigneeList
   const owner_openid = chatInfo.group_openid as string
   let related_openids = [...assignees, owner_openid]
   related_openids = valTool.uniqueArray(related_openids)
+  const assigneeList = assignees.map(v => {
+    const obj5: PeopleTasksAPI.AssigneeItem = {
+      group_openid: v,
+    }
+    return obj5
+  })
 
   // 6. create the task
   const b6 = getBasicStampWhileAdding()
@@ -98,7 +153,7 @@ async function create_wx_task(
     open_single_roomid: chatInfo.open_single_roomid,
     chat_type: chatInfo.chat_type as WxMiniAPI.ChatType,
     desc,
-    assignees,
+    assigneeList,
     related_openids,
     activity_id,
     endStamp,

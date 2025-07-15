@@ -1925,7 +1925,7 @@ export interface Table_WxTask extends BaseTable {
   open_single_roomid?: string
   chat_type: WxMiniAPI.ChatType
   desc: string
-  assignees: string[]
+  assigneeList: PeopleTasksAPI.AssigneeItem[]
   related_openids: string[]
   activity_id?: string
   endStamp?: number
@@ -4338,7 +4338,7 @@ export namespace WxMiniAPI {
 
 export namespace PeopleTasksAPI {
 
-  export type OperateType = "enter-wx-chat-tool" | "create-wx-task"
+  export type OperateType = "enter-wx-chat-tool" | "create-wx-task" | "get-wx-task"
   export interface Res_EnterWxChatTool {
     operateType: "enter-wx-chat-tool"
     chatInfo: WxMiniAPI.ChatInfo
@@ -4350,6 +4350,33 @@ export namespace PeopleTasksAPI {
     desc: Sch_String_WithLength,
     assignees: vbot.array(Sch_String_WithLength),
   })
+  
+  export interface AssigneeItem {
+    group_openid: string
+    doneStamp?: number
+  }
+  
+  export interface Res_GetWxTask {
+    operateType: "get-wx-task"
+    id: string
+    activity_id?: string
+    desc: string
+    owner_openid: string
+    opengid?: string
+    open_single_roomid?: string
+    chat_type: number
+    assigneeList: AssigneeItem[]
+    endStamp?: number
+  }
+
+  export const Sch_Param_GetWxTask = vbot.object({
+    operateType: vbot.literal("get-wx-task"),
+    chatInfo: WxMiniAPI.Sch_ChatInfo,
+    id: Sch_Id,
+  })
+
+  
+
 
 }
 

@@ -87,6 +87,11 @@ export namespace PeopleTasksAPI {
     chatInfo: WxMiniAPI.ChatInfo
   }
 
+  export interface AssigneeItem {
+    group_openid: string
+    doneStamp?: number
+  }
+  
   export interface Res_GetWxTask {
     operateType: "get-wx-task"
     id: string
@@ -96,6 +101,7 @@ export namespace PeopleTasksAPI {
     opengid?: string
     open_single_roomid?: string
     chat_type: number
+    assigneeList: AssigneeItem[]
     endStamp?: number
   }
 
