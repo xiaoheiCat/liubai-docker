@@ -1,6 +1,8 @@
 import { LiuApi } from "./LiuApi"
 import valTool from "./val-tool"
 
+export type TunnelKey = "wx-chat-info"
+  | "just-create-task"
 
 export class LiuTunnel {
 
@@ -8,7 +10,7 @@ export class LiuTunnel {
   private static _val: any
 
   static async setStuff<T>(
-    key: string,
+    key: TunnelKey,
     val: T,
   ) {
     this._key = key
@@ -21,7 +23,7 @@ export class LiuTunnel {
   }
   
   static async takeStuff<T>(
-    key: string,
+    key: TunnelKey,
   ): Promise<T | undefined> {
     if(this._key === key && this._val) {
       const val1 = valTool.copyObject(this._val)

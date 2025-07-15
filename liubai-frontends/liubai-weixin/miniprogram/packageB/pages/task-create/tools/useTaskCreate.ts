@@ -2,8 +2,12 @@ import { LiuApi } from "~/packageB/utils/LiuApi"
 import { Loginer } from "~/packageB/utils/login/Loginer"
 import { TaskManager } from "../../shared/TaskManager"
 import APIs from "~/packageB/requests/APIs"
-import { LiuReq } from "~/requests/LiuReq"
+import { LiuReq } from "~/packageB/requests/LiuReq"
 import { LiuUtil } from "~/packageB/utils/liu-util/index"
+import { ShowTip } from "~/packageB/utils/managers/ShowTip"
+import { LiuTunnel } from "~/packageB/utils/LiuTunnel"
+import { JustCreateTask } from "~/packageB/types/types-tunnel"
+import { LiuTime } from "~/packageB/utils/LiuTime"
 
 let hasCheckedName = false
 
@@ -21,9 +25,9 @@ export async function handlePost(
 
   // 2. wait for chatInfo
   const res2 = await TaskManager.init()
-  if(!res2) return
+  // if(!res2) return
   const chatInfo = TaskManager.getChatInfo()
-  if(!chatInfo) return
+  // if(!chatInfo) return
 
   // 3. to fetch
   const w3 = {
@@ -39,7 +43,39 @@ export async function handlePost(
 
   // 4. handle result
   console.log("handlePost res3: ", res3)
+  const code4 = res3.code
+  const id = res3?.data?.id
+  if(code4 !== "0000" || !id) {
+    ShowTip.showErrMsg("🤨", res3)
+    return
+  }
 
+  navigateToDetailById(id)
+}
+
+
+
+async function navigateToDetailById(
+  id: string,
+) {
+  const pages = LiuApi.getPages()
+  const pageLength = pages.length
+  if(pageLength > 1) {
+    const prevPage = pages[pageLength - 2]
+    const prevName = prevPage.data.pageName
+    if(prevName === "task-detail") {
+      const data1: JustCreateTask = {
+        stamp: LiuTime.getTime(),
+        id,
+      }
+      await LiuTunnel.setStuff("just-create-task", data1)
+      LiuApi.navigateBack()
+      return
+    }
+  }
+
+  const url = `/packageB/pages/task-detail/task-detail?id=${id}`
+  LiuApi.redirectTo({ url })
 }
 
 

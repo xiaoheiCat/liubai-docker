@@ -21,6 +21,7 @@ Component({
   ],
 
   data: {
+    pageName: "task-create",
     focus: false,
     canSubmit: false,
     assignees: [] as string[],
