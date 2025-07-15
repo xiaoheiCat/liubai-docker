@@ -14,6 +14,7 @@ export default {
     "cannot_use_1": "Function not open",
     "privacy_tip": "Privacy 🔏",
     "ok": "OK",
+    "hold_on": "Hold on",
   },
   "err": {
     "no_data": "Nothing Here",

@@ -152,14 +152,14 @@ export type OState_Draft = typeof oState_Drafts[number]
 export const Sch_OState_Draft = vbot.picklist(oState_Drafts)
 
 // coupon 的 oState
-export const oState_Coupons = [
+export const oState_Cool = [
   "OK", 
   "REVIEWING", 
   "DEL_BY_USER", 
   "DEL_BY_ADMIN",
   "DEL_BY_AI",
 ] as const
-export type OState_Coupon = typeof oState_Coupons[number]
+export type OState_Cool = typeof oState_Cool[number]
 
 // order 的 oState
 export const oState_Orders = ["OK", "DEL_BY_USER"] as const
@@ -1854,7 +1854,7 @@ export interface Table_HappyCoupon extends BaseTable {
   img_to_txt?: string
   img_trace_id?: string
   owner?: string
-  oState: OState_Coupon
+  oState: OState_Cool
   fromType: LiuFromType
   emoji?: string
   brand?: string
@@ -1887,7 +1887,7 @@ export interface Vector_happy_coupons extends BaseTable {
   title: string
   keywords?: string[]
   owner?: string
-  oState: OState_Coupon
+  oState: OState_Cool
   textEmbeddingModel?: string
   imageEmbeddingModel?: string
   expireStamp: number
@@ -1914,6 +1914,10 @@ export interface Table_WxBond extends BaseTable {
   open_single_roomid?: string
   group_openid?: string
   chat_type?: 1 | 2 | 3 | 4
+}
+
+export interface Table_WxTask extends BaseTable {
+  
 }
 
 
@@ -4309,16 +4313,30 @@ export namespace WxMiniAPI {
                                    // 4: 企业微信互通群聊
   }
 
+  export const Sch_ChatInfo = vbot.object({
+    opengid: Sch_Opt_Str,
+    open_single_roomid: Sch_Opt_Str,
+    group_openid: Sch_Opt_Str,
+    chat_type: Sch_Opt_Num,
+  })
+
 }
 
 
 export namespace PeopleTasksAPI {
 
-  export type OperateType = "enter-wx-chat-tool"
+  export type OperateType = "enter-wx-chat-tool" | "create-wx-task"
   export interface Res_EnterWxChatTool {
     operateType: "enter-wx-chat-tool"
     chatInfo: WxMiniAPI.ChatInfo
   }
+
+  export const Sch_Param_CreateWxTask = vbot.object({
+    operateType: vbot.literal("create-wx-task"),
+    chatInfo: WxMiniAPI.Sch_ChatInfo,
+    desc: Sch_String_WithLength,
+    assignees: vbot.array(Sch_String_WithLength),
+  })
 
 }
 

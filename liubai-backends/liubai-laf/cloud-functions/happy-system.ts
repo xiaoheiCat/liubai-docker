@@ -18,7 +18,7 @@ import type {
   LiuAi,
   LiuRqReturn,
   OaiPrompt,
-  OState_Coupon,
+  OState_Cool,
   Partial_Id,
   Table_AiRoom,
   Table_Credential,
@@ -379,7 +379,7 @@ async function coupon_delete(
   const user = vRes.userData
   const userId = user._id
   const myRole = user.role
-  let newOState: OState_Coupon | undefined
+  let newOState: OState_Cool | undefined
   if(userId === coupon.owner) newOState = "DEL_BY_USER"
   else if(myRole === "admin") newOState = "DEL_BY_ADMIN"
   if(!newOState) {
@@ -943,7 +943,7 @@ class CouponBaseManager {
   }
 
   async downgradeOState(
-    oState: OState_Coupon,
+    oState: OState_Cool,
     aiReason?: string,
   ) {
     // 1. get coupon

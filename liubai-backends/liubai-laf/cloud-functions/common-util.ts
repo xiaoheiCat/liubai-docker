@@ -2657,6 +2657,8 @@ export class WxMiniHandler {
     TEXT_CHECK: "https://api.weixin.qq.com/wxa/msg_sec_check",
     IMG_CHECK: "https://api.weixin.qq.com/wxa/media_check_async",
     USER_RISK: "https://api.weixin.qq.com/wxa/getuserriskrank",
+    CREATE_ACT_ID: "https://api.weixin.qq.com/cgi-bin/message/wxopen/activityid/create",
+
   }
 
   static async getAccessToken() {
@@ -2763,6 +2765,12 @@ export class WxMiniHandler {
     }
     const url = this.idToUrl.USER_RISK
     const res = await this.toRequest<WxMiniAPI.Res_GetUserRiskRank>(url, obj)
+    return res
+  }
+
+  static async createActivityId() {
+    const url = this.idToUrl.CREATE_ACT_ID
+    const res = await this.toRequest(url, {})
     return res
   }
 

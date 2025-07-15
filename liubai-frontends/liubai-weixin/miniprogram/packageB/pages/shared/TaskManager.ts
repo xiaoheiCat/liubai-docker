@@ -2,7 +2,6 @@ import { LiuReq } from "../../requests/LiuReq"
 import APIs from "../../requests/APIs"
 import { LiuApi } from "../../utils/LiuApi"
 import { LiuApp } from "../../utils/usePackageB"
-import { LiuUtil } from "../../utils/liu-util/index"
 import type { WxMiniAPI } from "../../types/types-wx"
 import type { PeopleTasksAPI } from "../../requests/req-types"
 import { LiuTunnel } from "../../utils/LiuTunnel"
@@ -16,7 +15,6 @@ export class TaskManager {
 
     // 0. get chat info from tunnel
     const res0 = await LiuTunnel.takeStuff<WxMiniAPI.ChatInfo>("wx-chat-info")
-    console.log("TaskManager init res0: ", res0)
     if(res0) {
       this.chatInfo = res0
     }
@@ -24,17 +22,12 @@ export class TaskManager {
 
     // 1. login first
     const res1 = await LiuApp.autoLogin()
-    if(!res1) return
+    if(!res1) return false
 
     // 2. get chat tool info which is encrypted
     const res2 = await LiuApi.getChatToolInfo()
     if(!res2) {
-      // await LiuUtil.showCustomModal({
-      //   content: "fail to get chat tool info",
-      //   showCancel: false,
-      // })
-      // LiuUtil.goHome()
-      return
+      return false
     }
 
     // 3. fetch chat tool info

@@ -11,6 +11,7 @@ export default {
     "cannot_use_1": "功能不开放",
     "privacy_tip": "隐私提示🔏",
     "ok": "好",
+    "hold_on": "请稍等",
   },
   "err": {
     "no_data": "找不到耶",
