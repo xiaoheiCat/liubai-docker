@@ -49,14 +49,6 @@
     "navigationStyle": "custom",
     "initialRenderingCache": "static"
   },
-  "supportedMaterials": [
-    {
-      "materialType": "image/*",
-      "name": "用${nickname}查找",
-      "desc": "找优惠",
-      "path": "pages/index/index"
-    }
-  ],
   "singlePage": {
     "navigationBarFit": "float"
   },

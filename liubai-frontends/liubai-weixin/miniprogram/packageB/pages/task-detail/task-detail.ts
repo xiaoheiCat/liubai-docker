@@ -3,12 +3,13 @@ import { i18nBehavior } from "../../behaviors/i18n-behavior";
 import { themeBehavior } from "../../behaviors/theme-behavior";
 import { LiuTime } from "~/packageB/utils/LiuTime";
 import { TaskManager } from "../shared/TaskManager";
-import { fetchTaskDetail } from "./tools/useTaskDetail";
+import { fetchTaskDetail, showDetail } from "./tools/useTaskDetail";
 import { LiuTunnel } from "~/packageB/utils/LiuTunnel";
-import { JustCreateTask } from "~/packageB/types/types-tunnel";
+import type { JustCreateTask } from "~/packageB/types/types-tunnel";
 import { LiuApi } from "~/packageB/utils/LiuApi";
-import { PeopleTasksAPI } from "~/packageB/requests/req-types";
 import { pageStates } from "~/packageB/utils/atom-util";
+import type { WxMiniAPI } from "~/packageB/types/types-wx";
+import type { TaskDetail } from "./tools/types";
 
 Component({
 
@@ -26,8 +27,11 @@ Component({
     pageName: "task-detail",
     _id: "",
     _whenLoadStamp: 0,
-    detail: null as PeopleTasksAPI.Res_GetWxTask | null,
+    detail: null as TaskDetail | null,
     pState: pageStates.LOADING,
+    errTip: "",
+    chatInfo: null as WxMiniAPI.ChatInfo | null,
+    alwaysGoHome: false,
   },
 
   methods: {
@@ -69,21 +73,38 @@ Component({
 
       // 2. wait for chatInfo
       const res2 = await TaskManager.init()
-      if(!res2) {
+      const chatInfo = TaskManager.getChatInfo()
+      if(!res2 || !chatInfo) {
         this.youAreNotInTheRoom()
         return
       }
+      this.setData({ chatInfo })
 
       // 3. fetch task detail
-      const res3 = await fetchTaskDetail(id)
+      const res3 = await fetchTaskDetail(id, chatInfo)
+      const code3 = res3.code
+      const data3 = res3.data
+      if(code3 === "E4004") {
+        this.setData({ pState: pageStates.NO_DATA, alwaysGoHome: true })
+        return
+      }
+      if(code3 === "PT001") {
+        this.youAreNotInTheRoom()
+        return
+      }
+      if(!data3) {
+        this.setData({ pState: pageStates.NO_AUTH, alwaysGoHome: true })
+        return
+      }
 
-
-
+      // 4. show
+      const detail = showDetail(data3)
+      this.setData({ detail, pState: pageStates.OK, alwaysGoHome: false })
     },
 
     youAreNotInTheRoom() {
-      
-
+      console.log("youAreNotInTheRoom......")
+      this.setData({ pState: pageStates.NOT_IN_ROOM, alwaysGoHome: true })
     },
 
   },

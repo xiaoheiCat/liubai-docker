@@ -127,5 +127,5 @@ export function initI18n(
     return res2
   }
 
-  return { t }
+  return { t, locale }
 }

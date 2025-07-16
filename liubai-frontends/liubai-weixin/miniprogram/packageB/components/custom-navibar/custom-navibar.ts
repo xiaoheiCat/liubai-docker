@@ -34,6 +34,9 @@ Component({
     title: {
       type: String,
     },
+    openGid: {
+      type: String,
+    },
     alwaysArrowBack: {
       type: Boolean,
       value: false,
@@ -81,6 +84,10 @@ Component({
       LiuApi.vibrateShort({ type: "light" })
       LiuUtil.goHome()
     },
+
+    onShowGroupNameErr(e: any) {
+      console.log("onShowGroupNameErr: ", e)
+    }
 
 
   }

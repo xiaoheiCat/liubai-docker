@@ -1,3 +1,54 @@
-<view>
-  <text>hi, task-detail!</text>
-</view>
+<!-- task-detail -->
+ <scroll-view 
+  scroll-y
+  class="liu-{{theme}} liu-scroll-view"
+  type="custom"
+  associative-container="pop-gesture"
+>
+  <virtual-navibar height1="{{height1}}" height2="{{height2}}"></virtual-navibar>
+  <placeholder-view height3="{{height3}}" p-state="{{pState}}"
+    check-skyline err-tip="{{errTip}}"
+  ></placeholder-view>
+
+  <view wx:if="{{pState < 0 && detail}}" class="liu-main-container">
+    <view class="liu-main-box">
+
+      <!-- desc -->
+      <view class="td-desc">
+        <text>{{detail.desc}}</text>
+      </view>
+
+      <!-- owner -->
+      <open-data-list type="groupMembers" members="{{detail.owner_openid_list}}">
+        <view class="td-owner" slot:index>
+          <open-data-item class="td-owner-avatar" type="userAvatar" index="{{index}}" />
+          <open-data-item class="td-owner-name" type="userNickName" index="{{index}}" />
+        </view>
+      </open-data-list>
+
+      <!-- posted time -->
+      <view class="td-posted-time">
+        <text>{{detail.postedTimeStr}}</text>
+      </view>
+
+      <!-- from: group or you two -->
+      <view class="td-from" wx:if="{{chatInfo.opengid}}">
+        <open-data type="groupName" open-gid="{{chatInfo.opengid}}" 
+          default-text="{{t1.from_group}}" 
+        />
+      </view>
+      <view class="td-from" wx:else>
+        <text>{{t1.only_you}}</text>
+      </view>
+
+      <!-- virtual-bar -->
+      <view class="td-virtual-one"></view>
+
+    </view>
+  </view>
+  
+</scroll-view>
+<custom-navibar 
+  height1="{{height1}}" height2="{{height2}}" 
+  visible="{{visible}}" always-go-home="{{alwaysGoHome}}"
+></custom-navibar>

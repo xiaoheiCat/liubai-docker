@@ -107,7 +107,23 @@ Component({
 
     onTapTask() {
       if(!this.isEverythingOK()) return
-      this.toCreateTask()
+      // this.toCreateTask()
+      this.toMockDetail()
+    },
+
+    toMockDetail() {
+      console.log("toMockDetail........")
+      LiuApi.openChatTool({
+        url: "/packageB/pages/task-detail/task-detail?id=6876493b5c5bae5764b24631",
+        chatType: 1,
+        roomid: "AF66ptQfxi5NRx41bJxvMyObLSGJB82nddE1R-vVpdC6pA6zZA",
+        success(res) {
+          console.log("toMockDetail success", res)
+        },
+        fail(err) {
+          console.warn("toMockDetail fail", err)
+        }
+      })
     },
 
     toCreateTask() {

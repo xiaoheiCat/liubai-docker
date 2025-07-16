@@ -36,4 +36,12 @@ export default {
     "done": "就這樣",
     "meet_issue": "遇到問題？",
   },
+  "task-detail": {
+    "from_group": "來自群組",
+    "only_you": "僅你與對方可见",
+  },
+  "date": {
+    "show_1": "{mm}月{dd}日 {hr}:{min}",
+    "show_2": "{yyyy}年{mm}月{dd}日 {hr}:{min}",
+  },
 }

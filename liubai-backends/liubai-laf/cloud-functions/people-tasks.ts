@@ -86,6 +86,7 @@ async function get_wx_task(
     open_single_roomid: data2.open_single_roomid,
     chat_type: data2.chat_type,
     assigneeList: data2.assigneeList,
+    insertedStamp: data2.insertedStamp,
     endStamp: data2.endStamp,
   }
   return { code: "0000", data: data3 }

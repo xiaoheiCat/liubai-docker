@@ -47,9 +47,12 @@
       <image wx:else src="{{imagePath}}arrow-down.png" class="cn-close-image" />
     </view>
 
-    <view wx:if="{{title}}" class="cn-title-box">
+    <view wx:if="{{openGid || title}}" class="cn-title-box">
       <view class="cn-title">
-        <text>{{title}}</text>
+        <open-data wx:if="{{openGid}}" type="groupName" open-gid="{{openGid}}" 
+          default-text="{{title}}" binderror="onShowGroupNameErr"
+        />
+        <text wx:else>{{title}}</text>
       </view>
     </view>
 

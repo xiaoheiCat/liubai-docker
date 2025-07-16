@@ -39,4 +39,12 @@ export default {
     "done": "That's it",
     "meet_issue": "Run into issue?",
   },
+  "task-detail": {
+    "from_group": "From group",
+    "only_you": "Only for you two",
+  },
+  "date": {
+    "show_1": "{yyyy}-{mm}-{dd} {hr}:{min}",
+    "show_2": "{yyyy}-{mm}-{dd} {hr}:{min}",
+  }
 }
