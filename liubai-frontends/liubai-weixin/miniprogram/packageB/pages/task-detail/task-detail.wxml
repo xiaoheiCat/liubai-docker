@@ -72,8 +72,69 @@
         
       </view>
 
-      <!-- virtual-bar -->
-      <view class="td-virtual-one"></view>
+      <!-- Buttons for owner -->
+      <view wx:if="{{!detail.closedStamp && detail.isMyTask}}" class="td-buttons">
+
+        <!-- Reminder -->
+        <custom-button wx:if="{{detail.hasAnyIncomplete}}">
+          <text wx:if="{{chatInfo.opengid}}">{{t1.remind_them}}</text>
+          <text wx:else>{{t1.remind_ta}}</text>
+        </custom-button>
+
+        <!-- or Share -->
+        <custom-button wx:else>
+          <text wx:if="{{chatInfo.opengid}}">{{t1.share_to_group}}</text>
+          <text wx:else>{{t1.share_to_ta}}</text>
+        </custom-button>
+
+        <!-- Complete -->
+        <custom-button wx:if="{{detail.canIComplete}}" btn-type="normal">
+          <text>{{t1.complete_task}}</text>
+        </custom-button>
+
+        <!-- Close the task -->
+        <custom-button btn-type="normal">
+          <text>{{t1.close_task}}</text>
+        </custom-button>
+
+        <!-- Create Other -->
+        <custom-button btn-type="normal">
+          <text>{{t1.create_other}}</text>
+        </custom-button>
+
+      </view>
+
+      <!-- Buttons for assignee still incomplete -->
+      <view wx:elif="{{!detail.closedStamp && detail.canIComplete}}" class="td-buttons">
+        <!-- Complete -->
+        <custom-button>
+          <text>{{t1.complete_task}}</text>
+        </custom-button>
+
+        <!-- Share -->
+        <custom-button btn-type="normal">
+          <text>{{t1.share}}</text>
+        </custom-button>
+
+        <!-- Create Other -->
+        <custom-button btn-type="normal">
+          <text>{{t1.create_other}}</text>
+        </custom-button>
+      </view>
+
+      <!-- Buttons for closed or completed assignee -->
+      <view wx:else class="td-buttons">
+        <!-- Create others -->
+        <custom-button>
+          <text>{{t1.create_other}}</text>
+        </custom-button>
+
+        <!-- Share -->
+        <custom-button btn-type="normal">
+          <text>{{t1.share}}</text>
+        </custom-button>
+      </view>
+
 
     </view>
   </view>

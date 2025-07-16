@@ -157,6 +157,7 @@ Component({
     },
     
     onTapCreator() {
+      LiuApi.vibrateShort({ type: "light" })
       const { detail } = this.data
       if(!detail) return
       const timeStr = detail.postedTimeStr
@@ -170,6 +171,7 @@ Component({
     },
 
     onTapOneAssignee(e: WechatMiniprogram.BaseEvent) {
+      LiuApi.vibrateShort({ type: "light" })
       const idx = e.currentTarget.dataset.idx
       const { detail } = this.data
       if(typeof idx !== "number" || !detail) return
