@@ -25,6 +25,7 @@
   margin-bottom: 10px;
   position: relative;
   min-height: 30px;
+  transition: .15s;
 }
 
 .td-owner-avatar {
@@ -111,6 +112,7 @@
   padding: 10px 20px;
   box-sizing: border-box;
   align-items: flex-start;
+  transition: .15s;
 }
 
 .tc-assignee-avatar {
@@ -125,6 +127,7 @@
 .tc-assignee-name {
   line-height: 30px;
   font-size: var(--btn-font);
+  font-weight: 700;
   color: var(--main-normal);
   flex: 1;
 }
@@ -143,6 +146,10 @@
 .tc-assignee-checked-icon {
   width: 24px;
   height: 24px;
+}
+
+.tc-hover {
+  opacity: .75;
 }
 
 

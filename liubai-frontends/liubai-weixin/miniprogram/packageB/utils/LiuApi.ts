@@ -452,6 +452,18 @@ export class LiuApi {
     }
   }
 
+  static async updateShareMenu(opt: WechatMiniprogram.UpdateShareMenuOption) {
+    try {
+      const res = await wx.updateShareMenu(opt)
+      return res
+    }
+    catch(err) {
+      console.warn("updateShareMenu err: ")
+      console.log(err)
+      return
+    }
+  }
+
   
 
 }

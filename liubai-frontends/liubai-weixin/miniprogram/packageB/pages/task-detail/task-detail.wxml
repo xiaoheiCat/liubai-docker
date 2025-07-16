@@ -20,7 +20,9 @@
 
       <!-- owner -->
       <open-data-list type="groupMembers" members="{{detail.owner_openid_list}}">
-        <view class="td-owner" slot:index>
+        <view class="td-owner" slot:index catchtap="onTapCreator"
+          hover-class="tc-hover"
+        >
           <open-data-item class="td-owner-avatar" type="userAvatar" index="{{index}}" />
           <open-data-item class="td-owner-name" type="userNickName" index="{{index}}" />
         </view>
@@ -55,7 +57,9 @@
         <!-- Assignees -->
         <view class="tc-assignees" style="min-height: {{detail.assignees.length * 50}}px">
           <open-data-list type="groupMembers" members="{{detail.assignees}}">
-            <view class="tc-assignee" slot:index>
+            <view class="tc-assignee" slot:index hover-class="tc-hover" 
+              data-idx="{{index}}" catchtap="onTapOneAssignee"
+            >
               <open-data-item class="tc-assignee-avatar" type="userAvatar" index="{{index}}" />
               <open-data-item class="tc-assignee-name" type="userNickName" index="{{index}}" />
               <view class="tc-assignee-checked" wx:if="{{detail.assigneeList[index].doneStamp}}">

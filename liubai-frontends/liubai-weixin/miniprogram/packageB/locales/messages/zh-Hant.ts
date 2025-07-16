@@ -48,6 +48,10 @@ export default {
     "forward_2": "任務提醒",
     "closed_1": "任務已結束",
     "assign_to": "指派給",
+    "completed_1": "TA 已完成 ✅",
+    "imcompleted": "TA 尚未完成 ❌",
+    "creator": "創建人",
+    "created_time": "創建時間: {timeStr}",
   },
   "date": {
     "show_1": "{mm}月{dd}日 {hr}:{min}",

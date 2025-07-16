@@ -13,6 +13,7 @@ import type { TaskDetail } from "./tools/types";
 import { LiuUtil } from "~/packageB/utils/liu-util/index";
 import valTool from "~/utils/val-tool";
 import { useI18n } from "~/packageB/locales/index";
+import { DateUtil } from "~/packageB/utils/date-util";
 
 Component({
 
@@ -104,10 +105,12 @@ Component({
       // 4. show
       const detail = showDetail(chatInfo, data3)
       this.setData({ detail, pState: pageStates.OK, alwaysGoHome: false })
+      if(detail.isMyTask) {
+        this.toUpdateShareMenu()
+      }
 
       // 5. if just created
       const res5 = await LiuTunnel.takeStuff<JustCreateTask>("just-create-task")
-      console.log("getTaskDetail res5: ", res5)
       if(!res5 || res5.id !== id) return
 
       // 6. show modal
@@ -124,12 +127,75 @@ Component({
       this.toForward(true)
     },
 
+    async toUpdateShareMenu() {
+      console.log("go to update share menu......")
+      const { detail } = this.data
+      if(!detail) return
+      const activityId = detail.activity_id
+      if(!activityId) return
+
+      let chooseType = 2
+      let participant: string[] | undefined
+      if(detail.hasAnyIncomplete) {
+        chooseType = 1
+        participant = detail.assignees
+      }
+
+      const res = await LiuApi.updateShareMenu({
+        withShareTicket: true,
+        isUpdatableMessage: true,
+        activityId,
+        useForChatTool: true,
+        chooseType,
+        participant,
+        templateInfo: {
+          parameterList: [],
+          templateId: "4A68CBB88A92B0A9311848DBA1E94A199B166463",
+        },
+      })
+      console.log("updateShareMenu res: ", res)
+    },
+    
+    onTapCreator() {
+      const { detail } = this.data
+      if(!detail) return
+      const timeStr = detail.postedTimeStr
+      const { t } = useI18n()
+      const content = t("task-detail.created_time", { timeStr })
+      LiuUtil.showCustomModal({
+        title_key: "task-detail.creator",
+        content,
+        showCancel: false,
+      })
+    },
+
+    onTapOneAssignee(e: WechatMiniprogram.BaseEvent) {
+      const idx = e.currentTarget.dataset.idx
+      const { detail } = this.data
+      if(typeof idx !== "number" || !detail) return
+      console.log("onTapOneAssignee idx: ", idx)
+      const doneStamp = detail.assigneeList[idx].doneStamp
+      if(!doneStamp) {
+        LiuUtil.showCustomToast({ 
+          title_key: "task-detail.imcompleted",
+          icon: "none",
+        })
+        return
+      }
+
+      const timeStr = DateUtil.showBasicTime(doneStamp)
+      LiuUtil.showCustomModal({
+        title_key: "task-detail.completed_1",
+        content: timeStr,
+        showCancel: false,
+      })
+    },
+
     async toForward(justCreated = false) {
       const { t } = useI18n()
       const key = justCreated ? "task-detail.forward_1" : "task-detail.forward_2"
       const title = t(key)
-      const res1 = await LiuApi.shareAppMessageToGroup({ title })
-      console.log("toForward res1: ", res1)
+      await LiuApi.shareAppMessageToGroup({ title })
     },
 
     youAreNotInTheRoom() {

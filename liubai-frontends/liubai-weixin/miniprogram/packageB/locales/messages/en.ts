@@ -51,6 +51,10 @@ export default {
     "forward_2": "Task Reminder",
     "closed_1": "Task CLOSED",
     "assign_to": "Assign to",
+    "completed_1": "Completed ✅",
+    "imcompleted": "Not completed ❌",
+    "creator": "Creator",
+    "created_time": "Created at: {timeStr}",
   },
   "date": {
     "show_1": "{yyyy}-{mm}-{dd} {hr}:{min}",
