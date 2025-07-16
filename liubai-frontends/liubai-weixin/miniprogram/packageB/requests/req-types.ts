@@ -105,6 +105,7 @@ export namespace PeopleTasksAPI {
     insertedStamp: number
     editedStamp?: number
     endStamp?: number
+    closedStamp?: number
   }
 
 }

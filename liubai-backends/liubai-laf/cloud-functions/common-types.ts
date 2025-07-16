@@ -1929,6 +1929,7 @@ export interface Table_WxTask extends BaseTable {
   related_openids: string[]
   activity_id?: string
   endStamp?: number
+  closedStamp?: number
 }
 
 
@@ -4369,6 +4370,7 @@ export namespace PeopleTasksAPI {
     insertedStamp: number
     editedStamp?: number
     endStamp?: number
+    closedStamp?: number
   }
 
   export const Sch_Param_GetWxTask = vbot.object({

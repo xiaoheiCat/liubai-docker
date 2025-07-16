@@ -50,39 +50,46 @@ export async function handlePost(
     return
   }
 
-  navigateToDetailById(id)
+  showCreated(id)
 }
 
+async function showCreated(id: string) {
+  const data1: JustCreateTask = {
+    stamp: LiuTime.getTime(),
+    id,
+  }
+  await LiuTunnel.setStuff("just-create-task", data1)
 
+  LiuUtil.showCustomModal({
+    content_key: "task-create.created_1",
+    confirm_key: "shared.view",
+    showCancel: false,
+    success() {
+      navigateToDetailById(id)
+    }
+  })
+}
 
-async function navigateToDetailById(
-  id: string,
-) {
+async function navigateToDetailById(id: string) {
   const pages = LiuApi.getPages()
   const pageLength = pages.length
   if(pageLength > 1) {
     const prevPage = pages[pageLength - 2]
     const prevName = prevPage.data.pageName
     if(prevName === "task-detail") {
-      const data1: JustCreateTask = {
-        stamp: LiuTime.getTime(),
-        id,
-      }
-      await LiuTunnel.setStuff("just-create-task", data1)
       LiuApi.navigateBack()
       return
     }
   }
 
   const url = `/packageB/pages/task-detail/task-detail?id=${id}`
-  console.log("navigateToDetailById url: ", url)
   LiuApi.redirectTo({ 
     url,
     success(res) {
-      console.log("navigateToDetailById success: ", res)
+      console.log("navigateToDetailById success 111: ", res)
     },
     fail(err) {
-      console.log("navigateToDetailById fail: ", err)
+      console.warn("navigateToDetailById fail 111: ", err)
     }
   })
 }

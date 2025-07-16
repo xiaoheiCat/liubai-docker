@@ -8,8 +8,8 @@
 
 .td-desc {
   width: 100%;
-  margin-top: 20px;
-  margin-bottom: 30px;
+  margin-top: 50px;
+  margin-bottom: 60px;
   font-size: var(--big-word-style);
   font-weight: 700;
   color: var(--main-text);
@@ -51,7 +51,30 @@
   display: inline;
 }
 
+.td-closed-tag {
+  margin-top: 30px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: var(--main-note);
+  font-size: var(--btn-font);
+  font-style: italic;
+  position: relative;
+  overflow: hidden;
+}
+
+.td-closed-tag::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--primary-color);
+  opacity: .06;
+}
+
 .td-virtual-one {
   width: 100%;
-  height: 30px;
+  height: 60px;
 }
+

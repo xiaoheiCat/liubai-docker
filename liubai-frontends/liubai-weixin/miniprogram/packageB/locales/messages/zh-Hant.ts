@@ -12,6 +12,7 @@ export default {
     "privacy_tip": "隱私提示🔏",
     "ok": "好",
     "hold_on": "請稍等",
+    "view": "去檢視"
   },
   "err": {
     "no_data": "找不到耶",
@@ -35,10 +36,17 @@ export default {
     "assign_to": "指派給",
     "done": "就這樣",
     "meet_issue": "遇到問題？",
+    "created_1": "任務已創建📌",
   },
   "task-detail": {
     "from_group": "來自群組",
     "only_you": "僅你與對方可见",
+    "created_1": "你剛創建了任務🤸",
+    "created_2": "轉發給 TA，讓 TA 知道",
+    "created_3": "轉發到群聊，讓他們知道",
+    "forward_1": "我創建了任務",
+    "forward_2": "任務提醒",
+    "closed_1": "任務已結束",
   },
   "date": {
     "show_1": "{mm}月{dd}日 {hr}:{min}",

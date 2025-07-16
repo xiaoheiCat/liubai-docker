@@ -88,6 +88,7 @@ async function get_wx_task(
     assigneeList: data2.assigneeList,
     insertedStamp: data2.insertedStamp,
     endStamp: data2.endStamp,
+    closedStamp: data2.closedStamp,
   }
   return { code: "0000", data: data3 }
 }

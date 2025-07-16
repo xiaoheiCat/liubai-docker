@@ -10,6 +10,9 @@ import { LiuApi } from "~/packageB/utils/LiuApi";
 import { pageStates } from "~/packageB/utils/atom-util";
 import type { WxMiniAPI } from "~/packageB/types/types-wx";
 import type { TaskDetail } from "./tools/types";
+import { LiuUtil } from "~/packageB/utils/liu-util/index";
+import valTool from "~/utils/val-tool";
+import { useI18n } from "~/packageB/locales/index";
 
 Component({
 
@@ -48,7 +51,7 @@ Component({
 
     async onShow() {
       const stamp1 = this.data._whenLoadStamp
-      const justOnLoad = LiuTime.isWithinMillis(stamp1, 1000)
+      const justOnLoad = LiuTime.isWithinMillis(stamp1, 1500)
       if(justOnLoad) return
 
       this.checkStateWhileShowing()
@@ -58,6 +61,7 @@ Component({
       const res1 = await LiuTunnel.takeStuff<JustCreateTask>("just-create-task")
       const newId = res1?.id
       if(newId && newId !== this.data._id) {
+        await LiuTunnel.setStuff("just-create-task", res1)
         const url = `/packageB/pages/task-detail/task-detail?id=${newId}`
         LiuApi.navigateTo({ url })
         return
@@ -98,8 +102,34 @@ Component({
       }
 
       // 4. show
-      const detail = showDetail(data3)
+      const detail = showDetail(chatInfo, data3)
       this.setData({ detail, pState: pageStates.OK, alwaysGoHome: false })
+
+      // 5. if just created
+      const res5 = await LiuTunnel.takeStuff<JustCreateTask>("just-create-task")
+      console.log("getTaskDetail res5: ", res5)
+      if(!res5 || res5.id !== id) return
+
+      // 6. show modal
+      const isGroup = Boolean(chatInfo.opengid)
+      const res6 = await LiuUtil.showCustomModal({
+        title_key: "task-detail.created_1",
+        content_key: isGroup ? "task-detail.created_3" : "task-detail.created_2",
+        confirm_key: "shared.ok",
+      })
+      if(!res6.confirm) return
+
+      // 7. forward
+      valTool.waitMilli(2000)
+      this.toForward(true)
+    },
+
+    async toForward(justCreated = false) {
+      const { t } = useI18n()
+      const key = justCreated ? "task-detail.forward_1" : "task-detail.forward_2"
+      const title = t(key)
+      const res1 = await LiuApi.shareAppMessageToGroup({ title })
+      console.log("toForward res1: ", res1)
     },
 
     youAreNotInTheRoom() {

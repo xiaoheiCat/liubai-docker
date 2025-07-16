@@ -114,9 +114,9 @@ Component({
     toMockDetail() {
       console.log("toMockDetail........")
       LiuApi.openChatTool({
-        url: "/packageB/pages/task-detail/task-detail?id=6876493b5c5bae5764b24631",
+        url: "/packageB/pages/task-detail/task-detail?id=6877693d5c5bae5764b24636",
         chatType: 1,
-        roomid: "AF66ptQfxi5NRx41bJxvMyObLSGJB82nddE1R-vVpdC6pA6zZA",
+        roomid: "AF66ptRddE2IYBqqsJfnz5gG7EsVie5XVE5BGSHsBlR5dqsT_Q",
         success(res) {
           console.log("toMockDetail success", res)
         },

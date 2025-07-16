@@ -15,6 +15,7 @@ export default {
     "privacy_tip": "Privacy 🔏",
     "ok": "OK",
     "hold_on": "Hold on",
+    "view": "View"
   },
   "err": {
     "no_data": "Nothing Here",
@@ -38,10 +39,17 @@ export default {
     "assign_to": "Assign to",
     "done": "That's it",
     "meet_issue": "Run into issue?",
+    "created_1": "Task Created 📌",
   },
   "task-detail": {
     "from_group": "From group",
     "only_you": "Only for you two",
+    "created_1": "You just created a task🤸",
+    "created_2": "Forward and let her/him know",
+    "created_3": "Forward and let them know",
+    "forward_1": "I created a task",
+    "forward_2": "Task Reminder",
+    "closed_1": "Task CLOSED",
   },
   "date": {
     "show_1": "{yyyy}-{mm}-{dd} {hr}:{min}",

@@ -440,6 +440,18 @@ export class LiuApi {
     wx.selectGroupMembers(opt)
   }
 
+  static async shareAppMessageToGroup(opt: WechatMiniprogram.ShareAppMessageToGroupOption) {
+    try {
+      const res = await wx.shareAppMessageToGroup(opt)
+      return res
+    }
+    catch(err) {
+      console.warn("shareAppMessageToGroup err: ")
+      console.log(err)
+      return
+    }
+  }
+
   
 
 }

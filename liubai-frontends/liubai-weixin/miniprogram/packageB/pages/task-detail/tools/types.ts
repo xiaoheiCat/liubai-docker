@@ -9,5 +9,11 @@ export interface TaskDetail {
   insertedStamp: number
   editedStamp?: number
   endStamp?: number
+  closedStamp?: number
   postedTimeStr: string
+
+  // calculate some state
+  isMyTask: boolean
+  hasAnyIncomplete: boolean
+  canIComplete: boolean
 }

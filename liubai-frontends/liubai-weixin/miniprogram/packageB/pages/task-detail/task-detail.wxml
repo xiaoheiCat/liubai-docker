@@ -41,6 +41,13 @@
         <text>{{t1.only_you}}</text>
       </view>
 
+      <!-- if the task has been closed -->
+      <view class="td-closed-tag">
+        <text>{{t1.closed_1}}</text>
+      </view>
+
+      <!-- assignees -->
+
       <!-- virtual-bar -->
       <view class="td-virtual-one"></view>
 
