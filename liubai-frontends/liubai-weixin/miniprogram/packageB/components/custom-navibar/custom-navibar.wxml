@@ -20,7 +20,8 @@
       style="width: {{height2}}px; height: {{height2}}px;"
       catchtap="onTapHome"
     >
-      <image src="{{imagePath}}home.png" class="cn-home-image"></image>
+      <image wx:if="{{alwaysArrowBack}}" src="{{imagePath}}arrow-back.png" class="cn-back-image" />
+      <image wx:else src="{{imagePath}}home.png" class="cn-home-image" />
     </view>
 
     <!-- exit or back -->

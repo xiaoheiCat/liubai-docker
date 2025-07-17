@@ -86,6 +86,6 @@
 </scroll-view>
 <custom-navibar 
   height1="{{height1}}" height2="{{height2}}" 
-  visible="{{visible}}"
+  visible="{{visible}}" always-arrow-back="{{alwaysArrowBack}}"
   title="{{t1.title}}"
 ></custom-navibar>

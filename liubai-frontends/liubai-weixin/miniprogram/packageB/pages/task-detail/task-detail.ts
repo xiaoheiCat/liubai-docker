@@ -205,6 +205,11 @@ Component({
       this.setData({ pState: pageStates.NOT_IN_ROOM, alwaysGoHome: true })
     },
 
+    onTapCreateTask() {
+      LiuApi.vibrateShort({ type: "medium" })
+      LiuUtil.navigateWithPopup("/packageB/pages/task-create/task-create")
+    },
+
   },
 
 

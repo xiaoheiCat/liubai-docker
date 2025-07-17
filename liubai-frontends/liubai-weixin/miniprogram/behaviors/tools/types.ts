@@ -6,4 +6,5 @@ export interface NbData {
   height3: number
   lastResizeTimeout: LiuTimeout
   visible: boolean
+  alwaysArrowBack: boolean
 }

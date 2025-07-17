@@ -16,6 +16,7 @@ export function navibarBehavior() {
       height3: defaultHeight3,    // 通常指 页面高度 - 状态栏高度 - 胶囊高度
       lastResizeTimeout: 0,
       visible: true,
+      alwaysArrowBack: false,
     },
   
     lifetimes: {
@@ -71,6 +72,7 @@ export function navibarBehavior() {
   
   
           // 6. check if we need to consider status bar
+          let alwaysArrowBack = false
           const windowHeight = sizeInfo?.windowHeight ?? defaultData.windowHeight
           const screenHeight = sizeInfo?.screenHeight ?? defaultData.screenHeight
           const scrollViewHeight = pageInfo?.height ?? windowHeight
@@ -89,13 +91,14 @@ export function navibarBehavior() {
   
           // 7.1 consider status bar or not
           if(considerStatusBar) {
+            alwaysArrowBack = true
             if(height1 > 10) {
               height1 -= 6
               height2 += 12
             }
           }
           else {
-            // console.log(height2, mbTop, mbHeight)
+            console.log(height2, mbTop, mbHeight)
             height2 = mbTop + mbHeight
             height2 = Math.max(height1, height2)
             if(mbTop <= 12) height2 += mbTop
@@ -110,6 +113,9 @@ export function navibarBehavior() {
           }
           if(apiCategory === "nativeFunctionalized" && mode === "halfPage") {
             newData.visible = false
+          }
+          if(alwaysArrowBack !== this.data.alwaysArrowBack) {
+            newData.alwaysArrowBack = alwaysArrowBack
           }
     
           // 8. get to set data

@@ -6,7 +6,7 @@ import { LiuApi } from "./LiuApi";
 
 let hasInitTheme = false
 
-function setNaviForNewTheme(theme?: SupportedTheme) {
+export function setNaviForNewTheme(theme?: SupportedTheme) {
   if(!theme) {
     theme = LiuUtil.getCurrentTheme()
   }

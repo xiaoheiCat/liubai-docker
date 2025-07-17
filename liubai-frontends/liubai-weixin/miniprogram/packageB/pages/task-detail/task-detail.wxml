@@ -98,7 +98,7 @@
         </custom-button>
 
         <!-- Create Other -->
-        <custom-button btn-type="normal">
+        <custom-button btn-type="normal" catchtap="onTapCreateTask">
           <text>{{t1.create_other}}</text>
         </custom-button>
 
@@ -117,7 +117,7 @@
         </custom-button>
 
         <!-- Create Other -->
-        <custom-button btn-type="normal">
+        <custom-button btn-type="normal" catchtap="onTapCreateTask">
           <text>{{t1.create_other}}</text>
         </custom-button>
       </view>
@@ -125,7 +125,7 @@
       <!-- Buttons for closed or completed assignee -->
       <view wx:else class="td-buttons">
         <!-- Create others -->
-        <custom-button>
+        <custom-button catchtap="onTapCreateTask">
           <text>{{t1.create_other}}</text>
         </custom-button>
 
@@ -143,4 +143,5 @@
 <custom-navibar 
   height1="{{height1}}" height2="{{height2}}" 
   visible="{{visible}}" always-go-home="{{alwaysGoHome}}"
+  always-arrow-back="{{alwaysArrowBack}}"
 ></custom-navibar>

@@ -468,6 +468,10 @@ export class LiuApi {
     wx.setNavigationBarColor(opt)
   }
 
+  static onAppRouteDone(listener: WechatMiniprogram.OnAppRouteDoneCallback) {
+    if(typeof wx.onAppRouteDone !== "function") return
+    wx.onAppRouteDone(listener)
+  }
   
 
 }

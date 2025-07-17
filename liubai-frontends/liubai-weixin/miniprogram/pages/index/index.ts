@@ -127,6 +127,7 @@ Component({
     },
 
     toCreateTask() {
+      LiuApi.vibrateShort({ type: "medium" })
       LiuApi.openChatTool({
         url: "/packageB/pages/task-create/task-create",
         fail(err) {
