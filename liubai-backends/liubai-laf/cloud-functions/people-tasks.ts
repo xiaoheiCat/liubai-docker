@@ -39,8 +39,30 @@ export async function main(ctx: FunctionContext) {
   else if(oT === "get-wx-task") {
     res = await get_wx_task(body, vRes)
   }
+  else if(oT === "complete-wx-task") {
+    await complete_wx_task(body, vRes)
+  }
+  else if(oT === "close-wx-task") {
+    await close_wx_task(body, vRes)
+  }
 
   return res
+}
+
+
+async function close_wx_task(
+  body: Record<string, any>,
+  vRes: VerifyTokenRes_B,
+) {
+  
+}
+
+
+async function complete_wx_task(
+  body: Record<string, any>,
+  vRes: VerifyTokenRes_B,
+) {
+
 }
 
 

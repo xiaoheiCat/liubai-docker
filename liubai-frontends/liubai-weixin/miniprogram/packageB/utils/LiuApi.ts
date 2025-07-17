@@ -472,6 +472,10 @@ export class LiuApi {
     if(typeof wx.onAppRouteDone !== "function") return
     wx.onAppRouteDone(listener)
   }
+
+  static notifyGroupMembers(opt: WechatMiniprogram.NotifyGroupMembersOption) {
+    wx.notifyGroupMembers(opt)
+  }
   
 
 }

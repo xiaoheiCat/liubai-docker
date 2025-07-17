@@ -8,6 +8,7 @@
   margin: 20px 0;
   padding: 16px 0;
   line-height: 1.5;
+  font-weight: 700;
 }
 
 .tc-placeholder {

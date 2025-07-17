@@ -3,6 +3,7 @@ import valTool from "./val-tool"
 
 export type TunnelKey = "wx-chat-info"
   | "just-create-task"
+  | "please-create-task"
 
 export class LiuTunnel {
 

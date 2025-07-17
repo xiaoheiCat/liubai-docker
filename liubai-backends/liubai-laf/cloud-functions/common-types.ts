@@ -4339,7 +4339,11 @@ export namespace WxMiniAPI {
 
 export namespace PeopleTasksAPI {
 
-  export type OperateType = "enter-wx-chat-tool" | "create-wx-task" | "get-wx-task"
+  export type OperateType = "enter-wx-chat-tool" | "create-wx-task" 
+    | "get-wx-task"
+    | "close-wx-task"
+    | "complete-wx-task"
+
   export interface Res_EnterWxChatTool {
     operateType: "enter-wx-chat-tool"
     chatInfo: WxMiniAPI.ChatInfo

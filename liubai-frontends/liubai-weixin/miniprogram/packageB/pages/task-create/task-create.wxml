@@ -21,13 +21,14 @@
         focus="{{focus}}"
         bindinput="onInput"
         bindconfirm="onInput"
+        value="{{inputValue}}"
       />
 
       <!-- Assign to -->
       <view class="tc-box">
         <view class="tc-first-bar"
           hover-class="tc-hover"
-          catchtap="onTapAsignees"
+          catchtap="onTapAssignees"
           hover-stay-time="300"
         >
           <image src="{{imagePath}}group.png" class="tcfb-icon" />

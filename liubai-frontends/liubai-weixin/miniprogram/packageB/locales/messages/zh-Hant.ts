@@ -36,7 +36,7 @@ export default {
     "assign_to": "指派給",
     "done": "就這樣",
     "meet_issue": "遇到問題？",
-    "created_1": "任務已創建📌",
+    "created_1": "任務已創建🔫",
   },
   "task-detail": {
     "from_group": "來自群組",

@@ -3,17 +3,18 @@ import { i18nBehavior } from "../../behaviors/i18n-behavior";
 import { themeBehavior } from "../../behaviors/theme-behavior";
 import { LiuTime } from "~/packageB/utils/LiuTime";
 import { TaskManager } from "../shared/TaskManager";
-import { fetchTaskDetail, showDetail } from "./tools/useTaskDetail";
+import { fetchTaskDetail, showDetail, toNotifyMembers } from "./tools/useTaskDetail";
 import { LiuTunnel } from "~/packageB/utils/LiuTunnel";
-import type { JustCreateTask } from "~/packageB/types/types-tunnel";
+import type { JustCreateTask, PleaseCreateTask } from "~/packageB/types/types-tunnel";
 import { LiuApi } from "~/packageB/utils/LiuApi";
 import { pageStates } from "~/packageB/utils/atom-util";
 import type { WxMiniAPI } from "~/packageB/types/types-wx";
 import type { TaskDetail } from "./tools/types";
 import { LiuUtil } from "~/packageB/utils/liu-util/index";
-import valTool from "~/utils/val-tool";
+import valTool from "~/packageB/utils/val-tool";
 import { useI18n } from "~/packageB/locales/index";
 import { DateUtil } from "~/packageB/utils/date-util";
+import { waitForCreateTask } from "../shared/useTaskCreate";
 
 Component({
 
@@ -59,13 +60,13 @@ Component({
     },
 
     async checkStateWhileShowing() {
-      const res1 = await LiuTunnel.takeStuff<JustCreateTask>("just-create-task")
-      const newId = res1?.id
-      if(newId && newId !== this.data._id) {
-        await LiuTunnel.setStuff("just-create-task", res1)
-        const url = `/packageB/pages/task-detail/task-detail?id=${newId}`
-        LiuApi.navigateTo({ url })
-        return
+      const res1 = await LiuTunnel.takeStuff<PleaseCreateTask>("please-create-task")
+      if(res1) {
+        const justPosting = LiuTime.isWithinMillis(res1.stamp, LiuTime.MINUTE)
+        if(justPosting) {
+          waitForCreateTask()
+          return
+        }
       }
 
       this.getTaskDetail()
@@ -112,8 +113,13 @@ Component({
       // 5. if just created
       const res5 = await LiuTunnel.takeStuff<JustCreateTask>("just-create-task")
       if(!res5 || res5.id !== id) return
+      if(!LiuTime.isWithinMillis(res5.stamp, LiuTime.MINUTE)) {
+        console.warn("over one minute!")
+        return
+      }
 
       // 6. show modal
+      await valTool.waitMilli(1500)
       const isGroup = Boolean(chatInfo.opengid)
       const res6 = await LiuUtil.showCustomModal({
         title_key: "task-detail.created_1",
@@ -123,21 +129,19 @@ Component({
       if(!res6.confirm) return
 
       // 7. forward
-      valTool.waitMilli(2000)
       this.toForward(true)
     },
 
     async toUpdateShareMenu() {
-      console.log("go to update share menu......")
       const { detail } = this.data
       if(!detail) return
       const activityId = detail.activity_id
       if(!activityId) return
 
-      let chooseType = 2
+      let chooseType = 2  // 表示群内所有成员均为参与者（包括后加入群）
       let participant: string[] | undefined
       if(detail.hasAnyIncomplete) {
-        chooseType = 1
+        chooseType = 1    // 表示按指定的 participant 当作参与者
         participant = detail.assignees
       }
 
@@ -201,9 +205,22 @@ Component({
     },
 
     youAreNotInTheRoom() {
-      console.log("youAreNotInTheRoom......")
       this.setData({ pState: pageStates.NOT_IN_ROOM, alwaysGoHome: true })
     },
+
+
+    onTapReminder() {
+      LiuApi.vibrateShort({ type: "medium" })
+      const { detail, _id } = this.data
+      if(!detail || !_id) return
+      toNotifyMembers(_id, detail)
+    },
+
+    onTapShare() {
+      LiuApi.vibrateShort({ type: "medium" })
+      this.toForward()
+    },
+
 
     onTapCreateTask() {
       LiuApi.vibrateShort({ type: "medium" })

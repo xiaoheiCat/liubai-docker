@@ -76,13 +76,13 @@
       <view wx:if="{{!detail.closedStamp && detail.isMyTask}}" class="td-buttons">
 
         <!-- Reminder -->
-        <custom-button wx:if="{{detail.hasAnyIncomplete}}">
+        <custom-button wx:if="{{detail.hasAnyIncomplete}}" catchtap="onTapReminder">
           <text wx:if="{{chatInfo.opengid}}">{{t1.remind_them}}</text>
           <text wx:else>{{t1.remind_ta}}</text>
         </custom-button>
 
         <!-- or Share -->
-        <custom-button wx:else>
+        <custom-button wx:else catchtap="onTapShare">
           <text wx:if="{{chatInfo.opengid}}">{{t1.share_to_group}}</text>
           <text wx:else>{{t1.share_to_ta}}</text>
         </custom-button>
@@ -112,7 +112,7 @@
         </custom-button>
 
         <!-- Share -->
-        <custom-button btn-type="normal">
+        <custom-button btn-type="normal" catchtap="onTapShare">
           <text>{{t1.share}}</text>
         </custom-button>
 
@@ -130,7 +130,7 @@
         </custom-button>
 
         <!-- Share -->
-        <custom-button btn-type="normal">
+        <custom-button btn-type="normal" catchtap="onTapShare">
           <text>{{t1.share}}</text>
         </custom-button>
       </view>
