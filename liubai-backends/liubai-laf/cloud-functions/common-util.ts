@@ -2614,10 +2614,12 @@ export async function tagWxUserLang(
     tagid: tagId,
   }
   const res3 = await liuReq<Res_Common>(link4, q4)
-  const errcode = res3.data?.errcode
-  if(errcode !== 0) {
+  const data3 = res3.data
+  const errcode = data3?.errcode
+  // 50005: user is unsubscribed
+  if(errcode !== 0 && errcode !== 50005) {
     console.warn("tag user for wechat gzh failed")
-    console.log(res3.data)
+    console.log(data3)
   }
 
   return true
