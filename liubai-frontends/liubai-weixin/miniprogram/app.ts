@@ -1,5 +1,5 @@
 // app.ts
-import { useApp } from "./utils/useApp"
+import { useApp, useForwardMaterials } from "./utils/useApp"
 
 App({
   
@@ -10,4 +10,12 @@ App({
   onLaunch() {
     useApp()
   },
+
+  onShow(opt) {
+    if(opt.scene === 1173 && opt.forwardMaterials?.length) {
+      useForwardMaterials(opt.forwardMaterials)
+    }
+
+  },
+
 })

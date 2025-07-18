@@ -1,0 +1,5 @@
+<!-- virtual-navibar.wxml -->
+
+<view class="vn-container"
+  style="height: {{ height1 + height2 }}px"
+></view>

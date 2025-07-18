@@ -35,15 +35,17 @@ const { t } = useI18n()
         <div class="ap-title">
           <span v-if="wbData.status === 'bound'">{{ t('login.bound') }}</span>
           <span v-else-if="wbData.status === 'logged'">{{ t('login.logged') }}</span>
-          <span v-else-if="wbData.status === 'logout'">{{ t('login.wechat_login') }}</span>
+          <span v-else-if="wbData.status === 'logout' || wbData.status === 'wxmini-login'">{{ t('login.wechat_login') }}</span>
           <span v-else>{{ t('login.bind_wechat') }}</span>
         </div>
 
-        <div class="ap-mobile-virtual" v-if="wbData.status === 'logout'"></div>
+        <div class="ap-mobile-virtual" 
+          v-if="wbData.status === 'logout' || wbData.status === 'wxmini-login'"
+        ></div>
 
         <div class="ap-btn-container">
 
-          <div v-if="wbData.status === 'logout'" class="ap-mobile-agree">
+          <div v-if="wbData.status === 'logout' || wbData.status === 'wxmini-login'" class="ap-mobile-agree">
             <AgreeBox v-model:agree="wbData.agreeRule" be-center
               :shaking-num="wbData.agreeShakingNum"
             ></AgreeBox>
@@ -51,9 +53,9 @@ const { t } = useI18n()
 
           <!-- Main Button -->
           <custom-btn class="ap-btn ap-ok-btn" @click="onTapBtn1">
-            <span v-if="wbData.status === 'logout'">{{ t('login.wechat_one_login') }}</span>
+            <span v-if="wbData.status === 'logout' || wbData.status === 'wxmini-login'">{{ t('login.wechat_one_login') }}</span>
             <span v-else-if="wbData.status === 'waiting'">{{ t('login.bind_instantly') }}</span>
-            <span v-else-if="wbData.status === 'logged'">{{ t('login.lets_chat') }}</span>
+            <span v-else-if="wbData.status === 'logged' && wbData.pageName === 'wechat-bind'">{{ t('login.lets_chat') }}</span>
             <span v-else>{{ t('common.back') }}</span>
           </custom-btn>
 
@@ -66,7 +68,7 @@ const { t } = useI18n()
 
         </div>
 
-        <div v-if="wbData.status === 'logout'" class="ap-desktop-agree">
+        <div v-if="wbData.status === 'logout' || wbData.status === 'wxmini-login'" class="ap-desktop-agree">
           <AgreeBox v-model:agree="wbData.agreeRule" be-center
             :shaking-num="wbData.agreeShakingNum"
           ></AgreeBox>

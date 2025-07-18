@@ -1,0 +1,149 @@
+<!-- task-detail -->
+ <scroll-view 
+  scroll-y
+  class="liu-{{theme}} liu-scroll-view"
+  type="custom"
+  associative-container="pop-gesture"
+>
+  <virtual-navibar height1="{{height1}}" height2="{{height2}}"></virtual-navibar>
+  <placeholder-view height3="{{height3}}" p-state="{{pState}}"
+    check-skyline err-tip="{{errTip}}"
+  ></placeholder-view>
+
+  <view wx:if="{{pState < 0 && detail}}" class="liu-main-container">
+    <view class="liu-main-box">
+
+      <!-- desc -->
+      <view class="td-desc">
+        <text>{{detail.desc}}</text>
+      </view>
+
+      <!-- owner -->
+      <open-data-list type="groupMembers" members="{{detail.owner_openid_list}}">
+        <view class="td-owner" slot:index catchtap="onTapCreator"
+          hover-class="tc-hover"
+        >
+          <open-data-item class="td-owner-avatar" type="userAvatar" index="{{index}}" />
+          <open-data-item class="td-owner-name" type="userNickName" index="{{index}}" />
+        </view>
+      </open-data-list>
+
+      <!-- posted time -->
+      <view class="td-posted-time">
+        <text>{{detail.postedTimeStr}}</text>
+      </view>
+
+      <!-- from: group or you two -->
+      <view class="td-from" wx:if="{{chatInfo.opengid}}">
+        <open-data type="groupName" open-gid="{{chatInfo.opengid}}" 
+          default-text="{{t1.from_group}}" 
+        />
+      </view>
+      <view class="td-from" wx:else>
+        <text>{{t1.only_you}}</text>
+      </view>
+
+      <!-- if the task has been closed -->
+      <view class="td-closed-tag" wx:if="{{detail.closedStamp}}">
+        <text>{{t1.closed_1}}</text>
+      </view>
+
+      <!-- Assign to -->
+      <view wx:if="{{detail.assignees.length > 0}}" class="tc-box">
+        <view class="tc-first-bar">
+          <text>{{t1.assign_to}}</text>
+        </view>
+
+        <!-- Assignees -->
+        <view class="tc-assignees" style="min-height: {{detail.assignees.length * 50}}px">
+          <open-data-list type="groupMembers" members="{{detail.assignees}}">
+            <view class="tc-assignee" slot:index hover-class="tc-hover" 
+              data-idx="{{index}}" catchtap="onTapOneAssignee"
+            >
+              <open-data-item class="tc-assignee-avatar" type="userAvatar" index="{{index}}" />
+              <open-data-item class="tc-assignee-name" type="userNickName" index="{{index}}" />
+              <view class="tc-assignee-checked" wx:if="{{detail.assigneeList[index].doneStamp}}">
+                <image src="{{imagePath}}checked.png" class="tc-assignee-checked-icon" />
+              </view>
+            </view>
+          </open-data-list>
+
+        </view>
+        
+      </view>
+
+      <!-- Buttons for owner -->
+      <view wx:if="{{!detail.closedStamp && detail.isMyTask}}" class="td-buttons">
+
+        <!-- Reminder -->
+        <custom-button wx:if="{{detail.hasAnyIncomplete}}" catchtap="onTapReminder">
+          <text wx:if="{{chatInfo.opengid}}">{{t1.remind_them}}</text>
+          <text wx:else>{{t1.remind_ta}}</text>
+        </custom-button>
+
+        <!-- or Share -->
+        <custom-button wx:else catchtap="onTapShare">
+          <text wx:if="{{chatInfo.opengid}}">{{t1.share_to_group}}</text>
+          <text wx:else>{{t1.share_to_ta}}</text>
+        </custom-button>
+
+        <!-- Complete -->
+        <custom-button wx:if="{{detail.canIComplete}}" btn-type="normal"
+          catchtap="onTapCompleteTask"
+        >
+          <text>{{t1.complete_task}}</text>
+        </custom-button>
+
+        <!-- Close the task -->
+        <custom-button btn-type="normal" catchtap="onTapCloseTask">
+          <text>{{t1.close_task}}</text>
+        </custom-button>
+
+        <!-- Create Other -->
+        <custom-button btn-type="normal" catchtap="onTapCreateTask">
+          <text>{{t1.create_other}}</text>
+        </custom-button>
+
+      </view>
+
+      <!-- Buttons for assignee still incomplete -->
+      <view wx:elif="{{!detail.closedStamp && detail.canIComplete}}" class="td-buttons">
+        <!-- Complete -->
+        <custom-button catchtap="onTapCompleteTask">
+          <text>{{t1.complete_task}}</text>
+        </custom-button>
+
+        <!-- Share -->
+        <custom-button btn-type="normal" catchtap="onTapShare">
+          <text>{{t1.share}}</text>
+        </custom-button>
+
+        <!-- Create Other -->
+        <custom-button btn-type="normal" catchtap="onTapCreateTask">
+          <text>{{t1.create_other}}</text>
+        </custom-button>
+      </view>
+
+      <!-- Buttons for closed or completed assignee -->
+      <view wx:else class="td-buttons">
+        <!-- Create others -->
+        <custom-button catchtap="onTapCreateTask">
+          <text>{{t1.create_other}}</text>
+        </custom-button>
+
+        <!-- Share -->
+        <custom-button btn-type="normal" catchtap="onTapShare">
+          <text>{{t1.share}}</text>
+        </custom-button>
+      </view>
+
+
+    </view>
+  </view>
+  
+</scroll-view>
+<custom-navibar 
+  height1="{{height1}}" height2="{{height2}}" 
+  visible="{{visible}}" always-go-home="{{alwaysGoHome}}"
+  always-arrow-back="{{alwaysArrowBack}}"
+></custom-navibar>

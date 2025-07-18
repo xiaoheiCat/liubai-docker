@@ -1,4 +1,4 @@
-import type { BoolFunc } from "./basic/type-tool"
+import type { BoolFunc, StrFunc } from "./basic/type-tool"
 
 
 export class LiuApi {
@@ -9,7 +9,14 @@ export class LiuApi {
     return pages
   }
 
-  static navigateTo(opt: WechatMiniprogram.NavigateToOption) {
+  static navigateTo(
+    opt: WechatMiniprogram.NavigateToOption,
+    router?: WechatMiniprogram.Component.Router,
+  ) {
+    if(router) {
+      router.navigateTo(opt)
+      return
+    }
     wx.navigateTo(opt)
   }
 
@@ -51,6 +58,20 @@ export class LiuApi {
     return wx.getMenuButtonBoundingClientRect()
   }
 
+  static onMenuButtonBoundingClientRectWeightChange(
+    listener: WechatMiniprogram.OnMenuButtonBoundingClientRectWeightChangeCallback
+  ) {
+    if(!wx.onMenuButtonBoundingClientRectWeightChange) return
+    return wx.onMenuButtonBoundingClientRectWeightChange(listener)
+  }
+
+  static offMenuButtonBoundingClientRectWeightChange(
+    listener: WechatMiniprogram.OffMenuButtonBoundingClientRectWeightChangeCallback
+  ) {
+    if(!wx.offMenuButtonBoundingClientRectWeightChange) return
+    return wx.offMenuButtonBoundingClientRectWeightChange(listener)
+  }
+
   static getEnterOptionsSync() {
     return wx.getEnterOptionsSync()
   }
@@ -60,6 +81,12 @@ export class LiuApi {
     const res = wx.getApiCategory()
     if(!res) return "browseOnly"
     return res as WechatMiniprogram.ApiCategory
+  }
+
+  static onApiCategoryChange(
+    listener: WechatMiniprogram.OnApiCategoryChangeCallback
+  ) {
+    wx.onApiCategoryChange(listener)
   }
 
   static getSkylineInfoSync() {
@@ -115,6 +142,10 @@ export class LiuApi {
     return wx.request(opt)
   }
 
+  static uploadFile(opt: WechatMiniprogram.UploadFileOption) {
+    return wx.uploadFile(opt)
+  }
+
   static getFileSystemManager() {
     return wx.getFileSystemManager()
   }
@@ -123,7 +154,7 @@ export class LiuApi {
     return wx.env
   }
 
-  static async vibrateShort(opt: WechatMiniprogram.VibrateShortOption) {
+  static async vibrateShort(opt: WechatMiniprogram.LiuVibrateShortOption) {
     const res = await wx.vibrateShort(opt)
     return res
   }
@@ -189,6 +220,242 @@ export class LiuApi {
     opt: WechatMiniprogram.OpenCustomerServiceChatOption,
   ) {
     wx.openCustomerServiceChat(opt)
+  }
+
+  static login() {
+    const _wait = (a: StrFunc) => {
+      wx.login({
+        timeout: 5000,
+        success(res) {
+          a(res.code)
+        },
+        fail(err) {
+          console.warn("login failed: ", err)
+          a("")
+        }
+      })
+    }
+    return new Promise(_wait)
+  }
+
+  static checkSession() {
+    const _wait = (a: BoolFunc) => {
+      wx.checkSession({
+        success() {
+          a(true)
+        },
+        fail(err) {
+          console.warn("checkSession failed: ", err)
+          a(false)
+        }
+      })
+    }
+    return new Promise(_wait)
+  }
+
+  static setStorage(opt: WechatMiniprogram.SetStorageOption) {
+    opt.key = `liu_${opt.key}`
+    return wx.setStorage(opt)
+  }
+
+  static async getStorage(opt: WechatMiniprogram.GetStorageOption) {
+    opt.key = `liu_${opt.key}`
+    try {
+      const res = await wx.getStorage(opt)
+      return res
+    }
+    catch(err) {
+      return null
+    }
+  }
+
+  static removeStorage(opt: WechatMiniprogram.RemoveStorageOption) {
+    opt.key = `liu_${opt.key}`
+    return wx.removeStorage(opt)
+  }
+
+  static getLaunchOptionsSync() {
+    return wx.getLaunchOptionsSync()
+  }
+
+  static onNetworkStatusChange(
+    listener: WechatMiniprogram.OnNetworkStatusChangeCallback
+  ) {
+    wx.onNetworkStatusChange(listener)
+  }
+
+  static offNetworkStatusChange(
+    listener?: WechatMiniprogram.OnNetworkStatusChangeCallback
+  ) {
+    wx.offNetworkStatusChange(
+      listener as unknown as WechatMiniprogram.OffNetworkStatusChangeCallback
+    )
+  }
+
+  static downloadFile(
+    opt: WechatMiniprogram.DownloadFileOption,
+  ) {
+    return wx.downloadFile(opt)
+  }
+  
+  static showShareImageMenu(
+    opt: WechatMiniprogram.ShowShareImageMenuOption,
+  ) {
+    return wx.showShareImageMenu(opt)
+  }
+
+
+  static async getSetting(withSubscriptions = true) {
+    try {
+      const res = await wx.getSetting({ withSubscriptions })
+      return res
+    }
+    catch(err) {
+      console.warn("getSetting failed: ", err)
+      return
+    }
+  }
+
+  static async openSetting(withSubscriptions = true) {
+    try {
+      const res = await wx.openSetting({ withSubscriptions })
+      return res
+    }
+    catch(err) {
+      console.warn("openSetting failed: ", err)
+      return
+    }
+  }
+
+  static async requestSubscribeMessage(tmplIds: string[]) {
+    try {
+      const res = await wx.requestSubscribeMessage({ tmplIds })
+      return res
+    }
+    catch(err) {
+      console.warn("requestSubscribeMessage failed: ", err)
+      return
+    }
+  }
+
+  static async openAppAuthorizeSetting() {
+    try {
+      const res = await wx.openAppAuthorizeSetting()
+      return res
+    }
+    catch(err) {
+      console.warn("openAppAuthorizeSetting failed: ", err)
+      return
+    }
+  }
+
+  static getAppAuthorizeSetting() {
+    const res = wx.getAppAuthorizeSetting()
+    return res
+  }
+
+  static chooseContact(opt: WechatMiniprogram.ChooseContactOption) {
+    wx.chooseContact(opt)
+  }
+
+  static async chooseMedia(opt: WechatMiniprogram.ChooseMediaOption) {
+    try {
+      const res = await wx.chooseMedia(opt)
+      return res
+    }
+    catch(err) {
+      console.warn("chooseMedia err: ")
+      console.log(err)
+      return
+    }
+  }
+
+  static async compressImage(opt: WechatMiniprogram.CompressImageOption) {
+    try {
+      const res = await wx.compressImage(opt)
+      return res
+    }
+    catch(err) {
+      console.warn("compressImage err: ")
+      console.log(err)
+      return
+    }
+  }
+
+  static async getImageInfo(opt: WechatMiniprogram.GetImageInfoOption) {
+    try {
+      const res = await wx.getImageInfo(opt)
+      return res
+    }
+    catch(err) {
+      console.warn("getImageInfo err: ")
+      console.log(err)
+      return
+    }
+  }
+
+  static cropImage(opt: WechatMiniprogram.CropImageOption) {
+    wx.cropImage(opt)
+  }
+
+  static previewMedia(opt: WechatMiniprogram.PreviewMediaOption) {
+    return wx.previewMedia(opt)
+  }
+
+  static async getClipboardData() {
+    try {
+      const res = await wx.getClipboardData()
+      return res
+    }
+    catch(err) {
+      console.warn("getClipboardData err: ")
+      console.log(err)
+      return
+    }
+  }
+
+  static async showLoading(opt: WechatMiniprogram.ShowLoadingOption) {
+    try {
+      const res = await wx.showLoading(opt)
+      return res
+    }
+    catch(err) {
+      console.warn("showLoading err: ")
+      console.log(err)
+      return
+    }
+  }
+
+  static async hideLoading() {
+    try {
+      const res = await wx.hideLoading()
+      return res
+    }
+    catch(err) {
+      console.warn("hideLoading err: ")
+      console.log(err)
+      return
+    }
+  }
+
+  static async openChatTool(opt: WechatMiniprogram.OpenChatToolOption) {
+    try {
+      const res = await wx.openChatTool(opt)
+      return res
+    }
+    catch(err) {
+      console.warn("openChatTool err: ")
+      console.log(err)
+      return
+    }
+  }
+
+  static getGroupEnterInfo(opt: WechatMiniprogram.GetGroupEnterInfoOption) {
+    wx.getGroupEnterInfo(opt)
+  }
+
+  static setNavigationBarColor(opt: WechatMiniprogram.SetNavigationBarColorOption) {
+    wx.setNavigationBarColor(opt)
   }
 
 }

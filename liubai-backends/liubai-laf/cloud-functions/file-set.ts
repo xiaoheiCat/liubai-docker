@@ -75,6 +75,8 @@ function getUploadTokenViaQiniu(
 
   // 1.1 构造鉴权对象 mac
   const _env = process.env
+  const isDev = _env.LIU_ENV_STATE === "dev"
+  const folderPrefix = isDev ? "dev" : "prod"
   const qiniu_access_key = _env.LIU_QINIU_ACCESS_KEY ?? ""
   const qiniu_secret_key = _env.LIU_QINIU_SECRET_KEY ?? ""
   const qiniu_bucket = _env.LIU_QINIU_BUCKET ?? ""
@@ -85,10 +87,16 @@ function getUploadTokenViaQiniu(
 
   // 1.2 handle folder
   let qiniu_folder = _env.LIU_QINIU_FOLDER || "users"
-  if(body.purpose === "avatar") {
-    const dateStr = LiuDateUtil.getYYYYMMDD()
-    const avatarFolder = _env.LIU_QINIU_AVATAR_FOLDER || "avatars"
-    qiniu_folder = `${avatarFolder}/${dateStr}`
+  const purpose = body.purpose
+  const dateStr = LiuDateUtil.getYYYYMMDD()
+  if(purpose === "avatar") {
+    qiniu_folder = `${folderPrefix}/avatars/${dateStr}`
+  }
+  else if(purpose === "coupon-upload") {
+    qiniu_folder = `${folderPrefix}/c1/${dateStr}`
+  }
+  else if(purpose === "coupon-tmp") {
+    qiniu_folder = `${folderPrefix}/c2/${dateStr}`
   }
 
   // 1.3 generate prefix

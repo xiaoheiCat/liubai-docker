@@ -22,7 +22,8 @@ interface LiuEnv {
 
 declare const LIU_ENV: LiuEnv
 
-// @see https://pay.weixin.qq.com/docs/merchant/apis/jsapi-payment/jsapi-transfer-payment.html
+// document from wxpay: https://pay.weixin.qq.com/docs/merchant/apis/jsapi-payment/jsapi-transfer-payment.html
+// document from miniprogram: https://developers.weixin.qq.com/miniprogram/dev/component/web-view.html
 declare const WeixinJSBridge: {
   invoke: (method: string, ...args: any[]) => void
 }
@@ -34,6 +35,7 @@ interface Document {
 
 // extend Window
 interface Window {
+	__wxjs_environment: string
   showOpenFilePicker(options?: ShowOpenFilePickerOptions): Promise<FileSystemFileHandle[]>
 }
 
@@ -92,4 +94,9 @@ interface ShowOpenFilePickerOptions {
 
 interface CSSStyleDeclaration {
   viewTransitionName: string;
+}
+
+declare module 'another-vue3-blurhash' {
+  import { DefineComponent } from 'vue';
+  export const BlurHashCanvas: DefineComponent<any, any, any>;
 }

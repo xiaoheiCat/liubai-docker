@@ -10,6 +10,9 @@ import { useI18n } from "~/locales/index"
 import { LiuUtil } from "~/utils/liu-util/index"
 import { LiuApi } from "~/utils/LiuApi"
 import valTool from "~/utils/val-tool"
+import { Loginer } from "~/utils/login/Loginer"
+import { ShowTip } from "~/utils/managers/ShowTip"
+import { handleGroupInfo } from "./tools/useIndexPage"
 
 Component({
 
@@ -18,43 +21,41 @@ Component({
   },
 
   data: {
-    showFollowUs: true,
     pageName: "index",
+    canSearch: false,
     _key1: "",
+    _key2: "",
+    _searchValue: "",
   },
 
   behaviors: [
     i18nBehavior("index"),
-    navibarBehavior,
+    navibarBehavior(),
     sharedBehavior(),
     themeBehavior(),
   ],
 
   lifetimes: {
 
-    attached() {
-
-      // 1. 检查当前版本是否支持打开微信公众号主页
-      const cha = LiuUtil.getCharacteristic()
-      const res1 = valTool.compareVersion(cha.SDKVersion, "3.4.8")
-      const showFollowUs = Boolean(res1 >= 0 && cha.isMobile)
-      this.setData({ showFollowUs })
-
-    },
+    attached() {},
 
   },
 
   methods: {
 
-    goToShowcase() {
-      LiuApi.vibrateShort({ type: "medium" })
-      const url = "/pages/showcase/showcase?key=cuiyanzhe"
-      LiuUtil.navigateWithPopup(url)
+    isEverythingOK() {
+      const canLogin = Loginer.canILogin()
+      if(!canLogin) {
+        ShowTip.showOpenMiniForBrowseOnly()
+        return false
+      }
+      return true
     },
 
     onTapFollowUs() {
       // 0. vibrate
-      LiuApi.vibrateShort({ type: "medium" })
+      LiuApi.vibrateShort({ type: "light" })
+      if(!this.isEverythingOK()) return
 
       // 1. check out whether the current version supports 
       // opening the WeChat official account profile
@@ -63,7 +64,7 @@ Component({
       const res1 = valTool.compareVersion(sdkVersion, "3.7.10")
       const canOpenGzh = Boolean(res1 >= 0 && cha.isMobile)
       if(canOpenGzh) {
-        this.toOpenWzh()
+        this.toOpenGzh()
         return
       }
 
@@ -80,7 +81,7 @@ Component({
 
     toOpenArticle() {
       LiuApi.openOfficialAccountArticle({
-        url: defaultData.fellowArticleLink,
+        url: defaultData.followArticleLink,
         success(res) {
           console.log("openOfficialAccountArticle success", res)
         },
@@ -90,29 +91,68 @@ Component({
       })
     },
 
-    onTapArticle(e: any) {
-      LiuApi.vibrateShort({ type: "medium" })
-      const dataset = e.currentTarget.dataset
-      const type = dataset.type
-      if(!type) return
-      const url = `/pages/article/article?type=${type}`
-      LiuApi.navigateTo({ url })
-    },
-
-    toOpenWzh() {
+    toOpenGzh() {
       const username = envData.GZH_USERNAME
       if(!username) {
         console.warn("GZH_USERNAME is not set")
         return
       }
 
-      LiuApi.openOfficialAccountProfile({ username }) 
+      LiuApi.openOfficialAccountProfile({ username, success(res) {
+        console.log("openOfficialAccountProfile success", res)
+      }, fail(err) {
+        console.warn("openOfficialAccountProfile fail", err)
+      } }) 
     },
+
+    onTapTask() {
+      if(!this.isEverythingOK()) return
+      this.toCreateTask()
+      // this.toMockDetail()
+    },
+
+    toMockDetail() {
+      console.log("toMockDetail........")
+      LiuApi.openChatTool({
+        url: "/packageB/pages/task-detail/task-detail?id=6879cac65c5bae5764b24646",
+        chatType: 1,
+        roomid: "AF66ptRddE2IYBqqsJfnz5gG7EsVie5XVE5BGSHsBlR5dqsT_Q",
+        success(res) {
+          console.log("toMockDetail success", res)
+        },
+        fail(err) {
+          console.warn("toMockDetail fail", err)
+        }
+      })
+    },
+
+    toCreateTask() {
+      LiuApi.vibrateShort({ type: "medium" })
+      LiuApi.openChatTool({
+        url: "/packageB/pages/task-create/task-create",
+        fail(err) {
+          if(err?.errMsg?.includes?.("cancel")) return
+          console.warn("openChatTool fail", err)
+          ShowTip.showErrMsg("fail to open chat tool", err)
+        }
+      })
+    },
+
 
     onLoad(query: Record<string, string>) {
       if(query?.key1) {
         this.data._key1 = query.key1
       }
+      else if(query?.key2) {
+        this.data._key2 = query.key2
+      }
+    },
+
+    onTapCoupon() {
+      if(!this.isEverythingOK()) return
+      LiuApi.navigateTo({ 
+        url: "/packageA/pages/coupon-home/coupon-home",
+      })
     },
 
     onReady() {
@@ -120,12 +160,22 @@ Component({
       if(key1) {
         const url = `/pages/showcase/showcase?key=${key1}`
         LiuUtil.navigateWithPopup(url)
+        return
       }
+
+      const key2 = this.data._key2
+      if(key2 === "CREATE_TASK") {
+        this.toCreateTask()
+        return
+      }
+      
+      handleGroupInfo()
     },
 
     onUnload() {
       // reset 
       this.data._key1 = ""
+      this.data._key2 = ""
     },
 
     onShareAppMessage() {

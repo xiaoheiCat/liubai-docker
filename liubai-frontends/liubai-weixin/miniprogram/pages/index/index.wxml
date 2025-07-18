@@ -1,67 +1,34 @@
 <!-- index.wxml -->
-<scroll-view 
-  class="liu-{{theme}} liu-scroll-view" 
-  scroll-y 
-  type="list"
->
-  
-  <view class="index-scroll-view {{renderer}}">
 
-    <view class="index-virtual-one"></view>
+<view class="liu-{{theme}} liu-{{locale}} index-container">
 
-    <!-- Logo --> 
-    <view class="index-logo-box">
-      <image src="/images/shared/logo_256x256_v3.png" class="index-logo" />
+  <view class="index-virtual-one"></view>
+
+  <!-- <view class="liu-hover index-button" hover-class="liu-skyline-hover"
+    catchtap="onTapCoupon"
+  >
+    <image src="/images/shared/star-struck_3d.png" class="ib-image" />
+    <view class="ib-title">
+      <text>{{t1.find_coupon}}</text>
     </view>
+  </view> -->
 
-    <!-- Title -->
-    <view class="index-title">
-      <text>{{t1.title}}</text>
+  <view class="liu-hover index-button" hover-class="liu-skyline-hover"
+    catchtap="onTapTask"
+  >
+    <image src="/images/shared/memo_3d.png" class="ib-image" />
+    <view class="ib-title">
+      <text>{{t1.create_task}}</text>
     </view>
-
-    <!-- Description -->
-    <view class="index-desc">
-      <text>{{t1.desc}}</text>
-    </view>
-
-    <!-- Buttons -->
-    <view class="index-btns">
-
-      <!-- flow -->
-      <custom-button btn-type="normal" 
-        data-type="flow" catchtap="onTapArticle"
-      >
-        <text class="liu-pointer">{{t1.flow}}</text>
-      </custom-button>
-
-      <!-- connect -->
-      <custom-button btn-type="normal" 
-        data-type="connect" catchtap="onTapArticle"
-      >
-        <text class="liu-pointer">{{t1.connect}}</text>
-      </custom-button>
-
-      <!-- map -->
-      <custom-button btn-type="normal" 
-        data-type="map" catchtap="onTapArticle"
-      >
-        <text class="liu-pointer">{{t1.map}}</text>
-      </custom-button>
-
-      <!-- DM me -->
-      <custom-button btn-type="normal" 
-        catchtap="goToShowcase"
-      >
-        <text class="liu-pointer">{{t1.dm_me}}</text>
-      </custom-button>
-
-      <custom-button wx:if="{{showFollowUs}}" btn-type="transparent" 
-        catchtap="onTapFollowUs"
-      >
-        <text class="liu-pointer">{{t1.follow_us}}</text>
-      </custom-button>
-    </view> 
-
-    <view class="index-virtual-two"></view>
   </view>
-</scroll-view>
+
+  <view class="index-virtual-two"></view>
+
+</view>
+
+<view class="liu-{{theme}} index-footer-container" catchtap="onTapFollowUs">
+  <image src="/images/shared/logo_256x256_v3.png" class="index-logo"/>
+  <view class="index-powered-by">
+    <text>{{t1.powered_by}}</text>
+  </view>
+</view>

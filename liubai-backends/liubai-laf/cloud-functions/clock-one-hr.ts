@@ -13,7 +13,8 @@ import {
 } from "@/common-time"
 import type { 
   Config_WeCom_Qynb,
-  Config_WeChat_GZH, 
+  Config_WeChat_GZH,
+  Config_WeChat_MINI,
   Table_Config,
   WxpayReqAuthorizationOpt,
   Res_Wxpay_Download_Cert,
@@ -64,8 +65,11 @@ export async function main(ctx: FunctionContext) {
   const cfg = await getGlobalConfig()
   if(!cfg) return false
 
-  // 3. get accessToken from wechat
+  // 3.1 get accessToken from wechat gzh
   const wechat_gzh = await handleWeChatGZHConfig(cfg)
+
+  // 3.2 get accessToken from wechat mini
+  const wechat_mini = await handleWeChatMini(cfg)
 
   // 4. get accessToken from wecom
   const wecom_qynb = await handleWeComQynbConfig(cfg)
@@ -74,7 +78,12 @@ export async function main(ctx: FunctionContext) {
   const wxpay_certs = await handleWxpayCerts()
 
   // 6. update config
-  await updateGlobalConfig(cfg, { wechat_gzh, wecom_qynb, wxpay_certs })
+  await updateGlobalConfig(cfg, { 
+    wechat_gzh, 
+    wechat_mini,
+    wecom_qynb, 
+    wxpay_certs,
+  })
 
   // 7. update user's quota on 1st day of each month
   await updateUserQuota()
@@ -187,6 +196,7 @@ export async function updateUserQuota() {
 
 interface UpdateCfgOpt {
   wechat_gzh?: Config_WeChat_GZH
+  wechat_mini?: Config_WeChat_MINI
   wecom_qynb?: Config_WeCom_Qynb
   wxpay_certs?: LiuWxpayCert[]
 }
@@ -226,6 +236,47 @@ async function getGlobalConfig() {
   }
   
   return cfg
+}
+
+async function handleWeChatMini(
+  cfg: Table_Config
+): Promise<Config_WeChat_MINI | undefined> {
+  // 1. get params
+  const now1 = getNowStamp()
+  const _env = process.env
+  const appid = _env.LIU_WX_MINI_APPID
+  const secret = _env.LIU_WX_MINI_APPSECRET
+  if(!appid || !secret) {
+    console.warn("appid and secret are required")
+    console.log("fail to get access_token from wechat mini")
+    return
+  }
+
+  // 2. fetch access_token
+  const url2 = new URL(API_WECHAT_ACCESS_TOKEN)
+  const sP2 = url2.searchParams
+  sP2.set("grant_type", "client_credential")
+  sP2.set("appid", appid)
+  sP2.set("secret", secret)
+  const link2 = url2.toString()
+  const res2 = await liuReq(link2, undefined, { method: "GET" })
+  const rData2 = res2?.data
+  const access_token = rData2?.access_token
+  if(!access_token) {
+    console.warn("fail to get access_token from wechat mini")
+    console.log(res2)
+    return
+  }
+
+  const wechat_mini: Config_WeChat_MINI = {
+    ...cfg.wechat_mini,
+    
+    // for access_token
+    access_token,
+    expires_in: rData2?.expires_in,
+    lastGetStamp: now1,
+  }
+  return wechat_mini
 }
 
 async function handleWeChatGZHConfig(

@@ -3,15 +3,10 @@ export default {
     "appName": "留白记事"
   },
   "index": {
-    "title": "留小白的抽屉",
-    "desc": "收藏每一个有趣的灵魂！",
-    "add_my_wechat": "加我微信",
-    "follow_us": "关注我们",
-    "slogan": "去掉中间商，直连你的微信",
-    "flow": "🧑‍💻 打造心流",
-    "connect": "🖇️ 连接外部",
-    "map": "🗺️ 路线规划",
-    "dm_me": "💬 加我微信"
+    "slogan": "用留白记事，消灭所有杂事！",
+    "powered_by": "用留白记事，消灭所有杂事",
+    "find_coupon": "找优惠",
+    "create_task": "建任务",
   },
   "shared": {
     "copied": "已复制",
@@ -22,6 +17,11 @@ export default {
     "got_it": "了解",
     "contact_us": "联系客服",
     "try_again_later": "请稍后再试",
+    "cannot_use_1": "功能不开放",
+    "privacy_tip": "隐私提示🔏",
+    "ok": "好",
+    "open_mini_1": "前往小程序",
+    "open_mini_2": "请点击右下角“前往小程序”",
   },
   "err": {
     "no_data": "找不到耶",
@@ -41,4 +41,15 @@ export default {
     "tip_4": "看太多啦🤯",
     "tip_5": "赶紧去聊天吧！",
   },
+  "coupon-related": {
+    "tip_1": "太多优惠券啦",
+    "tip_2": "去管理一下吧！",
+    "tip_3": "这将会读取你的剪贴板内容，助力你一键上传！",
+    "tip_4": "请确定剪贴板的内容为优惠信息",
+    "manage": "去管理",
+    "slogan": "你的优惠券，都被收进留小白的抽屉里！",
+    "try_1": "试试看，输入",
+    "try_2": "“瑞幸”\n“霸王茶姬”\n......",
+    "got_it": "知道了",
+  }
 }

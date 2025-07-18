@@ -1,0 +1,6 @@
+/** virtual-navibar.wxss **/
+
+.vn-container {
+  width: 100%;
+  background-color: transparent;
+}

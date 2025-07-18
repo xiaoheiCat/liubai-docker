@@ -11,6 +11,10 @@ Component({
       type: String,
       value: "main",  // main, normal, transparent
     },
+    disabled: {
+      type: Boolean,
+      value: false,
+    }
   },
 
 

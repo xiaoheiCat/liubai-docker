@@ -1,0 +1,92 @@
+<!-- task-create.wxml -->
+
+<scroll-view 
+  scroll-y
+  class="liu-{{theme}} liu-scroll-view"
+  type="custom"
+  associative-container="pop-gesture"
+>
+  <virtual-navibar height1="{{height1}}" height2="{{height2}}"></virtual-navibar>
+  <placeholder-view height3="{{height3}}" p-state="{{-1}}"
+    check-skyline
+  ></placeholder-view>
+  
+  <view class="liu-main-container">
+    <view class="liu-main-box">
+
+      <input placeholder="{{t1.placeholder}}" maxlength="66"
+        class="tc-input"
+        placeholder-style="color: {{ colors.main_note }};"
+        cursor-color="{{ colors.primary_color }}"
+        focus="{{focus}}"
+        bindinput="onInput"
+        bindconfirm="onInput"
+        value="{{inputValue}}"
+      />
+
+      <!-- Assign to -->
+      <view class="tc-box">
+        <view class="tc-first-bar"
+          hover-class="tc-hover"
+          catchtap="onTapAssignees"
+          hover-stay-time="300"
+        >
+          <image src="{{imagePath}}group.png" class="tcfb-icon" />
+          <view class="tcfb-text">
+            <text>{{t1.assign_to}}</text>
+          </view>
+          <view class="tcfb-arrow-box">
+            <image src="{{imagePath}}arrow-down.png" 
+              class="tcfb-arrow {{assignees.length > 0 ? 'tcfb-arrow_rotated' : ''}}"
+            />
+          </view>
+        </view>
+
+        <!-- Assignees -->
+        <view class="tc-assignees"
+          style="max-height: {{assignees.length * 70}}px"
+        >
+          <open-data-list type="groupMembers" members="{{assignees}}">
+            <view class="tc-assignee" slot:index>
+              <open-data-item class="tc-assignee-avatar" type="userAvatar" index="{{index}}" />
+              <open-data-item class="tc-assignee-name" type="userNickName" index="{{index}}" />
+              <view class="tc-assignee-clear" hover-class="liu-hover-class"
+                catchtap="onTapClearAssignee"
+                data-idx="{{index}}"
+                hover-stay-time="200"
+              >
+                <image src="{{imagePath}}close.png" class="tc-assignee-clear-icon" />
+              </view>
+            </view>
+          </open-data-list>
+
+          <view class="tc-assignee-virtual"></view>
+        </view>
+        
+      </view>
+
+      <!-- Bug Tip -->
+      <view class="tc-issue-box">
+        <view class="tc-issue" hover-class="liu-hover-class"
+          catchtap="onTapIssue"
+        >
+          <image src="{{imagePath}}warning.png" class="tc-issue-icon" />
+          <text>{{t1.meet_issue}}</text>
+        </view>
+      </view>
+
+      <!-- Done Button -->
+      <custom-button catchtap="onTapPost" disabled="{{!canSubmit}}">
+        <text>{{t1.done}}</text>
+      </custom-button>
+
+
+    </view>
+  </view>
+  
+</scroll-view>
+<custom-navibar 
+  height1="{{height1}}" height2="{{height2}}" 
+  visible="{{visible}}" always-arrow-back="{{alwaysArrowBack}}"
+  title="{{t1.title}}"
+></custom-navibar>

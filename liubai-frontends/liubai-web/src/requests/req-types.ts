@@ -82,6 +82,12 @@ export namespace UserLoginAPI {
     state?: string
   }
 
+  export interface Res_WxGzhForMini {
+    operateType: "wx_gzh_for_mini"
+    nickname: string
+    headimgurl?: string
+  }
+
 }
 
 

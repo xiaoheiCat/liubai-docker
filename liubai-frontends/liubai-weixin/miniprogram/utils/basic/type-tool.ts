@@ -14,6 +14,8 @@ export type SimpleFunc = () => void
 
 export type BoolFunc = (val: boolean) => void
 
+export type StrFunc = (val: string) => void
+
 export type Prettify<T> = {
   [K in keyof T]: T[K]
 } & {}

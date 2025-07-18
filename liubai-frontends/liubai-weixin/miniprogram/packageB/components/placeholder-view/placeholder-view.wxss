@@ -1,0 +1,68 @@
+@import "../../styles/custom-styles.wxss";
+
+.pv-shell {
+  width: 100%;
+  height: 1px;
+  position: relative;
+}
+
+.pv-container {
+  width: 100%;
+  height: calc(100vh - 80px);
+  top: 0;
+  left: 0;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pv-container2 {
+  z-index: 1000;
+  background-color: var(--bg-color);
+}
+
+.pv-container_hidden {
+  opacity: 0;
+}
+
+.pv-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pv-emoji-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.pv-emoji-image {
+  width: 80px;
+  height: 80px;
+}
+
+.pv-err-title {
+  color: var(--main-text);
+  font-weight: 700;
+  font-size: var(--title-font);
+  line-height: 1.5;
+  text-align: center;
+  width: 75%;
+}
+
+.pv-err-tip {
+  margin-top: 10px;
+  color: var(--main-normal);
+  font-size: var(--btn-font);
+  line-height: 1.5;
+  text-align: center;
+  text-wrap: balance;
+  width: 75%;
+}
+
+
+

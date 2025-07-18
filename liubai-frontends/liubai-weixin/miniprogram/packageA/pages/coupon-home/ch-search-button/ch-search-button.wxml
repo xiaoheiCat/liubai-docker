@@ -1,0 +1,14 @@
+<view class="liu-hover2 index-search-btn" catchtap="onTapButton"
+  hover-class="liu-skyline-hover2"
+>
+  <view class="isb-img-box">
+    <image src="{{imagePath}}search-on-primary.png" class="isb-image" />
+  </view>
+
+  <view class="isb-text-box {{canSearch ? 'isb-text-box_expanded' : ''}}">
+    <view class="isb-text">
+      <text>{{t1.search}}</text>
+    </view>
+  </view>
+
+</view>

@@ -31,7 +31,23 @@ Component({
     },
     title: {
       type: String,
-    }
+    },
+    alwaysArrowBack: {
+      type: Boolean,
+      value: false,
+    },
+    alwaysGoHome: {
+      type: Boolean,
+      value: false,
+    },
+    backTargetPageName: {
+      type: String,
+      value: "",
+    },
+    targetPageUrl: {
+      type: String,
+      value: "",
+    },
   },
 
   lifetimes: {
@@ -47,6 +63,11 @@ Component({
   methods: {
     onTapBack() {
       LiuApi.vibrateShort({ type: "light" })
+      const { backTargetPageName, targetPageUrl } = this.data
+      if(backTargetPageName && targetPageUrl) {
+        this.jumpToTargetPage()
+        return
+      }
 
       const pages = LiuApi.getPages()
       const pLength = pages.length
@@ -56,6 +77,28 @@ Component({
       else {
         LiuApi.navigateBack()
       }
+    },
+
+    jumpToTargetPage() {
+      const { backTargetPageName, targetPageUrl } = this.data
+
+      const pages = LiuApi.getPages()
+      const pLength = pages.length
+      if(pLength < 2) {
+        LiuApi.redirectTo({ url: targetPageUrl })
+        return
+      }
+
+      for(let i=pLength-2; i>=0; i--) {
+        const thePage = pages[i]
+        if(thePage.data.pageName === backTargetPageName) {
+          const delta = (pLength - 1) - i
+          LiuApi.navigateBack({ delta })
+          return
+        }
+      }
+
+      LiuApi.redirectTo({ url: targetPageUrl })
     },
 
     onTapHome() {

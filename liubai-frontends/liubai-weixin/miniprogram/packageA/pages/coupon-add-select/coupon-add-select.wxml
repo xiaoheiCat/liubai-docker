@@ -1,0 +1,35 @@
+<custom-navibar 
+  height1="{{height1}}" height2="{{height2}}" 
+  visible="{{visible}}"
+></custom-navibar>
+<view class="liu-{{theme}} liu-scroll-view ca-container">
+
+  <view class="ca-virtual-one"></view>
+
+  <view class="ca-title" >
+    <text>{{t1.title}}</text>
+  </view>
+
+  <view class="liu-hover ca-box" hover-class="liu-skyline-hover"
+    catchtap="onTapPoster"
+  >
+    <view class="cab-icon">
+      <text>🖼️</text>
+    </view>
+    <view class="cab-text">
+      <text>{{t1.btn_1}}</text>
+    </view>
+  </view>
+
+  <view class="liu-hover ca-box" hover-class="liu-skyline-hover"
+    catchtap="onTapClipboard"
+  >
+    <view class="cab-icon">
+      <text>🔗</text>
+    </view>
+    <view class="cab-text">
+      <text>{{t1.btn_2}}</text>
+    </view>
+  </view>
+
+</view>

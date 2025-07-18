@@ -1,0 +1,67 @@
+<!-- custom-navibar.wxml -->
+
+<view class="liu-{{theme}} cn-container">
+
+  <!-- status bar -->
+  <view class="cn-status-bar"
+    wx:if="{{ height1 > 0 }}"
+    style="height: {{height1}}px"
+  />
+
+  <!-- navigation bar -->
+  <view class="cn-box {{visible ? '' : 'cn-box_hidden'}}" 
+    wx:if="{{ height2 > 0 }}"
+    style="height: {{height2}}px"
+  >
+    <!-- redirect to home -->
+    <view wx:if="{{alwaysGoHome || (isEmbedded && pageLength <= 1)}}"
+      class="liu-hover cn-close-box" 
+      hover-class="cn-close-box_active"
+      style="width: {{height2}}px; height: {{height2}}px;"
+      catchtap="onTapHome"
+    >
+      <image wx:if="{{alwaysArrowBack}}" src="{{imagePath}}arrow-back.png" class="cn-back-image" />
+      <image wx:else src="{{imagePath}}home.png" class="cn-home-image" />
+    </view>
+
+    <!-- exit or back -->
+    <view wx:else
+      class="liu-hover cn-close-box" 
+      hover-class="cn-close-box_active"
+      style="width: {{height2}}px; height: {{height2}}px;"
+      catchtap="onTapBack"
+    >
+
+      <!-- arrow back -->
+      <image 
+        wx:if="{{alwaysArrowBack || (renderer === 'webview' && pageLength > 1)}}" 
+        src="{{imagePath}}arrow-back.png" 
+        class="cn-back-image"
+      />
+      <image 
+        wx:elif="{{preferIcon === 'arrow-back'}}" 
+        src="{{imagePath}}arrow-back.png" 
+        class="cn-back-image"
+      />
+       
+      <!-- fallback: arrow down -->
+      <image wx:else src="{{imagePath}}arrow-down.png" class="cn-close-image" />
+    </view>
+
+    <view wx:if="{{openGid || title}}" class="cn-title-box">
+      <view class="cn-title">
+        <open-data wx:if="{{openGid}}" type="groupName" open-gid="{{openGid}}" 
+          default-text="{{title}}" binderror="onShowGroupNameErr"
+        />
+        <text wx:else>{{title}}</text>
+      </view>
+    </view>
+
+    <!-- virtual box to placeholder -->
+    <view class="cn-close-box"
+      style="width: {{height2}}px; height: {{height2}}px;"
+    ></view>
+
+  </view>
+
+</view>

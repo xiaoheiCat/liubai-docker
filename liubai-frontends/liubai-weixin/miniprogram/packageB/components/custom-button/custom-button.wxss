@@ -1,0 +1,114 @@
+
+@import "../../styles/custom-styles.wxss";
+
+.cb-btn {
+  box-sizing: border-box;
+  width: 100%;
+  margin-bottom: 10px;
+  border-radius: 30px;
+  padding: 16px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: var(--btn-font);
+  font-weight: 700;
+  background-color: var(--primary-color);
+  color: var(--on-primary);
+  cursor: pointer;
+  transition: .15s;
+}
+
+.cb-disabled.cb-btn {
+  opacity: .5;
+}
+
+.cb-normal-btn {
+  background-color: var(--card-bg);
+  color: var(--main-text);
+}
+
+.cb-transparent-btn {
+  background-color: transparent;
+  color: var(--main-text);
+}
+
+@media (hover: hover) {
+  .webview.cb-btn:hover {
+    background-color: var(--primary-hover);
+  }
+
+  .webview.cb-normal-btn:hover {
+    background-color: var(--card-bg);
+    opacity: .75;
+  }
+
+  .webview.cb-transparent-btn:hover {
+    background-color: transparent;
+    opacity: .75;
+  }
+
+  .cb-disabled.cb-btn:hover {
+    background-color: var(--primary-color);
+  }
+
+  .cb-disabled.cb-normal-btn:hover {
+    opacity: .5;
+  }
+
+  .cb-disabled.cb-transparent-btn:hover {
+    opacity: .5;
+  }
+}
+
+.webview.cb-btn:active {
+  background-color: var(--primary-active);
+  transform: scale(0.98);
+}
+
+.webview.cb-normal-btn:active {
+  background-color: var(--card-bg);
+  opacity: .5;
+}
+
+.webview.cb-transparent-btn:active {
+  background-color: transparent;
+  opacity: .5;
+}
+
+.cb-disabled.cb-btn:active {
+  background-color: var(--primary-color);
+  transform: scale(1);
+}
+
+
+.skyline.cb-btn_hover {
+  background-color: var(--primary-hover);
+  transform: scale(0.98);
+}
+
+.skyline.cb-normal-btn_hover {
+  background-color: var(--card-bg);
+  opacity: .75;
+}
+
+.skyline.cb-transparent-btn_hover {
+  background-color: transparent;
+  opacity: .75;
+}
+
+.cb-disabled.cb-btn_hover {
+  background-color: var(--primary-color);
+  transform: scale(1);
+}
+
+.cb-disabled.cb-normal-btn_hover {
+  background-color: var(--card-bg);
+  opacity: .5;
+}
+
+.cb-disabled.cb-transparent-btn_hover {
+  background-color: transparent;
+  opacity: .5;
+}
+

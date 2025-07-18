@@ -11,11 +11,34 @@
       "pages": [
         "pages/watch-video/watch-video"
       ]
+    },
+    {
+      "root": "packageB",
+      "name": "packageB",
+      "pages": [
+        "pages/task-create/task-create",
+        "pages/task-detail/task-detail",
+        "pages/article/article",
+        "pages/landing-premium/landing-premium"
+      ],
+      "independent": true,
+      "entry": "entry.js",
+      "componentFramework": "glass-easel",
+      "renderer": "skyline"
+    }
+  ],
+  "chatTools": [
+    {
+      "root": "packageB",
+      "entryPagePath": "pages/task-create/task-create",
+      "desc": "用微信群做任务管理"
     }
   ],
   "usingComponents": {
     "placeholder-view": "/components/placeholder-view/placeholder-view",
-    "custom-button": "/components/custom-button/custom-button"
+    "custom-button": "/components/custom-button/custom-button",
+    "custom-navibar": "/components/custom-navibar/custom-navibar",
+    "virtual-navibar": "/components/virtual-navibar/virtual-navibar"
   },
   "window": {
     "backgroundTextStyle": "dark",

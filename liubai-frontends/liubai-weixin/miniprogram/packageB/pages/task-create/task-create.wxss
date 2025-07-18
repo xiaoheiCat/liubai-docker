@@ -1,0 +1,155 @@
+@import "../../styles/custom-styles.wxss";
+
+.tc-input {
+  width: 100%;
+  height: 50px;
+  font-size: var(--head-font);
+  color: var(--main-text);
+  margin: 20px 0;
+  padding: 16px 0;
+  line-height: 1.5;
+  font-weight: 700;
+}
+
+.tc-placeholder {
+  color: var(--primary-color);
+}
+
+.tc-box {
+  position: relative;
+  width: 100%;
+  border-radius: 30px;
+  overflow: hidden;
+  background-color: var(--card-bg);
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  padding: 10px 0;
+}
+
+.tc-first-bar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 20px 20px;
+  box-sizing: border-box;
+  transition: .15s;
+}
+
+.tc-hover {
+  opacity: .75;
+}
+
+.tcfb-icon {
+  width: 36px;
+  height: 36px;
+  margin-right: 16px;
+}
+
+.tcfb-text {
+  font-size: var(--desc-font);
+  color: var(--main-normal);
+  flex: 1;
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+.tcfb-arrow-box {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  margin-right: -10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.tcfb-arrow {
+  width: 20px;
+  height: 20px;
+  transform: rotate(-90deg);
+  transition: .3s;
+}
+
+.tcfb-arrow_rotated {
+  transform: rotate(0);
+}
+
+
+.tc-assignees {
+  width: 100%;
+  position: relative;
+  max-height: 0;
+  transition: .3s;
+}
+
+.tc-assignee-virtual {
+  width: 100%;
+  height: 10px;
+}
+
+.tc-assignee {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+  position: relative;
+  padding: 10px 20px;
+  box-sizing: border-box;
+  align-items: flex-start;
+}
+
+.tc-assignee-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  margin-right: 16px;
+  overflow: hidden;
+  flex: none;
+}
+
+.tc-assignee-name {
+  padding-top: 5px;
+  line-height: 30px;
+  font-size: var(--btn-font);
+  color: var(--main-normal);
+  flex: 1;
+}
+
+.tc-assignee-clear {
+  width: 28px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: .15s;
+  flex: none;
+  margin-right: -8px;
+}
+
+.tc-assignee-clear-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.tc-issue-box {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.tc-issue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--mini-font);
+  color: var(--main-note);
+  transition: .15s;
+}
+
+.tc-issue-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 5px;
+}
+

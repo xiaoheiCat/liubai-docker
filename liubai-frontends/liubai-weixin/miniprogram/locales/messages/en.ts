@@ -5,15 +5,10 @@ export default {
     "appName": "Liubai"
   },
   "index": {
-    "title": "Liubai Drawer",
-    "desc": "Collect every interesting soul!",
-    "add_my_wechat": "DM me",
-    "follow_us": "Follow us",
-    "slogan": "Connect your WeChat without middlemen",
-    "flow": "🧑‍💻 Flow",
-    "connect": "🖇️ Connect",
-    "map": "🗺️ Map",
-    "dm_me": "💬 DM me"
+    "slogan": "Done everything using Liubai!",
+    "powered_by": "Done everything using Liubai",
+    "find_coupon": "Find Coupons",
+    "create_task": "Create Tasks",
   },
   "shared": {
     "copied": "Copied",
@@ -24,6 +19,11 @@ export default {
     "got_it": "Got it",
     "contact_us": "Contact us",
     "try_again_later": "Try again later",
+    "cannot_use_1": "Function not open",
+    "privacy_tip": "Privacy 🔏",
+    "ok": "OK",
+    "open_mini_1": "Open MiniProgram",
+    "open_mini_2": "Please click \"前往小程序\" on the bottom right corner",
   },
   "err": {
     "no_data": "Nothing Here",
@@ -43,4 +43,14 @@ export default {
     "tip_4": "Watch too much 🤯",
     "tip_5": "Go back to chat!",
   },
+  "coupon-related": {
+    "tip_1": "Too many coupons",
+    "tip_2": "Let's manange them!",
+    "tip_3": "This will read your clipboard content, helping you upload quickly!",
+    "manage": "Manage",
+    "slogan": "All you coupons are received by Liubai!",
+    "try_1": "Try to Input",
+    "try_2": '"Luckin Coffee"\n"Chagee Tea"\n......',
+    "got_it": "Got it",
+  }
 }

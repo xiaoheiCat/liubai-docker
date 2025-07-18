@@ -46,6 +46,13 @@ export const wx_expired_tmpl = {
   }
 }
 
+
+export const ppl_system_cfg = {
+  chat_tool_tmpl_id_1: "4A68CBB88A92B0A9311848DBA1E94A199B166463",
+  coming_soom_hrs: 3,
+}
+
+
 /********************* tencent SES template config ****************/
 export const tencent_ses_tmpl_cfg = {
   "confirmation": {
@@ -74,5 +81,23 @@ export const ai_cfg = {
   conversation_to_ad: 2,
 
   watch_video_path: "packageA/pages/watch-video/watch-video",
+
+  img2text_prompt: "解释一下图中的现象",
+
+}
+
+
+/********************* milvus config ****************/
+export const milvus_cfg = {
+  coupon_keywords_max_capacity: 32,
+}
+
+/********************* happy coupon config ****************/
+export const happy_coupon_cfg = {
+  cache_mins: 10, 
+
+  free_max_coupons: 2,
+  premium_max_coupons: 9,
+  max_coupons: 30,
 
 }

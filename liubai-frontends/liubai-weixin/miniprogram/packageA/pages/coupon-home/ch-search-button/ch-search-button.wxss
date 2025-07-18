@@ -1,0 +1,43 @@
+
+@import "../../../../styles/custom-styles.wxss";
+
+.index-search-btn {
+  display: flex;
+  align-items: center;
+  border-radius: 50px;
+  background-color: var(--primary-color);
+}
+
+.isb-img-box {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.isb-image {
+  width: 30px;
+  height: 30px;
+}
+
+.isb-text-box {
+  max-width: 0;
+  opacity: 0;
+  transition: .45s;
+  overflow: hidden;
+}
+
+.isb-text-box_expanded {
+  opacity: 1;
+  max-width: 120px;
+}
+
+.isb-text {
+  white-space: nowrap;
+  width: max-content;
+  padding-right: 20px;
+  font-size: var(--desc-font);
+  font-weight: 700;
+  color: var(--on-primary);
+}

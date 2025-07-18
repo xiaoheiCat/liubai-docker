@@ -1,0 +1,47 @@
+
+
+.ca-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ca-virtual-one {
+  width: 100%;
+  height: 20vh;
+}
+
+.ca-title {
+  width: 92%;
+  max-width: 500px;
+  text-align: center;
+  color: var(--main-normal);
+  font-size: var(--head-font);
+  margin-bottom: 5vh;
+  font-weight: 700;
+}
+
+.ca-box {
+  width: 92%;
+  max-width: 500px;
+  background-color: var(--card-bg);
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36px;
+  box-sizing: border-box;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.cab-icon {
+  font-size: var(--big-word-style);
+  margin-right: 20px;
+}
+
+.cab-text {
+  font-size: var(--desc-font);
+  color: var(--main-normal);
+  font-weight: 700;
+}

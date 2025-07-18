@@ -1,9 +1,13 @@
 
 
+
+/************** for webview *************/
+
 .liu-hover {
   position: relative;
   cursor: pointer;
   outline: 0;
+  overflow: hidden;
 }
 
 .liu-hover::before {
@@ -19,6 +23,13 @@
   background-color: var(--primary-color);
 }
 
+.liu-hover2 {
+  position: relative;
+  cursor: pointer;
+  outline: 0;
+  transition: .15s;
+}
+
 @media(hover: hover) {
   .liu-hover:focus-visible {
     outline: 2px solid var(--main-normal);
@@ -27,8 +38,37 @@
   .liu-hover:hover::before {
     opacity: .06;
   }
+
+  .liu-hover2:hover {
+    opacity: .8;
+  }
 }
 
 .liu-hover:active::before {
   opacity: .1;
+}
+
+/************** for skyline *************/
+
+.liu-skyline-hover {
+  position: relative;
+  cursor: pointer;
+  outline: 0;
+}
+
+.liu-skyline-hover::before {
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  content: "";
+  transition: .1s;
+  opacity: .1;
+  background-color: var(--primary-color);
+}
+
+.liu-skyline-hover2 {
+  transform: scale(.95);
 }

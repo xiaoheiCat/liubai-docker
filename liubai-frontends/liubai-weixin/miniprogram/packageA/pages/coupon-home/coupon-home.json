@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "ch-search-button": "./ch-search-button/ch-search-button"
+  }
+}

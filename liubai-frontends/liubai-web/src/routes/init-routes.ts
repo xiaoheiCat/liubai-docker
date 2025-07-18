@@ -104,6 +104,14 @@ export const routes: Array<RouteRecordRaw> = [
     }
   },
   {
+    path: "/wxmini-login",
+    component: WechatBind,
+    name: "wxmini-login",
+    meta: {
+      inApp: false,
+    }
+  },
+  {
     path: "/subscription",
     components: {
       default: SubscribePage,

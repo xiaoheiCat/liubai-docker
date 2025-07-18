@@ -782,8 +782,6 @@ class Controller {
 
 
   // call by invoke_by_user
-
-
   private async getRooms(
     minNeedSystem2Stamp: number,
   ) {

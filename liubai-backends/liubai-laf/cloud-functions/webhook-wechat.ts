@@ -30,7 +30,7 @@ import type {
 } from "@/common-types";
 import { decrypt } from "@wecom/crypto"
 import xml2js from "xml2js"
-import { 
+import {
   getNowStamp, 
   isWithinMillis,
   MINUTE,
@@ -239,7 +239,8 @@ async function handle_text(
 
   // 2. check if we get to auto-reply
   const userText = msgObj.Content
-  const res2 = await autoReplyAfterReceivingText(wx_gzh_openid, userText)
+  const trimText = userText.trim()
+  const res2 = await autoReplyAfterReceivingText(wx_gzh_openid, trimText)
   if(res2) return
 
   // 3. get user
@@ -247,7 +248,7 @@ async function handle_text(
   if(!user) return
 
   // 4. dynamic auto reply
-  const res4 = autoDynamicReply(wx_gzh_openid, userText, user)
+  const res4 = autoDynamicReply(wx_gzh_openid, trimText, user)
   if(res4) return
 
   // 5. ai!
@@ -530,6 +531,7 @@ async function login_with_wechat_gzh(
   opt?: OperationOpt,
 ) {
   // console.log("login_with_wechat_gzh......")
+  const wx_unionid = userInfo?.unionid
 
   // 1. get credential
   const cCol = db.collection("Credential")
@@ -576,15 +578,44 @@ async function login_with_wechat_gzh(
     _sendGoBackToOurApp()
   }
 
-  // 3. get user by wx_gzh_openid
+  // 2.3 bind wx_gzh_openid and wx_unionid
+  const _bindWxId = async (user: Table_User) => {
+    let needUpdate = false
+    const u2: Partial<Table_User> = { updatedStamp: getNowStamp() }
+    if(wx_gzh_openid !== user.wx_gzh_openid) {
+      needUpdate = true
+      u2.wx_gzh_openid = wx_gzh_openid
+    }
+    if(wx_unionid && wx_unionid !== user.wx_unionid) {
+      needUpdate = true
+      u2.wx_unionid = wx_unionid
+    }
+    if(!needUpdate) return
+    const userId = user._id
+    await uCol.doc(userId).update(u2)
+  }
+  
+  // 3.1 get user by wx_gzh_openid
   const uCol = db.collection("User")
   const w3: Partial<Table_User> = { wx_gzh_openid }
-  const q3 = uCol.where(w3)
-  const res3 = await q3.getOne<Table_User>()
-  const user3 = res3.data
-  if(user3) {
+  const res3_1 = await uCol.where(w3).getOne<Table_User>()
+  const user3_1 = res3_1.data
+  if(user3_1) {
     _setCredential2()
+    _bindWxId(user3_1)
     return
+  }
+
+  // 3.2 get user by wx_unionid
+  if(wx_unionid) {
+    const w3_2: Partial<Table_User> = { wx_unionid }
+    const res3_2 = await uCol.where(w3_2).getOne<Table_User>()
+    const user3_2 = res3_2.data
+    if(user3_2) {
+      _setCredential2()
+      _bindWxId(user3_2)
+      return
+    }
   }
 
   // 4. create user
@@ -870,6 +901,7 @@ async function make_user_subscribed(
 
 
 
+
 /***************** helper functions *************/
 
 async function getVoiceLink(
@@ -889,43 +921,13 @@ async function getVoiceLink(
   return link
 }
 
-
-async function downloadVoice(
-  media_id: string,
-) {
-  // 1. get accessToken for wx gzh
-  const res1 = await checkAccessToken()
-  if(!res1) return
-
-  // 2. construct link
-  const url = new URL(API_MEDIA_DOWNLOAD)
-  const sP = url.searchParams
-  sP.set("access_token", res1)
-  sP.set("media_id", media_id)
-  const link = url.toString()
-
-  // 3. to download
-  try {
-    const res = await fetch(link)
-    const fileBlob = await res.blob()
-    const arrayBuffer = await fileBlob.arrayBuffer()
-    const buffer = Buffer.from(arrayBuffer)
-    const b64 = buffer.toString("base64")
-    return { fileBlob, b64 }
-  }
-  catch(err) {
-    console.warn("downloadVoice err:")
-    console.log(err)
-  }
-}
-
 function autoDynamicReply(
   wx_gzh_openid: string,
   text: string,
   user: Table_User,
 ) {
   // 0. trim and lowercase
-  const txt = text.trim().toLowerCase()
+  const txt = text.toLowerCase()
 
   // 1. membership info
   const keywords1 = [
@@ -977,10 +979,9 @@ function sendMemberInfo(
 // when user sends text, check out if we have to reply automatically
 async function autoReplyAfterReceivingText(
   wx_gzh_openid: string,
-  text: string,
+  text1: string,
 ) {
   // 1. check if text is empty
-  const text1 = text.trim()
   if(!text1) {
     console.warn("autoReply: text is empty")
     return true

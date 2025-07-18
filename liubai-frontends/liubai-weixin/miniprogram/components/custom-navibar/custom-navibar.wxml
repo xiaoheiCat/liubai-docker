@@ -14,7 +14,7 @@
     style="height: {{height2}}px"
   >
     <!-- redirect to home -->
-    <view wx:if="{{isEmbedded && pageLength <= 1}}"
+    <view wx:if="{{alwaysGoHome || (isEmbedded && pageLength <= 1)}}"
       class="liu-hover cn-close-box" 
       hover-class="cn-close-box_active"
       style="width: {{height2}}px; height: {{height2}}px;"
@@ -30,18 +30,22 @@
       style="width: {{height2}}px; height: {{height2}}px;"
       catchtap="onTapBack"
     >
+
       <!-- arrow back -->
-      <image wx:if="{{renderer === 'webview' && pageLength > 1}}" 
+      <image 
+        wx:if="{{alwaysArrowBack || (renderer === 'webview' && pageLength > 1)}}" 
         src="{{imagePath}}arrow-back.png" 
         class="cn-back-image"
-      ></image>
+      />
        
-      <!-- arrow down -->
-      <image wx:else src="{{imagePath}}arrow-down.png" class="cn-close-image"></image>
+      <!-- fallback: arrow down -->
+      <image wx:else src="{{imagePath}}arrow-down.png" class="cn-close-image" />
     </view>
 
-    <view wx:if="{{title}}" class="cn-title">
-      <text>{{title}}</text>
+    <view wx:if="{{title}}" class="cn-title-box">
+      <view class="cn-title">
+        <text>{{title}}</text>
+      </view>
     </view>
 
     <!-- virtual box to placeholder -->

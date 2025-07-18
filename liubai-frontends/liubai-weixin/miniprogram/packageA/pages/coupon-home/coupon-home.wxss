@@ -1,0 +1,162 @@
+/** index.wxss **/
+
+@import "../../../styles/custom-styles.wxss";
+
+.index-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 90vh;
+}
+
+.index-virtual-one {
+  width: 100%;
+  height: 20px;
+}
+
+
+.index-title {
+  width: 96%;
+  font-size: var(--big-word-style);
+  margin-bottom: 10px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--main-normal);
+}
+
+.index-search-box {
+  width: 92%;
+  max-width: var(--max-mobile);
+  box-sizing: border-box;
+  padding: 36px 36px 30px;
+  border-radius: 24px;
+  background-color: var(--card-bg);
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.index-search-input {
+  width: 100%;
+  font-size: var(--title-font);
+  color: var(--main-text);
+  padding-bottom: 40px;
+  margin-bottom: 10px;
+  accent-color: var(--primary-color);
+}
+
+.input-search-placeholder {
+  color: var(--main-note);
+}
+
+.index-search-bar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+
+.index-image-box {
+  width: 50px;
+  height: 50px;
+  margin-left: -8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.isb-image-icon {
+  width: 36px;
+  height: 36px;
+}
+
+.isb-footer {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  margin-right: -8px;
+}
+
+
+.index-add-mine {
+  display: flex;
+  align-items: center;
+  width: 92%;
+  max-width: var(--max-mobile);
+  --iam-height: 72px;
+}
+
+.index-add {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  height: var(--iam-height);
+  position: relative;
+  padding-left: 36px;
+  box-sizing: border-box;
+  border-radius: 24px;
+  overflow: hidden;
+  background-color: var(--card-bg);
+}
+
+.iam-icon {
+  margin-left: -2px;
+  width: 32px;
+  height: 32px;
+}
+
+.index-add-text {
+  margin-left: 4px;
+  font-size: var(--desc-font);
+  color: var(--main-text);
+  font-weight: 700;
+}
+
+.index-mine {
+  margin-left: 10px;
+  flex: none;
+  width: var(--iam-height);
+  height: var(--iam-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: var(--card-bg);
+}
+
+.iam-icon-two {
+  width: 32px;
+  height: 32px;
+}
+
+.index-virtual-two {
+  width: 100%;
+  height: 100px;
+}
+
+.index-footer-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  height: 10vh;
+  min-height: 50px;
+  box-sizing: border-box;
+  padding-top: 10px;
+}
+
+.index-logo {
+  width: 28px;
+  height: 28px;
+  margin-right: 6px;
+}
+
+.index-powered-by {
+  font-size: var(--mini-font);
+  color: var(--main-note);
+}

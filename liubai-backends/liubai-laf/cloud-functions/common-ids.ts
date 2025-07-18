@@ -152,7 +152,7 @@ export function createEncNonce() {
   return createRandom(10)
 }
 
-export function createCommonNonce(digit: number = 16) {
+export function createCommonNonce(digit = 16) {
   return createRandom(digit, "allowUppercase")
 }
 

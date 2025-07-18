@@ -4,7 +4,7 @@ import {
   type SupportedLocale,
   type GetMessages,
   type UseI18nOpt,
-  T_I18N,
+  type T_I18N,
 } from "../types/types-locale"
 import { LiuApi } from "./LiuApi"
 import valTool from "./val-tool"
@@ -30,6 +30,8 @@ function normalizeLanguage(val: string): SupportedLocale {
 export function getLocale(): SupportedLocale {
   const appBaseInfo = LiuApi.getAppBaseInfo()
   const lang = appBaseInfo?.language ?? defaultData.language
+
+  // return "en"
   if(isSupportedLocale(lang)) return lang
   return normalizeLanguage(lang)
 }
@@ -125,5 +127,5 @@ export function initI18n(
     return res2
   }
 
-  return { t }
+  return { t, locale }
 }

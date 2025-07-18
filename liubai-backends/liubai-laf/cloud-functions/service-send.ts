@@ -739,8 +739,13 @@ export class LiuReporter {
     if(typeof data === "string") return data
     if(!data) return
 
-    const msg1 = valTool.objToStr(data)
-    if(msg1 && msg1 !== "[object Object]" && msg1 !== "{}") return msg1
+    let msg1 = valTool.objToStr(data, true)
+    if(msg1 && msg1 !== "[object Object]" && msg1 !== "{}") {
+      if(msg1.startsWith("{") && msg1.endsWith("}")) {
+        msg1 = `\`\`\`json\n${msg1}\n\`\`\``
+      }
+      return msg1
+    }
     if(!data.toString) return
 
     let msg2 = ""

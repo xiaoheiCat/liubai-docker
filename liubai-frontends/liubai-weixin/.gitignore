@@ -17,4 +17,4 @@ dev-dist
 !.vscode/i18n-ally-reviews.yml
 
 # custom ignore files
-miniprogram/config/pre_config.ts
+pre_config.ts

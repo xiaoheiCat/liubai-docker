@@ -22,7 +22,7 @@ Component({
 
   behaviors: [
     i18nBehavior("watch-video"),
-    navibarBehavior,
+    navibarBehavior(),
     themeBehavior(),
   ],
 

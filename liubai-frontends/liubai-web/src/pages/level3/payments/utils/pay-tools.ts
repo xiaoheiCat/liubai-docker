@@ -104,9 +104,11 @@ export async function buyViaWxpayJSAPI(
   order_id: string,
   wx_gzh_openid: string
 ) {
-  // 0.1 define a function to pull wxpay
+  // 0. define a function to pull wxpay
   const _pullWxpay = async (param: Wxpay_Jsapi_Params) => {
-    await waitWxJSBridge()
+    const res0 = await waitWxJSBridge()
+    if(!res0) return false
+
     const _wait = (a: BoolFunc) => {
       WeixinJSBridge.invoke("getBrandWCPayRequest", param, (res: any) => {
         console.log("WeixinJSBridge.invoke res:")

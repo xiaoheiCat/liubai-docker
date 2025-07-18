@@ -1,7 +1,6 @@
 // Function Name: open-connect
 import { 
   getNowStamp,
-  getBasicStampWhileAdding,
   MINUTE,
 } from "@/common-time"
 import cloud from "@lafjs/cloud"
@@ -32,6 +31,7 @@ import {
 import { 
   checkAndGetWxGzhAccessToken,
   checker,
+  CommonShared,
   decryptCloudData,
   encryptDataWithAES,
   getAESKey,
@@ -673,23 +673,16 @@ async function handle_bind_wechat(
   }
 
   // 8. add credential into db
-  const b8 = getBasicStampWhileAdding()
-  const now8 = b8.insertedStamp
-  const data8: Partial<Table_Credential> = {
-    ...b8,
+  const expireStamp = getNowStamp() + MIN_10
+  CommonShared.createCredential(userId, expireStamp, "bind-wechat", {
     credential: cred,
-    infoType: "bind-wechat",
-    expireStamp: now8 + MIN_10,
-    verifyNum: 0,
-    userId,
     meta_data: {
       memberId,
       qr_code: qr_code_7,
       x_liu_theme: body["x_liu_theme"],
       x_liu_language: body["x_liu_language"],
     }
-  }
-  cCol.add(data8)
+  })
 
   return {
     code: "0000",
@@ -911,24 +904,16 @@ async function handle_bind_wecom(
     }
   }
 
-
   // 9. add credential into db
-  const b9 = getBasicStampWhileAdding()
-  const now9 = b9.insertedStamp
-  const data9: Partial<Table_Credential> = {
-    ...b9,
+  const expireStamp = getNowStamp() + MIN_10
+  CommonShared.createCredential(userId, expireStamp, "bind-wecom", {
     credential: cred,
-    infoType: "bind-wecom",
-    expireStamp: now9 + MIN_10,
-    verifyNum: 0,
-    userId,
     meta_data: {
       memberId,
       pic_url: pic_url_8,
       ww_qynb_config_id: c8,
     }
-  }
-  cCol.add(data9)
+  })
 
   return {
     code: "0000",

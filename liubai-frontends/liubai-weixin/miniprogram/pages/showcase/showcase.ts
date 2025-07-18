@@ -18,7 +18,7 @@ Component({
 
   behaviors: [
     sharedBehavior(), 
-    navibarBehavior,
+    navibarBehavior(),
     themeBehavior(),
   ],
 

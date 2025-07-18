@@ -66,7 +66,7 @@ export function useCropperContent(
 }
 
 function showCropperLoading(
-  title_key: string = "tip.hold_on",
+  title_key = "tip.hold_on",
 ) {
   isLoading = true
   cui.showLoading({ title_key })

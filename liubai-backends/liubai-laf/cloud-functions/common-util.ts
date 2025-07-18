@@ -62,6 +62,10 @@ import type {
   PhoneData,
   Table_BlockList,
   LiuIDEType,
+  WxMiniAPI,
+  Table_Credential_Type,
+  Partial_Id,
+  Table_Credential,
 } from '@/common-types'
 import { 
   sch_opt_arr,
@@ -80,6 +84,8 @@ import {
   createImgId, 
   createOrderId,
   createPaymentNonce,
+  createCommonNonce,
+  createAdCredential,
 } from "@/common-ids"
 import { 
   getNowStamp, 
@@ -101,7 +107,7 @@ import {
   getFallbackLocale, 
   useI18n,
 } from '@/common-i18n'
-import { wechat_tag_cfg } from '@/common-config'
+import { wechat_tag_cfg, milvus_cfg } from '@/common-config'
 import { 
   wxpay_apiclient_serial_no,
   wxpay_apiclient_key,
@@ -116,6 +122,14 @@ import {
   differenceInCalendarDays,
 } from "date-fns"
 import { AlipaySdk, type AlipayCommonResult } from "alipay-sdk"
+import { 
+  MilvusClient,
+  DataType as MilvusDataType,
+  IndexType as MilvusIndexType,
+  MetricType as MilvusMetricType,
+  FieldType as MilvusFieldType,
+  FunctionType as MilvusFuncType,
+} from "@zilliz/milvus2-sdk-node"
 
 const db = cloud.database()
 const _ = db.command
@@ -185,10 +199,18 @@ function strToObj<T = any>(str: string): T {
 }
 
 // 对象转字符串
-function objToStr<T = any>(obj: T): string {
-  let str = ``
+function objToStr<T = any>(
+  obj: T,
+  visualized: boolean = false,
+): string {
+  let str = ""
   try {
-    str = JSON.stringify(obj)
+    if(visualized) {
+      str = JSON.stringify(obj, null, 2)
+    }
+    else {
+      str = JSON.stringify(obj)
+    }
   }
   catch(err) {}
   return str
@@ -392,6 +414,10 @@ export class ValueTransform {
     const num2 = Number(n2)
     if(isNaN(num1) || isNaN(num2)) return
     return [num1, num2]
+  }
+
+  static escapeRegExp(str: string) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
   }
 
 }
@@ -2588,10 +2614,12 @@ export async function tagWxUserLang(
     tagid: tagId,
   }
   const res3 = await liuReq<Res_Common>(link4, q4)
-  const errcode = res3.data?.errcode
-  if(errcode !== 0) {
+  const data3 = res3.data
+  const errcode = data3?.errcode
+  // 50005: user is unsubscribed
+  if(errcode !== 0 && errcode !== 50005) {
     console.warn("tag user for wechat gzh failed")
-    console.log(res3.data)
+    console.log(data3)
   }
 
   return true
@@ -2621,6 +2649,198 @@ export async function untagWxUser(
   }
   return res
 }
+
+
+export class WxMiniHandler {
+
+  private static _accessToken = ""
+  private static _lastGetTokenStamp = 0
+  private static idToUrl = {
+    TEXT_CHECK: "https://api.weixin.qq.com/wxa/msg_sec_check",
+    IMG_CHECK: "https://api.weixin.qq.com/wxa/media_check_async",
+    USER_RISK: "https://api.weixin.qq.com/wxa/getuserriskrank",
+    CREATE_ACT_ID: "https://api.weixin.qq.com/cgi-bin/message/wxopen/activityid/create",
+    CHAT_TOOL_MSG: "https://api.weixin.qq.com/cgi-bin/message/wxopen/chattoolmsg/send",
+  }
+
+  static async getAccessToken() {
+    if(this._accessToken) {
+      if(isWithinMillis(this._lastGetTokenStamp, MIN_5)) {
+        return this._accessToken
+      }
+    }
+
+    const col = db.collection("Config")
+    const res = await col.getOne<Table_Config>()
+    const d = res.data
+    const accessToken = d?.wechat_mini?.access_token
+    if(accessToken) {
+      this._accessToken = accessToken
+      this._lastGetTokenStamp = getNowStamp()
+    }
+    return accessToken
+  }
+
+  private static async resetAccessToken() {
+    this._accessToken = ""
+  }
+
+  private static async toRequest<T = any>(
+    link: string,
+    data: any,
+  ): Promise<DataPass<T>> {
+    const accessToken = await this.getAccessToken()
+    if(!accessToken) {
+      return { pass: false, err: { code: "E5001", errMsg: "no access token" } }
+    }
+    const url = new URL(link)
+    url.searchParams.set("access_token", accessToken)
+    link = url.toString()
+    const res = await liuReq(link, data)
+    if(res.code !== "0000") {
+      return { pass: false, err: res }
+    }
+
+    // handle error from wx mini
+    const data2 = res.data
+    const errcode = data2.errcode
+    if(typeof errcode === "number" && errcode !== 0) {
+      let errMsg = data2.errmsg ?? "fail to request wx mini"
+      if(errcode === 40001) {
+        this.resetAccessToken()
+      }
+      return {
+        pass: false,
+        err: { code: "E5001", errMsg }
+      }
+    }
+
+    return { pass: true, data: res.data }
+  }
+
+  private static getVersionType() {
+    const _env = process.env
+    const v = _env.LIU_WX_MINI_VERTION_TYPE
+    if(v === "1") return 1
+    if(v === "2") return 2
+    return 0
+  }
+
+  // https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/sec-center/sec-check/msgSecCheck.html
+  static async msgSecCheck(
+    text: string,
+    openid: string,
+  ) {
+    const obj = {
+      content: text,
+      version: 2,
+      scene: 4,
+      openid,
+    }
+    const url = this.idToUrl.TEXT_CHECK
+    const res = await this.toRequest<WxMiniAPI.Res_MsgSecCheck>(url, obj)
+    return res
+  }
+
+  // https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/sec-center/sec-check/mediaCheckAsync.html
+  static async mediaCheckAsync(
+    media_url: string,
+    openid: string,
+  ) {
+    const obj = {
+      media_url,
+      media_type: 2,
+      version: 2,
+      scene: 4,
+      openid,
+    }
+    const url = this.idToUrl.IMG_CHECK
+    const res = await this.toRequest<WxMiniAPI.Res_MediaCheckAsync>(url, obj)
+    return res
+  }
+
+  // https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/sec-center/safety-control-capability/getUserRiskRank.html
+  static async getUserRiskRank(
+    openid: string,
+    client_ip: string,
+  ) {
+    const _env = process.env
+    const appid = _env.LIU_WX_MINI_APPID
+    const is_test =  _env.LIU_ENV_STATE === "dev"
+    const obj = {
+      appid,
+      openid,
+      client_ip,
+      is_test,
+    }
+    const url = this.idToUrl.USER_RISK
+    const res = await this.toRequest<WxMiniAPI.Res_GetUserRiskRank>(url, obj)
+    return res
+  }
+
+  static async createActivityId() {
+    const url = this.idToUrl.CREATE_ACT_ID
+    const res = await this.toRequest(url, {})
+    return res
+  }
+
+
+  static decryptUserData<T>(
+    appid: string,
+    session_key: string,
+    encryptedData: string,
+    iv: string,
+  ) {
+    const sessionKeyBuf = Buffer.from(session_key, "base64")
+    const encryptedDataBuf = Buffer.from(encryptedData, "base64")
+    const ivBuf = Buffer.from(iv, "base64")
+   
+    let decrypted = ""
+    try {
+      const decipher = crypto.createDecipheriv("aes-128-cbc", sessionKeyBuf, ivBuf)
+      decipher.setAutoPadding(true)
+      decrypted = decipher.update(encryptedDataBuf, undefined, 'utf8')
+      decrypted += decipher.final('utf8')
+    }
+    catch(err) {
+      console.warn("decryptUserData failed")
+      console.log(err)
+      return
+    }
+    
+    const decryptedObj = valTool.strToObj(decrypted)
+    const theAppid = decryptedObj?.watermark?.appid
+    if(theAppid && theAppid !== appid) {
+      console.warn("appid not match")
+      return
+    }
+    
+    return decryptedObj as T
+  }
+
+  static async setChatToolMsg(
+    activity_id: string,
+    target_state: number,
+    template_id: string,
+    participator_info_list?: WxMiniAPI.ChatToolParticipatorInfo[],
+  ) {
+    const obj = {
+      activity_id,
+      target_state,
+      template_id,
+      participator_info_list,
+      version_type: this.getVersionType(),
+    }
+    console.log("see setChatToolMsg obj: ", obj)
+    const url = this.idToUrl.CHAT_TOOL_MSG
+    const res = await this.toRequest(url, obj)
+    console.log("see setChatToolMsg res: ", res)
+    return res
+  }
+
+
+}
+
 
 /*************** Functions about wechat ends ****************/
 
@@ -3570,3 +3790,278 @@ export class SafeGuard {
   }
 
 }
+
+export class LiuMilvus {
+  static getClient() {
+    const _env = process.env
+    const address = _env.LIU_MILVUS_ADDRESS
+    const token = _env.LIU_MILVUS_TOKEN
+    if(!address || !token) return
+    const milvusClient = new MilvusClient({
+      address,
+      token,
+    })
+    return milvusClient
+  }
+
+  static getEntityId(insertedRes: any) {
+    const IDs = insertedRes?.IDs
+    if(!IDs) return
+    const list = IDs?.str_id?.data
+    if(!list || !Array.isArray(list)) return
+    const id = list[0]
+    if(!id) return
+    return id as string
+  }
+
+  async init() {
+    const client = LiuMilvus.getClient()
+    if(!client) return
+
+    const res1 = await client.hasCollection({ collection_name: "happy_coupons" })
+    console.log("happy_coupons exists: ", res1.value)
+    if(res1.value) {
+      await this.checkHappyCoupons()
+    }
+    else {
+      await this._createHappyCoupons()
+    }
+  }
+
+  async checkHappyCoupons() {
+    const client = LiuMilvus.getClient()
+    if (!client) return
+    const t1 = getNowStamp()
+    const res1 = await client.describeIndex({ collection_name: "happy_coupons" })
+    const t2 = getNowStamp()
+    const durationStamp = t2 - t1
+    console.log(`_checkHappyCoupons cost ${durationStamp} ms`)
+    console.log("_checkHappyCoupons res1: ", res1)
+    return res1
+  }
+  
+  private async _createHappyCoupons() {
+    const client = LiuMilvus.getClient()
+    if (!client) return
+
+    const schema: MilvusFieldType[] = [
+      {
+        name: "_id",
+        data_type: MilvusDataType.VarChar,
+        is_primary_key: true,
+        max_length: 64,
+      },
+      {
+        name: "copytext_vector",
+        data_type: MilvusDataType.FloatVector,
+        dim: 1024,
+      },
+      {
+        name: "image_vector",
+        data_type: MilvusDataType.FloatVector,
+        dim: 1024,
+      },
+      {
+        name: "title_vector",
+        data_type: MilvusDataType.FloatVector,
+        dim: 1024,
+      },
+      {
+        name: "copytext_sparse",
+        data_type: MilvusDataType.SparseFloatVector,
+      },
+      {
+        name: "copytext",
+        data_type: MilvusDataType.VarChar,
+        max_length: 1024,
+        enable_analyzer: true,
+        enable_match: true,
+        analyzer_params: {
+          type: "chinese",
+        }
+      },
+      {
+        name: "title",
+        data_type: MilvusDataType.VarChar,
+        max_length: 128,
+        enable_analyzer: true,
+        enable_match: true,
+        analyzer_params: {
+          type: "chinese",
+        }
+      },
+      {
+        name: "keywords",
+        data_type: MilvusDataType.Array,
+        element_type: MilvusDataType.VarChar,
+        max_length: 128,
+        max_capacity: milvus_cfg.coupon_keywords_max_capacity,
+        nullable: true,
+      },
+      {
+        name: "owner",
+        data_type: MilvusDataType.VarChar,
+        max_length: 64,
+        nullable: true,
+      },
+      {
+        name: "oState",
+        data_type: MilvusDataType.VarChar,
+        max_length: 32,
+      },
+      {
+        name: "textEmbeddingModel",
+        data_type: MilvusDataType.VarChar,
+        max_length: 64,
+        nullable: true,
+      },
+      {
+        name: "imageEmbeddingModel",
+        data_type: MilvusDataType.VarChar,
+        max_length: 64,
+        nullable: true,
+      },
+      {
+        name: "expireStamp",
+        data_type: MilvusDataType.Int64,
+      },
+      {
+        name: "insertedStamp",
+        data_type: MilvusDataType.Int64,
+      },
+      {
+        name: "updatedStamp",
+        data_type: MilvusDataType.Int64,
+      }
+    ]
+
+    const index_params = [
+      {
+        field_name: "_id",
+        index_type: MilvusIndexType.AUTOINDEX,
+      },
+      {
+        field_name: "copytext_vector",
+        index_type: MilvusIndexType.AUTOINDEX,
+        metric_type: MilvusMetricType.COSINE,
+      },
+      {
+        field_name: "image_vector",
+        index_type: MilvusIndexType.HNSW,
+        metric_type: MilvusMetricType.L2,
+      },
+      {
+        field_name: "title_vector",
+        index_type: MilvusIndexType.AUTOINDEX,
+        metric_type: MilvusMetricType.COSINE,
+      },
+      {
+        field_name: "copytext_sparse",
+        index_type: MilvusIndexType.AUTOINDEX,
+        metric_type: MilvusMetricType.BM25,
+      },
+      {
+        field_name: "copytext",
+        index_type: MilvusIndexType.AUTOINDEX,
+      },
+      {
+        field_name: "title",
+        index_type: MilvusIndexType.AUTOINDEX,
+      },
+      {
+        field_name: "keywords",
+        index_type: MilvusIndexType.AUTOINDEX,
+      },
+      {
+        field_name: "owner",
+        index_type: MilvusIndexType.AUTOINDEX,
+      },
+      {
+        field_name: "oState",
+        index_type: MilvusIndexType.BITMAP,
+      },
+      {
+        field_name: "expireStamp",
+        index_type: MilvusIndexType.STL_SORT,
+      },
+      {
+        field_name: "insertedStamp",
+        index_type: MilvusIndexType.STL_SORT,
+      },
+      {
+        field_name: "updatedStamp",
+        index_type: MilvusIndexType.STL_SORT,
+      },
+    ]
+
+    const funcs = [
+      {
+        name: "copytext_bm25",
+        description: "turn copytext into sparse vector",
+        type: MilvusFuncType.BM25,
+        input_field_names: ["copytext"],
+        output_field_names: ["copytext_sparse"],
+        params: {},
+      }
+    ]
+
+    const t1 = getNowStamp()
+    const res = await client.createCollection({
+      collection_name: "happy_coupons",
+      schema,
+      index_params,
+      functions: funcs,
+      enableDynamicField: true,
+    })
+    const t2 = getNowStamp()
+    const durationStamp = t2 - t1
+    console.log(`creating happy coupons cost ${durationStamp} ms`)
+    console.log("creating happy coupons res: ", res)
+
+    const t3 = getNowStamp()
+    const res2 = await client.getLoadState({
+      collection_name: "happy_coupons",
+    })
+    const t4 = getNowStamp()
+    const durationStamp2 = t4 - t3
+    console.log(`happy_coupons load state cost ${durationStamp2} ms`)
+    console.log("happy_coupons load state res2: ", res2)
+  }
+
+}
+
+export class CommonShared {
+  static getGzhType() {
+    const _env = process.env
+    return _env.LIU_WX_GZ_TYPE ?? "subscription_account"
+  }
+
+  static async createCredential(
+    userId: string,
+    expireStamp: number,
+    infoType: Table_Credential_Type,
+    otherData?: Partial<Table_Credential>,
+  ) {
+    const b2 = getBasicStampWhileAdding()
+    let credential = createCommonNonce()
+    if(infoType === "weixin-ad") {
+      credential = createAdCredential()
+    }
+
+    const newCred: Partial_Id<Table_Credential> = {
+      ...b2,
+      credential,
+      infoType,
+      expireStamp,
+      verifyNum: 0,
+      userId,
+      ...otherData,
+    }
+    const cCol = db.collection("Credential")
+    const res = await cCol.add(newCred)
+    const _id = getDocAddId(res)
+    newCred._id = _id
+    return newCred
+  }
+}
+

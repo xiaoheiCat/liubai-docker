@@ -8,7 +8,7 @@ import type {
   Shared_AES_Key_IV,
 } from "@/common-types"
 import { getNowStamp } from "@/common-time"
-import { getDocAddId, SafeGuard, valTool } from '@/common-util'
+import { getDocAddId, LiuMilvus, SafeGuard, valTool } from '@/common-util'
 
 const db = cloud.database()
 
@@ -20,9 +20,17 @@ export async function main(ctx: FunctionContext) {
 
   await initBlockedIPs()
   await initConfig()
-  viewMyIP()
+  await viewMyIP()
+
+  // init milvus
+  await initMilvus()
 
   return { data123: "Hi! __init__ has been run" }
+}
+
+async function initMilvus() {
+  const liuMilvus = new LiuMilvus()
+  await liuMilvus.init()
 }
 
 async function viewMyIP() {

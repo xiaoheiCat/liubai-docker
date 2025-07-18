@@ -1,0 +1,23 @@
+<view class="image-box"
+  hover-class="image-box_hover"
+  style="padding-bottom: {{percentH2W}}"
+>
+  <image 
+    wx:if="{{enable}}"
+    src="{{imageUrl}}" 
+    mode="{{imageMode}}" 
+    class="the-image {{loaded ? 'the-image_loaded' : ''}}" 
+    show-menu-by-longpress
+    bindload="onImageLoaded"
+    binderror="onImageError"
+    catchtap="onTapImage"
+  />
+
+  <view wx:if="{{isErr}}" class="image-error" catchtap="onTapRefresh">
+    <image src="{{imagePath}}refresh.png" class="image-error-icon" />
+    <view class="image-error-text">
+      <text>{{t1.network}}</text>
+    </view>
+  </view>
+  <view wx:elif="{{!loaded}}" class="image-skeleton"></view>
+</view>

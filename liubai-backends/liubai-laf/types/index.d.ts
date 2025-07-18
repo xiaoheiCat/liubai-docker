@@ -27,6 +27,8 @@ declare global {
       */
       LIU_CLOUD_LOGIN: LiuSwitch | "03"
 
+      LIU_ENV_STATE?: "prod" | "dev" 
+
       /** 当前应用的域名 
        *  其结尾请不要添加路径的开头 `/`
       */
@@ -98,6 +100,12 @@ declare global {
       /** 微信小程序 */
       LIU_WX_REWARDED_VIDEO_AD?: string    // rewarded video unit ad id
       LIU_WX_MINI_APPID?: string
+      LIU_WX_MINI_APPSECRET?: string
+      LIU_WX_MINI_TMPL_ID_1?: string       // 优惠券即将过期通知
+      LIU_WX_MINI_TMPL_ID_2?: string       // 如果有相似的优惠券，要发送的通知
+      LIU_WX_MINI_VERTION_TYPE?: "0" | "1" | "2"    // 0: 正式版
+                                                    // 1: 开发版
+                                                    // 2: 体验版
       
 
       /** 企业微信 企业内部自建应用 */
@@ -220,6 +228,14 @@ declare global {
 
       /** Amap */
       LIU_AMAP_WEB_KEY?: string              // Web Key of Amap
+
+      /** Jina */ 
+      LIU_JINA_BASE_URL?: string             // Do not add a trailing slash: /
+      LIU_JINA_APIKEY?: string
+
+      /** Milvus */
+      LIU_MILVUS_ADDRESS?: string
+      LIU_MILVUS_TOKEN?: string
 
     }
   }

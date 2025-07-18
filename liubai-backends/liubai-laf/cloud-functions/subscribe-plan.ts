@@ -5,13 +5,13 @@ import Stripe from "stripe";
 import { 
   verifyToken, 
   getIpArea, 
-  getDocAddId,
   checkIfUserSubscribed,
   LiuStripe,
   WxpayHandler,
   updateUserInCache,
   getCurrencySymbol,
   AlipayHandler,
+  CommonShared,
 } from '@/common-util';
 import type { 
   Table_Subscription, 
@@ -24,8 +24,7 @@ import type {
   Wxpay_Refund_Custom_Param,
   Alipay_Refund_Param,
 } from "@/common-types";
-import { 
-  getBasicStampWhileAdding,
+import {
   getNowStamp,
   MINUTE,
   HOUR,
@@ -521,9 +520,10 @@ async function handle_create_stripe(
   }
 
   // 3. check Credential for old session
+  const userId = user._id
   const w1: Partial<Table_Credential> = {
     infoType: "stripe-checkout-session",
-    userId: user._id,
+    userId,
   }
   const col_cred = db.collection("Credential")
   const q1 = col_cred.where(w1).orderBy("expireStamp", "desc")
@@ -620,23 +620,21 @@ async function handle_create_stripe(
   }
 
   // 6. create Credential
-  const b1 = getBasicStampWhileAdding()
-  const cred: Omit<Table_Credential, "_id"> = {
-    ...b1,
-    credential: session_id,
-    infoType: "stripe-checkout-session",
+  const cred_data = await CommonShared.createCredential(
+    userId, 
     expireStamp,
-    userId: user._id,
-    stripeCheckoutSession: session,
-    meta_data: {
-      payment_circle: data_2.payment_circle,
-      payment_timezone: userTimezone,
-      plan: subscription_id,
-    },
-  }
-  const res3 = await col_cred.add(cred)
-  const newCredId = getDocAddId(res3)
-  if(!newCredId) {
+    "stripe-checkout-session",
+    {
+      credential: session_id,
+      stripeCheckoutSession: session,
+      meta_data: {
+        payment_circle: data_2.payment_circle,
+        payment_timezone: userTimezone,
+        plan: subscription_id,
+      },
+    }
+  )
+  if(!cred_data._id) {
     return { code: "SP005", errMsg: "Err while creating credential" }
   }
 

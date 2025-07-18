@@ -255,6 +255,7 @@ export const wechatLang: LangAtom = {
     "go_back_to_app": "登录中，请返回 APP 内查看......",
     "membership_1": "点击下方链接👇 成为\n<a href='{LIU_DOMAIN}/subscription'>留白记事 Premium 会员</a>",
     "membership_2": "你已是最可爱的 Premium 会员 🫶\n\n⏱️ 会员有效期至 {endDate}\n\n👉 <a href='{groupLink}'>戳我加入会员限定群聊</a>\n\n📊 回复“额度”查看使用情况",
+    "find_coupon": "找优惠？👇\n<a href='{LIU_DOMAIN}' data-miniprogram-appid='{appid}' data-miniprogram-path='{path}'>翻抽屉呀！</a>"
   },
   "zh-Hant": {
     "welcome_1": "歡迎追蹤留白記事！\n\n留白記事 = AI 加持的備忘錄📝 + 行事曆📆 + 任務📌 + 待辦清單📂\n\n你可以在這裡記錄所有事情，所有「只屬於你」的資訊都將在這裡匯聚。\n\n若這世界就是一個巨大的遊樂園，請去體驗、去創造🥂\n\n[未完待續]",
@@ -269,6 +270,7 @@ export const wechatLang: LangAtom = {
     "go_back_to_app": "登入中，請返回 APP 內檢視......",
     "membership_1": "輕觸下方連結👇 成為\n<a href='{LIU_DOMAIN}/subscription'>留白記事 Premium 會員</a>",
     "membership_2": "你已是最可愛的 Premium 會員 🫶\n\n⏱️ 會員有效期至 {endDate}\n\n👉 <a href='{groupLink}'>輕觸加入會員限定群組</a>\n\n📊 回覆「額度」查看使用情況",
+    "find_coupon": "找優惠？👇\n<a href='{LIU_DOMAIN}' data-miniprogram-appid='{appid}' data-miniprogram-path='{path}'>快來翻抽屜！</a>"
   },
   "en": {
     "welcome_1": "Welcome to follow Liubai!\n\nLiubai = Notes📝 + Calendar📆 + Tasks📌 + Todo📂 with AI\n\nYou can record all your life’s events, and all information you want is out here.\n\nIf this world is a giant playground, please experience it and create it 🥂\n\n[To be continued]",
@@ -283,6 +285,7 @@ export const wechatLang: LangAtom = {
     "go_back_to_app": "Logging in......\nPlease go back to our app to view",
     "membership_1": "Tap the link👇\n<a href='{LIU_DOMAIN}/subscription'>Liubai Premium Membership</a>\nto have premium 🎁",
     "membership_2": "You are the most adorable Premium member 🫶\n\n⏱️ Membership will expire at {endDate}\n\n👉 <a href='{groupLink}'>Join VIP exclusive group</a>\n\n📊 Reply 'quota' to view usage",
+    "find_coupon": "Get Coupons?👇\n<a href='{LIU_DOMAIN}' data-miniprogram-appid='{appid}' data-miniprogram-path='{path}'>All in the Drawer!</a>"
   }
 }
 

@@ -6,7 +6,8 @@ import type { BaseSchema } from "valibot"
 import { Stream } from "openai/streaming"
 
 // 全局类型
-// Table_ 开头，表示为数据表结构
+// Table_ 开头，表示为数据表结构（文档型数据库）
+// Vector_ 开头，表示为向量数据库结构
 // Shared_ 开头，表示为全局缓存 cloud.shared 所涉及的结构
 // Sch_ 开头的，表示类型的 Schema，用于 valibot
 // Res_ 开头的，表示返回至前端的类型
@@ -150,6 +151,16 @@ export const oState_Drafts = ["OK", "POSTED", "DELETED", "LOCAL"] as const
 export type OState_Draft = typeof oState_Drafts[number]
 export const Sch_OState_Draft = vbot.picklist(oState_Drafts)
 
+// coupon 的 oState
+export const oState_Cool = [
+  "OK", 
+  "REVIEWING", 
+  "DEL_BY_USER", 
+  "DEL_BY_ADMIN",
+  "DEL_BY_AI",
+] as const
+export type OState_Cool = typeof oState_Cool[number]
+
 // order 的 oState
 export const oState_Orders = ["OK", "DEL_BY_USER"] as const
 export type OState_Order = typeof oState_Orders[number]
@@ -164,6 +175,9 @@ export type PayChannel = "stripe" | "wxpay" | "alipay"
 // running status
 export type RunningStatus = "no_need" | "fail" | "success"
 
+// from type
+export type LiuFromType = "official" | "user"
+
 // type of order
 export const orderTypes = ["subscription", "product"] as const
 export type OrderType = typeof orderTypes[number]
@@ -176,6 +190,18 @@ export const Sch_SupportedTheme = vbot.picklist(supportedThemes)
 export const localThemes = [...supportedThemes, "system", "auto"] as const
 export type LocalTheme = typeof localThemes[number]
 export const Sch_LocalTheme = vbot.picklist(localThemes)
+
+// type of role
+export const liuRoles = ["admin", "user"] as const
+export type LiuRole = typeof liuRoles[number]
+export const Sch_LiuRole = vbot.picklist(liuRoles)
+
+// typeo of functionality
+export const liuFunctionalitys = [
+  "note", "coupon"
+] as const
+export type LiuFunctionality = typeof liuFunctionalitys[number]
+export const Sch_LiuFunctionality = vbot.picklist(liuFunctionalitys)
 
 // type of gender
 export const genderTypes = ["male", "female"] as const
@@ -659,7 +685,7 @@ export type DownloadUploadRes = DownloadUploadRes_1 | DownloadUploadRes_2
 
 /*********************** About AI **********************/
 export type AiProvider = "aliyun-bailian" | "baichuan" | "deepseek" | "tencent-hunyuan" 
-  | "minimax" | "moonshot" | "stepfun" | "zero-one" | "zhipu"
+  | "minimax" | "moonshot" | "stepfun" | "zero-one" | "zhipu" | "jina"
 
 export type AiSecondaryProvider = "siliconflow" | "gitee-ai" | "qiniu" | "tencent-lkeap"
   | "suanleme"
@@ -906,12 +932,17 @@ export interface UserWeChatGzh {
   headimgurl?: string
 }
 
+export interface UserWeixinMini {
+  session_key?: string
+}
+
 // User 表里的 thirdData 字段的类型
 export interface UserThirdData {
   google?: any
   github?: any
   wecom?: Ww_External_Contact
   wx_gzh?: UserWeChatGzh
+  wx_mini?: UserWeixinMini
 }
 
 /** User's Subscription Plan */
@@ -1348,7 +1379,7 @@ export interface Table_LoginState extends BaseTable {
 }
 
 export interface Table_LogAi extends BaseTable {
-  infoType: "cost" | "kick_character" | "add_character"
+  infoType: "cost" | "kick_character" | "add_character" | "cost-embedding"
   characters?: AiCharacter[]
   costUsage?: LiuAi.Usage
   costBaseUrl?: string
@@ -1384,6 +1415,7 @@ export interface Table_User extends BaseTable {
 
   /** wechat data */
   wx_gzh_openid?: string
+  wx_mini_openid?: string
   wx_unionid?: string
 
   /** wecom data for qynb, which is for company internal use */
@@ -1391,6 +1423,8 @@ export interface Table_User extends BaseTable {
 
   userAgent?: string
   timezone?: string
+  role?: LiuRole
+  blockedFuncs?: LiuFunctionality[]
   
 }
 
@@ -1545,6 +1579,12 @@ export interface Config_WeChat_GZH {
   jsapi_ticket?: string
 }
 
+export interface Config_WeChat_MINI {
+  access_token?: string
+  expires_in?: number 
+  lastGetStamp?: number
+}
+
 export interface Config_WeCom_Qynb {
   access_token?: string
   expires_in?: number
@@ -1572,6 +1612,9 @@ export interface Table_Config extends BaseTable {
   // wechat subscription
   wechat_gzh?: Config_WeChat_GZH
 
+  // wechat miniprogram
+  wechat_mini?: Config_WeChat_MINI
+
   // wecom config for company internal development
   // qynb means 企业内部（开发）
   wecom_qynb?: Config_WeCom_Qynb
@@ -1583,7 +1626,7 @@ export interface Table_Config extends BaseTable {
 /** 临时凭证表的类型 */
 export type Table_Credential_Type =  "sms-code" | "email-code" | "wx-gzh-scan"
   | "users-select" | "stripe-checkout-session" | "bind-wecom" | "bind-wechat" 
-  | "bind-phone" | "auth-code" | "weixin-ad"
+  | "bind-phone" | "auth-code" | "weixin-ad" | "coupon-auth"
 
 /** 临时凭证表 */
 export interface Table_Credential extends BaseTable {
@@ -1609,6 +1652,7 @@ export interface Table_Credential extends BaseTable {
   sms_sent_result?: Record<string, any>
   redirect_uri?: string        // required when infoType is "auth-code"
   app_type?: LiuAppType        // required when infoType is "auth-code"
+  wx_gzh_openid?: string
 }
 
 /** 订阅方案表 */
@@ -1788,6 +1832,11 @@ export interface Table_AiChat extends BaseTable {
   wxMediaId16K?: string
 }
 
+export interface CopyBox {
+  title?: string
+  content: string
+}
+
 export interface Table_Showcase extends BaseTable {
   key?: string
   title: string
@@ -1798,35 +1847,90 @@ export interface Table_Showcase extends BaseTable {
   isOn: BaseIsOn
 }
 
-export interface CopyBox {
-  title?: string
-  content: string
-}
-
-
-export interface Table_Coupon extends BaseTable {
+export interface Table_HappyCoupon extends BaseTable {
+  copytext?: string
+  image_url?: string
+  image_h2w?: string
+  img_to_txt?: string
+  img_trace_id?: string
   owner?: string
-  oState: OState
-  fromType: "official" | "user"
-  tags?: string[]
+  oState: OState_Cool
+  fromType: LiuFromType
   emoji?: string
   brand?: string
-  keywords?: string[]
   title?: string
-  copybox?: string
-  description?: string
-  images?: Cloud_ImageStore[]
+  keywords?: string[]
   gottenNum: number
-  maxNum?: number
-  expireStamp?: number
+  totalNum: number
+  embeddingModel?: string
+  expireStamp: number
+  extraData?: {
+    aiReason?: string
+    imgToTxtModel?: string
+    imgToTxtProvider?: string
+
+    parseModel?: string
+    parseProvider?: string
+
+    keywordModel?: string
+    keywordProvider?: string
+    
+  }
 }
 
-export interface Table_Action extends BaseTable {
+export interface Vector_happy_coupons extends BaseTable {
+  copytext_vector: number[]
+  image_vector: number[]
+  title_vector: number[]
+  // copytext_sparse 交由 milvus 自行生成
+  copytext: string
+  title: string
+  keywords?: string[]
+  owner?: string
+  oState: OState_Cool
+  textEmbeddingModel?: string
+  imageEmbeddingModel?: string
+  expireStamp: number
+}
+
+export interface Table_HappyCache extends BaseTable {
+  infoType: "coupon-image" | "coupon-keyword"
+  image_url?: string
+  keyword?: string
+  query_ids?: string[]
+  search_ids?: string[]
+}
+
+export interface Table_HappyReception extends BaseTable {
   userId: string
-  infoType: "get_coupon"
+  infoType: "happy_coupon"
   couponId?: string
 }
 
+export interface Table_WxBond extends BaseTable {
+  infoType: "chat-tool"
+  userId: string
+  opengid?: string
+  open_single_roomid?: string
+  group_openid?: string
+  chat_type?: WxMiniAPI.ChatType
+}
+
+export interface Table_WxTask extends BaseTable {
+  oState: OState_Cool
+  taskState: "DEFAULT" | "CLOSED"
+  owner_userid: string
+  owner_openid: string
+  opengid?: string
+  open_single_roomid?: string
+  chat_type: WxMiniAPI.ChatType
+  desc: string
+  assigneeList: PeopleTasksAPI.AssigneeItem[]
+  related_openids: string[]
+  activity_id?: string
+  endStamp?: number
+  closedStamp?: number
+}
 
 
 /*********************** 基于 Table 的扩展类型 ***********************/
@@ -1971,8 +2075,10 @@ export type UserLoginOperate = "init" | "email" | "email_code"
   | "github_oauth" 
   | "google_oauth"
   | "wx_gzh_oauth"
+  | "wx_gzh_for_mini"
   | "wx_gzh_scan"
   | "wx_gzh_base"   // only for wx_gzh_openid
+  | "wx_mini_session"
   | "scan_check"
   | "scan_login"
   | "google_credential"
@@ -2067,16 +2173,16 @@ export namespace UserSettingsAPI {
     voicePreference?: GenderType
   }
 
-  export interface Param_MemberAvatar {
-    operateType: "member-avatar"
-    memberId: string
-    image: Cloud_ImageStore
-  }
-
   export const Sch_Param_MemberAvatar = vbot.object({
     operateType: vbot.literal("member-avatar"),
     memberId: Sch_Id,
     image: Sch_Cloud_ImageStore,
+  })
+
+  export const Sch_Param_MemberName = vbot.object({
+    operateType: vbot.literal("member-name"),
+    memberId: Sch_Id,
+    name: Sch_String_WithLength,
   })
 
 }
@@ -2107,7 +2213,7 @@ export namespace FileSetAPI {
 
   export interface Param {
     operateType: "get-upload-token"
-    purpose?: "avatar"
+    purpose?: "avatar" | "coupon-upload" | "coupon-tmp"
   }
 
   export interface Res_UploadToken {
@@ -2480,6 +2586,11 @@ export namespace HappySystemAPI {
     footer?: string
   }
 
+  export interface Res_GetAdData {
+    operateType: "get-ad-data"
+    rewardedAdUnitId?: string
+  }
+
   export interface Res_GetWeixinAd {
     operateType: "get-weixin-ad"
     adUnitId: string
@@ -2492,6 +2603,102 @@ export namespace HappySystemAPI {
     operateType: "post-weixin-ad"
     conversationCountFromAd: number
   }
+
+  export type OperateType = "get-showcase"
+    | "get-ad-data"
+    | "get-weixin-ad"
+    | "post-weixin-ad"
+    | "coupon-status"
+    | "coupon-check"
+    | "coupon-post"
+    | "coupon-detail"
+    | "coupon-mine"
+    | "coupon-update"
+    | "coupon-delete"
+    | "coupon-search"
+
+  export interface Param_CouponSearch {
+    mode: "fast" | "deep"
+    texts?: string[]
+    image_url?: string
+  }
+
+  export const Sch_Param_CouponSearch = vbot.object({
+    mode: vbot.picklist(["fast", "deep"]),
+    texts: sch_opt_arr(vbot.string(), [vbot.maxLength(9)]),
+    image_url: Sch_Opt_Str,
+  })
+
+  export interface CouponItem {
+    _id: string
+    title?: string
+    copytext?: string
+    image_url?: string
+    image_h2w?: string
+    emoji?: string
+    brand?: string
+    expireStamp: number
+
+    // for detail
+    isMine?: boolean
+    drawn?: boolean
+  }
+
+  export interface Res_FastSearch {
+    fromType: "query" | "cache"
+    queryList: CouponItem[]
+    searchList?: CouponItem[]
+  }
+
+  export interface Res_CouponPost {
+    couponId?: string
+  }
+
+  export interface Res_CouponStatus {
+    can_i_use: boolean
+    membership: "free" | "premium"
+    tmpl_id_1?: string
+    tmpl_id_2?: string
+    max_coupons?: number
+    posted_coupons?: number
+  }
+  
+  export interface Res_CouponCheck {
+    operateType: "coupon-check"
+    pass: boolean
+    credential?: string
+    failReason?: string
+  }
+
+  export interface Res_CouponDetail {
+    operateType: "coupon-detail"
+    detail: CouponItem
+  }
+
+  export interface Res_CouponMine {
+    operateType: "coupon-mine"
+    drawnList: CouponItem[]
+    postedList: CouponItem[]
+  }
+
+  export interface Param_CouponUpdate {
+    operateType: "coupon-update"
+    couponId: string
+    image_url?: string
+    image_h2w?: string
+    copytext?: string
+    availableDays?: number
+  }
+
+  export const Sch_Param_CouponUpdate = vbot.object({
+    operateType: vbot.literal("coupon-update"),
+    couponId: Sch_String_WithLength,
+    image_url: Sch_Opt_Str,
+    image_h2w: Sch_Opt_Str,
+    copytext: Sch_Opt_Str,
+    availableDays: Sch_Opt_Num,
+  })
+
 }
 
 /****************** sync-operate api ***************/
@@ -2602,6 +2809,17 @@ export namespace UserLoginAPI {
     x_liu_client: vbot.literal("ide-extension"),
     x_liu_ide_type: Sch_LiuIDEType,
   })
+
+  export interface Res_WxMiniSession extends Res_UserLoginNormal {
+    operateType: "wx_mini_session"
+    wx_mini_openid: string
+  }
+
+  export interface Res_WxGzhForMini {
+    operateType: "wx_gzh_for_mini"
+    nickname: string
+    headimgurl?: string
+  }
 
 }
 
@@ -2800,6 +3018,16 @@ export interface Wx_Res_GzhUploadMedia {
   type?: string
   media_id?: string
   created_at?: number     // seconds
+}
+
+export namespace WeixinAPI {
+  export interface Res_Code2Session {
+    session_key: string
+    unionid?: string
+    errmsg?: string
+    openid: string
+    errcode?: number
+  }
 }
 
 
@@ -3610,7 +3838,7 @@ export interface Res_Alipay_Refund {
 export namespace LiuAi {
 
   export interface Usage {
-    completion_tokens: number
+    completion_tokens?: number
     prompt_tokens: number
     total_tokens: number
   }
@@ -3808,11 +4036,44 @@ export namespace LiuAi {
     computingProvider: ComputingProvider
     model: string
     character?: AiCharacter
+    stream?: boolean
   }
 
 
   export interface TextToSpeechOpt {
     room?: Table_AiRoom
+  }
+
+  export interface EmbeddingInputText {
+    text: string
+  }
+
+  export interface EmbeddingInputImage {
+    image: string
+  }
+
+  export type EmbeddingInput = EmbeddingInputText | EmbeddingInputImage
+
+  export interface EmbeddingOutput {
+    object: "embedding"
+    index: number
+    embedding: number[]
+  }
+
+  export interface EmbeddingResult {
+    model: string
+    object: "list"
+    usage: {
+      total_tokens: number
+      prompt_tokens: number
+    }
+    data?: LiuAi.EmbeddingOutput[]
+  }
+
+  export interface Res_Embedding {
+    computingProvider: ComputingProvider
+    character?: AiCharacter
+    originalResult?: EmbeddingResult
   }
 
 }
@@ -4011,3 +4272,130 @@ export namespace Ns_MapTool {
   
 
 }
+
+
+export namespace WxMiniAPI {
+  export interface ResultBase {
+    errcode: number
+    errmsg: string
+  }
+
+  export type SecCheckSuggest = "risky" | "pass" | "review"
+  export type SecCheckLabel = 100 | 10001 | 
+    20001 | 20002 | 20003 | 20006 | 20008 | 20012 | 20013 | 21000
+
+  export interface Res_MsgSecCheck extends ResultBase {
+    detail: {
+      strategy: string
+      errcode: number
+      suggest: SecCheckSuggest
+      label: SecCheckLabel
+      keyword?: string
+      prob?: number
+    }[]
+    trace_id: string
+    result: {
+      suggest: SecCheckSuggest
+      label: SecCheckLabel
+    }
+  }
+
+  export interface Res_MediaCheckAsync extends ResultBase {
+    trace_id?: string
+  }
+
+  export interface Res_GetUserRiskRank extends ResultBase {
+    risk_rank: number  // 用户风险等级，合法值为0,1,2,3,4，数字越大风险越高
+    unoin_id: number
+  }
+
+  export interface EncryptedAtom {
+    errMsg: string
+    encryptedData: string
+    iv: string
+  }
+
+  export const Sch_EncryptedAtom = vbot.object({
+    errMsg: vbot.string(),
+    encryptedData: vbot.string(),
+    iv: vbot.string(),
+  })
+
+  export type ChatType = 1 | 2 | 3 | 4
+
+  export interface ChatInfo {
+    opengid?: string               // 多聊群下返回的群唯一标识
+    open_single_roomid?: string    // 单聊下的房间唯一标识
+    group_openid?: string          // 用户在当前聊天室的唯一标识
+    chat_type?: ChatType           // 1: 单聊
+                                   // 2: 企业微信联系人
+                                   // 3: 普通微信群聊
+                                   // 4: 企业微信互通群聊
+  }
+
+  export const Sch_ChatInfo = vbot.object({
+    opengid: Sch_Opt_Str,
+    open_single_roomid: Sch_Opt_Str,
+    group_openid: Sch_Opt_Str,
+    chat_type: Sch_Opt_Num,
+  })
+
+  export interface ChatToolParticipatorInfo {
+    group_openid: string
+    state: 1
+  }
+
+}
+
+
+export namespace PeopleTasksAPI {
+
+  export type OperateType = "enter-wx-chat-tool" | "create-wx-task" 
+    | "get-wx-task"
+    | "close-wx-task"
+    | "complete-wx-task"
+
+  export interface Res_EnterWxChatTool {
+    operateType: "enter-wx-chat-tool"
+    chatInfo: WxMiniAPI.ChatInfo
+  }
+
+  export const Sch_Param_CreateWxTask = vbot.object({
+    operateType: vbot.literal("create-wx-task"),
+    chatInfo: WxMiniAPI.Sch_ChatInfo,
+    desc: Sch_String_WithLength,
+    assignees: vbot.array(Sch_String_WithLength),
+  })
+  
+  export interface AssigneeItem {
+    group_openid: string
+    doneStamp?: number
+  }
+  
+  export interface Res_GetWxTask {
+    operateType: "get-wx-task"
+    id: string
+    activity_id?: string
+    desc: string
+    owner_openid: string
+    opengid?: string
+    open_single_roomid?: string
+    chat_type: number
+    assigneeList: AssigneeItem[]
+    insertedStamp: number
+    editedStamp?: number
+    endStamp?: number
+    closedStamp?: number
+  }
+
+  export const Sch_Param_GetWxTask = vbot.object({
+    operateType: vbot.literal("get-wx-task"),
+    chatInfo: WxMiniAPI.Sch_ChatInfo,
+    id: Sch_Id,
+  })
+
+  
+
+
+}
+

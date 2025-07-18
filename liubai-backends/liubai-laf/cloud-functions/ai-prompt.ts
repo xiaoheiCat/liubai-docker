@@ -226,7 +226,7 @@ export const aiBots: AiBot[] = [
     name: "智谱",
     character: "zhipu",
     provider: "zhipu",
-    model: "glm-4-air",
+    model: "glm-4-air-250414",
     abilities: ["chat", "tool_use"],
     alias: ["智谱AI", "智谱清言", "ChatGLM", "zp", "glm"],
     maxWindowTokenK: 128,

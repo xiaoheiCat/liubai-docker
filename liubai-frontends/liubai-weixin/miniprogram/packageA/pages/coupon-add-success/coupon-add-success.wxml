@@ -1,0 +1,30 @@
+<custom-navibar 
+  height1="{{height1}}" height2="{{height2}}" 
+  visible="{{visible}}"
+  back-target-page-name="coupon-home"
+  target-page-url="/packageA/pages/coupon-home/coupon-home"
+></custom-navibar>
+<view class="liu-{{theme}} liu-scroll-view ca-container">
+
+  <view class="ca-virtual-one ca-virtual-one_success"></view>
+
+  <view class="ca-img-box">
+    <image src="/packageA/images/shared/ok_hand_3d_medium-light.png" 
+      class="ca-image"
+    />
+  </view>
+
+  <view class="ca-title ca-title_success">
+    <text>{{t1.title}}</text>
+  </view>
+
+  <view class="ca-btns">
+    <custom-button catchtap="onTapPostAgain">
+      <text class="liu-pointer ca-btn-text">{{t1.btn_1}}</text>
+    </custom-button>
+    <custom-button btn-type="transparent" catchtap="onTapBack">
+      <text class="liu-pointer ca-btn-text">{{t1.btn_2}}</text>
+    </custom-button>
+  </view>
+
+</view>

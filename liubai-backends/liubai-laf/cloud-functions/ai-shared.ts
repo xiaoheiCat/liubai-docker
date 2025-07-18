@@ -57,6 +57,7 @@ import {
   RichTexter,
   valTool,
   ValueTransform,
+  CommonShared,
 } from "@/common-util"
 import { aiBots, aiI18nShared } from "@/ai-prompt"
 import { useI18n, aiLang, getCurrentLocale, commonLang, getAppName } from "@/common-i18n"
@@ -74,6 +75,7 @@ import { addDays, set as date_fn_set } from "date-fns"
 import { WebSocket } from "ws"
 import { createRandom } from "@/common-ids"
 import { ai_cfg } from "@/common-config"
+import xml2js from "xml2js"
 
 const db = cloud.database()
 const _ = db.command
@@ -87,6 +89,105 @@ export const charactersTakingARest: AiCharacter[] = [
 
 type BaseChatResolver = (res: OaiChatCompletion | undefined) => void
 type BufferResolver = (res: Buffer | undefined) => void
+
+
+export const txt2TxtAiWorkers: LiuAi.AiWorker[] = [
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen-plus-2025-04-28",
+    character: "tongyi-qwen",
+    stream: true,
+  },
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen-plus-2025-01-25",
+    character: "tongyi-qwen",
+  },
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen3-235b-a22b",
+    character: "tongyi-qwen",
+    stream: true,
+  },
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen-turbo",
+    character: "tongyi-qwen",
+    stream: true,
+  },
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen-turbo-latest",
+    character: "tongyi-qwen",
+    stream: true,
+  },
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen-turbo-2025-04-28",
+    character: "tongyi-qwen",
+    stream: true,
+  }
+]
+
+// export const txt2TxtAiWorkers: LiuAi.AiWorker[] = [
+//   {
+//     computingProvider: "minimax",
+//     model: "MiniMax-M1",
+//     character: "hailuo",
+//   }
+// ]
+
+
+export const img2TxtWorkers: LiuAi.AiWorker[] = [
+  {
+    computingProvider: "stepfun",
+    model: "step-r1-v-mini",
+    character: "yuewen",
+  },
+  {
+    computingProvider: "zhipu",
+    model: "glm-4v-plus-0111",
+    character: "zhipu",
+  },
+  {
+    computingProvider: "minimax",
+    model: "MiniMax-Text-01",
+    character: "hailuo",
+  },
+
+  // qwen vl
+  // https://bailian.console.aliyun.com/?tab=model#/model-market/detail/qwen-vl-max?modelGroup=qwen-vl-max
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen-vl-max",
+    character: "tongyi-qwen",
+  },
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen-vl-max-latest",
+    character: "tongyi-qwen",
+  },
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen-vl-max-2025-01-25",
+    character: "tongyi-qwen",
+  },
+
+  // qvq
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qvq-max-2025-03-25",
+    character: "tongyi-qwen",
+    stream: true,
+  },
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qvq-max-latest",
+    character: "tongyi-qwen",
+    stream: true,
+  }
+]
+
 
 export class BaseLLM {
   protected _client: OpenAI | undefined
@@ -163,6 +264,12 @@ export class BaseLLM {
     _this._tryTimes++
     const copiedParams = valTool.copyObject(params)
     copiedParams.stream_options = { include_usage: true }
+
+    // special case for qwen: enable_thinking
+    if(copiedParams.model.startsWith("qwen")) {
+      //@ts-expect-error enable_thinking
+      copiedParams.enable_thinking = true
+    }
 
     let usage: LiuAi.Usage | undefined
     let id = ""
@@ -464,6 +571,10 @@ export class AiShared {
       apiKey = _env.LIU_ZHIPU_API_KEY
       baseURL = _env.LIU_ZHIPU_BASE_URL
     }
+    else if(p === "jina") {
+      apiKey = _env.LIU_JINA_APIKEY
+      baseURL = _env.LIU_JINA_BASE_URL
+    }
 
     if(apiKey && baseURL) {
       return { apiKey, baseURL }
@@ -556,11 +667,6 @@ export class AiShared {
     const bot = aiBots.find(v => v.character === character)
     if(bot) name = bot.name
     return name
-  }
-
-  static getGzhType() {
-    const _env = process.env
-    return _env.LIU_WX_GZ_TYPE ?? "subscription_account"
   }
 
   static getAiFinishReason(
@@ -996,6 +1102,69 @@ export class AiShared {
     return model
   }
 
+  static fixOutputForLLM(content: string) {
+    const res1 = content.startsWith("<output>")
+    if(!res1) content = "<output>\n" + content
+    const res2 = content.endsWith("</output>")
+    if(!res2) content += "\n</output>"
+    return content
+  }
+
+  static async turnOutputIntoObject<T = Record<string, any>>(
+    content: string,
+  ) {
+    // 1. replace <output> and </output> with <xml> and </xml>
+    const outputStr1 = "<output>"
+    const outputStr2 = "</output>"
+    const len1 = outputStr1.length
+    const len2 = outputStr2.length
+    const tmpLength = content.length
+    if(tmpLength <= len1 + len2) return
+    
+    content = "<xml>" + content.substring(len1)
+    content = content.substring(0, content.length - len2) + "</xml>"
+
+    // 2. turn into object using xml2js
+    let res2 = {} as T
+    const parser = new xml2js.Parser({ explicitArray: false })
+    try {
+      const { xml } = await parser.parseStringPromise(content)
+      res2 = xml
+    }
+    catch(err) {
+      console.warn("AiShared turnOutputIntoObject xml2js.Parser error: ", content)
+      return
+    }
+    return res2
+  }
+
+  static async turnOutputIntoStr(content: string) {
+    const outputStr1 = "<output>"
+    const outputStr2 = "</output>"
+    const len1 = outputStr1.length
+    const len2 = outputStr2.length
+    const tmpLength = content.length
+    if(tmpLength <= len1 + len2) return
+    const newContent = `<xml>${content}</xml>`
+    const parser = new xml2js.Parser({ explicitArray: false })
+
+    let res2: any = {}
+    try {
+      const { xml } = await parser.parseStringPromise(newContent)
+      res2 = xml
+    }
+    catch(err) {
+      console.warn("AiShared turnOutputIntoStr xml2js.Parser error: ", newContent)
+      return
+    }
+
+    console.log("turnOutputIntoStr res2: ", res2)
+    const res3 = res2.output
+    if(valTool.isStringWithVal(res3)) {
+      return res3
+    }
+  }
+
 }
 
 
@@ -1111,8 +1280,7 @@ export class TellUser {
     suffixMessage: string,
     fromCharacter?: AiCharacter
   ) {
-    const _env = process.env
-    const gzhType = AiShared.getGzhType()
+    const gzhType = CommonShared.getGzhType()
     const { wx_gzh_openid, user } = entry
     const { t } = useI18n(aiLang, { user })
 
@@ -3320,4 +3488,404 @@ export class LogHelper {
     console.log(printMsg)
   }
 
+}
+
+
+export class LiuEmbedding {
+
+  private _jina_model = "jina-embeddings-v4"
+  private _gitee_model = "jina-clip-v2"
+  private _dimensions = 1024
+
+  private _tongyi_text_model = "text-embedding-v4"
+  private _tongyi_multi_model = "multimodal-embedding-v1"
+  private _tongyi_multi_url = "https://dashscope.aliyuncs.com/api/v1/services/embeddings/multimodal-embedding/multimodal-embedding"
+
+  private _zhipu_model = "embedding-3"
+
+  async run(input: LiuAi.EmbeddingInput[]) {
+
+    // 1. using jina first
+    let res = await this.runByJina(input)
+    if(res) return res
+
+    // 2. using tongyi
+    res = await this.runByTongyi(input)
+    if(res) return res
+
+    // 3. using zhipu
+    res = await this.runByZhipu(input)
+    return res
+  }
+
+  private async _runWithOpenAICompatible(
+    apiEndpoint: LiuAi.ApiEndpoint,
+    model: string,
+    input: string[] | string,
+  ) {
+    try {
+      const client = new OpenAI(apiEndpoint)
+      const t1 = getNowStamp()
+      const res = await client.embeddings.create({
+        model,
+        input,
+        dimensions: this._dimensions,
+      })
+      const t2 = getNowStamp()
+      this._log(res, t2 - t1, apiEndpoint.baseURL)
+      console.log(`${model} using OpenAICompatible cost ${t2 - t1} ms`)
+      return res as LiuAi.EmbeddingResult
+    }
+    catch(err) {
+      console.warn("fail to get embedding by openai compatible")
+      console.log(err)
+    }
+  }
+
+  private _log(
+    res: LiuAi.EmbeddingResult,
+    costDuration: number,
+    baseUrl: string,
+  ) {
+    const usage = res.usage
+    if(!usage) return
+
+    const logCol = db.collection("LogAi")
+    const b1 = getBasicStampWhileAdding()
+    const aLog: Partial_Id<Table_LogAi> = {
+      ...b1,
+      infoType: "cost-embedding",
+      costUsage: usage,
+      costBaseUrl: baseUrl,
+      model: res.model,
+      costDuration,
+    }
+    logCol.add(aLog)
+  }
+
+  private async _runWithLiuReq(
+    url: string,
+    apiKey: string,
+    model: string,
+    input: LiuAi.EmbeddingInput[],
+  ) {
+    const headers = {
+      "Authorization": `Bearer ${apiKey}`,
+    }
+    const body = {
+      model,
+      dimensions: this._dimensions,
+      input,
+    }
+
+    try {
+      const t1 = getNowStamp()
+      const res1 = await liuReq(url, body, { headers })
+      const t2 = getNowStamp()
+      const durationStamp = t2 - t1
+      console.log(`${model} cost ${durationStamp} ms`)
+  
+      const rData = res1.data as LiuAi.EmbeddingResult
+      if(res1.code !== "0000" || !rData) {
+        console.warn(`${model} fail to get embedding`)
+        console.log(res1)
+        return
+      }
+      this._log(rData, durationStamp, url)
+      return rData
+    }
+    catch(err) {
+      console.warn("fail to get embedding by liuReq")
+      console.log(err)
+    }
+  }
+
+  async runByZhipu(
+    input: LiuAi.EmbeddingInput[],
+    apiEndpoint?: LiuAi.ApiEndpoint,
+  ) {
+    // 0. define total result
+    const totalResult: LiuAi.Res_Embedding = {
+      computingProvider: "zhipu",
+    }
+
+    // 1. get apiEndpoint if not provided
+    if(!apiEndpoint) {
+      apiEndpoint = AiShared.getEndpointFromProvider("zhipu")
+      if(!apiEndpoint) {
+        console.warn("there is no api key and base url for zhipu")
+        return totalResult
+      }
+    }
+
+    // 2. has something out of text
+    let hasOtherOutOfText = false
+    const texts: string[] = []
+    input.forEach(v => {
+      if(v && (v as any).text) {
+        texts.push((v as any).text)
+      }
+      else {
+        hasOtherOutOfText = true
+      }
+    })
+    if(hasOtherOutOfText) {
+      console.warn("zhipu only supports texts for embedding")
+      return totalResult
+    }
+
+    // 3. run
+    const res3 = await this._runWithOpenAICompatible(
+      apiEndpoint,
+      this._zhipu_model,
+      texts,
+    )
+    totalResult.originalResult = res3
+    return totalResult
+  }
+
+  async runByTongyi(
+    input: LiuAi.EmbeddingInput[],
+    apiEndpoint?: LiuAi.ApiEndpoint,
+  ) {
+    // 0. define total result
+    const totalResult: LiuAi.Res_Embedding = {
+      computingProvider: "aliyun-bailian",
+    }
+
+    // 1. get apiEndpoint if not provided
+    if(!apiEndpoint) {
+      apiEndpoint = AiShared.getEndpointFromProvider("aliyun-bailian")
+      if(!apiEndpoint) {
+        console.warn("there is no api key and base url for aliyun-bailian")
+        return totalResult
+      }
+    }
+
+    // 2. check out if we have to use multimodal
+    const allText: string[] = []
+    let usingMulti = false
+    input.forEach(v => {
+      if(v && (v as any).text) {
+        allText.push((v as any).text)
+      }
+      else {
+        usingMulti = true
+      }
+    })
+
+    // 3. using multi model
+    if(usingMulti) {
+      const res3 = await this._runWithLiuReq(
+        this._tongyi_multi_url,
+        apiEndpoint.apiKey,
+        this._tongyi_multi_model,
+        input,
+      )
+      totalResult.originalResult = res3
+      return totalResult
+    }
+
+    // 4. turn input to all string arr
+    const res4 = await this._runWithOpenAICompatible(
+      apiEndpoint,
+      this._tongyi_text_model,
+      allText,
+    )
+    totalResult.originalResult = res4
+    return totalResult
+  }
+
+  async runByJina(
+    input: LiuAi.EmbeddingInput[],
+    apiEndpoint?: LiuAi.ApiEndpoint,
+  ) {
+    
+    // 1. check out if we can use gitee ai
+    const allText: string[] = []
+    let usingMulti = false
+    input.forEach(v => {
+      if(v && (v as any).text) {
+        allText.push((v as any).text)
+      }
+      else {
+        usingMulti = true
+      }
+    })
+    if(!usingMulti) {
+      const res2 = await this.runByGiteeAI(allText)
+      if(res2?.originalResult?.data) {
+        return res2
+      }
+    }
+
+    // 2. define total result for jina provider
+    const totalResult: LiuAi.Res_Embedding = {
+      computingProvider: "jina",
+    }
+
+    // 3. using Provider Jina
+    if(!apiEndpoint) {
+      apiEndpoint = AiShared.getEndpointFromProvider("jina")
+      if(!apiEndpoint) {
+        console.warn("there is no api key and base url for jina")
+        return totalResult
+      }
+    }
+
+    const { apiKey, baseURL } = apiEndpoint
+    const url = `${baseURL}/embeddings`
+    const res2 = await this._runWithLiuReq(url, apiKey, this._jina_model, input)
+    totalResult.originalResult = res2
+    return totalResult
+  }
+
+  async runByGiteeAI(
+    input: string[],
+    apiEndpoint?: LiuAi.ApiEndpoint,
+  ) {
+    // 1. define total result & get apiEndpoint if not provided
+    const totalResult: LiuAi.Res_Embedding = {
+      computingProvider: "gitee-ai",
+    }
+    if(!apiEndpoint) {
+      apiEndpoint = AiShared.getEndpointFromProvider("gitee-ai")
+      if(!apiEndpoint) {
+        console.warn("there is no api key and base url for gitee ai")
+        return totalResult
+      }
+    }
+
+    // 2. to request
+    const res2 = await this._runWithOpenAICompatible(
+      apiEndpoint,
+      this._gitee_model,
+      input,
+    )
+    totalResult.originalResult = res2
+    return totalResult
+  }
+  
+
+  getOutputs(res: LiuAi.Res_Embedding) {
+    const data = res?.originalResult?.data
+    if(!data || data.length < 1) return
+    return data
+  }
+
+}
+
+
+export class WorkerBase {
+
+  private _workers: LiuAi.AiWorker[] = []
+  private _current: LiuAi.AiWorker | undefined
+
+  constructor(type: "txt2txt" | "img2txt") {
+    if(type === "img2txt") {
+      this._workers = valTool.copyObject(img2TxtWorkers)
+    }
+    else {
+      this._workers = valTool.copyObject(txt2TxtAiWorkers)
+    }
+  }
+
+  private _deleteProvider(p: LiuAi.ComputingProvider) {
+    this._workers = this._workers.filter(v => v.computingProvider !== p)
+  }
+
+  getWorker() {
+    const workers = this._workers
+    const len = workers.length
+    if(len <= 0) return
+    const idx = Math.floor(Math.random() * len)
+    const theWorker = workers[idx]
+    this._deleteProvider(theWorker.computingProvider)
+    this._current = theWorker
+    return theWorker
+  }
+
+  getCurrent() {
+    return this._current
+  }
+
+  async justDoIt(messages: OaiPrompt[]) {
+    // 1. get a worker
+    const worker = this.getWorker()
+    if(!worker) return
+    let apiEndpoint = AiShared.getEndpointFromProvider(worker.computingProvider)
+    if(!apiEndpoint) return
+
+    // 2. run by BaseLLM
+    const llm = new BaseLLM(apiEndpoint.apiKey, apiEndpoint.baseURL)
+    const result = await llm.chat({ 
+      messages, 
+      model: worker.model,
+      stream: worker.stream,
+    })
+
+    return { worker, result }
+  }
+
+
+}
+
+
+/*************** Image Parser (Image to Text) ************/
+
+export interface Param_Img2Txt {
+  image_url: string
+  prompt?: string
+}
+
+
+export class Img2Txt {
+  private _image_url: string
+  private _prompt?: string
+
+  constructor(opt: Param_Img2Txt) {
+    this._image_url = opt.image_url
+    this._prompt = opt.prompt
+  }
+
+  async run() {
+
+    // 1. construct prompts
+    const url = this._image_url
+    const messages: OaiPrompt[] = [
+      {
+        role: "user",
+        content: [
+          {
+            type: "image_url",
+            image_url: { url }
+          },
+          { type: "text", 
+            text: this._prompt || ai_cfg.img2text_prompt,
+          },
+        ]
+      },
+    ]
+
+    // 2. just do it!
+    const workerBase = new WorkerBase("img2txt")
+    let chatRes: OaiChatCompletion | undefined
+    let worker: LiuAi.AiWorker | undefined
+    let res2 = await workerBase.justDoIt(messages)
+    if(!res2 || !res2.result) {
+      res2 = await workerBase.justDoIt(messages)
+    }
+    worker = res2?.worker
+    chatRes = res2?.result
+    if(!chatRes) return
+    
+    // 3. get text
+    const res3 = AiShared.getContentFromLLM(chatRes)
+    if(!res3.content) return
+
+    return {
+      text: res3.content,
+      worker,
+    }
+  }
 }

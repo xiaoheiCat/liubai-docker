@@ -16,6 +16,7 @@ import {
   valTool,
   checkAndGetWxGzhAccessToken,
   RichTexter,
+  getWxGzhUserInfo,
 } from "@/common-util";
 import { commonLang, getCurrentLocale, useI18n } from "@/common-i18n";
 import { wx_reminder_tmpl } from "@/common-config";
@@ -68,6 +69,7 @@ export async function main(ctx: FunctionContext) {
 
   await handle_remind()
   await handle_system_two()
+  await handle_update_unionid()
 
   return { code: "0000" }
 }
@@ -79,6 +81,58 @@ async function handle_system_two() {
   const remainder = min % 5
   if(remainder !== 3) return
   await invoke_by_clock()
+}
+
+async function handle_update_unionid() {
+  const w1 = {
+    wx_unionid: _.exists(false),
+    wx_gzh_openid: _.exists(true),
+    thirdData: {
+      wx_gzh: {
+        subscribe: _.eq(1),
+      }
+    }
+  }
+  const uCol = db.collection("User")
+  const q1 = uCol.where(w1).limit(50).orderBy("insertedStamp", "asc")
+  const res = await q1.get<Table_User>()
+  const users = res.data
+  if (!users || users.length === 0) {
+    console.warn("no need to update unionid")
+    return
+  }
+  const access_token = await checkAndGetWxGzhAccessToken()
+  if (!access_token) {
+    console.warn("handle_update_unionid: access_token is not found")
+    return
+  }
+
+  let updatedNum = 0
+  for (const user of users) {
+    const userId = user._id
+    const wx_gzh_openid = user.wx_gzh_openid
+    if (!wx_gzh_openid || user.wx_unionid) continue
+
+    const userInfoRes = await getWxGzhUserInfo(wx_gzh_openid)
+    if(!userInfoRes) {
+      console.warn("handle_update_unionid: userInfoRes is not found")
+      break
+    }
+
+    const wx_unionid = userInfoRes.unionid
+    if(!wx_unionid) {
+      console.warn("handle_update_unionid: unionid is not found", wx_gzh_openid)
+      console.log(userInfoRes)
+      continue
+    }
+
+    const w2: Partial<Table_User> = { wx_unionid }
+    await uCol.doc(userId).update(w2)
+    updatedNum++
+    await valTool.waitMilli(200)
+  }
+
+  console.log(`update ${updatedNum} for wx_unionid`)
 }
 
 

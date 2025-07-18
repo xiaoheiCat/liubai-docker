@@ -15,8 +15,8 @@ importers:
         specifier: ^16.5.0
         version: 16.5.0
       miniprogram-api-typings:
-        specifier: ^4.0.7
-        version: 4.0.7
+        specifier: ^4.1.0
+        version: 4.1.0
       tsx:
         specifier: ^4.19.3
         version: 4.19.3
@@ -196,8 +196,8 @@ packages:
   get-tsconfig@4.10.0:
     resolution: {integrity: sha512-kGzZ3LWWQcGIAmg6iWvXn0ei6WDtV26wzHRMwDSzmAbcXrTEXxHy6IehI6/4eT6VRKyMP1eF1VqwrVUmE/LR7A==}
 
-  miniprogram-api-typings@4.0.7:
-    resolution: {integrity: sha512-sUxqpA1+JxnDWYjO6ihiLWNJl94WzjlhnDpozfBeC+w8Mpejjsc8JuxyC3Xisimj/gp5OYaJ7nd4fM6wepzhEQ==}
+  miniprogram-api-typings@4.1.0:
+    resolution: {integrity: sha512-4RBsz27nBKyRkVGoNkRaPx24/KeJBw3zaaIlXDR8s/WBh2PbcUAc+q7wLLbp7Qsmb3bLzzUu7tqAti+B06kmjg==}
 
   resolve-pkg-maps@1.0.0:
     resolution: {integrity: sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw==}
@@ -333,7 +333,7 @@ snapshots:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
-  miniprogram-api-typings@4.0.7: {}
+  miniprogram-api-typings@4.1.0: {}
 
   resolve-pkg-maps@1.0.0: {}
 

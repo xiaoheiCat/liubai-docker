@@ -33,6 +33,9 @@ analysis.html
 MP_verify_*
 WW_verify_*
 
+# verify file for WeChat Mini Program
+PdZ0xvU28n.txt
+
 # Sentry Config File
 .env.sentry-build-plugin
 

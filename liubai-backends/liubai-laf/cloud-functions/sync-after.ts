@@ -34,7 +34,6 @@ import {
 } from '@/ai-shared'
 import { commonLang, i18nFill, useI18n } from '@/common-i18n'
 import { getNowStamp } from '@/common-time'
-import xml2js from "xml2js"
 import { LiuReporter } from '@/service-send'
 
 const db = cloud.database()
@@ -727,10 +726,10 @@ class AiCluster {
     }
 
     // 6. fix content
-    const content6 = this.fixContentFromLLM(content5)
+    const content6 = AiShared.fixOutputForLLM(content5)
 
     // 7. turn into object
-    const res7 = await this.turnIntoObject(content6)
+    const res7 = await AiShared.turnOutputIntoObject(content6)
     if(!res7) {
       this._reporter(content5, "xml2js failed in ai cluster")
       return false
@@ -878,42 +877,6 @@ class AiCluster {
     quota.lastAiClusterStamp = now2
     const res2 = await uCol.doc(userId).update({ quota })
     return true
-  }
-
-  private async turnIntoObject(content: string) {
-    // 1. replace <output> and </output> with <xml> and </xml>
-    const outputStr1 = "<output>"
-    const outputStr2 = "</output>"
-    const len1 = outputStr1.length
-    const len2 = outputStr2.length
-    const tmpLength = content.length
-    if(tmpLength <= len1 + len2) return
-    
-    content = "<xml>" + content.substring(len1)
-    content = content.substring(0, content.length - len2) + "</xml>"
-
-    // 2. turn into object using xml2js
-    let res2: Record<string, any> = {}
-    const parser = new xml2js.Parser({ explicitArray: false })
-    try {
-      const { xml } = await parser.parseStringPromise(content)
-      res2 = xml
-    }
-    catch(err) {
-      console.warn("AiCluster xml2js.Parser parse error: ", content)
-      return
-    }
-
-    return res2
-  }
-
-
-  private fixContentFromLLM(content: string) {
-    const res1 = content.startsWith("<output>")
-    if(!res1) content = "<output>\n" + content
-    const res2 = content.endsWith("</output>")
-    if(!res2) content += "\n</output>"
-    return content
   }
 
   private getAiWorker(

@@ -43,8 +43,16 @@ function main() {
   const totalCfg = { ...envCfg, ...pkgCfg }
   const strEnvCfg = JSON.stringify(totalCfg, null, 2)
   const preCfgStr = `export default ${strEnvCfg}`
-  const preCfgPath = path.resolve(__dirname, "../miniprogram/config/pre_config.ts")
+
+  // 1. for main package
+  const link1 = "../miniprogram/config/pre_config.ts"
+  const preCfgPath = path.resolve(__dirname, link1)
   fs.writeFileSync(preCfgPath, preCfgStr)
+
+  // 2. for packageB
+  const link2 = "../miniprogram/packageB/config/pre_config.ts"
+  const preCfgPathB = path.resolve(__dirname, link2)
+  fs.writeFileSync(preCfgPathB, preCfgStr)
 }
 
 main()

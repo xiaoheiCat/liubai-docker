@@ -3,15 +3,10 @@ export default {
     "appName": "留白記事"
   },
   "index": {
-    "title": "留小白的抽屜",
-    "desc": "收藏每一個有趣的靈魂！",
-    "add_my_wechat": "加我微信",
-    "follow_us": "追蹤我們",
-    "slogan": "去掉中間商，直連你的微信",
-    "flow": "🧑‍💻 打造心流",
-    "connect": "🖇️ 連接外部",
-    "map": "🗺️ 路线规划",
-    "dm_me": "💬 加我微信"
+    "slogan": "用留白記事，消滅所有雜事！",
+    "powered_by": "用留白記事，消滅所有雜事",
+    "find_coupon": "找優惠",
+    "create_task": "建任務",
   },
   "shared": {
     "copied": "已複製",
@@ -22,6 +17,11 @@ export default {
     "got_it": "了解",
     "contact_us": "聯繫客服",
     "try_again_later": "請稍後再試",
+    "cannot_use_1": "功能未開放",
+    "privacy_tip": "隱私提示🔏",
+    "ok": "好",
+    "open_mini_1": "前往小程式",
+    "open_mini_2": "請輕觸右下角「前往小程式」",
   },
   "err": {
     "no_data": "找不到耶",
@@ -41,4 +41,14 @@ export default {
     "tip_4": "看太多啦🤯",
     "tip_5": "快去聊天吧！",
   },
+  "coupon-related": {
+    "tip_1": "太多優惠券啦",
+    "tip_2": "去管理一下吧！",
+    "tip_3": "這將會讀取你的剪貼板內容，幫助你快速上傳！",
+    "manage": "去管理",
+    "slogan": "你的優惠券，都被收進留小白的抽屜裡！",
+    "try_1": "試試看，鍵入",
+    "try_2": "“瑞幸”\n“霸王茶姬”\n......",
+    "got_it": "知道了",
+  }
 }
