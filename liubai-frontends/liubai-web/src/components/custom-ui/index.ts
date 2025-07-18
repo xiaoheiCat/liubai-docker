@@ -16,6 +16,7 @@ import { showCommentPopup } from "./comment-popup/tools/useCommentPopup"
 import { showHashtagSelector } from "./hashtag-selector/tools/useHashtagSelector"
 import { showQRCodePopup } from "./qrcode-popup/tools/useQRCodePopup"
 import { showBindPopup } from "./bind-popup/tools/useBindPopup"
+import { browseCode } from "./browse-code/tools/useBrowseCode"
 
 export default {
   showModal,
@@ -36,4 +37,5 @@ export default {
   showCommentPopup,
   showQRCodePopup,
   showBindPopup,
+  browseCode,
 }

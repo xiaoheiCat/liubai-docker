@@ -75,7 +75,8 @@
     "opened": "已開啟",
     "saved": "已保存",
     "closed": "已關閉",
-    "crop": "剪裁"
+    "crop": "剪裁",
+    "click_to_close": "輕觸關閉"
   },
   "editor": {
     "when": "什麼時候",
@@ -107,7 +108,8 @@
     "mail": "寫信",
     "call": "撥號",
     "try_to_open": "嘗試開啟",
-    "one_click": "一鍵視覺化"
+    "one_click": "一鍵視覺化",
+    "expand_code": "展開程式"
   },
   "cui": {
     "plz_input_txt": "請輸入文字"

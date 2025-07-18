@@ -75,7 +75,8 @@
     "opened": "已开启",
     "saved": "已保存",
     "closed": "已关闭",
-    "crop": "剪裁"
+    "crop": "剪裁",
+    "click_to_close": "点击关闭"
   },
   "editor": {
     "when": "什么时候",
@@ -107,7 +108,8 @@
     "mail": "写信",
     "call": "拨号",
     "try_to_open": "尝试打开",
-    "one_click": "一键可视化"
+    "one_click": "一键可视化",
+    "expand_code": "展开代码"
   },
   "cui": {
     "plz_input_txt": "请输入文字"

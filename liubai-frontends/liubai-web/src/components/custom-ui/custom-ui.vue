@@ -18,6 +18,7 @@ const CommentPopup = defineAsyncComponent(() => import("./comment-popup/comment-
 const HashtagSelector = defineAsyncComponent(() => import("./hashtag-selector/hashtag-selector.vue"))
 const QrcodePopup = defineAsyncComponent(() => import("./qrcode-popup/qrcode-popup.vue"))
 const BindPopup = defineAsyncComponent(() => import("./bind-popup/bind-popup.vue"))
+const BrowseCode = defineAsyncComponent(() => import("./browse-code/browse-code.vue"))
 
 </script>
 <template>
@@ -72,7 +73,10 @@ const BindPopup = defineAsyncComponent(() => import("./bind-popup/bind-popup.vue
 
   <!-- Bind account popup -->
   <BindPopup></BindPopup>
-  
+
+  <!-- Browse code -->
+  <BrowseCode></BrowseCode>
+
 </template>
 
 <style scoped lang="scss">

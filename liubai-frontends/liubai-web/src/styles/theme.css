@@ -2,5 +2,11 @@
 
 .theme-common {
   transition: color .3s, background-color .3s;
-  --hover-opacity: 0.5;
+
+  /** about code block */
+  --code-block-bg: #121212;
+  --code-block-gradient: linear-gradient(
+    0deg, rgba(18, 18, 18, 1) 10%, rgba(18, 18, 18, 0.7) 70%, rgba(18, 18, 18, 0.1) 96%
+  );
+  --code-btn-text: #a0a0a0;
 }
