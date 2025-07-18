@@ -9,7 +9,6 @@ import type { TaskDetail } from "./types";
 import { DateUtil } from "~/packageB/utils/date-util";
 import valTool from "~/packageB/utils/val-tool";
 import { LiuApi } from "~/packageB/utils/LiuApi";
-import { ShowTip } from "~/packageB/utils/managers/ShowTip";
 import { useI18n } from "~/packageB/locales/index";
 import { LiuRewardedVideo } from "./liu-rewarded-video";
 import { LiuUtil } from "~/packageB/utils/liu-util/index";
@@ -81,17 +80,16 @@ export function toNotifyMembers(
 
   // 2. handle title
   const desc = detail.desc
-  const title = getNotifyTitle(detail.desc)
+  const title = getNotifyTitle(desc)
   if(!title) {
-    toForward()
+    toForward(id, desc)
     return
   }
   const res2 = Math.abs(desc.length - title.length)
   if(res2 > 5 && title.length < 10) {
-    toForward()
+    toForward(id, desc)
     return
   }
-  
   console.log("getNotifyTitle result:", title)
 
   // 3. handle entrancePath
@@ -110,18 +108,38 @@ export function toNotifyMembers(
       console.warn("notifyGroupMembers fail: ", err)
       const errMsg = err?.errMsg
       if(errMsg.includes("cancel")) return
-      ShowTip.showErrMsg("提醒失败", err)
+      // ShowTip.showErrMsg("提醒失败", err)
+      toForward(id, desc)
     }
   })
 }
 
-export async function toForward(
-  justCreated = false,
+export function toForward(
+  id: string,
+  title?: string,
+  justCreated?: boolean,
 ) {
-  const { t } = useI18n()
-  const key = justCreated ? "task-detail.forward_1" : "task-detail.forward_2"
-  const title = t(key)
-  await LiuApi.shareAppMessageToGroup({ title })
+  if(!title) {
+    const { t } = useI18n()
+    title = t("task-detail.forward_2")
+  }
+  const path = `packageB/pages/task-detail/task-detail?id=${id}`
+  let imageUrl = "/packageB/images/shared/task-reminder.jpg"
+  if(justCreated) {
+    imageUrl = "/packageB/images/shared/you-have-a-new-task.jpg"
+  }
+
+  LiuApi.shareAppMessageToGroup({ 
+    title,
+    path,
+    imageUrl,
+    success(res) {
+      console.log("shareAppMessageToGroup success: ", res)
+    },
+    fail(err) {
+      console.warn("shareAppMessageToGroup fail: ", err)
+    }
+  })
 }
 
 function getNotifyTitle(desc: string) {

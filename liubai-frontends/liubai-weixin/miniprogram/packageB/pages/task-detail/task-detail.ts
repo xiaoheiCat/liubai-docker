@@ -104,6 +104,7 @@ Component({
         return
       }
       if(code3 === "PT001") {
+        console.warn("PT001......", id, chatInfo)
         this.youAreNotInTheRoom()
         return
       }
@@ -138,7 +139,7 @@ Component({
       if(!res6.confirm) return
 
       // 7. forward
-      toForward(true)
+      toForward(id, detail.desc, true)
     },
 
     async toUpdateShareMenu() {
@@ -220,7 +221,10 @@ Component({
 
     onTapShare() {
       LiuApi.vibrateShort({ type: "medium" })
-      toForward()
+      const { detail, _id } = this.data
+      if(!detail || !_id) return
+
+      toForward(_id, detail.desc)
     },
 
     onTapCreateTask() {

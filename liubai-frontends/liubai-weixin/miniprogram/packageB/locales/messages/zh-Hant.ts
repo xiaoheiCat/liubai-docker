@@ -44,7 +44,6 @@ export default {
     "created_1": "你剛創建了任務🤸",
     "created_2": "請轉發給 TA，否則之後會找不到",
     "created_3": "請轉發到群組，否則之後會找不到",
-    "forward_1": "我創建了任務",
     "forward_2": "任務提醒",
     "closed_1": "任務已結束",
     "assign_to": "指派給",

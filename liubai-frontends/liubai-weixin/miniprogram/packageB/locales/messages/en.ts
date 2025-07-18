@@ -47,7 +47,6 @@ export default {
     "created_1": "You've just created a task 🤸",
     "created_2": "Forward please, otherwise you won't find it later",
     "created_3": "Forward to group please, otherwise you won't find it later",
-    "forward_1": "I've created a task",
     "forward_2": "Task Reminder",
     "closed_1": "Task CLOSED",
     "assign_to": "Assign to",

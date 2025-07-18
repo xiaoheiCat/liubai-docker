@@ -17,8 +17,8 @@ export class TaskManager {
     const res0 = await LiuTunnel.takeStuff<WxMiniAPI.ChatInfo>("wx-chat-info")
     if(res0) {
       this.chatInfo = res0
+      return true
     }
-    if(this.chatInfo) return true
 
     // 1. login first
     const res1 = await LiuApp.autoLogin()
