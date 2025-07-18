@@ -634,8 +634,6 @@ async function login_with_wechat_gzh(
     thirdData = { wx_gzh }
   }
   const res4 = await init_user(body, { wx_gzh_openid }, thirdData)
-  console.log("init_user: ")
-  console.log(res4.data)
 
   // 5. update user's tag (language) for wx gzh
   const data5 = res4.data

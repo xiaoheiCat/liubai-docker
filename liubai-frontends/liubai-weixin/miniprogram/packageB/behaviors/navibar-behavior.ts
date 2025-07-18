@@ -137,7 +137,7 @@ export function navibarBehavior() {
           height3 = Math.max(0, height3)
           newData.height3 = height3
   
-          console.log("navibarBehavior new data: ", newData)
+          // console.log("navibarBehavior new data: ", newData)
   
           if(valTool.objHasAnyKey(newData)) {
             this.setData(newData)

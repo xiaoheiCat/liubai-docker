@@ -78,7 +78,6 @@ export async function waitForCreateTask() {
 
   // 1. handle loading 
   let isShowLoading = false
-  console.log("see hasCreatedTask: ", hasCreatedTask)
   if(!hasCreatedTask) {
     isShowLoading = true
     LiuUtil.showCustomLoading({ title_key: "shared.hold_on" })
@@ -128,9 +127,6 @@ async function navigateToDetailById(id: string) {
   const url = `/packageB/pages/task-detail/task-detail?id=${id}`
   LiuApi.navigateTo({ 
     url,
-    success(res) {
-      console.log("navigateToDetailById success 111: ", res)
-    },
     fail(err) {
       console.warn("navigateToDetailById fail 111: ", err)
     }

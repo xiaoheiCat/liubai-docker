@@ -60,7 +60,7 @@ Component({
       const now = LiuTime.getTime()
       this.setData({ _whenLoadStamp: now, _id: id })
 
-      this.getTaskDetail()
+      this.getTaskDetail(true)
     },
 
     async onShow() {
@@ -81,18 +81,26 @@ Component({
         }
       }
 
-      this.getTaskDetail()
+      this.getTaskDetail(false)
     },
 
-    async getTaskDetail() {
+    async getTaskDetail(
+      justOnLoad: boolean,
+    ) {
       // 1. get param
       const id = this.data._id
       if(!id) return
 
       // 2. wait for chatInfo
-      const res2 = await TaskManager.init()
+      if(justOnLoad) {
+        const res2 = await TaskManager.init()
+        if(!res2) {
+          this.youAreNotInTheRoom()
+          return
+        }
+      }
       const chatInfo = TaskManager.getChatInfo()
-      if(!res2 || !chatInfo) {
+      if(!chatInfo) {
         this.youAreNotInTheRoom()
         return
       }
@@ -158,7 +166,7 @@ Component({
         participant = detail.assignees
       }
 
-      const res = await LiuApi.updateShareMenu({
+      await LiuApi.updateShareMenu({
         withShareTicket: true,
         isUpdatableMessage: true,
         activityId,
@@ -170,7 +178,6 @@ Component({
           templateId: "4A68CBB88A92B0A9311848DBA1E94A199B166463",
         },
       })
-      console.log("updateShareMenu res: ", res)
     },
     
     onTapCreator() {
