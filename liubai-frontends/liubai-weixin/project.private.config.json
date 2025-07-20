@@ -2,43 +2,9 @@
   "libVersion": "3.8.5",
   "condition": {
     "miniprogram": {
-      "list": [
-        {
-          "name": "创建任务",
-          "pathName": "packageB/pages/task-create/task-create",
-          "query": "",
-          "scene": 1158,
-          "launchMode": "default",
-          "groupInfo": {
-            "groupIdx": 1,
-            "groupName": "测试模拟群1"
-          }
-        },
-        {
-          "name": "index",
-          "pathName": "pages/index/index",
-          "query": "",
-          "launchMode": "singlePage",
-          "scene": null
-        },
-        {
-          "name": "视频",
-          "pathName": "packageA/pages/watch-video/watch-video",
-          "query": "r=67ab7836f1028b7bcc3d7776",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "showcase",
-          "pathName": "pages/showcase/showcase",
-          "query": "",
-          "launchMode": "embedded",
-          "scene": null
-        }
-      ]
+      "list": []
     }
   },
-  "projectname": "liubai-weixin",
   "setting": {
     "urlCheck": false,
     "coverView": false,

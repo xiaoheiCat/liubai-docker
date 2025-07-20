@@ -181,8 +181,14 @@ export class LiuApi {
   static async setClipboardData(
     opt: WechatMiniprogram.SetClipboardDataOption,
   ) {
-    const res = await wx.setClipboardData(opt)
-    return res
+    try {
+      const res = await wx.setClipboardData(opt)
+      return res
+    }
+    catch(err) {
+      console.warn("setClipboardData err: ", err)
+      return
+    }
   }
 
   static async showToast(opt: WechatMiniprogram.ShowToastOption) {

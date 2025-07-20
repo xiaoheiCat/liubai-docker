@@ -26,6 +26,7 @@ import { waitForCreateTask } from "../shared/useTaskCreate";
 import { envData } from "~/packageB/config/env-data";
 import { pageBehavior } from "~/packageB/behaviors/page-behavior";
 import { checkNameExisted } from "../shared/some-funcs";
+import { defaultData } from "~/packageB/config/default-data";
 
 Component({
 
@@ -44,6 +45,7 @@ Component({
     pageName: "task-detail",
     _id: "",
     _whenLoadStamp: 0,
+    _justCreated: false,
     detail: null as TaskDetail | null,
     pState: pageStates.LOADING,
     errTip: "",
@@ -58,7 +60,14 @@ Component({
       const id = query.id
       if(!id || typeof id !== "string") return
       const now = LiuTime.getTime()
-      this.setData({ _whenLoadStamp: now, _id: id })
+      const pages = LiuApi.getPages()
+      const pLength = pages.length
+      let bind: Record<string, any> = {
+        _whenLoadStamp: now,
+        _id: id
+      }
+      if(pLength === 1) bind.alwaysGoHome = true
+      this.setData(bind)
 
       this.getTaskDetail(true)
     },
@@ -126,10 +135,8 @@ Component({
 
       // 4. show
       const detail = showDetail(chatInfo, data3)
-      this.setData({ detail, pState: pageStates.OK, alwaysGoHome: false })
-      if(detail.isMyTask) {
-        this.toUpdateShareMenu()
-      }
+      this.setData({ detail, pState: pageStates.OK })
+      this.toUpdateShareMenu()
 
       // 5. if just created
       const res5 = await LiuTunnel.takeStuff<JustCreateTask>("just-create-task")
@@ -148,6 +155,7 @@ Component({
         confirm_key: "shared.ok",
       })
       if(!res6.confirm) return
+      this.data._justCreated = true
 
       // 7. forward
       toForward(id, detail.desc, true)
@@ -158,13 +166,17 @@ Component({
       if(!detail) return
       const activityId = detail.activity_id
       if(!activityId) return
+      const { endStamp } = detail
+      const now1 = LiuTime.getTime()
+      if(endStamp && now1 > endStamp) return
 
       let chooseType = 2  // 表示群内所有成员均为参与者（包括后加入群）
       let participant: string[] | undefined
-      if(detail.hasAnyIncomplete) {
+      if(detail.assignees.length > 0) {
         chooseType = 1    // 表示按指定的 participant 当作参与者
         participant = detail.assignees
       }
+      const templateId = defaultData.chat_tool_tmpl_id_1
 
       await LiuApi.updateShareMenu({
         withShareTicket: true,
@@ -175,7 +187,7 @@ Component({
         participant,
         templateInfo: {
           parameterList: [],
-          templateId: "4A68CBB88A92B0A9311848DBA1E94A199B166463",
+          templateId,
         },
       })
     },
@@ -231,10 +243,10 @@ Component({
 
     onTapShare() {
       LiuApi.vibrateShort({ type: "medium" })
-      const { detail, _id } = this.data
+      const { detail, _id, _justCreated } = this.data
       if(!detail || !_id) return
 
-      toForward(_id, detail.desc)
+      toForward(_id, detail.desc, _justCreated)
     },
 
     onTapCreateTask() {
@@ -247,11 +259,13 @@ Component({
       const { detail, _id } = this.data
       if(!detail || !_id) return
 
-      const res1 = await LiuUtil.showCustomModal({
-        title: "📥",
-        content_key: "task-detail.close_1",
-      })
-      if(!res1.confirm) return
+      if(detail.hasAnyIncomplete) {
+        const res1 = await LiuUtil.showCustomModal({
+          title: "📥",
+          content_key: "task-detail.close_1",
+        })
+        if(!res1.confirm) return
+      }
 
       const bind: Record<string, any> = {}
       bind["detail.closedStamp"] = LiuTime.getTime()

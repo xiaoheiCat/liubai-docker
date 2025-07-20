@@ -15,7 +15,9 @@ export default {
     "privacy_tip": "Privacy 🔏",
     "ok": "OK",
     "hold_on": "Hold on",
-    "view": "View"
+    "view": "View",
+    "copied_link": "Link Copied",
+    "open_it_with_browser": "Open it with browser",
   },
   "err": {
     "no_data": "Nothing Here",
@@ -31,6 +33,7 @@ export default {
     "group_1": "It may not work in groups with less than four people. We have already reported this issue to WeChat team!",
     "not_in_room_1": "You are not in the chat",
     "not_in_room_2": "Please confirm that you have not deleted this friend related to the task, or you are still in the group chat.",
+    "select_group_members_fail": "Fail to select group members. The issue is from WeChat team. Welcome to report it to them!",
   },
   "task-create": {
     "title": "New",

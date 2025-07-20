@@ -9,6 +9,7 @@ import { ShowTip } from "~/packageB/utils/managers/ShowTip";
 import { prePost } from "../shared/useTaskCreate";
 import { pageBehavior } from "../../behaviors/page-behavior";
 import { checkNameExisted } from "../shared/some-funcs";
+import { LiuUtil } from "~/packageB/utils/liu-util/index";
 
 Component({
 
@@ -56,6 +57,30 @@ Component({
         return
       }
 
+      const _setClipboard = async () => {
+        const link = defaultData.issue_1
+        const res = await LiuApi.setClipboardData({ data: link })
+        const errMsg = res?.errMsg ?? ""
+        if(!errMsg.endsWith("ok")) return
+        LiuUtil.showCustomModal({
+          title_key: "shared.copied_link",
+          content_key: "shared.open_it_with_browser",
+          showCancel: false,
+        })
+      }
+
+      const _showErr = () => {
+        LiuUtil.showCustomModal({
+          title: "selectGroupMembers:fail",
+          content_key: "err.select_group_members_fail",
+          confirm_key: "shared.ok",
+          success(res) {
+            if(!res.confirm) return
+            _setClipboard()
+          }
+        })
+      }
+
       LiuApi.selectGroupMembers({ 
         maxSelectCount: 20,
         success(res1) {
@@ -63,6 +88,10 @@ Component({
         },
         fail(err) {
           console.warn("selectGroupMembers fail: ", err)
+          const errMsg = err.errMsg
+          if(errMsg === "selectGroupMembers:fail ") {
+            _showErr()
+          }
         }
       })
     },

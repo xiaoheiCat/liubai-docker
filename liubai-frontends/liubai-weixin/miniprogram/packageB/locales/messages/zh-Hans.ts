@@ -12,7 +12,9 @@ export default {
     "privacy_tip": "隐私提示🔏",
     "ok": "好",
     "hold_on": "请稍等",
-    "view": "去查看"
+    "view": "去查看",
+    "copied_link": "已复制链接",
+    "open_it_with_browser": "请前往浏览器打开",
   },
   "err": {
     "no_data": "找不到耶",
@@ -28,6 +30,7 @@ export default {
     "group_1": "三个人以下的小群可能会遭遇 Bug，我们已经向微信团队反馈了！",
     "not_in_room_1": "你似乎不在聊天室中",
     "not_in_room_2": "请确认你没有删除对方好友或仍在群聊中",
+    "select_group_members_fail": "选择群成员失败，该问题来自于微信团队，欢迎你向他们反馈！",
   },
   "task-create": {
     "title": "创建任务",

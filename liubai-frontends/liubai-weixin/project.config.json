@@ -1,5 +1,6 @@
 {
-  "description": "项目配置文件",
+  "projectname": "liubai-weixin",
+  "description": "这是 Liubai for Weixin 项目配置文件",
   "miniprogramRoot": "miniprogram/",
   "compileType": "miniprogram",
   "setting": {
@@ -41,7 +42,7 @@
     "tabIndent": "insertSpaces",
     "tabSize": 2
   },
-  "libVersion": "trial",
+  "libVersion": "widelyUsed",
   "packOptions": {
     "ignore": [],
     "include": []
