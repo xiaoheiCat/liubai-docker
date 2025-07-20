@@ -106,7 +106,7 @@ const onTapTopFooterBtn = () => {
         @cansubmit="(newV) => cpData.canSubmit = newV"
       ></CommentEditor>
 
-      <div class="cp-virtual"></div>
+      <div class="cp-virtual-bottom"></div>
 
     </div>
 
@@ -170,7 +170,7 @@ const onTapTopFooterBtn = () => {
   width: 100%;
   padding: 10px 14px 0px;
   box-sizing: border-box;
-  max-height: min(500px, 90vh);
+  max-height: min(600px, 90vh);
   overflow: auto;
   position: relative;
   z-index: 2511;
@@ -285,7 +285,7 @@ const onTapTopFooterBtn = () => {
   position: relative;
 }
 
-.cp-virtual {
+.cp-virtual-bottom {
   width: 90%;
   height: 14px;
 }
@@ -307,6 +307,10 @@ const onTapTopFooterBtn = () => {
     border-radius: 24px 24px 0px 0px;
     transform: translateY(100%);
     opacity: .48;
+  }
+
+  .cp-virtual-bottom {
+    height: 50px;
   }
 }
 
