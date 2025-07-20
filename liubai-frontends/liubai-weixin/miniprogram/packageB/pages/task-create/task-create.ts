@@ -58,7 +58,7 @@ Component({
       }
 
       const _setClipboard = async () => {
-        const link = "https://developers.weixin.qq.com/community/develop/doc/000c6c6fe4cb584cc093b65b06bc00"
+        const link = defaultData.issue_1
         const res = await LiuApi.setClipboardData({ data: link })
         const errMsg = res?.errMsg ?? ""
         if(!errMsg.endsWith("ok")) return
@@ -72,7 +72,7 @@ Component({
       const _showErr = () => {
         LiuUtil.showCustomModal({
           title: "selectGroupMembers:fail",
-          content: "选择群成员失败，该问题来自于微信团队，欢迎你向他们反馈！",
+          content_key: "err.select_group_members_fail",
           confirm_key: "shared.ok",
           success(res) {
             if(!res.confirm) return

@@ -12,6 +12,8 @@ export const defaultData = {
   duration_ms_2: 500,     // 一个常用的等待时间，用于一些后台请求，去分散频繁调用网络所使用
 
   chat_tool_tmpl_id_1: "4A68CBB88A92B0A9311848DBA1E94A199B166463",
+
+  issue_1: "https://developers.weixin.qq.com/community/develop/doc/000c6c6fe4cb584cc093b65b06bc00",
 }
 
 export const colorData = {
