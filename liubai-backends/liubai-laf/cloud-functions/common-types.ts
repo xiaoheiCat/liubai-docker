@@ -1918,6 +1918,7 @@ export interface Table_WxBond extends BaseTable {
 
 export interface Table_WxTask extends BaseTable {
   oState: OState_Cool
+  infoType: "TASK" | "ACTIVITY"
   taskState: "DEFAULT" | "CLOSED"
   owner_userid: string
   owner_openid: string
@@ -1926,6 +1927,7 @@ export interface Table_WxTask extends BaseTable {
   chat_type: WxMiniAPI.ChatType
   desc: string
   assigneeList: PeopleTasksAPI.AssigneeItem[]
+  participatorList?: PeopleTasksAPI.ParticipatorItem[]
   related_openids: string[]
   activity_id?: string
   endStamp?: number
@@ -4371,10 +4373,16 @@ export namespace PeopleTasksAPI {
     group_openid: string
     doneStamp?: number
   }
+
+  export interface ParticipatorItem {
+    group_openid: string
+    engagedStamp?: number
+  }
   
   export interface Res_GetWxTask {
     operateType: "get-wx-task"
     id: string
+    infoType: "TASK" | "ACTIVITY"
     activity_id?: string
     desc: string
     owner_openid: string
@@ -4382,6 +4390,7 @@ export namespace PeopleTasksAPI {
     open_single_roomid?: string
     chat_type: number
     assigneeList: AssigneeItem[]
+    participatorList?: ParticipatorItem[]
     insertedStamp: number
     editedStamp?: number
     endStamp?: number

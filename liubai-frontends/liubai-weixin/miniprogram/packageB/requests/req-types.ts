@@ -102,6 +102,7 @@ export namespace PeopleTasksAPI {
   
   export interface Res_GetWxTask {
     operateType: "get-wx-task"
+    infoType: "TASK" | "ACTIVITY"
     id: string
     activity_id?: string
     desc: string

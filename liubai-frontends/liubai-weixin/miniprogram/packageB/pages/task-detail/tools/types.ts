@@ -13,7 +13,10 @@ export interface TaskDetail {
   postedTimeStr: string
 
   // calculate some state
-  isMyTask: boolean
+  isMine: boolean
   hasAnyIncomplete: boolean
   canIComplete: boolean
+
+  // activity
+  isActivity: boolean
 }

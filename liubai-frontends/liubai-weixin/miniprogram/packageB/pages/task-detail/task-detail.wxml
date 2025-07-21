@@ -73,7 +73,7 @@
       </view>
 
       <!-- Buttons for owner -->
-      <view wx:if="{{!detail.closedStamp && detail.isMyTask}}" class="td-buttons">
+      <view wx:if="{{!detail.closedStamp && detail.isMine}}" class="td-buttons">
 
         <!-- Reminder -->
         <custom-button wx:if="{{detail.hasAnyIncomplete}}" catchtap="onTapReminder">

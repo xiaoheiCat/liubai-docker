@@ -24,7 +24,7 @@ import {
   liuReq, 
   SafeGuard,
 } from '@/common-util'
-import { notifyWxToCloseTask } from '@/people-tasks'
+import { notifyWxToCloseChatTool } from '@/people-tasks'
 
 const db = cloud.database()
 const _ = db.command
@@ -58,6 +58,7 @@ async function checkWxTasks() {
   const ONE_DAY_AGO = HR_23_AGO - HOUR
   const w1 = {
     oState: "OK",
+    infoType: "TASK",
     taskState: "DEFAULT",
     updatedStamp: _.lt(HR_23_AGO),
     assigneeList: _.elemMatch({
@@ -93,7 +94,7 @@ async function checkWxTasks() {
     // notify wechat
     const activity_id = v.activity_id
     if(!activity_id) continue
-    const resFromWx = await notifyWxToCloseTask(activity_id)
+    const resFromWx = await notifyWxToCloseChatTool(activity_id, false)
     if(!resFromWx.pass) {
       console.warn("fail to notify wechat to close task: ", activity_id)
       console.log(resFromWx)

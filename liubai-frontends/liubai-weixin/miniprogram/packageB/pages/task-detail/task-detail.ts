@@ -176,7 +176,10 @@ Component({
         chooseType = 1    // 表示按指定的 participant 当作参与者
         participant = detail.assignees
       }
-      const templateId = defaultData.chat_tool_tmpl_id_1
+      let templateId = defaultData.task_tmpl_id
+      if(detail.isActivity) {
+        templateId = defaultData.activity_tmpl_id
+      }
 
       await LiuApi.updateShareMenu({
         withShareTicket: true,

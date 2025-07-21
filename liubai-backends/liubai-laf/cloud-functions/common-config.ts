@@ -48,7 +48,8 @@ export const wx_expired_tmpl = {
 
 
 export const ppl_system_cfg = {
-  chat_tool_tmpl_id_1: "4A68CBB88A92B0A9311848DBA1E94A199B166463",
+  task_tmpl_id: "4A68CBB88A92B0A9311848DBA1E94A199B166463",
+  activity_tmpl_id: "2A84254B945674A2F88CE4970782C402795EB607",
   coming_soom_hrs: 3,
 }
 

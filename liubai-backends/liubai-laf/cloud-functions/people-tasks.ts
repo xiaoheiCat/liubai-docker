@@ -90,15 +90,16 @@ async function close_wx_task(
   // if(now3 >= (endStamp - SECOND)) return { code: "0000" }
 
   // get to notify
-  await notifyWxToCloseTask(activity_id)
+  await notifyWxToCloseChatTool(activity_id, data1.infoType === "ACTIVITY")
   
   return { code: "0000" }
 }
 
-export async function notifyWxToCloseTask(
+export async function notifyWxToCloseChatTool(
   activity_id: string,
+  isActivity: boolean,
 ) {
-  const tmpl_id = ppl_system_cfg.chat_tool_tmpl_id_1
+  const tmpl_id = isActivity ? ppl_system_cfg.activity_tmpl_id : ppl_system_cfg.task_tmpl_id
   const target_state = 3
   const res4 = await WxMiniHandler.setChatToolMsg(activity_id, target_state, tmpl_id)
   return res4
@@ -121,6 +122,7 @@ async function complete_wx_task(
   if(!data1 || data1.oState !== "OK") {
     return { code: "E4004", errMsg: "no such task" }
   }
+  const isActivity = data1.infoType === "ACTIVITY"
   
   // 2. find my bond about the chat
   const w2: Partial<Table_WxBond> = {
@@ -142,41 +144,61 @@ async function complete_wx_task(
   }
 
   // 3. update the state
+  const now3 = getNowStamp()
+  const u3: Record<string, any> = { updatedStamp: now3 }
   const assigneeList = data1.assigneeList
   const related_openids = data1.related_openids
-  const myAssignee = assigneeList.find(v => v.group_openid === my_group_openid)
-  if(!myAssignee) {
-    return { code: "PT002", errMsg: "you are not the assignee of this task" }
+  const participatorList = data1.participatorList ?? []
+  let idx3 = -1
+  if(isActivity) {
+    const myParticipator = participatorList.find(v => {
+      if(v.engagedStamp && v.group_openid === my_group_openid) return true
+      return false
+    })
+    if(myParticipator) {
+      return { code: "PT003", errMsg: "you have already engaged in this activity" }
+    }
+    const newParticipator: PeopleTasksAPI.ParticipatorItem = {
+      group_openid: my_group_openid,
+      engagedStamp: now3,
+    }
+    u3.participatorList = _.push(newParticipator)
+    idx3 = related_openids.indexOf(my_group_openid)
+    if(idx3 < 0) {
+      u3.related_openids = _.push(my_group_openid)
+    }
   }
-  if(myAssignee.doneStamp) {
-    return { code: "0001" }
-  }
-  const idx3 = related_openids.indexOf(my_group_openid)
-  if(idx3 >= 0) {
-    related_openids.splice(idx3, 1)
+  else {
+    const myAssignee = assigneeList.find(v => v.group_openid === my_group_openid)
+    if(!myAssignee) {
+      return { code: "PT002", errMsg: "you are not the assignee of this task" }
+    }
+    if(myAssignee.doneStamp) {
+      return { code: "0001" }
+    }
+    idx3 = related_openids.indexOf(my_group_openid)
+    if(idx3 >= 0) {
+      related_openids.splice(idx3, 1)
+    }
+    myAssignee.doneStamp = now3
+    u3.assigneeList = assigneeList
+    u3.related_openids = related_openids
   }
 
   // 4. update the task in db
-  const now4 = getNowStamp()
-  myAssignee.doneStamp = now4
-  const u4: Partial<Table_WxTask> = {
-    assigneeList,
-    related_openids,
-    updatedStamp: now4,
-  }
-  await wtCol.doc(id).update(u4)
+  await wtCol.doc(id).update(u3)
 
   // notify wechat if needed
-  const endStamp = data1.endStamp ?? now4
+  const endStamp = data1.endStamp ?? now3
   const activity_id = data1.activity_id
   if(!activity_id) return { code: "0000" }
-  if(now4 >= (endStamp - SECOND)) return { code: "0000" }
+  if(now3 >= (endStamp - SECOND)) return { code: "0000" }
   if(data1.closedStamp) return { code: "0000" }
 
   // get to notify
-  const tmpl_id = ppl_system_cfg.chat_tool_tmpl_id_1
+  const tmpl_id = isActivity ? ppl_system_cfg.activity_tmpl_id : ppl_system_cfg.task_tmpl_id
   const thresholdStamp = endStamp - ppl_system_cfg.coming_soom_hrs * HOUR
-  const isComingSoon = now4 >= thresholdStamp
+  const isComingSoon = now3 >= thresholdStamp
   const target_state = isComingSoon ? 2 : 1
   const myInfo: WxMiniAPI.ChatToolParticipatorInfo = {
     group_openid: my_group_openid,
@@ -231,6 +253,7 @@ async function get_wx_task(
   const data3: PeopleTasksAPI.Res_GetWxTask = {
     operateType: "get-wx-task",
     id: data2._id,
+    infoType: data2.infoType ?? "TASK",
     activity_id: data2.activity_id,
     desc: data2.desc,
     owner_openid: data2.owner_openid,
@@ -238,6 +261,7 @@ async function get_wx_task(
     open_single_roomid: data2.open_single_roomid,
     chat_type: data2.chat_type,
     assigneeList: data2.assigneeList,
+    participatorList: data2.participatorList,
     insertedStamp: data2.insertedStamp,
     endStamp: data2.endStamp,
     closedStamp: data2.closedStamp,
@@ -299,6 +323,7 @@ async function create_wx_task(
   const data6: Partial_Id<Table_WxTask> = {
     ...b6,
     oState: "OK",
+    infoType: assignees.length > 0 ? "TASK" : "ACTIVITY",
     taskState: "DEFAULT",
     owner_userid: userId,
     owner_openid,
