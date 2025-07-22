@@ -1,11 +1,15 @@
 {
   "name": "liubai-weixin",
-  "version": "0.17.0",
+  "version": "0.17.1",
   "description": "Liubai for Weixin",
   "scripts": {
     "pre-build": "tsx build/pre-build.ts"
   },
-  "keywords": ["task", "weixin-miniprogram", "chat-tool"],
+  "keywords": [
+    "task",
+    "weixin-miniprogram",
+    "chat-tool"
+  ],
   "author": "yenche123 <tsuiyenche@outlook.com> (https://github.com/yenche123)",
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
