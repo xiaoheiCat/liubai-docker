@@ -59,6 +59,8 @@ export default {
     "created_time": "Created at: {timeStr}",
     "remind_them": "🛎️ Remind them",
     "remind_ta": "🛎️ Remind",
+    "urge_them": "🛎️ Urge them",
+    "urge_ta": "🛎️ Urge",
     "share_to_group": "Share to group",
     "share_to_ta": "Share to him/her",
     "close_task": "Close task",

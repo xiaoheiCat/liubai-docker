@@ -109,11 +109,21 @@
       <!-- Buttons for assignee still incomplete -->
       <view wx:elif="{{!detail.closedStamp && detail.canIComplete}}" class="td-buttons">
         <!-- Complete -->
-        <custom-button catchtap="onTapCompleteTask">
+        <custom-button wx:if="{{detail.canIComplete}}" catchtap="onTapCompleteTask">
           <text>{{t1.complete_task}}</text>
         </custom-button>
 
-        <!-- Share -->
+        <!-- Urge -->
+        <custom-button wx:elif="{{detail.hasAnyIncomplete}}" catchtap="onTapReminder">
+          <text>{{t1.complete_task}}</text>
+        </custom-button>
+
+        <!-- Share 1 -->
+        <custom-button wx:else catchtap="onTapShare">
+          <text>{{t1.share}}</text>
+        </custom-button>
+
+        <!-- Share 2 -->
         <custom-button btn-type="normal" catchtap="onTapShare">
           <text>{{t1.share}}</text>
         </custom-button>

@@ -56,6 +56,8 @@ export default {
     "created_time": "創建時間: {timeStr}",
     "remind_them": "🛎️ 提醒他們",
     "remind_ta": "🛎️ 提醒 TA",
+    "urge_them": "🛎️ 督促他們",
+    "urge_ta": "🛎️ 督促 TA",
     "share_to_group": "分享到群組",
     "share_to_ta": "分享給 TA",
     "close_task": "關閉任務",
