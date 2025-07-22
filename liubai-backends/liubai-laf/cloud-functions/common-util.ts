@@ -16,7 +16,6 @@ import type {
   Table_User,
   LiuUserInfo,
   SupportedClient,
-  PartialSth,
   LiuRqReturn,
   CryptoCipherAndIV,
   LiuPlainText,
@@ -1731,8 +1730,9 @@ export async function insertToken(
   const expireStamp = now + (30 * DAY)
   const basic1 = getBasicStampWhileAdding()
   const platform = body['x_liu_client'] as SupportedClient
+  const deviceStr = body["x_liu_device"]
   const ip = getIp(ctx)
-  const obj1: PartialSth<Table_Token, "_id"> = {
+  const obj1: Partial_Id<Table_Token> = {
     ...basic1,
     token,
     expireStamp,
@@ -1743,6 +1743,7 @@ export async function insertToken(
     lastRead: now,
     lastSet: now,
     ip,
+    deviceStr,
   }
   if(platform === "ide-extension") {
     const ideType = body["x_liu_ide_type"] as LiuIDEType

@@ -1371,6 +1371,7 @@ export interface Table_Token extends BaseTable {
   ip?: string
   ipGeo?: string
   ideType?: LiuIDEType
+  deviceStr?: string
 }
 
 export interface Table_LoginState extends BaseTable {
