@@ -25,7 +25,6 @@ import { createEmailCode } from '@/common-ids'
 import { LiuDateUtil, liuReq, valTool } from '@/common-util'
 import { ses as TencentSES } from "tencentcloud-sdk-nodejs-ses"
 import { sms as TencentSMS } from "tencentcloud-sdk-nodejs-sms"
-import qiniu from "qiniu"
 
 const db = cloud.database()
 const _ = db.command
@@ -276,90 +275,6 @@ export class LiuTencentSMS {
 
 }
 
-
-/** package Qiniu SMS */
-export class LiuQiniuSMS {
-
-  private static _getMac() {
-    const _env = process.env
-    const ak = _env.LIU_QINIU_ACCESS_KEY
-    const sk = _env.LIU_QINIU_SECRET_KEY
-    if(!ak || !sk) {
-      console.warn("ak and sk are required to generate mac for qiniu")
-      return
-    }
-    const mac = new qiniu.auth.digest.Mac(ak, sk)
-    return mac
-  }
-
-  static sendVerifyCode(
-    code: string,
-    mobile: string,   // 11 digits
-  ): Promise<LiuRqReturn> {
-    // 1. get mac
-    const mac = this._getMac()
-    if(!mac) {
-      const err1: LiuErrReturn = { code: "E5001", errMsg: "no mac while sending sms" }
-      const emptyPro = valTool.getPromise(err1)
-      return emptyPro
-    }
-
-    // 2. get template id
-    const template_id = process.env.LIU_QINIU_SMS_TEMP_ID
-    if(!template_id) {
-      console.warn("LIU_QINIU_SMS_TEMP_ID is required")
-      const err2: LiuErrReturn = { code: "E5001", errMsg: "no template id while sending sms" }
-      const emptyPro = valTool.getPromise(err2)
-      return emptyPro
-    }
-
-    // 3. construct param
-    const reqBody = {
-      template_id,
-      mobile,
-      parameters: {
-        code,
-      }
-    }
-
-    const _send = (a: SendResolver) => {
-      // 1. custom timeout
-      let hasReturn = false
-      const timeout = setTimeout(() => {
-        hasReturn = true
-        console.warn("qiniu sms timeout!")
-        a({ code: "E5005", errMsg: "qiniu sms timeout" })
-      }, 5000)
-
-      // 2. send by qiniu
-      qiniu.sms.message.sendSingleMessage(reqBody, mac, (
-        respErr, respBody, respInfo,
-      ) => {
-        clearTimeout(timeout)
-        if(respErr) {
-          console.warn("sendSingleMessage failed")
-          console.log(respErr)
-
-          if(hasReturn) return
-          a({ code: "E5004", errMsg: "sending sms failed from qiniu" })
-          return
-        }
-        if(!respInfo || respInfo.statusCode !== 200) {
-          console.warn("qiniu sendSingleMessage got a non-200 response")
-          console.log(respInfo)
-        }
-
-        if(hasReturn) return
-        a({ code: "0000" })
-      })
-    }
-    
-    return new Promise(_send)
-  }
-  
-}
-
-
 export interface ResultOfSMS {
   send_channel: "tencent-sms" | "qiniu-sms"
   result: LiuRqReturn
@@ -372,15 +287,8 @@ export class SmsController {
     localNumber: string,
     smsCode: string,
   ): Promise<ResultOfSMS> {
-    // 1. send by qiniu
+    // 1. prepare
     let res: LiuRqReturn
-    res = await LiuQiniuSMS.sendVerifyCode(smsCode, localNumber)
-    if(res.code === "0000") {
-      return {
-        send_channel: "qiniu-sms",
-        result: res,
-      }
-    }
 
     // 2. check out params for tencent sms
     const _env = process.env
