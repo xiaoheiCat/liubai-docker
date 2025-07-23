@@ -4,7 +4,7 @@
 
 ## 🚀 先用再说
 
-<img src="./assets0723/minicode.png" width="200" />
+<img src="./assets0723/minicode.png" width="200" alt="小程序码" />
 
 微信扫一扫👆，立即使用。
 
@@ -14,13 +14,13 @@
 
 在大家都有微信的前提下，无需邀请注册，你可以直接选择群聊里（单聊也适用）的参与者：
 
-<img src="./assets0723/select-group-members.gif" width="360" />
+<img src="./assets0723/select-group-members.gif" width="360" alt="选择群聊成员" />
 
 ### 无需点开，在聊天界面里展示状态
 
 与单聊和群聊深度集成，让你在微信聊天界面里，查看任务状态：
 
-<img src="./assets0723/IMG_5755.JPG" width="250" />
+<img src="./assets0723/IMG_5755.JPG" width="250" alt="聊天界面内任务状态截图" />
 
 ### 一键软提醒
 
@@ -28,7 +28,7 @@
 
 “轻松提醒”，我们都为你想好了：
 
-<img src="./assets0723/reminderr.gif" width="400" style="margin-bottom: 20px" />
+<img src="./assets0723/reminderr.gif" width="400" style="margin-bottom: 20px" alt="一键提醒" />
 
 所有的任务不顺，请全责怪给留白记事！
 
@@ -51,21 +51,21 @@
 
 ### 方法一: 置顶留白记事（推荐）
 
-<img src="../../guide/assets-community/weixin.png" width="360" style="margin-top: 20px" />
+<img src="../../guide/assets-community/weixin.png" width="360" style="margin-top: 20px" alt="留白记事服务号二维码" />
 
 微信扫一扫 ⬆️ 卡片，再如下图所示，置顶留白记事。
 
-<img src="./assets0723/pin.png" width="360" />
+<img src="./assets0723/pin.png" width="360" alt="置顶留白记事" />
 
 以后，你只需要在菜单栏上选择 `记事 // 给别人的` 即可快速新建任务。
 
-<img src="./assets0723/for-others.PNG" width="360" />
+<img src="./assets0723/for-others.PNG" width="360" alt="菜单栏点击给别人的" />
 
 ### 方法二：添加到我的小程序 or 桌面
 
 打开小程序后，点击右上角“...”，如下图所示，即可添加到我的小程序 or 桌面。
 
-<img src="./assets0723/IMG_5761.PNG" width="280" />
+<img src="./assets0723/IMG_5761.PNG" width="280" alt="添加到我的小程序或桌面示例" />
 
 ## ⛵ 结语
 
