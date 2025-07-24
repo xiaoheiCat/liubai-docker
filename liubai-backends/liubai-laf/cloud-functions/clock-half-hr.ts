@@ -23,8 +23,10 @@ import {
   getWwQynbAccessToken, 
   liuReq, 
   SafeGuard,
+  WxMiniHandler,
 } from '@/common-util'
 import { notifyWxToCloseChatTool } from '@/people-tasks'
+import { ppl_system_cfg } from '@/common-config'
 
 const db = cloud.database()
 const _ = db.command
@@ -44,16 +46,46 @@ export async function main(ctx: FunctionContext) {
   clearTokenUser()
   await clearExpiredOrder()
   await checkSecurity()
-  await checkWxTasks()
+  await checkWxTasksToClose()
+  await checkWxTasksForComingSoon()
   // console.log("---------- End 清理缓存程序 ----------")
   // console.log(" ")
 
   return true
 }
 
+export async function checkWxTasksForComingSoon() {
+  const time1 = getNowStamp() + ppl_system_cfg.coming_soom_hrs * HOUR
+  const time2 = Math.floor(time1 + 0.5 * HOUR)
+  const threshold1 = _.gte(time1)
+  const threshold2 = _.lt(time2)
+  const constraint1 = _.and(threshold1, threshold2)
 
+  const w1 = {
+    oState: "OK",
+    taskState: "DEFAULT",
+    activity_id: _.exists(true),
+    endStamp: constraint1,
+  }
+  const wtCol = db.collection("WxTask")
+  const q1 = wtCol.where(w1).limit(50).orderBy("insertedStamp", "asc")
+  const res1 = await q1.get<Table_WxTask>()
+  const tasks = res1.data
+  if(tasks.length < 1) {
+    return true
+  }
 
-async function checkWxTasks() {
+  for(let i=0; i<tasks.length; i++) {
+    const v = tasks[i]
+    const activity_id = v.activity_id as string
+    const isActivity = v.infoType === "ACTIVITY"
+    const tmpl_id = isActivity ? ppl_system_cfg.activity_tmpl_id : ppl_system_cfg.task_tmpl_id
+    await WxMiniHandler.setChatToolMsg(activity_id, 2, tmpl_id)
+  }
+  return true
+}
+
+async function checkWxTasksToClose() {
   const HR_23_AGO = getNowStamp() - HR_23
   const ONE_DAY_AGO = HR_23_AGO - HOUR
   const w1 = {
