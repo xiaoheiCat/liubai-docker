@@ -199,7 +199,7 @@ async function complete_wx_task(
   const endStamp = data1.endStamp ?? now3
   const activity_id = data1.activity_id
   if(!activity_id) return { code: "0000" }
-  if(now3 >= (endStamp - SECOND)) return { code: "0000" }
+  // if(now3 >= (endStamp - SECOND)) return { code: "0000" }
   if(data1.closedStamp) return { code: "0000" }
 
   // get to notify
@@ -409,7 +409,7 @@ async function enter_wx_chat_tool(
 
   // 4. save chat info
   const userId = vRes.userData._id
-  saveChatInfo(userId, res3)
+  await saveChatInfo(userId, res3)
 
   // 5. return data
   const result: PeopleTasksAPI.Res_EnterWxChatTool = {
@@ -435,18 +435,39 @@ async function saveChatInfo(
   }
   const res1 = await wbCol.where(w1).get<Table_WxBond>()
   const list1 = res1.data
-  if(list1.length > 0) return true
 
-  const b2 = getBasicStampWhileAdding()
-  const newData: Partial_Id<Table_WxBond> = {
-    ...b2,
-    infoType: "chat-tool",
-    userId,
-    opengid: chatInfo.opengid,
-    open_single_roomid: chatInfo.open_single_roomid,
-    group_openid,
-    chat_type,
+  const _update = async (row: Table_WxBond) => {
+    const bondId = row._id
+    const now2 = getNowStamp()
+    const u2: Partial<Table_WxBond> = {
+      enterStamp: now2,
+      updatedStamp: now2,
+    }
+    await wbCol.doc(bondId).update(u2)
   }
-  await wbCol.add(newData)
+
+  const _add = async () => {
+    const b2 = getBasicStampWhileAdding()
+    const newData: Partial_Id<Table_WxBond> = {
+      ...b2,
+      enterStamp: b2.insertedStamp,
+      infoType: "chat-tool",
+      userId,
+      opengid: chatInfo.opengid,
+      open_single_roomid: chatInfo.open_single_roomid,
+      group_openid,
+      chat_type,
+    }
+    await wbCol.add(newData)
+  }
+
+  if(list1.length > 0) {
+    const theBond = list1[0]
+    _update(theBond)
+  }
+  else {
+    await _add()
+  }
+  
   return true
 }

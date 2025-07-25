@@ -105,6 +105,12 @@ export const txt2TxtAiWorkers: LiuAi.AiWorker[] = [
   },
   {
     computingProvider: "aliyun-bailian",
+    model: "qwen3-235b-a22b-instruct-2507",
+    character: "tongyi-qwen",
+    stream: true,
+  },
+  {
+    computingProvider: "aliyun-bailian",
     model: "qwen3-235b-a22b",
     character: "tongyi-qwen",
     stream: true,

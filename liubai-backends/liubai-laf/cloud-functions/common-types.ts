@@ -1918,6 +1918,7 @@ export interface Table_WxBond extends BaseTable {
   open_single_roomid?: string
   group_openid?: string
   chat_type?: WxMiniAPI.ChatType
+  enterStamp?: number
 }
 
 export interface Table_WxTask extends BaseTable {
