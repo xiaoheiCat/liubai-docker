@@ -15,7 +15,7 @@ import {
   type Table_WxTask, 
 } from "@/common-types"
 import * as vbot from "valibot"
-import { getBasicStampWhileAdding, getNowStamp, HOUR, SECOND } from "@/common-time"
+import { getBasicStampWhileAdding, getNowStamp, HOUR } from "@/common-time"
 import { ppl_system_cfg } from "@/common-config"
 
 const db = cloud.database()
@@ -61,6 +61,7 @@ async function close_wx_task(
   }
   const userId = vRes.userData._id
 
+  // 1. get task
   const wtCol = db.collection("WxTask")
   const res1 = await wtCol.doc(id).get<Table_WxTask>()
   const data1 = res1.data
@@ -74,20 +75,28 @@ async function close_wx_task(
     return { code: "0000" }
   }
 
+  // 2. handle finished_openids
+  let finished_openids = data1.finished_openids ?? []
+  const assignees = data1.assigneeList.map(v => v.group_openid)
+  const owner_openid = data1.owner_openid
+  finished_openids.push(...assignees)
+  finished_openids.push(owner_openid)
+  finished_openids = valTool.uniqueArray(finished_openids)
+
+  // 3. update the task
   const now3 = getNowStamp()
   const w3: Partial<Table_WxTask> = {
     taskState: "CLOSED",
     closedStamp: now3,
     updatedStamp: now3,
     related_openids: [],
+    finished_openids,
   }
   await wtCol.doc(id).update(w3)
 
   // notify wechat if needed
-  // const endStamp = data1.endStamp ?? now3
   const activity_id = data1.activity_id
   if(!activity_id) return { code: "0000" }
-  // if(now3 >= (endStamp - SECOND)) return { code: "0000" }
 
   // get to notify
   await notifyWxToCloseChatTool(activity_id, data1.infoType === "ACTIVITY", body)
@@ -155,9 +164,12 @@ async function complete_wx_task(
   const u3: Record<string, any> = { updatedStamp: now3 }
   const assigneeList = data1.assigneeList
   const related_openids = data1.related_openids
+  const finished_openids = data1.finished_openids ?? []
   const participatorList = data1.participatorList ?? []
-  let idx3 = -1
+  let idx3_1 = -1
+  let idx3_2 = -1
   if(isActivity) {
+    // if we are operating ACTIVITY
     const myParticipator = participatorList.find(v => {
       if(v.engagedStamp && v.group_openid === my_group_openid) return true
       return false
@@ -170,12 +182,13 @@ async function complete_wx_task(
       engagedStamp: now3,
     }
     u3.participatorList = _.push(newParticipator)
-    idx3 = related_openids.indexOf(my_group_openid)
-    if(idx3 < 0) {
+    idx3_1 = related_openids.indexOf(my_group_openid)
+    if(idx3_1 < 0) {
       u3.related_openids = _.push(my_group_openid)
     }
   }
   else {
+    // if we are operating TASK
     const myAssignee = assigneeList.find(v => v.group_openid === my_group_openid)
     if(!myAssignee) {
       return { code: "PT002", errMsg: "you are not the assignee of this task" }
@@ -183,10 +196,16 @@ async function complete_wx_task(
     if(myAssignee.doneStamp) {
       return { code: "0001" }
     }
-    idx3 = related_openids.indexOf(my_group_openid)
-    if(idx3 >= 0) {
-      related_openids.splice(idx3, 1)
+    idx3_1 = related_openids.indexOf(my_group_openid)
+    if(idx3_1 >= 0) {
+      related_openids.splice(idx3_1, 1)
     }
+    idx3_2 = finished_openids.indexOf(my_group_openid)
+    if(idx3_2 < 0) {
+      finished_openids.push(my_group_openid)
+      u3.finished_openids = finished_openids
+    }
+    
     myAssignee.doneStamp = now3
     u3.assigneeList = assigneeList
     u3.related_openids = related_openids
@@ -341,6 +360,7 @@ async function create_wx_task(
     desc,
     assigneeList,
     related_openids,
+    finished_openids: [],
     activity_id,
     endStamp,
   }

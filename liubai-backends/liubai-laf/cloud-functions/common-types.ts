@@ -1934,6 +1934,7 @@ export interface Table_WxTask extends BaseTable {
   assigneeList: PeopleTasksAPI.AssigneeItem[]
   participatorList?: PeopleTasksAPI.ParticipatorItem[]
   related_openids: string[]
+  finished_openids?: string[]
   activity_id?: string
   endStamp?: number
   closedStamp?: number
