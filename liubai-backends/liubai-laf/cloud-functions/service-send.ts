@@ -34,10 +34,6 @@ export async function main(ctx: FunctionContext) {
   return true
 }
 
-/********************** some types *****************/
-
-type SendResolver = (res: LiuRqReturn) => void
-
 /********************** 发送邮件相关 *****************/
 
 

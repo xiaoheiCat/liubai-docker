@@ -1,7 +1,7 @@
 {
   "name": "liubai-ffmpeg",
   "private": true,
-  "version": "0.17.3",
+  "version": "0.17.4",
   "description": "",
   "main": "index.js",
   "scripts": {
