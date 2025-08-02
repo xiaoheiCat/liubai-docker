@@ -4,6 +4,7 @@ import valTool from "./val-tool"
 export type TunnelKey = "wx-chat-info"
   | "just-create-task"
   | "please-create-task"
+  | "task-fr-list-to-detail"
 
 export class LiuTunnel {
 
@@ -32,6 +33,7 @@ export class LiuTunnel {
       this.clear()
       return val1 as T
     }
+    if(this._key && this._key !== key) return
 
     const res = await LiuApi.getStorage({ key: "tunnel" })
     if(!res || !res.data) return

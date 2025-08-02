@@ -169,4 +169,33 @@ export namespace PeopleTasksAPI {
     chatInfo: WxMiniAPI.ChatInfo
   }
 
+  export interface AssigneeItem {
+    group_openid: string
+    doneStamp?: number
+  }
+  
+  export interface Res_GetWxTask {
+    operateType: "get-wx-task"
+    infoType: "TASK" | "ACTIVITY"
+    id: string
+    activity_id?: string
+    desc: string
+    owner_openid: string
+    opengid?: string
+    open_single_roomid?: string
+    chat_type: WxMiniAPI.ChatType
+    assigneeList: AssigneeItem[]
+    isMine?: boolean
+    insertedStamp: number
+    editedStamp?: number
+    endStamp?: number
+    closedStamp?: number
+  }
+
+  export type WxTaskItem = Omit<Res_GetWxTask, "operateType">
+
+  export interface Res_ListWxTasks {
+    operateType: "list-wx-tasks"
+    tasks: WxTaskItem[]
+  }
 }

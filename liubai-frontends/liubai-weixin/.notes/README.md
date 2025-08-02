@@ -44,3 +44,9 @@
 @import "../../styles/custom-styles.wxss";
 ```
 
+
+### Skyline 暂不支持 setInitialRenderingCache
+
+see https://developers.weixin.qq.com/miniprogram/dev/framework/custom-component/glass-easel/migration.html
+
+

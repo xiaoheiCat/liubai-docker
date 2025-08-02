@@ -10,6 +10,7 @@ export default {
     "find_coupon": "Find Coupons",
     "create_task": "Create Tasks",
     "pc_not_supported": "It's not supported on PC",
+    "my_tasks": "My Tasks",
   },
   "shared": {
     "copied": "Copied",
@@ -53,5 +54,12 @@ export default {
     "try_1": "Try to Input",
     "try_2": '"Luckin Coffee"\n"Chagee Tea"\n......',
     "got_it": "Got it",
+  },
+  "task-card": {
+    "from_single_chat": "Single Chat",
+    "all_done": "All Done",
+    "each_other_done": " | Each Other Done",
+    "done_1": "Done by ",
+    "done_2": "",
   }
 }

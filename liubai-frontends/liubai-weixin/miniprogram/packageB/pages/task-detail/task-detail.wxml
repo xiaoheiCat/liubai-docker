@@ -39,7 +39,7 @@
           default-text="{{t1.from_group}}" 
         />
       </view>
-      <view class="td-from" wx:else>
+      <view class="td-from" wx:elif="{{chatInfo.open_single_roomid}}">
         <text>{{t1.only_you}}</text>
       </view>
 

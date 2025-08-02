@@ -4362,6 +4362,7 @@ export namespace PeopleTasksAPI {
     | "get-wx-task"
     | "close-wx-task"
     | "complete-wx-task"
+    | "list-wx-tasks"
 
   export interface Res_EnterWxChatTool {
     operateType: "enter-wx-chat-tool"
@@ -4397,6 +4398,7 @@ export namespace PeopleTasksAPI {
     chat_type: number
     assigneeList: AssigneeItem[]
     participatorList?: ParticipatorItem[]
+    isMine?: boolean
     insertedStamp: number
     editedStamp?: number
     endStamp?: number
@@ -4409,8 +4411,18 @@ export namespace PeopleTasksAPI {
     id: Sch_Id,
   })
 
-  
+  export type WxTaskItem = Omit<Res_GetWxTask, "operateType">
 
+  export interface Res_ListWxTasks {
+    operateType: "list-wx-tasks"
+    tasks: WxTaskItem[]
+  }
+
+  export const Sch_Param_ListWxTasks = vbot.object({
+    operateType: vbot.literal("list-wx-tasks"),
+    listType: vbot.picklist(["available"]),
+    skip: Sch_Opt_Num,
+  })
 
 }
 

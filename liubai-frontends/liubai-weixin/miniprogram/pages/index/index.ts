@@ -12,8 +12,14 @@ import { LiuApi } from "~/utils/LiuApi"
 import valTool from "~/utils/val-tool"
 import { Loginer } from "~/utils/login/Loginer"
 import { ShowTip } from "~/utils/managers/ShowTip"
-import { handleGroupInfo } from "./tools/useIndexPage"
+import { 
+  getMyTasks, 
+  getStoragedMyTasks, 
+  handleGroupInfo, 
+  setStoragedMyTasks,
+} from "./tools/useIndexPage"
 import { pageBehavior } from "~/behaviors/page-behavior"
+import { TaskItem } from "~/types/types-task"
 
 Component({
 
@@ -24,6 +30,7 @@ Component({
   data: {
     pageName: "index",
     canSearch: false,
+    myTasks: [] as TaskItem[],
     _key1: "",
     _key2: "",
     _searchValue: "",
@@ -36,12 +43,6 @@ Component({
     themeBehavior(),
     pageBehavior(),
   ],
-
-  lifetimes: {
-
-    attached() {},
-
-  },
 
   methods: {
 
@@ -123,22 +124,6 @@ Component({
       }
 
       this.toCreateTask()
-      // this.toMockDetail()
-    },
-
-    toMockDetail() {
-      console.log("toMockDetail........")
-      LiuApi.openChatTool({
-        url: "/packageB/pages/task-detail/task-detail?id=6879cac65c5bae5764b24646",
-        chatType: 1,
-        roomid: "AF66ptRddE2IYBqqsJfnz5gG7EsVie5XVE5BGSHsBlR5dqsT_Q",
-        success(res) {
-          console.log("toMockDetail success", res)
-        },
-        fail(err) {
-          console.warn("toMockDetail fail", err)
-        }
-      })
     },
 
     toCreateTask() {
@@ -161,6 +146,14 @@ Component({
       else if(query?.key2) {
         this.data._key2 = query.key2
       }
+
+      this.initMyTasks()
+    },
+
+    async initMyTasks() {
+      const myTasks = await getStoragedMyTasks()
+      if(!myTasks) return
+      this.setData({ myTasks })
     },
 
     onTapCoupon() {
@@ -168,6 +161,19 @@ Component({
       LiuApi.navigateTo({ 
         url: "/packageA/pages/coupon-home/coupon-home",
       })
+    },
+
+    onShow() {
+      this.handleMyTasks()
+    },
+
+    async handleMyTasks() {
+      const res1 = LiuApi.getSkylineInfoSync()
+      if(!res1.isSupported) return
+      const myTasks = await getMyTasks()
+      if(!myTasks) return
+      this.setData({ myTasks })
+      setStoragedMyTasks(myTasks)
     },
 
     onReady() {

@@ -30,17 +30,20 @@ export async function fetchTaskDetail(
 
 
 export function showDetail(
-  chatInfo: WxMiniAPI.ChatInfo,
   data: PeopleTasksAPI.Res_GetWxTask,
+  chatInfo?: WxMiniAPI.ChatInfo,
 ) {
   const assigneeList = data.assigneeList
   const postedTimeStr = DateUtil.showBasicTime(data.insertedStamp)
 
   // calculate some state
-  const isMine = chatInfo.group_openid === data.owner_openid
+  let isMine = data.isMine
+  if(typeof isMine === "undefined") {
+    isMine = chatInfo?.group_openid === data.owner_openid
+  }
   let hasAnyIncomplete = assigneeList.some(v => !v.doneStamp)
   let canIComplete = assigneeList.some(v => {
-    if(v.group_openid === chatInfo.group_openid) {
+    if(v.group_openid === chatInfo?.group_openid) {
       return !Boolean(v.doneStamp)
     }
     return false

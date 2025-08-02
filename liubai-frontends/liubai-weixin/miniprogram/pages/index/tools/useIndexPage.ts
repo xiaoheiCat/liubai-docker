@@ -1,8 +1,10 @@
 import APIs from "~/requests/APIs";
 import { LiuReq } from "~/requests/LiuReq";
 import type { PeopleTasksAPI } from "~/requests/req-types";
+import { TaskItem } from "~/types/types-task";
 import { LiuApi } from "~/utils/LiuApi";
 import { LiuTunnel } from "~/utils/LiuTunnel";
+import { showTaskItems } from "~/utils/show/show-tasks";
 import { LiuApp } from "~/utils/useApp";
 
 export async function handleGroupInfo() {
@@ -77,3 +79,33 @@ async function fetchGroupInfo(
 
   
 }
+
+
+export async function getMyTasks() {
+  const res1 = await LiuApp.autoLogin()
+  if(!res1) return
+
+  const u2 = {
+    operateType: "list-wx-tasks",
+    listType: "available",
+  }
+  const res2 = await LiuReq.request<PeopleTasksAPI.Res_ListWxTasks>(APIs.PPL_TASKS, u2)
+  // console.log("getMyTasks res2: ", res2)
+  if(res2.code !== "0000" || !res2.data) return
+  const list = showTaskItems(res2.data?.tasks ?? [])
+  return list
+}
+
+
+export async function getStoragedMyTasks() {
+  const res = await LiuApi.getStorage({ key: "my-tasks" })
+  const data = res?.data as TaskItem[] | null
+  if(!data) return
+  return data
+}
+
+export async function setStoragedMyTasks(tasks: TaskItem[]) {
+  const res = await LiuApi.setStorage({ key: "my-tasks", data: tasks })
+  return res
+}
+

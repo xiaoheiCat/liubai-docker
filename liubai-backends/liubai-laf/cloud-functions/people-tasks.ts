@@ -37,6 +37,9 @@ export async function main(ctx: FunctionContext) {
   else if(oT === "create-wx-task") {
     res = await create_wx_task(body, vRes)
   }
+  else if(oT === "list-wx-tasks") {
+    res = await list_wx_tasks(body, vRes)
+  }
   else if(oT === "get-wx-task") {
     res = await get_wx_task(body, vRes)
   }
@@ -48,6 +51,64 @@ export async function main(ctx: FunctionContext) {
   }
 
   return res
+}
+
+
+async function list_wx_tasks(
+  body: Record<string, any>,
+  vRes: VerifyTokenRes_B,
+): Promise<LiuRqReturn<PeopleTasksAPI.Res_ListWxTasks>> {
+  // 1. check out params
+  const res1 = vbot.safeParse(PeopleTasksAPI.Sch_Param_ListWxTasks, body)
+  if(!res1.success) {
+    const errMsg = checker.getErrMsgFromIssues(res1.issues)
+    return { code: "E4000", errMsg }
+  }
+
+  // 2. get bonds
+  const userId = vRes.userData._id
+  const w2: Partial<Table_WxBond> = {
+    userId,
+    infoType: "chat-tool",
+  }
+  const wbCol = db.collection("WxBond")
+  const q2 = wbCol.where(w2).orderBy("enterStamp", "desc").limit(50)
+  const res2 = await q2.get<Table_WxBond>()
+  const data2 = res2.data ?? []
+  const openids = data2.map(v => v.group_openid)
+
+  // 3. construct result
+  const result: PeopleTasksAPI.Res_ListWxTasks = {
+    operateType: "list-wx-tasks",
+    tasks: [],
+  }
+  if(openids.length < 1) {
+    return { code: "0000", data: result }
+  }
+
+  // 4. get tasks
+  const w4: Record<string, any> = {
+    related_openids: _.in(openids),
+    oState: "OK",
+  }
+  if(body.listType === "available") {
+    w4.taskState = "DEFAULT"
+  }
+  const wtCol = db.collection("WxTask")
+  const q4 = wtCol.where(w4).orderBy("insertedStamp", "desc").limit(16)
+  if(body.skip) {
+    q4.skip(body.skip)
+  }
+  const res4 = await q4.get<Table_WxTask>()
+  const data4 = res4.data ?? []
+  if(data4.length < 1) {
+    return { code: "0000", data: result }
+  }
+
+  // 5. package tasks
+  const tasks = packageWxTasks(data4, userId)
+  result.tasks = tasks
+  return { code: "0000", data: result }
 }
 
 
@@ -139,6 +200,7 @@ async function complete_wx_task(
     return { code: "E4004", errMsg: "no such task" }
   }
   const isActivity = data1.infoType === "ACTIVITY"
+  const iAmOwner = data1.owner_userid === userId
   
   // 2. find my bond about the chat
   const w2: Partial<Table_WxBond> = {
@@ -189,17 +251,31 @@ async function complete_wx_task(
   }
   else {
     // if we are operating TASK
-    const myAssignee = assigneeList.find(v => v.group_openid === my_group_openid)
+    let isAllDone = true
+    let myAssignee: PeopleTasksAPI.AssigneeItem | undefined
+    assigneeList.forEach(v => {
+      if(v.group_openid === my_group_openid) {
+        myAssignee = v
+      }
+      else if(!v.doneStamp) {
+        isAllDone = false
+      }
+    })
+
     if(!myAssignee) {
       return { code: "PT002", errMsg: "you are not the assignee of this task" }
     }
     if(myAssignee.doneStamp) {
       return { code: "0001" }
     }
-    idx3_1 = related_openids.indexOf(my_group_openid)
-    if(idx3_1 >= 0) {
-      related_openids.splice(idx3_1, 1)
+
+    if(!iAmOwner || isAllDone) {
+      idx3_1 = related_openids.indexOf(my_group_openid)
+      if(idx3_1 >= 0) {
+        related_openids.splice(idx3_1, 1)
+      }
     }
+
     idx3_2 = finished_openids.indexOf(my_group_openid)
     if(idx3_2 < 0) {
       finished_openids.push(my_group_openid)
@@ -257,6 +333,7 @@ async function get_wx_task(
   }
   const id = body.id as string
   const chatInfo = body.chatInfo as WxMiniAPI.ChatInfo
+  const userId = vRes.userData._id
 
   // 2. get the task
   const wtCol = db.collection("WxTask")
@@ -277,21 +354,11 @@ async function get_wx_task(
   }
 
   // 3. package data
+  const list3 = packageWxTasks([data2], userId)
+  const item3 = list3[0]
   const data3: PeopleTasksAPI.Res_GetWxTask = {
     operateType: "get-wx-task",
-    id: data2._id,
-    infoType: data2.infoType ?? "TASK",
-    activity_id: data2.activity_id,
-    desc: data2.desc,
-    owner_openid: data2.owner_openid,
-    opengid: data2.opengid,
-    open_single_roomid: data2.open_single_roomid,
-    chat_type: data2.chat_type,
-    assigneeList: data2.assigneeList,
-    participatorList: data2.participatorList,
-    insertedStamp: data2.insertedStamp,
-    endStamp: data2.endStamp,
-    closedStamp: data2.closedStamp,
+    ...item3,
   }
   return { code: "0000", data: data3 }
 }
@@ -371,6 +438,34 @@ async function create_wx_task(
     return { code: "E5001", errMsg: "fail to create task, with operating db" }
   }
   return { code: "0000", data: { id: docId } }
+}
+
+function packageWxTasks(
+  tasks: Table_WxTask[],
+  myUserId: string,
+) {
+  const list: PeopleTasksAPI.WxTaskItem[] = []
+  for(let i=0; i<tasks.length; i++) {
+    const v = tasks[i]
+    const obj: PeopleTasksAPI.WxTaskItem = {
+      id: v._id,
+      infoType: v.infoType ?? "TASK",
+      activity_id: v.activity_id,
+      desc: v.desc,
+      owner_openid: v.owner_openid,
+      opengid: v.opengid,
+      open_single_roomid: v.open_single_roomid,
+      chat_type: v.chat_type,
+      assigneeList: v.assigneeList,
+      participatorList: v.participatorList,
+      isMine: v.owner_userid === myUserId,
+      insertedStamp: v.insertedStamp,
+      endStamp: v.endStamp,
+      closedStamp: v.closedStamp,
+    }
+    list.push(obj)
+  }
+  return list
 }
 
 

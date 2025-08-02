@@ -28,6 +28,7 @@ import { envData } from "~/packageB/config/env-data";
 import { pageBehavior } from "~/packageB/behaviors/page-behavior";
 import { checkNameExisted } from "../shared/some-funcs";
 import { defaultData } from "~/packageB/config/default-data";
+import type { PeopleTasksAPI } from "~/packageB/requests/req-types";
 
 Component({
 
@@ -60,7 +61,7 @@ Component({
       if(!query) return
       const id = query.id
       if(!id || typeof id !== "string") return
-      const now = LiuTime.getTime()
+      const now = LiuTime.getLocalTime()
       const pages = LiuApi.getPages()
       const pLength = pages.length
       let bind: Record<string, any> = {
@@ -75,7 +76,7 @@ Component({
 
     async onShow() {
       const stamp1 = this.data._whenLoadStamp
-      const justOnLoad = LiuTime.isWithinMillis(stamp1, 1500)
+      const justOnLoad = LiuTime.isWithinMillis(stamp1, 1500, true)
       if(justOnLoad) return
 
       this.checkStateWhileShowing()
@@ -103,11 +104,8 @@ Component({
 
       // 2. wait for chatInfo
       if(justOnLoad) {
-        const res2 = await TaskManager.init()
-        if(!res2) {
-          this.youAreNotInTheRoom()
-          return
-        }
+        const res2 = await this.initTaskDetail()
+        if(!res2) return
       }
       const chatInfo = TaskManager.getChatInfo()
       if(!chatInfo) {
@@ -135,7 +133,7 @@ Component({
       }
 
       // 4. show
-      const detail = showDetail(chatInfo, data3)
+      const detail = showDetail(data3, chatInfo)
       this.setData({ detail, pState: pageStates.OK })
       this.toUpdateShareMenu()
 
@@ -161,6 +159,53 @@ Component({
       // 7. forward
       toForward(id, detail.desc, true)
     },
+
+
+    async initTaskDetail() {
+      // 2.1 get detail from tunnel  
+      const res2_1 = await LiuTunnel.takeStuff<PeopleTasksAPI.Res_GetWxTask>(
+        "task-fr-list-to-detail"
+      )
+      if(res2_1) {
+        let bind2_1: Record<string, any> = { pState: pageStates.OK }
+        if(res2_1.isMine) {
+          bind2_1.chatInfo = {
+            group_openid: res2_1.owner_openid,
+            open_single_roomid: res2_1.open_single_roomid,
+            opengid: res2_1.opengid,
+            chat_type: res2_1.chat_type,
+          } as WxMiniAPI.ChatInfo
+          TaskManager.setChatInfo(bind2_1.chatInfo)
+          TaskManager.init()
+          bind2_1.detail = showDetail(res2_1, bind2_1.chatInfo)
+          this.setData(bind2_1)
+          this.toUpdateShareMenu()
+          return true
+        }
+
+        bind2_1.detail = showDetail(res2_1)
+        this.setData(bind2_1)
+      }
+
+      // 2.2 init task manager
+      const res2_2 = await TaskManager.init()
+      if(!res2_2) {
+        this.youAreNotInTheRoom()
+        return false
+      }
+
+      // 2.3 calculate detail again
+      if(res2_1) {
+        const chatInfo = TaskManager.getChatInfo()
+        if(!chatInfo) return false
+        const tmpDetail2_2 = showDetail(res2_1, chatInfo)
+        this.setData({ detail: tmpDetail2_2, chatInfo })
+        this.toUpdateShareMenu()
+      }
+
+      return true
+    },
+
 
     async toUpdateShareMenu() {
       const { detail } = this.data

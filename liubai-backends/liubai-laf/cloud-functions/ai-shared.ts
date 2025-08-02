@@ -93,6 +93,11 @@ type BufferResolver = (res: Buffer | undefined) => void
 
 export const txt2TxtAiWorkers: LiuAi.AiWorker[] = [
   {
+    computingProvider: "stepfun",
+    model: "step-3",
+    character: "yuewen",
+  },
+  {
     computingProvider: "aliyun-bailian",
     model: "qwen-plus-2025-04-28",
     character: "tongyi-qwen",
@@ -147,7 +152,7 @@ export const txt2TxtAiWorkers: LiuAi.AiWorker[] = [
 export const img2TxtWorkers: LiuAi.AiWorker[] = [
   {
     computingProvider: "stepfun",
-    model: "step-r1-v-mini",
+    model: "step-3",
     character: "yuewen",
   },
   {

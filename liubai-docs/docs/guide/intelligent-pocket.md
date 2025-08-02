@@ -22,11 +22,11 @@
 
 扫描上方二维码关注服务号，点击 `服务`，再点击 `打开留白`:
 
-<img src="./assets-intelligent-pocket/02.png" width="400" />
+<img src="./assets-intelligent-pocket/02_2.png" width="400" />
 
 接着点击右上角的 `...` → `浮窗`：
 
-<img src="./assets-intelligent-pocket/03.png" width="400" />
+<img src="./assets-intelligent-pocket/03_2.png" width="400" />
 
 就这么简单，你的智能口袋已经配置完毕！
 

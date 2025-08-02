@@ -8,6 +8,7 @@ export default {
     "find_coupon": "找优惠",
     "create_task": "建任务",
     "pc_not_supported": "PC 端暂不支持",
+    "my_tasks": "我的任务",
   },
   "shared": {
     "copied": "已复制",
@@ -52,5 +53,12 @@ export default {
     "try_1": "试试看，输入",
     "try_2": "“瑞幸”\n“霸王茶姬”\n......",
     "got_it": "知道了",
+  },
+  "task-card": {
+    "from_single_chat": "来自单聊",
+    "all_done": "已全部完成",
+    "each_other_done": "，对方已完成",
+    "done_1": "已有 ",
+    "done_2": " 人完成",
   }
 }

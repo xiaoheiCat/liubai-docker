@@ -1,34 +1,56 @@
 <!-- index.wxml -->
 
-<view class="liu-{{theme}} liu-{{locale}} index-container">
+<scroll-view 
+  class="liu-{{theme}} liu-{{locale}} liu-scroll-view"
+  scroll-y 
+>
 
-  <view class="index-virtual-one"></view>
+  <view class="index-container">
+    <view class="index-virtual-one"></view>
+  
+    <!-- <view class="liu-hover index-button" hover-class="liu-skyline-hover"
+      catchtap="onTapCoupon"
+    >
+      <image src="/images/shared/star-struck_3d.png" class="ib-image" />
+      <view class="ib-title">
+        <text>{{t1.find_coupon}}</text>
+      </view>
+    </view> -->
 
-  <!-- <view class="liu-hover index-button" hover-class="liu-skyline-hover"
-    catchtap="onTapCoupon"
-  >
-    <image src="/images/shared/star-struck_3d.png" class="ib-image" />
-    <view class="ib-title">
-      <text>{{t1.find_coupon}}</text>
+    <view class="liu-hover index-button" hover-class="liu-skyline-hover"
+      catchtap="onTapTask"
+    >
+      <image src="/images/shared/memo_3d.png" class="ib-image" />
+      <view class="ib-title">
+        <text>{{t1.create_task}}</text>
+      </view>
     </view>
-  </view> -->
 
-  <view class="liu-hover index-button" hover-class="liu-skyline-hover"
-    catchtap="onTapTask"
-  >
-    <image src="/images/shared/memo_3d.png" class="ib-image" />
-    <view class="ib-title">
-      <text>{{t1.create_task}}</text>
+    <view class="index-virtual-two"></view>
+
+    <view class="index-tasks" wx:if="{{myTasks.length > 0}}">
+
+      <view class="index-task-title">
+        <text>{{t1.my_tasks}}</text>
+      </view>
+
+      <block wx:for="{{myTasks}}" wx:key="id">
+
+        <task-card task="{{item}}"></task-card>
+
+      </block>
+
+    </view>
+
+  </view>
+
+  <view class="index-footer-container" catchtap="onTapFollowUs">
+    <image src="/images/shared/logo_256x256_v3.png" class="index-logo"/>
+    <view class="index-powered-by">
+      <text>{{t1.powered_by}}</text>
     </view>
   </view>
 
-  <view class="index-virtual-two"></view>
+</scroll-view>
 
-</view>
 
-<view class="liu-{{theme}} index-footer-container" catchtap="onTapFollowUs">
-  <image src="/images/shared/logo_256x256_v3.png" class="index-logo"/>
-  <view class="index-powered-by">
-    <text>{{t1.powered_by}}</text>
-  </view>
-</view>
