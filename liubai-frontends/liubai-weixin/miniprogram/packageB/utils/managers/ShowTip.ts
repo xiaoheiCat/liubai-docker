@@ -39,4 +39,15 @@ export class ShowTip {
     LiuUtil.showCustomModal(opt)
   }
 
+  static async showUnsupported(
+    func: string,
+  ) {
+    LiuUtil.showCustomModal({
+      title: "🙅",
+      content_key: "err.unsupported_1",
+      content_opt: { func },
+      showCancel: false,
+    })
+  }
+
 }

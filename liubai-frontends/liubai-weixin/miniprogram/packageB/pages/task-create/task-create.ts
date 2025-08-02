@@ -9,6 +9,7 @@ import { prePost } from "../shared/useTaskCreate";
 import { pageBehavior } from "../../behaviors/page-behavior";
 import { checkNameExisted } from "../shared/some-funcs";
 import { LiuUtil } from "~/packageB/utils/liu-util/index";
+import { ShowTip } from "~/packageB/utils/managers/ShowTip";
 
 Component({
 
@@ -68,7 +69,7 @@ Component({
         })
       }
 
-      const _showErr = () => {
+      const _showErr1 = () => {
         LiuUtil.showCustomModal({
           title: "selectGroupMembers:fail",
           content_key: "err.select_group_members_fail",
@@ -80,6 +81,23 @@ Component({
         })
       }
 
+      const _showUnsupported = () => {
+        ShowTip.showUnsupported("selectGroupMembers")
+      }
+
+      // check out wx.selectGroupMembers
+      const pages = LiuApi.getPages()
+      if(pages.length < 2 || typeof wx.selectGroupMembers !== "function") {
+        _showUnsupported()
+        return
+      }
+      const cha = LiuUtil.getCharacteristic()
+      const res2 = valTool.compareVersion(cha.SDKVersion, "3.7.8")
+      if(res2 < 0) {
+        _showUnsupported()
+        return
+      }
+
       LiuApi.selectGroupMembers({ 
         maxSelectCount: 20,
         success(res1) {
@@ -87,10 +105,13 @@ Component({
         },
         fail(err) {
           console.warn("selectGroupMembers fail: ", err)
-          const errMsg = err.errMsg
+          const errMsg = err.errMsg ?? ""
           if(errMsg === "selectGroupMembers:fail ") {
-            _showErr()
+            _showErr1()
+            return
           }
+          if(errMsg.includes("cancel")) return
+          ShowTip.showErrMsg("选择成员失败", err)
         }
       })
     },

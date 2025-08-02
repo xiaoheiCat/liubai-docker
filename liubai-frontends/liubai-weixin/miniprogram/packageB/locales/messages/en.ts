@@ -33,6 +33,7 @@ export default {
     "not_in_room_1": "You are not in the chat",
     "not_in_room_2": "Please confirm that you have not deleted this friend related to the task, or you are still in the group chat.",
     "select_group_members_fail": "Fail to select group members. The issue is from WeChat team. Welcome to report it to them!",
+    "unsupported_1": "Your WeChat version does not support: {func}",
   },
   "task-create": {
     "title": "New",

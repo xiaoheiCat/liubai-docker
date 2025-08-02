@@ -30,6 +30,7 @@ export default {
     "not_in_room_1": "你似乎不在聊天室中",
     "not_in_room_2": "請確認你沒有刪除對方好友或仍在群聊中",
     "select_group_members_fail": "選擇群組成員失敗，該問題來源於微信團隊，歡迎你向他們反映！",
+    "unsupported_1": "你的微信版本暫不支援: {func}",
   },
   "task-create": {
     "title": "創建任務",
