@@ -43,7 +43,6 @@ export class LiuTunnel {
     if(theKey !== key) return
 
     const val2 = valTool.copyObject(theVal)
-    console.log("LiuTunnel get val 222: ", val2)
     this.clear()
     return val2 as T
   }
