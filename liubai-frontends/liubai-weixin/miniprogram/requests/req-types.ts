@@ -183,7 +183,7 @@ export namespace PeopleTasksAPI {
     owner_openid: string
     opengid?: string
     open_single_roomid?: string
-    chat_type: number
+    chat_type: WxMiniAPI.ChatType
     assigneeList: AssigneeItem[]
     isMine?: boolean
     insertedStamp: number
