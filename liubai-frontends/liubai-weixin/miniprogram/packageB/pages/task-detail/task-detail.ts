@@ -432,7 +432,8 @@ Component({
     async onTapTitle() {
       const id = this.data._id
       const detail = this.data.detail
-      const newTitle = await toUpdateTitle(id, detail ?? undefined)
+      if(!detail) return
+      const newTitle = await toUpdateTitle(id, detail)
       if(!newTitle) return
 
       const bind: Record<string, any> = {}

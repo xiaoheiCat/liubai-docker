@@ -292,9 +292,9 @@ export function toCreateOtherTask(
 
 export async function toUpdateTitle(
   id: string,
-  detail?: TaskDetail,
+  detail: TaskDetail,
 ) {
-  const isMine = detail?.isMine
+  const isMine = detail.isMine
   if(!isMine) {
     LiuUtil.showCustomModal({
       title: "🫢",

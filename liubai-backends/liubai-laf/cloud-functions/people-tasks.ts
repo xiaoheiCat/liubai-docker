@@ -69,6 +69,9 @@ async function update_task_title(
   if(!valTool.isStringWithVal(title)) {
     return { code: "E4000", errMsg: "no title" }
   }
+  if(title.length > 144) {
+    return { code: "E4000", errMsg: "title is too long" }
+  }
   const userId = vRes.userData._id
 
   // 1. get task
