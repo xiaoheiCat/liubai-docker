@@ -15,6 +15,7 @@ export default {
     "view": "去檢視",
     "copied_link": "已複製連結",
     "open_it_with_browser": "請開啟瀏覽器檢視",
+    "updating": "更新中..",
   },
   "err": {
     "no_data": "找不到耶",
@@ -78,6 +79,12 @@ export default {
     "create_for_current_chat": "當前會話",
     "create_for_current_group": "當前群組",
     "create_for_others": "其他會話或群組",
+    "title_for_guests": "只有創建人才能修改標題",
+    "new_title_1": "修改標題",
+    "new_title_2": "請輸入新的標題",
+    "updated": "已更新",
+    "updated_tip": "請轉發，否則他們會不知道",
+    "updated_prefix": "任務發生變化: {desc}",
   },
   "date": {
     "show_1": "{mm}月{dd}日 {hr}:{min}",

@@ -288,3 +288,62 @@ export function toCreateOtherTask(
     }
   })
 }
+
+
+export async function toUpdateTitle(
+  id: string,
+  detail: TaskDetail,
+) {
+  const isMine = detail.isMine
+  if(!isMine) {
+    LiuUtil.showCustomModal({
+      title: "🫢",
+      content_key: "task-detail.title_for_guests",
+      showCancel: false,
+    })
+    return
+  }
+
+  // 1. show modal to let user edit the title
+  const res1 = await LiuUtil.showCustomModal({
+    title_key: "task-detail.new_title_1",
+    placeholder_key: "task-detail.new_title_2",
+    editable: true,
+  })
+  if(!res1.confirm) return
+
+  const newTitle = res1.content?.trim()
+  if(!newTitle) return
+  if(newTitle === detail.desc) return
+  
+
+  // 2. fetch
+  const url1 = APIs.PPL_TASKS
+  const w1 = {
+    operateType: "update-task-title",
+    id,
+    title: newTitle,
+  }
+  LiuUtil.showCustomLoading({ title_key: "shared.updating" })
+  const res2 = await LiuReq.request(url1, w1)
+  LiuApi.hideLoading()
+
+  // 3. handle result
+  const code3 = res2.code
+  if(code3 !== "0000" && code3 !== "0001") {
+    return
+  }
+  LiuUtil.showCustomModal({
+    title_key: "task-detail.updated",
+    content_key: "task-detail.updated_tip",
+    confirm_key: "shared.ok",
+    success(res3) {
+      if(!res3.confirm) return
+      const { t } = useI18n()
+      const title3 = t("task-detail.updated_prefix", { desc: newTitle })
+      toForward(id, title3)
+    }
+  })
+
+  return newTitle
+}

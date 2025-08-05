@@ -12,6 +12,7 @@ import {
   fetchCompleteTask,
   afterCompleteTask,
   toCreateOtherTask,
+  toUpdateTitle,
 } from "./tools/useTaskDetail";
 import { LiuTunnel } from "~/packageB/utils/LiuTunnel";
 import type { JustCreateTask, PleaseCreateTask } from "~/packageB/types/types-tunnel";
@@ -426,7 +427,19 @@ Component({
           console.warn("downloadFile fail: ", err)
         }
       })
-    }
+    },
+
+    async onTapTitle() {
+      const id = this.data._id
+      const detail = this.data.detail
+      if(!detail) return
+      const newTitle = await toUpdateTitle(id, detail)
+      if(!newTitle) return
+
+      const bind: Record<string, any> = {}
+      bind["detail.desc"] = newTitle
+      this.setData(bind)
+    },
 
   },
 

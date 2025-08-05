@@ -286,12 +286,7 @@ const {
   margin-inline-start: 4px;
 }
 
-.av-windsurf-svg {
-  width: 38%;
-  height: 100%;
-}
-
-.av-vscode-svg {
+.av-windsurf-svg, .av-vscode-svg {
   width: 60%;
   height: 60%;
 }

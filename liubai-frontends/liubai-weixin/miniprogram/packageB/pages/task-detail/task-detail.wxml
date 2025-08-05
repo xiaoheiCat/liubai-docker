@@ -14,7 +14,7 @@
     <view class="liu-main-box">
 
       <!-- desc -->
-      <view class="td-desc">
+      <view class="td-desc" catchtap="onTapTitle">
         <text>{{detail.desc}}</text>
       </view>
 

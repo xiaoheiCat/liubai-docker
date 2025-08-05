@@ -4363,6 +4363,7 @@ export namespace PeopleTasksAPI {
     | "close-wx-task"
     | "complete-wx-task"
     | "list-wx-tasks"
+    | "update-task-title"
 
   export interface Res_EnterWxChatTool {
     operateType: "enter-wx-chat-tool"

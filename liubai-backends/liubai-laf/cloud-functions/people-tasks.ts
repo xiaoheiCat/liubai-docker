@@ -49,10 +49,55 @@ export async function main(ctx: FunctionContext) {
   else if(oT === "close-wx-task") {
     res = await close_wx_task(body, vRes)
   }
+  else if(oT === "update-task-title") {
+    res = await update_task_title(body, vRes)
+  }
 
   return res
 }
 
+
+async function update_task_title(
+  body: Record<string, any>,
+  vRes: VerifyTokenRes_B,
+) {
+  const id = body.id
+  if(!valTool.isStringWithVal(id)) {
+    return { code: "E4000", errMsg: "no id" }
+  }
+  const title = body.title
+  if(!valTool.isStringWithVal(title)) {
+    return { code: "E4000", errMsg: "no title" }
+  }
+  if(title.length > 144) {
+    return { code: "E4000", errMsg: "title is too long" }
+  }
+  const userId = vRes.userData._id
+
+  // 1. get task
+  const wtCol = db.collection("WxTask")
+  const res1 = await wtCol.doc(id).get<Table_WxTask>()
+  const data1 = res1.data
+  if(!data1 || data1.oState !== "OK") {
+    return { code: "E4004", errMsg: "no such task" }
+  }
+  if(data1.owner_userid !== userId) {
+    return { code: "E4003", errMsg: "you are not the owner of this task" }
+  }
+  if(data1.desc === title) {
+    return { code: "0001" }
+  }
+
+  // 2. update the task
+  const now2 = getNowStamp()
+  const w2: Partial<Table_WxTask> = {
+    desc: title,
+    updatedStamp: now2,
+  }
+  await wtCol.doc(id).update(w2)
+
+  return { code: "0000" }
+}
 
 async function list_wx_tasks(
   body: Record<string, any>,

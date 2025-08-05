@@ -12,6 +12,7 @@ export interface CustomModalOpt extends WechatMiniprogram.ShowModalOption {
   content_opt?: Record<string, any>
   confirm_key?: string
   cancel_key?: string
+  placeholder_key?: string
 }
 
 export interface CustomToastOpt extends Partial<WechatMiniprogram.ShowToastOption> {
@@ -140,6 +141,15 @@ export class LiuUtil {
     else if(!opt.cancelText && opt.showCancel !== false) {
       opt.cancelText = t("shared.cancel")
     }
+
+    // 2.5 handle placeholder
+    if(opt.placeholder_key) {
+      if(!opt.placeholderText) {
+        opt.placeholderText = t(opt.placeholder_key)
+      }
+      delete opt.placeholder_key
+    }
+
     
     const res = await LiuApi.showModal(opt)
     if(res?.confirm) {

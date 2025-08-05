@@ -18,6 +18,7 @@ export default {
     "view": "View",
     "copied_link": "Link Copied",
     "open_it_with_browser": "Open it with browser",
+    "updating": "Updating..",
   },
   "err": {
     "no_data": "Nothing Here",
@@ -81,6 +82,12 @@ export default {
     "create_for_current_chat": "Current chat",
     "create_for_current_group": "Current group",
     "create_for_others": "Other chats or groups",
+    "title_for_guests": "Only creator can modify title",
+    "new_title_1": "Editing",
+    "new_title_2": "Please enter a new title",
+    "updated": "Updated",
+    "updated_tip": "Share please, otherwise they won't know about this update",
+    "updated_prefix": "Task Updated: {desc}",
   },
   "date": {
     "show_1": "{yyyy}-{mm}-{dd} {hr}:{min}",
