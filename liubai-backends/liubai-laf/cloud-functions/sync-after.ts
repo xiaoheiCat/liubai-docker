@@ -76,6 +76,16 @@ const fastAiWorkers: LiuAi.AiWorker[] = [
     "model": "kimi-k2-0711-preview",
     "character": "kimi",
   },
+  {
+    "computingProvider": "siliconflow",
+    "model": "moonshotai/Kimi-K2-Instruct",
+    "character": "kimi",
+  },
+  {
+    "computingProvider": "siliconflow",
+    "model": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+    "character": "tongyi-qwen",
+  }
 ]
 
 export async function main(ctx: FunctionContext) {
@@ -136,16 +146,9 @@ export async function afterPostingThread(
 
 
 export async function afterUpdatingTask(
-  id: string,
+  task: Table_WxTask,
 ) {
-  // 1. get task
-  const wtCol = db.collection("WxTask")
-  const res1 = await wtCol.doc(id).get<Table_WxTask>()
-  const task = res1.data
-  if(!task) return
-  if(task.oState !== "OK") return
-
-  // 2. get user
+  // 1. get user
   const userId = task.owner_userid
   const uCol = db.collection("User")
   const res2 = await uCol.doc(userId).get<Table_User>()
@@ -155,7 +158,6 @@ export async function afterUpdatingTask(
 
   const cluster2 = new AiCluster2(user, task)
   await cluster2.run()
-
 }
 
 
@@ -739,6 +741,7 @@ class AiCluster2 {
 
   async run() {
     const aiCapsule = ClusterHelper.getAiWorker()
+    console.log("aiCapsule: ", aiCapsule)
     if(!aiCapsule) return false
 
     const msg = this._task.desc

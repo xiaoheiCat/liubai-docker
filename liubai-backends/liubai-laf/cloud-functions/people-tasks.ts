@@ -18,6 +18,7 @@ import {
 import * as vbot from "valibot"
 import { getBasicStampWhileAdding, getNowStamp, HOUR } from "@/common-time"
 import { ppl_system_cfg } from "@/common-config"
+import { afterUpdatingTask } from "@/sync-after"
 
 const db = cloud.database()
 const _ = db.command
@@ -96,6 +97,10 @@ async function update_task_title(
     updatedStamp: now2,
   }
   await wtCol.doc(id).update(w2)
+
+  // 3. run syncAfter
+  const newTask = { ...data1, ...w2 } as Table_WxTask
+  await afterUpdatingTask(newTask)
 
   return { code: "0000" }
 }
@@ -484,6 +489,10 @@ async function create_wx_task(
     return { code: "E5001", errMsg: "fail to create task, with operating db" }
   }
   checkTaskForSecurity(docId, desc, vRes.userData)
+
+  // 7. run syncAfter
+  const newTask = { ...data6, _id: docId } as Table_WxTask
+  await afterUpdatingTask(newTask)
 
   return { code: "0000", data: { id: docId } }
 }
