@@ -12,7 +12,8 @@ import {
   type Table_WxBond,
   type Partial_Id,
   type LiuErrReturn,
-  type Table_WxTask, 
+  type Table_WxTask,
+  type Table_User, 
 } from "@/common-types"
 import * as vbot from "valibot"
 import { getBasicStampWhileAdding, getNowStamp, HOUR } from "@/common-time"
@@ -482,8 +483,51 @@ async function create_wx_task(
   if(!docId) {
     return { code: "E5001", errMsg: "fail to create task, with operating db" }
   }
+  checkTaskForSecurity(docId, desc, vRes.userData)
+
   return { code: "0000", data: { id: docId } }
 }
+
+
+async function checkTaskForSecurity(
+  id: string,
+  text: string,
+  user: Table_User,
+) {
+  const wx_mini_openid = user.wx_mini_openid
+  if(!wx_mini_openid) {
+    console.warn("checkTaskForSecurity: no wx_mini_openid")
+    return
+  }
+
+  // 1. msg sec check
+  const res1 = await WxMiniHandler.msgSecCheck(text, wx_mini_openid)
+  if(!res1.pass) {
+    console.warn("checkTaskForSecurity err1: ")
+    console.log(res1.err)
+    return
+  }
+
+  // 2. return if pass
+  const res2 = res1.data.result
+  if(res2.suggest === "pass") {
+    return
+  }
+  console.log("checkTaskForSecurity result: ", res2)
+  console.log("checkTaskForSecurity illegal text: ", text)
+  
+  // 3. to delete
+  const now3 = getNowStamp()
+  const w3: Partial<Table_WxTask> = {
+    oState: "DEL_BY_AI",
+    updatedStamp: now3,
+  }
+  const wtCol = db.collection("WxTask")
+  const res3 = await wtCol.doc(id).update(w3)
+  console.log("res3: ", res3)
+}
+
+
 
 function packageWxTasks(
   tasks: Table_WxTask[],
