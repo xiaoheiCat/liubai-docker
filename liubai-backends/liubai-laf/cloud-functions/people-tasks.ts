@@ -523,8 +523,7 @@ async function checkTaskForSecurity(
     updatedStamp: now3,
   }
   const wtCol = db.collection("WxTask")
-  const res3 = await wtCol.doc(id).update(w3)
-  console.log("res3: ", res3)
+  await wtCol.doc(id).update(w3)
 }
 
 
