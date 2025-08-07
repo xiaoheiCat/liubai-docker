@@ -85,9 +85,31 @@ export default {
     "updated": "已更新",
     "updated_tip": "请转发，否则他们会不知道",
     "updated_prefix": "任务有更新: {desc}",
+    "when": "什么时候",
+  },
+  "ai-related": {
+    "help_to_organize": "由 {name} 协助整理",
+  },
+  "ai-character": {
+    "deepseek": "DeepSeek",
+    "kimi": "Kimi",
+    "tongyi-qwen": "通义千问",
+    "hailuo": "Minimax",
+    "yuewen": "阶跃星辰",
   },
   "date": {
-    "show_1": "{mm}月{dd}日 {hr}:{min}",
-    "show_2": "{yyyy}年{mm}月{dd}日 {hr}:{min}"
-  }
+    "show_1": "{mm}月{dd}日 ({day}) {hr}:{min}",
+    "show_2": "{yyyy}年{mm}月{dd}日 {hr}:{min}",
+    "day_0": "日",
+    "day_1": "一",
+    "day_2": "二",
+    "day_3": "三",
+    "day_4": "四",
+    "day_5": "五",
+    "day_6": "六",
+    "on_time": "准时提醒",
+    "early_min": "提前 {min} 分钟提醒",
+    "early_hr": "提前 {hr} 小时提醒",
+    "early_day": "提前 {day} 天提醒",
+  },
 }

@@ -88,9 +88,27 @@ export default {
     "updated": "Updated",
     "updated_tip": "Share please, otherwise they won't know about this update",
     "updated_prefix": "Task Updated: {desc}",
+    "when": "When",
+  },
+  "ai-related": {
+    "help_to_organize": "{name} helped to organize",
+  },
+  "ai-character": {
+    "deepseek": "DeepSeek",
+    "kimi": "Kimi",
+    "tongyi-qwen": "Qwen",
+    "hailuo": "Minimax",
+    "yuewen": "Stepfun",
   },
   "date": {
-    "show_1": "{yyyy}-{mm}-{dd} {hr}:{min}",
+    "show_1": "{mm}-{dd} ({day}) {hr}:{min}",
     "show_2": "{yyyy}-{mm}-{dd} {hr}:{min}",
+    "day_0": "Su",
+    "day_1": "Mo",
+    "day_2": "Tu",
+    "day_3": "We",
+    "day_4": "Th",
+    "day_5": "Fr",
+    "day_6": "Sa",
   }
 }

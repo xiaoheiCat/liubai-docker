@@ -48,6 +48,28 @@ export function showDetail(
     }
     return false
   })
+
+  // when & remind
+  let whenStr: string | undefined
+  let remindStr: string | undefined
+  if(data.whenStamp) {
+    whenStr = DateUtil.showBasicTime(data.whenStamp)
+  }
+  if(data.remindMe && data.remindStamp) {
+    remindStr = DateUtil.getRemindMeStrAfterPost(
+      data.remindStamp, 
+      data.remindMe,
+    )
+  }
+
+  // ai help
+  const { t } = useI18n()
+  let aiHelpStr: string | undefined
+  if(data.aiWorker?.character) {
+    const aiName = t(`ai-character.${data.aiWorker.character}`)
+    aiHelpStr = t(`ai-related.help_to_organize`, { name: aiName })
+  }
+  
   
   // set detail
   const detail: TaskDetail = {
@@ -65,6 +87,9 @@ export function showDetail(
     hasAnyIncomplete,
     canIComplete,
     isActivity: data.infoType === "ACTIVITY",
+    whenStr,
+    remindStr,
+    aiHelpStr,
   }
   return detail
 }

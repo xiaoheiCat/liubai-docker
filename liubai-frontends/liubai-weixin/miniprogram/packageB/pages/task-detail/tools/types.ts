@@ -19,4 +19,9 @@ export interface TaskDetail {
 
   // activity
   isActivity: boolean
+
+  // remind
+  whenStr?: string
+  remindStr?: string
+  aiHelpStr?: string
 }
