@@ -9,6 +9,8 @@ import type {
   Table_Content,
   RequireSth,
   SupportedLocale,
+  Table_WxTask,
+  Table_WxBond,
 } from "@/common-types";
 import { 
   decryptEncData,
@@ -42,6 +44,17 @@ interface RemindAtom {
   locale?: SupportedLocale
   timezone?: string
 }
+
+interface TaskRemindAtom {
+  taskId: string
+  userId: string
+  title: string
+  calendarStamp: number
+  wx_gzh_openid?: string
+  locale?: SupportedLocale
+  timezone?: string
+}
+
 
 type RemindAtom_2 = RequireSth<RemindAtom, "wx_gzh_openid">
 
@@ -82,16 +95,6 @@ async function handle_system_two() {
   const remainder = min % 5
   if(remainder !== 3) return
   await invoke_by_clock()
-}
-
-async function handle_count_unionid() {
-  const w1 = {
-    wx_unionid: _.exists(true),
-  }
-  const uCol = db.collection("User")
-  const res1 = await uCol.where(w1).count()
-  console.log("see res1: ", res1)
-  return { code: "0000", data: res1 }
 }
 
 async function handle_update_unionid() {
@@ -165,6 +168,71 @@ async function handle_update_unionid() {
 }
 
 
+async function handle_task_remind() {
+  // 1. get tmplId
+  const _env = process.env
+  const tmplId = _env.LIU_WX_GZ_TMPL_ID_1
+  if(!tmplId) {
+    return false
+  }
+
+  // 2. get startStamp and endStamp
+  let startDate = addSeconds(new Date(), -59)
+  startDate = date_fn_set(startDate, { seconds: 55, milliseconds: 0 })
+  const endDate = addSeconds(startDate, 59)
+  const startStamp = startDate.getTime()
+  const endStamp = endDate.getTime()
+
+
+  // 3. 
+
+  
+}
+
+async function get_task_atoms(
+  startStamp: number,
+  endStamp: number,
+) {
+  let runTimes = 0
+  const NUM_ONCE = 50
+  const MAX_TIMES = 100
+
+  const w1 = {
+    oState: "OK",
+    taskState: "DEFAULT",
+    remindStamp: _.and(_.gte(startStamp), _.lte(endStamp)),
+  }
+  const wtCol = db.collection("WxTask")
+  const atoms: TaskRemindAtom[] = []
+
+  while(runTimes < MAX_TIMES) {
+    let q = wtCol.where(w1).orderBy("remindStamp", "asc")
+    if(runTimes > 0) {
+      q = q.skip(runTimes * NUM_ONCE)
+    }
+    const res = await q.limit(NUM_ONCE).get<Table_WxTask>()
+    const tmpList = res.data
+    const tLength = tmpList.length
+
+    for(let i=0; i<tLength; i++) {
+      const v = tmpList[i]
+      const newAtoms = await turnTaskIntoAtoms(v)
+      if(newAtoms) {
+        atoms.push(...newAtoms)
+      }
+    }
+
+    if(tLength < NUM_ONCE) break
+    runTimes++
+  }
+
+
+  
+  
+}
+
+
+
 async function handle_remind() {
 
   // check out if the tmplId is enabled
@@ -188,9 +256,6 @@ async function handle_remind() {
 
   const atoms2 = await find_remind_authors(atoms)
   if(atoms2.length < 1) {
-    console.warn("there is no atoms2")
-    console.log("see atoms: ")
-    console.log(atoms)
     return true
   }
 
@@ -451,6 +516,37 @@ function packAuthors1(
   return tmpList as AuthorAtom_2[]
 }
 
+async function turnTaskIntoAtoms(
+  task: Table_WxTask,
+) {
+  const calendarStamp = task.calendarStamp
+  if(!calendarStamp) return
+
+  const group_openids = task.assigneeList.map(v1 => v1.group_openid)
+  const w1 = {
+    infoType: "chat-tool",
+    group_openid: _.in(group_openids),
+  }
+  const wbCol = db.collection("WxBond")
+  const res1 = await wbCol.where(w1).get<Table_WxBond>()
+  const bonds = res1.data
+
+  let userIds = bonds.map(v => v.userId)
+  if(!userIds.includes(task.owner_userid)) {
+    userIds.push(task.owner_userid)
+  }
+
+  const atoms = userIds.map(v => {
+    const atom: TaskRemindAtom = {
+      taskId: task._id,
+      userId: v,
+      title: task.desc,
+      calendarStamp,
+    }
+    return atom
+  })
+  return atoms
+}
 
 function turnContentIntoAtom(
   v: Table_Content,
