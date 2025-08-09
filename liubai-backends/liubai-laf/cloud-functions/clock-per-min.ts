@@ -11,6 +11,7 @@ import type {
   SupportedLocale,
   Table_WxTask,
   Table_WxBond,
+  PartialSth,
 } from "@/common-types";
 import { 
   decryptEncData,
@@ -68,6 +69,13 @@ interface AuthorAtom {
 }
 
 type AuthorAtom_2 = RequireSth<AuthorAtom, "locale">
+
+interface TaskAuthorAtom {
+  userId: string
+  wx_gzh_openid: string
+  locale: SupportedLocale
+  timezone?: string
+}
 
 type Field_User = {
   [key in keyof Table_User]?: 0 | 1
@@ -183,11 +191,78 @@ async function handle_task_remind() {
   const startStamp = startDate.getTime()
   const endStamp = endDate.getTime()
 
+  // 3. find atoms
+  const atoms = await get_task_atoms(startStamp, endStamp)
+  if(atoms.length < 1) {
+    return true
+  }
 
-  // 3. 
+  // 4. find authors
+  const authors = await find_task_authors(atoms)
+  if(authors.length < 1) {
+    return true
+  }
 
+  // 5. send
+  const access_token = await checkAndGetWxGzhAccessToken()
+  if(!access_token) {
+    console.warn("access_token is not found")
+    return false
+  }
   
+
+
 }
+
+
+async function find_task_authors(
+  atoms: TaskRemindAtom[],
+) {
+  const userIds = valTool.uniqueArray(atoms.map(v => v.userId))
+  const authors: TaskAuthorAtom[] = []
+
+  const uCol = db.collection("User")
+  let runTimes = 0
+  const NUM_ONCE = 50
+  const MAX_TIMES = 100
+
+  while(userIds.length > 0 && runTimes < MAX_TIMES) {
+    const tmpUserIds = userIds.splice(0, NUM_ONCE)
+    const w = {
+      oState: "NORMAL",
+      _id: _.in(tmpUserIds),
+    }
+    const f: Field_User = {
+      _id: 1,
+      oState: 1,
+      thirdData: 1,
+      wx_gzh_openid: 1,
+      language: 1,
+      systemLanguage: 1,
+      timezone: 1,
+    }
+    const res1 = await uCol.where(w).field(f).get<Table_User>()
+    const results1 = res1.data
+
+    for(let i=0; i<results1.length; i++) {
+      const user = results1[i]
+      const wx_gzh_openid = user.wx_gzh_openid
+      if(!wx_gzh_openid) continue
+      const author: TaskAuthorAtom = {
+        userId: user._id,
+        wx_gzh_openid,
+        locale: getCurrentLocale({ user }),
+        timezone: user.timezone,
+      }
+      authors.push(author)
+    }
+    
+    runTimes++
+  }
+  
+  return authors
+}
+
 
 async function get_task_atoms(
   startStamp: number,
@@ -226,9 +301,7 @@ async function get_task_atoms(
     runTimes++
   }
 
-
-  
-  
+  return atoms
 }
 
 
