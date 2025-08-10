@@ -4425,7 +4425,7 @@ export namespace PeopleTasksAPI {
 
   export const Sch_Param_GetWxTask = vbot.object({
     operateType: vbot.literal("get-wx-task"),
-    chatInfo: WxMiniAPI.Sch_ChatInfo,
+    chatInfo: vbot.optional(WxMiniAPI.Sch_ChatInfo),
     id: Sch_Id,
   })
 

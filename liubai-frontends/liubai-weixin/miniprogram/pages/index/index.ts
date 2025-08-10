@@ -19,7 +19,7 @@ import {
   setStoragedMyTasks,
 } from "./tools/useIndexPage"
 import { pageBehavior } from "~/behaviors/page-behavior"
-import { TaskItem } from "~/types/types-task"
+import type { TaskItem } from "~/types/types-task"
 
 Component({
 
@@ -33,7 +33,7 @@ Component({
     myTasks: [] as TaskItem[],
     _key1: "",
     _key2: "",
-    _searchValue: "",
+    _taskId: "",
   },
 
   behaviors: [
@@ -89,7 +89,7 @@ Component({
           console.log("openOfficialAccountArticle success", res)
         },
         fail(err) {
-          console.error("openOfficialAccountArticle fail", err)
+          console.warn("openOfficialAccountArticle fail", err)
         }
       })
     },
@@ -145,6 +145,9 @@ Component({
       }
       else if(query?.key2) {
         this.data._key2 = query.key2
+      }
+      else if(query?.task) {
+        this.data._taskId = query.task
       }
 
       this.initMyTasks()

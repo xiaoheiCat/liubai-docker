@@ -89,7 +89,8 @@ export async function getMyTasks() {
     operateType: "list-wx-tasks",
     listType: "available",
   }
-  const res2 = await LiuReq.request<PeopleTasksAPI.Res_ListWxTasks>(APIs.PPL_TASKS, u2)
+  const url2 = APIs.PPL_TASKS
+  const res2 = await LiuReq.request<PeopleTasksAPI.Res_ListWxTasks>(url2, u2)
   // console.log("getMyTasks res2: ", res2)
   if(res2.code !== "0000" || !res2.data) return
   const list = showTaskItems(res2.data?.tasks ?? [])
@@ -107,5 +108,10 @@ export async function getStoragedMyTasks() {
 export async function setStoragedMyTasks(tasks: TaskItem[]) {
   const res = await LiuApi.setStorage({ key: "my-tasks", data: tasks })
   return res
+}
+
+
+export async function tryToOpenTask(taskId: string) {
+  
 }
 
