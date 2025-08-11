@@ -13,7 +13,7 @@ import {
   afterCompleteTask,
   toCreateOtherTask,
   toUpdateTitle,
-  checkBindingStatus,
+  getBindingStatus,
   whenTapAI,
   getQrCodePicUrlForBindingWx,
 } from "./tools/useTaskDetail";
@@ -87,10 +87,11 @@ Component({
       const justOnLoad = LiuTime.isWithinMillis(stamp1, 1500, true)
       if(justOnLoad) return
 
-      this.checkStateWhileShowing()
+      await this.checkBindingStatusWhileShowing()
+      await this.checkDetailWhileShowing()
     },
 
-    async checkStateWhileShowing() {
+    async checkDetailWhileShowing() {
       const res1 = await LiuTunnel.takeStuff<PleaseCreateTask>("please-create-task")
       if(res1) {
         const justPosting = LiuTime.isWithinMillis(res1.stamp, LiuTime.MINUTE)
@@ -100,7 +101,28 @@ Component({
         }
       }
 
-      this.getTaskDetail(false)
+      await this.getTaskDetail(false)
+    },
+
+    async checkBindingStatusWhileShowing() {
+      const { qrCodePicUrl, openBindingPopup } = this.data
+      if(!qrCodePicUrl || !openBindingPopup) return
+
+      const res1 = await getBindingStatus(false)
+      if(!res1) return
+      const bind: Record<string, any> = {
+        bindingStatus: "unfollowed"
+      }
+      if(res1.wx_gzh_openid) {
+        bind.bindingStatus = "followed"
+        bind.openBindingPopup = false
+        LiuUtil.showCustomToast({ 
+          title_key: "qrcode.bound_msg",
+          duration: 2500,
+        })
+        LiuApi.vibrateShort({ type: "light" })
+      }
+      this.setData(bind)
     },
 
     async getTaskDetail(
@@ -161,8 +183,8 @@ Component({
         this.waitForAiThenLoadAgain()
       }
 
-      // 6. show modal
-      await valTool.waitMilli(1500)
+      // 6. show modal if you've just created the task
+      await valTool.waitMilli(900)
       const isGroup = Boolean(chatInfo.opengid)
       const res6 = await LiuUtil.showCustomModal({
         title_key: "task-detail.created_1",
@@ -469,7 +491,7 @@ Component({
     async handleBindingStatus(
       tryToOpenBindingPopup = false,
     ) {
-      const res1 = await checkBindingStatus()
+      const res1 = await getBindingStatus()
       if(!res1) return
       let bindingStatus: BindingStatus = "unfollowed"
       if(res1.wx_gzh_openid && res1.wx_gzh_subscribed && res1.wx_gzh_toggle) {
@@ -485,10 +507,12 @@ Component({
     async handleQrCode() {
       const qrCodePicUrl = await getQrCodePicUrlForBindingWx()
       if(!qrCodePicUrl) return
+      await valTool.waitMilli(1500)
       this.setData({ openBindingPopup: true, qrCodePicUrl })
     },
 
     toCloseQrCodePopup() {
+      LiuApi.vibrateShort({ type: "light" })
       this.setData({ openBindingPopup: false })
     },
 

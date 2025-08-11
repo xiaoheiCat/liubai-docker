@@ -86,8 +86,6 @@ export default {
     "updated_tip": "请转发，否则他们会不知道",
     "updated_prefix": "任务有更新: {desc}",
     "when": "什么时候",
-    "bind_tip_1": "长按识别二维码",
-    "bind_tip_2": "关注后，到点时会自动提醒",
   },
   "ai-related": {
     "help_to_organize": "由 {name} 协助整理",
@@ -130,6 +128,7 @@ export default {
   },
   "qrcode": {
     "title": "长按识别二维码",
-    "tip": "关注后，到时会自动提醒你⏰",
+    "tip": "绑定微信，到时会自动提醒你⏰",
+    "bound_msg": "太好了！已绑定💐",
   }
 }

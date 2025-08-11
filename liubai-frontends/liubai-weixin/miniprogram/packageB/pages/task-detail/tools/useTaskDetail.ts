@@ -378,9 +378,13 @@ export async function toUpdateTitle(
 }
 
 let hasCheckedBindingStatus = false
-export async function checkBindingStatus() {
-  if(hasCheckedBindingStatus) return
-  hasCheckedBindingStatus = true
+export async function getBindingStatus(
+  judgeToggle = true,
+) {
+  if(judgeToggle) {
+    if(hasCheckedBindingStatus) return
+    hasCheckedBindingStatus = true
+  }
 
   const loginData = await Loginer.getLoginData()
   if(!loginData) return
@@ -396,12 +400,6 @@ export async function checkBindingStatus() {
   if(res1.code !== "0000" || !res1.data) return
   return res1.data
 }
-
-
-export function resetBindingStatus() {
-  hasCheckedBindingStatus = false
-}
-
 
 export async function getQrCodePicUrlForBindingWx() {
   const loginData = await Loginer.getLoginData()
