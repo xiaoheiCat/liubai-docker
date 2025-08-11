@@ -34,6 +34,7 @@ page {
   --main-normal: #3f4549;
   --main-note: #ababab;
   --skeleton-bg: linear-gradient(135deg, #fff 27%, #eaecef 38%, #fff 63%);
+  --frosted-glass-4: rgba(255, 255, 255, .66);
 }
 
 .liu-dark {
@@ -48,6 +49,7 @@ page {
   --main-normal: #c7c9ca;
   --main-note: #686868;
   --skeleton-bg: linear-gradient(135deg, #232323 27%, #2a2c2e 38%, #232323 63%);
+  --frosted-glass-4: rgba(35, 35, 35, .66);
 }
 
 .liu-scroll-view {

@@ -1,0 +1,72 @@
+@import "../../styles/custom-styles.wxss";
+
+.qp-container {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  transition-duration: 300ms; 
+}
+
+.qp-container_shown {
+  opacity: 1;
+}
+
+.qp-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--frosted-glass-4);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+}
+
+.qp-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 24px 50px 24px;
+  background-color: var(--bg-color);
+  border-radius: 24px 24px 0 0;
+  overflow: hidden;
+  transform: translateY(100%);
+  transition-duration: 300ms;
+}
+
+.qp-box_shown {
+  transform: translateY(0);
+}
+
+.qp-qrcode {
+  width: 200px;
+  height: 300px;
+}
+
+.qp-title {
+  margin-top: -24px;
+  width: 75%;
+  max-width: 500px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--primary-color);
+  font-size: var(--title-font);
+  margin-bottom: 12px;
+}
+
+.qp-tip {
+  width: 86%;
+  max-width: 500px;
+  text-align: center;
+  color: var(--main-normal);
+  font-size: var(--btn-font);
+}

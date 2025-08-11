@@ -1,0 +1,20 @@
+<view class="qp-container {{show ? 'qp-container_shown' : ''}}" 
+  wx:if="{{enable}}"
+>
+
+  <view class="qp-bg" catchtap="onTapBackground"></view>
+
+  <view class="qp-box {{show ? 'qp-box_shown' : ''}}">
+
+    <image src="{{qrCode}}" class="qp-qrcode" mode="aspectFit" />
+
+    <view class="qp-title">
+      <text>{{t1.title}}</text>
+    </view>
+
+    <view class="qp-tip">
+      <text>{{t1.tip}}</text>
+    </view>
+
+  </view>
+</view>

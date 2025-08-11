@@ -15,6 +15,7 @@ import {
   toUpdateTitle,
   checkBindingStatus,
   whenTapAI,
+  getQrCodeForBindingWx,
 } from "./tools/useTaskDetail";
 import { LiuTunnel } from "~/packageB/utils/LiuTunnel";
 import type { JustCreateTask, PleaseCreateTask } from "~/packageB/types/types-tunnel";
@@ -59,6 +60,7 @@ Component({
     alwaysGoHome: false,
     bindingStatus: undefined as BindingStatus | undefined,
     openBindingPopup: false,
+    qr_code: "",
   },
 
   methods: {
@@ -473,12 +475,18 @@ Component({
       if(res1.wx_gzh_openid && res1.wx_gzh_subscribed && res1.wx_gzh_toggle) {
         bindingStatus = "followed"
       }
-      let bind: Record<string, any> = { bindingStatus }
+      this.setData({ bindingStatus })
+      
       if(tryToOpenBindingPopup && bindingStatus === "unfollowed") {
-        bind.openBindingPopup = true
+        this.handleQrCode()
       }
-      this.setData(bind)
-    }
+    },
+
+    async handleQrCode() {
+      const qr_code = await getQrCodeForBindingWx()
+      if(!qr_code) return
+      this.setData({ openBindingPopup: true, qr_code })
+    },
 
   },
 

@@ -4,6 +4,7 @@ import type { WxMiniAPI } from "~/packageB/types/types-wx";
 import type { 
   HappySystemAPI, 
   PeopleTasksAPI,
+  Res_OC_BindWeChat,
   Res_OC_GetWeChat,
 } from "~/packageB/requests/req-types";
 import type { TaskDetail } from "./types";
@@ -400,6 +401,26 @@ export async function checkBindingStatus() {
 export function resetBindingStatus() {
   hasCheckedBindingStatus = false
 }
+
+
+export async function getQrCodeForBindingWx() {
+  const loginData = await Loginer.getLoginData()
+  const memberId = loginData?.memberId
+  if(!memberId) return
+
+  const url1 = APIs.OPEN_CONNECT
+  const w1 = {
+    operateType: "bind-wechat",
+    memberId,
+  }
+  const res1 = await LiuReq.request<Res_OC_BindWeChat>(url1, w1)
+  console.log("fetchQrCodeForBindingWx res1: ", res1)
+  const data1 = res1.data
+  if(res1.code !== "0000" || !data1) return
+  
+  return data1.qr_code
+}
+
 
 export function whenTapAI(
   detail: TaskDetail,

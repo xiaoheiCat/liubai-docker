@@ -11,7 +11,7 @@ const TRANSITION_MS = 300
 Component({
 
   options: {
-    pureDataPattern: /^_/, // 指定所有 _ 开头的数据字段为纯数据字段
+    pureDataPattern: /^_/,
   },
 
   behaviors: [

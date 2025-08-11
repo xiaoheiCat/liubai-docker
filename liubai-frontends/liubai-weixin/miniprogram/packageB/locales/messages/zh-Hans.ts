@@ -128,4 +128,8 @@ export default {
     "early_hr": "提前 {hr} 小时提醒",
     "early_day": "提前 {day} 天提醒",
   },
+  "qrcode": {
+    "title": "长按识别二维码",
+    "tip": "关注后，到时会自动提醒你⏰",
+  }
 }

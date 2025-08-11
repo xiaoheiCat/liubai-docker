@@ -128,6 +128,12 @@ export namespace PeopleTasksAPI {
 }
 
 
+export interface Res_OC_BindWeChat {
+  operateType: "bind-wechat"
+  qr_code: string
+  credential: string
+}
+
 export interface Res_OC_GetWeChat {
   operateType: "get-wechat"
   ww_qynb_external_userid?: string

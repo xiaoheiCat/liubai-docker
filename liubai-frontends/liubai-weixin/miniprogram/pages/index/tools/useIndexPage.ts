@@ -142,6 +142,7 @@ export async function tryToOpenTaskDetail(taskId: string) {
     },
     fail(err) {
       console.warn("openChatTool fail: ", err)
+      LiuTunnel.clear()
     }
   })
 }
