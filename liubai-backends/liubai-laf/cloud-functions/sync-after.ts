@@ -834,11 +834,21 @@ class AiCluster2 {
 
     // 8.2 check out waiting data
     const waitingData = res8.data
-    if(!waitingData.calendarStamp) {
+    const calendarStamp = waitingData.calendarStamp
+    if(!calendarStamp) {
       const title8_2 = "waiting data is weird"
       const msg8_2 = valTool.objToStr(waitingData)
       ClusterHelper.toReport(msg8_2, title8_2, aiWorker)
       return false
+    }
+    const now8 = getNowStamp()
+    if(now8 >= calendarStamp) return
+    if(!waitingData.remindStamp || !waitingData.remindMe) {
+      waitingData.remindStamp = calendarStamp
+      waitingData.remindMe = {
+        type: "early",
+        early_minute: 0,
+      }
     }
 
     console.log("see waiting data:: ", waitingData)

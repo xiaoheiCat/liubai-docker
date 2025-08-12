@@ -1,4 +1,4 @@
-import { LiuApi } from "~/packageB/utils/LiuApi"
+import { LiuApi } from "~/utils/LiuApi"
 
 export class LiuRewardedVideo {
   private static rewardedVideoAd: WechatMiniprogram.RewardedVideoAd | undefined

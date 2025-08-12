@@ -1,8 +1,7 @@
 import { LiuReq } from "~/packageB/requests/LiuReq";
 import APIs from "../../../requests/APIs";
 import type { WxMiniAPI } from "~/packageB/types/types-wx";
-import type { 
-  HappySystemAPI, 
+import type {
   PeopleTasksAPI,
   Res_OC_BindWeChat,
   Res_OC_GetWeChat,
@@ -12,7 +11,6 @@ import { DateUtil } from "~/packageB/utils/date-util";
 import valTool from "~/packageB/utils/val-tool";
 import { LiuApi } from "~/packageB/utils/LiuApi";
 import { useI18n } from "~/packageB/locales/index";
-import { LiuRewardedVideo } from "./liu-rewarded-video";
 import { LiuUtil } from "~/packageB/utils/liu-util/index";
 import { defaultData } from "~/packageB/config/default-data";
 import { Loginer } from "~/packageB/utils/login/Loginer";
@@ -237,29 +235,7 @@ export async function fetchCompleteTask(id: string) {
 }
 
 export async function afterCompleteTask() {
-  // 1. pull ad
-  const req1 = { operateType: "get-ad-data" }
-  const url1 = APIs.HAPPY_SYSTEM
-  const res1 = await LiuReq.request<HappySystemAPI.Res_GetAdData>(url1, req1)
-  const rewardedAdUnitId = res1.data?.rewardedAdUnitId
-  if(!rewardedAdUnitId) return
-
-  let hasShownModal = false
-  const ad = LiuRewardedVideo.init(rewardedAdUnitId)
-  if(!ad) {
-    showYouAreGreat()
-    return
-  }
-  ad.onLoad(res => {
-    console.log("rewardedVideoAd onLoad......", res)
-    if(hasShownModal) return
-    hasShownModal = true
-    showYouAreGreat()
-  })
-  ad.onError(err => {
-    console.warn("rewardedVideoAd onError: ", err)
-  })
-  LiuRewardedVideo.tryToLoad() 
+  showYouAreGreat()
 }
 
 function showYouAreGreat() {
@@ -271,10 +247,6 @@ function showYouAreGreat() {
     title_key: "task-detail.done_it",
     content_key,
     showCancel: false,
-    success(res) {
-      if(!res.confirm) return
-      LiuRewardedVideo.showRewardedVideoAd()
-    }
   })
 }
 
