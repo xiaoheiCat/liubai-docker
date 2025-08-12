@@ -16,11 +16,17 @@ export class TaskManager {
 
     // 0. get chat info from tunnel
     const res0 = await LiuTunnel.takeStuff<WxMiniAPI.ChatInfo>("wx-chat-info")
-    if(res0) {
+    if(res0 && res0.chat_type) {
       this.chatInfo = res0
+      this.toInit()
       return true
     }
 
+    const res1 = await this.toInit()
+    return res1
+  }
+
+  private static async toInit() {
     // 1. login first
     const d1_1 = LiuTime.getLocalTime()
     const res1 = await LiuApp.autoLogin()

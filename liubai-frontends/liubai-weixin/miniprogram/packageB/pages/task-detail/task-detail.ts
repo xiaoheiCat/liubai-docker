@@ -18,7 +18,10 @@ import {
   getQrCodePicUrlForBindingWx,
 } from "./tools/useTaskDetail";
 import { LiuTunnel } from "~/packageB/utils/LiuTunnel";
-import type { JustCreateTask, PleaseCreateTask } from "~/packageB/types/types-tunnel";
+import type { 
+  JustCreateTask, 
+  PleaseCreateTask,
+} from "~/packageB/types/types-tunnel";
 import { LiuApi } from "~/packageB/utils/LiuApi";
 import { pageStates } from "~/packageB/utils/atom-util";
 import type { WxMiniAPI } from "~/packageB/types/types-wx";
@@ -203,30 +206,38 @@ Component({
       this.getTaskDetail(false)
     },
 
+    whenChannelHasGettingRes(
+      res2_1: PeopleTasksAPI.Res_GetWxTask,
+    ) {
+      let bind2_1: Record<string, any> = { pState: pageStates.OK }
+      if(res2_1.isMine) {
+        bind2_1.chatInfo = {
+          group_openid: res2_1.owner_openid,
+          open_single_roomid: res2_1.open_single_roomid,
+          opengid: res2_1.opengid,
+          chat_type: res2_1.chat_type,
+        } as WxMiniAPI.ChatInfo
+        TaskManager.setChatInfo(bind2_1.chatInfo)
+        TaskManager.init()
+        bind2_1.detail = showDetail(res2_1, bind2_1.chatInfo)
+        this.setData(bind2_1)
+        this.toUpdateShareMenu()
+        return true
+      }
+
+      bind2_1.detail = showDetail(res2_1)
+      this.setData(bind2_1)
+      return false
+    },
+
     async initTaskDetail() {
       // 2.1 get detail from tunnel  
       const res2_1 = await LiuTunnel.takeStuff<PeopleTasksAPI.Res_GetWxTask>(
         "task-fr-list-to-detail"
       )
       if(res2_1) {
-        let bind2_1: Record<string, any> = { pState: pageStates.OK }
-        if(res2_1.isMine) {
-          bind2_1.chatInfo = {
-            group_openid: res2_1.owner_openid,
-            open_single_roomid: res2_1.open_single_roomid,
-            opengid: res2_1.opengid,
-            chat_type: res2_1.chat_type,
-          } as WxMiniAPI.ChatInfo
-          TaskManager.setChatInfo(bind2_1.chatInfo)
-          TaskManager.init()
-          bind2_1.detail = showDetail(res2_1, bind2_1.chatInfo)
-          this.setData(bind2_1)
-          this.toUpdateShareMenu()
-          return true
-        }
-
-        bind2_1.detail = showDetail(res2_1)
-        this.setData(bind2_1)
+        const res2_1_1 = this.whenChannelHasGettingRes(res2_1)
+        if(res2_1_1) return true
       }
 
       // 2.2 init task manager

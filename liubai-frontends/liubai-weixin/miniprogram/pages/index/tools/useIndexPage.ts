@@ -57,10 +57,13 @@ async function fetchGroupInfo(
   if(code2 !== "0000") return
   if(!data2) return
   const chatInfo = data2.chatInfo
-  const chatType = chatInfo.chat_type
-  if(!chatType) return
+  let chatType = chatInfo.chat_type
+  if(!chatType) {
+    if(chatInfo.open_single_roomid) chatType = 1
+    else if(chatInfo.opengid) chatType = 3
+  }
   const roomid = chatInfo.opengid ?? chatInfo.open_single_roomid
-  if(!roomid) return
+  if(!roomid || !chatType) return
 
   // 3. invoke openChatTool
   const url3 = "/packageB/pages/task-create/task-create"
