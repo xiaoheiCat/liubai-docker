@@ -403,6 +403,7 @@ Component({
         cancel_key: "task-detail.it_is_not_true",
         success(res) {
           if(!res.confirm) return
+          LiuApi.vibrateShort({ type: "light" })
           _this.toCompleteTask(_id, idx)
         }
       })
