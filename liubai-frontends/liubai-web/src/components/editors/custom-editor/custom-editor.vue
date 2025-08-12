@@ -297,7 +297,7 @@ usePhoneBound(props, ceData)
   width: 100%;
   max-height: v-bind("maxEditorHeight + 'px'");
   position: relative;
-  overflow-y: auto;
+  overflow-y: v-bind("ceData.overflowY");
   transition: .3s;
 }
 

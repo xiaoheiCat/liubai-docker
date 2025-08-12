@@ -72,6 +72,8 @@ const { cha } = useEditingBubbleMenu()
   background-color: var(--bubble-menu-bg);
   margin: 10px;
   box-shadow: var(--bubble-menu-shadow);
+  position: relative;
+  z-index: 2700;
 }
 
 .ec-bubble-box {
