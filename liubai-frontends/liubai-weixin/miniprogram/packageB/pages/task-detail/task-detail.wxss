@@ -162,7 +162,15 @@
   font-size: var(--btn-font);
   font-weight: 700;
   color: var(--main-normal);
-  flex: 1;
+  width: calc(100% - 30px - 28px);
+  max-width: 90%;
+  min-width: 50px;
+  overflow: hidden;
+  position: relative;
+  display: inline-block;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .tc-assignee-checked {
@@ -173,7 +181,7 @@
   justify-content: center;
   transition: .15s;
   flex: none;
-  margin-right: -8px;
+  transform: translateX(8px);
 }
 
 .tc-assignee-checked-icon {

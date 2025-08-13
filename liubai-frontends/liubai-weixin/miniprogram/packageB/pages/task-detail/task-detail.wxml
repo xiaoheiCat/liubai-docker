@@ -99,7 +99,9 @@
               data-idx="{{index}}" catchtap="onTapOneAssignee"
             >
               <open-data-item class="tc-assignee-avatar" type="userAvatar" index="{{index}}" />
-              <open-data-item class="tc-assignee-name" type="userNickName" index="{{index}}" />
+              <span class="tc-assignee-name">
+                <open-data-item type="userNickName" index="{{index}}" />
+              </span>
               <view class="tc-assignee-checked" wx:if="{{detail.assigneeList[index].doneStamp}}">
                 <image src="{{imagePath}}checked.png" class="tc-assignee-checked-icon" />
               </view>
