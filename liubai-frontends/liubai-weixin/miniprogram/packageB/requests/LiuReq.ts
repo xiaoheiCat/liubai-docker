@@ -78,6 +78,9 @@ export class LiuReq {
             return
           }
 
+          console.warn("resData is empty in LiuReq.request!")
+          console.log("res: ", res)
+
           a({ code: "C0001" })
         },
         fail(err) {

@@ -1948,6 +1948,7 @@ export interface Table_WxTask extends BaseTable {
   whenStamp?: number
   remindMe?: LiuRemindMe
   aiWorker?: LiuAi.AiWorker
+  note?: string
 }
 
 
@@ -4379,6 +4380,7 @@ export namespace PeopleTasksAPI {
     | "complete-wx-task"
     | "list-wx-tasks"
     | "update-task-title"
+    | "update-task-note"
 
   export interface Res_EnterWxChatTool {
     operateType: "enter-wx-chat-tool"
@@ -4428,6 +4430,7 @@ export namespace PeopleTasksAPI {
 
     // it only exists when chatInfo.open_single_roomid has been set
     each_other_openid?: string
+    note?: string
   }
 
   export const Sch_Param_GetWxTask = vbot.object({

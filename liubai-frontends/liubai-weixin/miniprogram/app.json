@@ -18,6 +18,7 @@
       "pages": [
         "pages/task-create/task-create",
         "pages/task-detail/task-detail",
+        "pages/task-add-note/task-add-note",
         "pages/article/article",
         "pages/landing-premium/landing-premium"
       ],

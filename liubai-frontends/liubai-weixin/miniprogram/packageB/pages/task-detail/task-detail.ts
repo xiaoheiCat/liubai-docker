@@ -163,6 +163,10 @@ Component({
         return
       }
       if(!data3) {
+        console.warn("data3 is empty!")
+        console.log("res3: ", res3)
+        console.log("id: ", id)
+        console.log("chatInfo: ", chatInfo)
         this.setData({ pState: pageStates.NO_AUTH, alwaysGoHome: true })
         return
       }

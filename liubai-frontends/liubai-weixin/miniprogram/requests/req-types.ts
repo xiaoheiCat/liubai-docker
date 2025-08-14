@@ -199,6 +199,7 @@ export namespace PeopleTasksAPI {
     aiWorker?: LiuAi.AiWorker
 
     each_other_openid?: string
+    note?: string
   }
 
   export type WxTaskItem = Omit<Res_GetWxTask, "operateType">

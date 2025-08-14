@@ -125,6 +125,7 @@ export namespace PeopleTasksAPI {
     aiWorker?: LiuAi.AiWorker
 
     each_other_openid?: string
+    note?: string
   }
 
 }
