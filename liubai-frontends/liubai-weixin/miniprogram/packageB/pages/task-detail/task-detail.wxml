@@ -102,6 +102,7 @@
               <span class="tc-assignee-name">
                 <open-data-item type="userNickName" index="{{index}}" />
               </span>
+              <view class="tc-assignee-fade"></view>
               <view class="tc-assignee-checked" wx:if="{{detail.assigneeList[index].doneStamp}}">
                 <image src="{{imagePath}}checked.png" class="tc-assignee-checked-icon" />
               </view>

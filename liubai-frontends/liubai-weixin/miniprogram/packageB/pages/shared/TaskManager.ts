@@ -12,18 +12,29 @@ export class TaskManager {
 
   static chatInfo: WxMiniAPI.ChatInfo | null = null
 
-  static async init() {
+  // private static mockChatInfo() {
+  //   this.chatInfo = {
+  //     open_single_roomid: "AF66ptTqfQ_7hNIGFwZMQpzGz3jrEx-KZSqzY0IBHw8clQJ0sw",
+  //     group_openid: "AF66ptQVIiGdKk-rwvMXoiYCwSqASxebl8gV1tM6c_RsZ0Q5_A",
+  //     chat_type: 1,
+  //   }
+  //   return true
+  // }
 
-    // 0. get chat info from tunnel
-    const res0 = await LiuTunnel.takeStuff<WxMiniAPI.ChatInfo>("wx-chat-info")
-    if(res0 && res0.chat_type) {
-      this.chatInfo = res0
+  static async init() {
+    // const res0 = this.mockChatInfo()
+    // if(res0) return true
+
+    // 1. get chat info from tunnel
+    const res1 = await LiuTunnel.takeStuff<WxMiniAPI.ChatInfo>("wx-chat-info")
+    if(res1 && res1.chat_type) {
+      this.chatInfo = res1
       this.toInit()
       return true
     }
 
-    const res1 = await this.toInit()
-    return res1
+    const res2 = await this.toInit()
+    return res2
   }
 
   private static async toInit() {

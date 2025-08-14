@@ -167,7 +167,7 @@
   font-size: var(--btn-font);
   font-weight: 700;
   color: var(--main-normal);
-  width: calc(100% - 30px - 28px);
+  width: calc(100% - 30px - 28px - 2px);
   max-width: 90%;
   min-width: 50px;
   overflow: hidden;
@@ -176,6 +176,14 @@
   white-space: pre-wrap;
   word-wrap: break-word;
   overflow-wrap: break-word;
+}
+
+.tc-assignee-fade {
+  width: 28px;
+  margin-left: -26px;
+  height: 30px;
+  background: var(--gradient-one);
+  flex: none;
 }
 
 .tc-assignee-checked {

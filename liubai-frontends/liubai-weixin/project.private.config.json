@@ -6,7 +6,7 @@
         {
           "name": "任务详情",
           "pathName": "packageB/pages/task-detail/task-detail",
-          "query": "id=68944acf90ce519394168a03",
+          "query": "id=689aee6f90ce519394168a21",
           "scene": null,
           "launchMode": "default"
         }
