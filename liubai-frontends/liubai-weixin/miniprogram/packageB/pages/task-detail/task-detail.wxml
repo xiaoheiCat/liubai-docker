@@ -112,79 +112,36 @@
         
       </view>
 
-      <!-- Buttons for owner -->
-      <view wx:if="{{!detail.closedStamp && detail.isMine}}" class="td-buttons">
+      <view class="td-buttons" wx:if="{{btnList.length > 0}}">
+        <block wx:for="{{btnList}}" wx:key="*this">
 
-        <!-- Reminder -->
-        <custom-button wx:if="{{detail.hasAnyIncomplete}}" catchtap="onTapReminder">
-          <text wx:if="{{chatInfo.opengid}}">{{t1.remind_them}}</text>
-          <text wx:else>{{t1.remind_ta}}</text>
-        </custom-button>
+          <custom-button btn-type="{{index > 0 ? 'normal' : 'main'}}" 
+            catchtap="onTap{{item}}"
+          >
+            <text wx:if="{{item === 'Reminder'}}">
+              <text wx:if="{{chatInfo.opengid}}">{{t1.remind_them}}</text>
+              <text wx:else>{{t1.remind_ta}}</text>
+            </text>
 
-        <!-- or Share -->
-        <custom-button wx:else catchtap="onTapShare">
-          <text wx:if="{{chatInfo.opengid}}">{{t1.share_to_group}}</text>
-          <text wx:else>{{t1.share_to_ta}}</text>
-        </custom-button>
+            <text wx:elif="{{item === 'Urge'}}">
+              <text wx:if="{{chatInfo.opengid}}">{{t1.urge_them}}</text>
+              <text wx:else>{{t1.urge_ta}}</text>
+            </text>
 
-        <!-- Complete -->
-        <custom-button wx:if="{{detail.canIComplete}}" btn-type="normal"
-          catchtap="onTapCompleteTask"
-        >
-          <text>{{t1.complete_task}}</text>
-        </custom-button>
+            <text wx:elif="{{item === 'Share'}}">
+              <text wx:if="{{chatInfo.opengid}}">{{t1.share_to_group}}</text>
+              <text wx:else>{{t1.share_to_ta}}</text>
+            </text>
 
-        <!-- Close the task -->
-        <custom-button btn-type="normal" catchtap="onTapCloseTask">
-          <text>{{t1.close_task}}</text>
-        </custom-button>
+            <text wx:elif="{{item === 'CompleteTask'}}">{{t1.complete_task}}</text>
+            <text wx:elif="{{item === 'CreateTask'}}">{{t1.create_other}}</text>
+            <text wx:elif="{{item === 'CloseTask'}}">{{t1.close_task}}</text>
+            
+          </custom-button>
 
-        <!-- Create Other -->
-        <custom-button btn-type="normal" catchtap="onTapCreateTask">
-          <text>{{t1.create_other}}</text>
-        </custom-button>
+        </block>
 
       </view>
-
-      <!-- Buttons during available period -->
-      <view wx:elif="{{!detail.closedStamp && detail.hasAnyIncomplete}}" class="td-buttons">
-        <!-- Complete -->
-        <custom-button wx:if="{{detail.canIComplete}}" catchtap="onTapCompleteTask">
-          <text>{{t1.complete_task}}</text>
-        </custom-button>
-
-        <!-- or Urge -->
-        <custom-button wx:else catchtap="onTapReminder">
-          <text wx:if="{{chatInfo.opengid}}">{{t1.urge_them}}</text>
-          <text wx:else>{{t1.urge_ta}}</text>
-        </custom-button>
-
-        <!-- Share -->
-        <custom-button 
-          btn-type="normal" catchtap="onTapShare"
-        >
-          <text>{{t1.share}}</text>
-        </custom-button>
-
-        <!-- Create Other -->
-        <custom-button btn-type="normal" catchtap="onTapCreateTask">
-          <text>{{t1.create_other}}</text>
-        </custom-button>
-      </view>
-
-      <!-- Buttons for the rest -->
-      <view wx:else class="td-buttons">
-        <!-- Create others -->
-        <custom-button catchtap="onTapCreateTask">
-          <text>{{t1.create_other}}</text>
-        </custom-button>
-
-        <!-- Share -->
-        <custom-button btn-type="normal" catchtap="onTapShare">
-          <text>{{t1.share}}</text>
-        </custom-button>
-      </view>
-
 
     </view>
   </view>

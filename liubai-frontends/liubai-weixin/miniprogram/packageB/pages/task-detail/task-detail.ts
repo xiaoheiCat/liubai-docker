@@ -17,6 +17,7 @@ import {
   whenTapAI,
   getQrCodePicUrlForBindingWx,
 } from "./tools/useTaskDetail";
+import { handleBtnList } from "./tools/handleBtnList";
 import { LiuTunnel } from "~/packageB/utils/LiuTunnel";
 import type { 
   JustCreateTask, 
@@ -64,6 +65,7 @@ Component({
     bindingStatus: undefined as BindingStatus | undefined,
     openBindingPopup: false,
     qrCodePicUrl: "",
+    btnList: [] as string[],
   },
 
   methods: {
@@ -167,7 +169,8 @@ Component({
 
       // 4.1 show
       const detail = showDetail(data3, chatInfo)
-      this.setData({ detail, pState: pageStates.OK })
+      const btnList = handleBtnList(detail)
+      this.setData({ detail, btnList, pState: pageStates.OK })
       this.toUpdateShareMenu()
 
       // 4.2 check out binding status
@@ -220,12 +223,14 @@ Component({
         TaskManager.setChatInfo(bind2_1.chatInfo)
         TaskManager.init()
         bind2_1.detail = showDetail(res2_1, bind2_1.chatInfo)
+        bind2_1.btnList = handleBtnList(bind2_1.detail)
         this.setData(bind2_1)
         this.toUpdateShareMenu()
         return true
       }
 
       bind2_1.detail = showDetail(res2_1)
+      bind2_1.btnList = handleBtnList(bind2_1.detail)
       this.setData(bind2_1)
       return false
     },
@@ -252,7 +257,8 @@ Component({
         const chatInfo = TaskManager.getChatInfo()
         if(!chatInfo) return false
         const tmpDetail2_2 = showDetail(res2_1, chatInfo)
-        this.setData({ detail: tmpDetail2_2, chatInfo })
+        const btnList2_2 = handleBtnList(tmpDetail2_2)
+        this.setData({ detail: tmpDetail2_2, btnList: btnList2_2, chatInfo })
         this.toUpdateShareMenu()
       }
 
@@ -343,6 +349,10 @@ Component({
       toNotifyMembers(_id, detail)
     },
 
+    onTapUrge() {
+      this.onTapReminder()
+    },
+
     onTapShare() {
       LiuApi.vibrateShort({ type: "medium" })
       const { detail, _id, _justCreated } = this.data
@@ -372,7 +382,10 @@ Component({
       }
 
       const bind: Record<string, any> = {}
-      bind["detail.closedStamp"] = LiuTime.getTime()
+      const now2 = LiuTime.getTime()
+      detail.closedStamp = now2
+      bind["detail.closedStamp"] = now2
+      bind.btnList = handleBtnList(detail)
       this.setData(bind)
       
       const res2 = await fetchCloseTask(_id)
@@ -436,10 +449,14 @@ Component({
       bind["detail.canIComplete"] = false
       bind[`detail.assigneeList[${idx}].doneStamp`] = now2
       this.setData(bind)
+
+      // 4. handle btnList
+      await LiuApi.nextTick()
+      const btnList = handleBtnList(this.data.detail as TaskDetail)
+      this.setData({ btnList })
       
-      // 3. fetch
+      // 5. fetch
       const res5 = await fetchCompleteTask(id)
-      console.log("fetchCompleteTask res5: ", res5)
       const code5 = res5.code
       if(code5 === "0000" || code5 === "0001") {
         if(!needShare) {

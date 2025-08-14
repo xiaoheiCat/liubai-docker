@@ -30,3 +30,8 @@ export interface TaskDetail {
 }
 
 export type BindingStatus = "followed" | "unfollowed"
+
+export type BtnType = "CompleteTask" | "Reminder" | "Urge" | "Share" | "CreateTask"
+  | "CloseTask"
+  | "More"
+  | "AddNote"
