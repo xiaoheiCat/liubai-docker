@@ -89,6 +89,8 @@ export default {
     "updated_tip": "Share please, otherwise they won't know about this update",
     "updated_prefix": "Task Updated: {desc}",
     "when": "When",
+    "more": "More",
+    "add_note": "Add Note",
   },
   "ai-related": {
     "help_to_organize": "Organized by {name}",

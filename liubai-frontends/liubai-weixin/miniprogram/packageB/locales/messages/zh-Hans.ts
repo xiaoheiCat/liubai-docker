@@ -86,6 +86,8 @@ export default {
     "updated_tip": "请转发，否则他们会不知道",
     "updated_prefix": "任务有更新: {desc}",
     "when": "什么时候",
+    "more": "更多",
+    "add_note": "添加备注",
   },
   "ai-related": {
     "help_to_organize": "由 {name} 协助整理",

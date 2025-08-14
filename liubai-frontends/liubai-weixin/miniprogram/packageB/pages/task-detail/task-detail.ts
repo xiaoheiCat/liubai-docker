@@ -17,7 +17,7 @@ import {
   whenTapAI,
   getQrCodePicUrlForBindingWx,
 } from "./tools/useTaskDetail";
-import { handleBtnList } from "./tools/handleBtnList";
+import { getMoreBtnList, handleBtnList } from "./tools/handleBtnList";
 import { LiuTunnel } from "~/packageB/utils/LiuTunnel";
 import type { 
   JustCreateTask, 
@@ -26,7 +26,7 @@ import type {
 import { LiuApi } from "~/packageB/utils/LiuApi";
 import { pageStates } from "~/packageB/utils/atom-util";
 import type { WxMiniAPI } from "~/packageB/types/types-wx";
-import type { TaskDetail } from "./tools/types";
+import type { BtnType, TaskDetail } from "./tools/types";
 import { LiuUtil } from "~/packageB/utils/liu-util/index";
 import valTool from "~/packageB/utils/val-tool";
 import { useI18n } from "~/packageB/locales/index";
@@ -65,7 +65,7 @@ Component({
     bindingStatus: undefined as BindingStatus | undefined,
     openBindingPopup: false,
     qrCodePicUrl: "",
-    btnList: [] as string[],
+    btnList: [] as BtnType[],
   },
 
   methods: {
@@ -167,25 +167,33 @@ Component({
         return
       }
 
-      // 4.1 show
-      const detail = showDetail(data3, chatInfo)
-      const btnList = handleBtnList(detail)
-      this.setData({ detail, btnList, pState: pageStates.OK })
+      // 4.1 check whether the task is just created
+      const bind4: Record<string, any> = {
+        detail: showDetail(data3, chatInfo),
+        _justCreated: false,
+        pState: pageStates.OK,
+      }
+      const res4_1 = await LiuTunnel.takeStuff<JustCreateTask>("just-create-task")
+      if(res4_1 && res4_1.id === id) {
+        if(LiuTime.isWithinMillis(res4_1.stamp, LiuTime.MINUTE)) {
+          bind4._justCreated = true
+        }
+      }
+      bind4.btnList = handleBtnList(bind4.detail, bind4._justCreated)
+
+      // 4.2 show
+      this.setData(bind4)
+      console.log("let's go to update share menu")
       this.toUpdateShareMenu()
 
-      // 4.2 check out binding status
-      if(detail.remindStr) {
+      // 4.3 check out binding status
+      if(bind4.detail.remindStr) {
         this.handleBindingStatus(true)
       }
 
-      // 5. if just created
-      const res5 = await LiuTunnel.takeStuff<JustCreateTask>("just-create-task")
-      if(!res5 || res5.id !== id) return
-      if(!LiuTime.isWithinMillis(res5.stamp, LiuTime.MINUTE)) {
-        console.warn("over one minute!")
-        return
-      }
-      if(!detail.remindStr && justOnLoad) {
+      // 5. return if not just created
+      if(!bind4._justCreated) return
+      if(!bind4.detail.remindStr && justOnLoad) {
         this.waitForAiThenLoadAgain()
       }
 
@@ -198,10 +206,9 @@ Component({
         confirm_key: "shared.ok",
       })
       if(!res6.confirm) return
-      this.data._justCreated = true
 
       // 7. forward
-      toForward(id, detail.desc, true)
+      toForward(id, bind4.detail.desc, true)
     },
 
     async waitForAiThenLoadAgain() {
@@ -452,7 +459,10 @@ Component({
 
       // 4. handle btnList
       await LiuApi.nextTick()
-      const btnList = handleBtnList(this.data.detail as TaskDetail)
+      const btnList = handleBtnList(
+        this.data.detail as TaskDetail,
+        this.data._justCreated,
+      )
       this.setData({ btnList })
       
       // 5. fetch
@@ -503,12 +513,49 @@ Component({
       const id = this.data._id
       const detail = this.data.detail
       if(!detail) return
+      LiuApi.vibrateShort({ type: "light" })
       const newTitle = await toUpdateTitle(id, detail)
       if(!newTitle) return
 
       const bind: Record<string, any> = {}
       bind["detail.desc"] = newTitle
       this.setData(bind)
+    },
+
+    async onTapAddNote() {
+      const detail = this.data.detail
+      if(!detail) return
+      LiuApi.vibrateShort({ type: "medium" })
+      console.warn("ready to add note!")
+      
+    },
+
+    onTapMore() {
+      const { detail, btnList, _justCreated } = this.data
+      if(!detail) return
+      LiuApi.vibrateShort({ type: "medium" })
+
+      const res1 = getMoreBtnList(detail, btnList, _justCreated)
+      if(!res1) return
+      const { moreBtnList, itemKeyList } = res1
+
+      const _this = this
+      LiuUtil.showCustomActionSheet({
+        alert_text_key: "task-detail.more",
+        item_key_list: itemKeyList,
+        success(res) {
+          const idx = res.tapIndex
+          if(idx < 0) return
+          const btnType = moreBtnList[idx]
+          if(!btnType) return
+          try {
+            _this[`onTap${btnType}`]()
+          }
+          catch(err) {
+            console.warn("onTapMore error: ", err)
+          }
+        }
+      })
     },
 
     onTapAI() {
