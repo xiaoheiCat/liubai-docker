@@ -1,0 +1,21 @@
+<span class="footer-box {{renderer}}">
+
+  <block wx:for="{{textList}}" wx:key="id">
+    
+    <!-- copy text -->
+    <span wx:if="{{item.type === 'copy'}}" 
+      class="fb-copy {{item.isHover ? 'fb-copy_hovered' : ''}}"
+      catchtap="onTapCopy"
+      data-text="{{item.text}}"
+      data-idx="{{index}}"
+    >
+      <image src="{{imagePath}}copy-primary.png" class="fb-copy-image" />
+      <text class="fb-copy-text">{{item.text}}</text>
+    </span>
+
+    <!-- other -->
+    <text wx:else>{{item.text}}</text>
+
+  </block>
+
+</span>
