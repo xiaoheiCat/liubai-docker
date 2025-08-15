@@ -52,6 +52,8 @@ export function prePost(
   assignees: string[],
   ctx: MiniProgramContext,
 ) {
+  jumpToDetailFunc = undefined
+  
   // 1. directly create the task
   toCreateTask(desc, assignees)
 
@@ -73,7 +75,9 @@ export function prePost(
   
   // 3. wait for createTaskPromise
   waitForCreateTask(ctx)
-  jumpToDetailFunc = "navigateTo"
+  if(!jumpToDetailFunc) {
+    jumpToDetailFunc = "navigateTo"
+  }
 }
 
 
