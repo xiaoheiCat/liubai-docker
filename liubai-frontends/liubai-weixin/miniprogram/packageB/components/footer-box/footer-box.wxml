@@ -1,4 +1,4 @@
-<span class="footer-box {{renderer}}">
+<span class="footer-box">
 
   <block wx:for="{{textList}}" wx:key="id">
     

@@ -454,5 +454,8 @@ function jumpToAddNote(
     read_clipboard,
   }
   LiuTunnel.setStuff("add-task-note", data)
-  LiuUtil.navigateWithPopup("/packageB/pages/task-add-note/task-add-note")
+  LiuApi.navigateTo({ 
+    url: "/packageB/pages/task-add-note/task-add-note",
+    routeType: "wx://upwards",
+  })
 }

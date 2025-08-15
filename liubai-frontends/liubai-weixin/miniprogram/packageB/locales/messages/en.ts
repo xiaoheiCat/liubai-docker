@@ -93,6 +93,7 @@ export default {
     "add_note": "Add note",
     "edit_note": "Edit note",
     "read_clipboard_tip": "Read clipboard content?\nThis can quickly paste meeting info",
+    "note_title": "INFO",
   },
   "ai-related": {
     "help_to_organize": "Organized by {name}",

@@ -8,7 +8,7 @@
   word-wrap: break-word;
   overflow-wrap: break-word;
   font-size: var(--btn-font);
-  color: var(--main-note);
+  color: var(--main-normal);
 }
 
 .fb-copy {
@@ -35,17 +35,7 @@
   background-color: var(--primary-color);
 }
 
-@media (hover: hover) {
-  .fb-copy:hover {
-    opacity: .75;
-  }
-}
-
-.fb-copy:active::before {
-  opacity: .06;
-}
-
-.skyline .fb-copy_hovered {
+.fb-copy_hovered {
   color: var(--primary-active);
 }
 

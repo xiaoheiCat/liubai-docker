@@ -4,6 +4,7 @@
     "custom-navibar": "../../components/custom-navibar/custom-navibar",
     "virtual-navibar": "../../components/virtual-navibar/virtual-navibar",
     "placeholder-view": "../../components/placeholder-view/placeholder-view",
-    "qrcode-popup": "../../components/qrcode-popup/qrcode-popup"
+    "qrcode-popup": "../../components/qrcode-popup/qrcode-popup",
+    "footer-box": "../../components/footer-box/footer-box"
   }
 }

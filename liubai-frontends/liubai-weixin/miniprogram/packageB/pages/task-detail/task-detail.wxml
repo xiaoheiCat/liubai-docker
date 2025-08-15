@@ -48,6 +48,8 @@
         <text>{{t1.closed_1}}</text>
       </view>
 
+      <view class="td-virtual-30" />
+
       <!-- When -->
       <view wx:if="{{detail.whenStr}}" class="tc-box">
         <view class="tc-first-bar">
@@ -86,6 +88,20 @@
         
       </view>
 
+      <view class="td-virtual-15" wx:if="{{detail.whenStr}}" />
+
+      <!-- note -->
+      <view class="tc-box" wx:if="{{detail.note}}">
+        <view class="tc-first-bar">
+          <text>{{t1.note_title}}</text>
+        </view>
+        <view class="td-box-bar">
+          <footer-box content="{{detail.note}}" />
+        </view>
+      </view>
+
+      <view class="td-virtual-15" wx:if="{{detail.note}}" />
+
       <!-- Assign to -->
       <view wx:if="{{detail.assignees.length > 0}}" class="tc-box">
         <view class="tc-first-bar">
@@ -113,6 +129,9 @@
         
       </view>
 
+      <view class="td-virtual-15" wx:if="{{detail.assignees.length > 0}}" />
+
+      <!-- Buttons -->
       <view class="td-buttons" wx:if="{{btnList.length > 0}}">
         <block wx:for="{{btnList}}" wx:key="*this">
 

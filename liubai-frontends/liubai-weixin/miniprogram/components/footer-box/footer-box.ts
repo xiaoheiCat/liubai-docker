@@ -36,7 +36,6 @@ Component({
 
       // 1. show hover
       const idx = dataset.idx
-      console.log('idx: ', idx)
       const res1 = this.handleHover(idx, true)
 
       // 2. vibrate and copy text

@@ -83,7 +83,6 @@
 /** assignees */
 
 .tc-box {
-  margin-top: 30px;
   position: relative;
   width: 100%;
   border-radius: 30px;
@@ -212,8 +211,18 @@
   height: 60px;
 }
 
+.td-virtual-30 {
+  width: 100%;
+  height: 30px;
+}
+
+.td-virtual-15 {
+  width: 100%;
+  height: 15px;
+}
+
 .td-buttons {
-  margin-top: 60px;
+  margin-top: 30px;
   width: 100%;
   position: relative;
   padding-bottom: 90px;

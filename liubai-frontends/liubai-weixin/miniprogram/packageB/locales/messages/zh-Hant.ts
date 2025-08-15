@@ -90,6 +90,7 @@ export default {
     "add_note": "新增備註",
     "edit_note": "編輯備註",
     "read_clipboard_tip": "是否讀取剪貼板中的文本？\n這可以快速黏貼會議資訊",
+    "note_title": "備註欄",
   },
   "ai-related": {
     "help_to_organize": "由 {name} 協助整理",
