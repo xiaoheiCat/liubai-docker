@@ -2,7 +2,6 @@
 .footer-box {
   display: inline-block;
   width: 100%;
-  text-align: center;
   line-height: 1.75;
   position: relative;
   white-space: pre-wrap;
@@ -48,13 +47,6 @@
 
 .skyline .fb-copy_hovered {
   color: var(--primary-active);
-}
-
-.fb-copy-image {
-  width: 18px;
-  height: 18px;
-  vertical-align: middle;
-  margin-right: 2px;
 }
 
 .fb-copy-text {

@@ -3,13 +3,14 @@
   <block wx:for="{{textList}}" wx:key="id">
     
     <!-- copy text -->
-    <span wx:if="{{item.type === 'copy'}}" 
+    <span 
+      wx:if="{{item.type !== 'plain-text'}}" 
       class="fb-copy {{item.isHover ? 'fb-copy_hovered' : ''}}"
       catchtap="onTapCopy"
       data-text="{{item.text}}"
       data-idx="{{index}}"
+      data-type="{{item.type}}"
     >
-      <image src="{{imagePath}}copy-primary.png" class="fb-copy-image" />
       <text class="fb-copy-text">{{item.text}}</text>
     </span>
 

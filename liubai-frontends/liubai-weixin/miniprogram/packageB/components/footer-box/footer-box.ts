@@ -17,7 +17,8 @@ Component({
     content: {
       type: String,
       value: "",
-      observer(newV) {
+      observer(newV, oldV) {
+        if(newV === oldV) return
         const textList = calculateTextList(newV)
         this.setData({ textList })
       }
@@ -32,11 +33,11 @@ Component({
     async onTapCopy(e: WechatMiniprogram.BaseEvent) {
       const dataset = e.currentTarget.dataset
       const text = dataset.text
-      if(!text) return
+      const type = dataset.type
+      if(!text || !type) return
 
       // 1. show hover
       const idx = dataset.idx
-      console.log('idx: ', idx)
       const res1 = this.handleHover(idx, true)
 
       // 2. vibrate and copy text
