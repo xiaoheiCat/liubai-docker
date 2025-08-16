@@ -10,4 +10,5 @@ export default {
   USER_SETTINGS: d + "user-settings",
   HAPPY_SYSTEM: d + "happy-system",
   PPL_TASKS: d + "people-tasks",
+  OPEN_CONNECT: d + "open-connect",
 }

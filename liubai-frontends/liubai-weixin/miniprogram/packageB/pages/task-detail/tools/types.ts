@@ -1,4 +1,5 @@
 import type { PeopleTasksAPI } from "~/packageB/requests/req-types"
+import { LiuAi } from "~/packageB/types/types-cloud"
 
 export interface TaskDetail {
   desc: string
@@ -19,4 +20,19 @@ export interface TaskDetail {
 
   // activity
   isActivity: boolean
+
+  // remind
+  whenStr?: string
+  remindStr?: string
+  aiHelpStr?: string
+  aiWorker?: LiuAi.AiWorker
+  each_other_openid?: string
+  note?: string
 }
+
+export type BindingStatus = "followed" | "unfollowed"
+
+export type BtnType = "CompleteTask" | "Reminder" | "Urge" | "Share" | "CreateTask"
+  | "CloseTask"
+  | "More"
+  | "AddNote"

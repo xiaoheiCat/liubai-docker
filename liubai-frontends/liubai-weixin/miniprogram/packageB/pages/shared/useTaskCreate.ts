@@ -8,11 +8,14 @@ import { LiuTunnel } from "~/packageB/utils/LiuTunnel"
 import type { JustCreateTask, PleaseCreateTask } from "~/packageB/types/types-tunnel"
 import { LiuTime } from "~/packageB/utils/LiuTime"
 import { LiuRqReturn } from "~/packageB/requests/tools/types"
+import type { MiniProgramContext } from "~/packageB/types"
 
 type CreateTaskResolver = (res: LiuRqReturn<any> | null) => void
+type JumpToDetailFunc = "navigateTo" | "navigateBack"
 
 let hasCreatedTask = false
 let createTaskPromise: Promise<LiuRqReturn<any> | null> | undefined
+let jumpToDetailFunc: JumpToDetailFunc | undefined
 
 function toCreateTask(
   desc: string,
@@ -47,7 +50,10 @@ function toCreateTask(
 export function prePost(
   desc: string,
   assignees: string[],
+  ctx: MiniProgramContext,
 ) {
+  jumpToDetailFunc = undefined
+  
   // 1. directly create the task
   toCreateTask(desc, assignees)
 
@@ -63,17 +69,21 @@ export function prePost(
       }
       LiuTunnel.setStuff("please-create-task", plzData)
       LiuApi.navigateBack()
-      return "navigateBack"
+      jumpToDetailFunc = "navigateBack"
     }
   }
   
   // 3. wait for createTaskPromise
-  waitForCreateTask()
-  return "navigateTo"
+  waitForCreateTask(ctx)
+  if(!jumpToDetailFunc) {
+    jumpToDetailFunc = "navigateTo"
+  }
 }
 
 
-export async function waitForCreateTask() {
+export async function waitForCreateTask(
+  ctx: MiniProgramContext,
+) {
   if(!createTaskPromise) return
 
   // 1. handle loading 
@@ -97,7 +107,22 @@ export async function waitForCreateTask() {
     ShowTip.showErrMsg("🤨", res1)
     return
   }
+
+  resetPageData(ctx)
   showCreated(id)
+}
+
+function resetPageData(ctx: MiniProgramContext) {
+  const pageName = ctx.data.pageName
+  if(jumpToDetailFunc === "navigateTo" && pageName === "task-create") {
+    ctx.setData({
+      _val: "",
+      inputValue: "",
+      assignees: [],
+      canSubmit: false,
+    })
+  }
+  jumpToDetailFunc = undefined
 }
 
 function resetStates() {

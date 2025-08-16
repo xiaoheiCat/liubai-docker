@@ -50,6 +50,7 @@ Component({
         },
         fail(err) {
           console.warn("openChatTool fail", err)
+          LiuTunnel.clear()
         }
       })
     }

@@ -34,6 +34,9 @@ page {
   --main-normal: #3f4549;
   --main-note: #ababab;
   --skeleton-bg: linear-gradient(135deg, #fff 27%, #eaecef 38%, #fff 63%);
+  --frosted-glass-4: rgba(255, 255, 255, .66);
+  --popup-shadow: 0 -16px 48px rgba(0, 0, 0, .09);
+  --gradient-one: linear-gradient(90deg, rgba(241, 243, 246, 0) 10%, rgba(241, 243, 246, 1) 86%);
 }
 
 .liu-dark {
@@ -48,6 +51,9 @@ page {
   --main-normal: #c7c9ca;
   --main-note: #686868;
   --skeleton-bg: linear-gradient(135deg, #232323 27%, #2a2c2e 38%, #232323 63%);
+  --frosted-glass-4: rgba(35, 35, 35, .66);
+  --popup-shadow: 0 -10px 30px rgba(255, 255, 255, .13);
+  --gradient-one: linear-gradient(90deg, rgba(42, 44, 46, 0) 10%, rgba(42, 44, 46, 1) 86%);
 }
 
 .liu-scroll-view {

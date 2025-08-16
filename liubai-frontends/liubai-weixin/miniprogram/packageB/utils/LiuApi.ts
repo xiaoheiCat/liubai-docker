@@ -505,5 +505,12 @@ export class LiuApi {
     return res
   }
   
+  static makePhoneCall(opt: WechatMiniprogram.MakePhoneCallOption) {
+    wx.makePhoneCall(opt)
+  }
+
+  static sendSms(opt: WechatMiniprogram.SendSmsOption) {
+    wx.sendSms(opt)
+  }
 
 }

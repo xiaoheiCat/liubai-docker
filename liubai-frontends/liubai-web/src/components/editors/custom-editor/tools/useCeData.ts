@@ -26,7 +26,7 @@ import { LocalToCloud } from "~/utils/cloud/LocalToCloud";
 import type { EcSelectionChangeData } from "../../editor-core/tools/types";
 import { useDebounceFn } from "~/hooks/useVueUse";
 import { deviceChaKey } from '~/utils/provide-keys';
-import { checkCanSubmit } from "./some-funcs";
+import { checkCanSubmit, checkOverflowY } from "./some-funcs";
 import { checkIfReminderEnabled } from "./reminder-tip";
 
 let collectTimeout: LiuTimeout
@@ -105,6 +105,7 @@ export function useCeData(
   const onEditorUpdate = (data: EditorCoreContent) => {
     ceData.editorContent = data
     checkCanSubmit(ceData)
+    checkOverflowY(ceData)
     toAutoChange(ctx)
   }
 

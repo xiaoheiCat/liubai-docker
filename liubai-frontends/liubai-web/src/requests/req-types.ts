@@ -276,6 +276,7 @@ export interface Res_OC_BindWeChat {
   operateType: "bind-wechat"
   qr_code: string
   credential: string
+  wx_qr_ticket?: string
 }
 
 export interface Res_OC_CheckWeChat {

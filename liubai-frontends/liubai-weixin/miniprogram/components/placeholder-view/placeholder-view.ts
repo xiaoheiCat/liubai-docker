@@ -2,6 +2,7 @@
 import { pageStates } from "~/utils/atom-util"
 import { i18nBehavior } from "~/behaviors/i18n-behavior"
 import { defaultData } from "~/config/default-data"
+import { themeBehavior } from "~/behaviors/theme-behavior"
 
 const TRANSITION_MS = 300
 
@@ -12,7 +13,8 @@ Component({
   },
 
   behaviors: [
-    i18nBehavior("err")
+    i18nBehavior("err"),
+    themeBehavior(),
   ],
 
   properties: {

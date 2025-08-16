@@ -1,6 +1,7 @@
-import type { LocalTheme } from "../types/types-atom"
+import type { LiuRemindMe, LocalTheme } from "../types/types-atom"
 import type { 
   CloudStorageService, 
+  LiuAi, 
   LiuSpaceAndMember, 
   UserSubscription,
 } from "../types/types-cloud"
@@ -116,6 +117,32 @@ export namespace PeopleTasksAPI {
     editedStamp?: number
     endStamp?: number
     closedStamp?: number
+
+    calendarStamp?: number
+    remindStamp?: number
+    whenStamp?: number
+    remindMe?: LiuRemindMe
+    aiWorker?: LiuAi.AiWorker
+
+    each_other_openid?: string
+    note?: string
   }
 
+}
+
+
+export interface Res_OC_BindWeChat {
+  operateType: "bind-wechat"
+  qr_code: string
+  credential: string
+  wx_qr_ticket?: string
+}
+
+export interface Res_OC_GetWeChat {
+  operateType: "get-wechat"
+  ww_qynb_external_userid?: string
+  ww_qynb_toggle?: boolean
+  wx_gzh_openid?: string
+  wx_gzh_toggle?: boolean
+  wx_gzh_subscribed?: boolean
 }

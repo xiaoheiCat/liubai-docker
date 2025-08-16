@@ -134,20 +134,7 @@ Component({
       if(!res1) return
 
       // 2. ready to post
-      const res2 = prePost(this.data._val, this.data.assignees)
-      if(res2 === "navigateTo") {
-        this.reset()
-      }
-    },
-
-    async reset() {
-      await valTool.waitMilli(300)
-      this.setData({
-        _val: "",
-        inputValue: "",
-        assignees: [],
-        canSubmit: false,
-      })
+      prePost(this.data._val, this.data.assignees, this)
     },
 
     onLoad() {

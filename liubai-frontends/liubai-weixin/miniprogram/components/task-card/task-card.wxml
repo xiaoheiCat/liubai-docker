@@ -1,4 +1,4 @@
-<view class="liu-hover task-card" hover-class="liu-skyline-hover" catchtap="onTapCard">
+<view class="task-card" hover-class="liu-skyline-hover" catchtap="onTapCard">
 
   <view class="task-card-title">
     <text>{{task.desc}}</text>

@@ -11,10 +11,6 @@
   font-weight: 700;
 }
 
-.tc-placeholder {
-  color: var(--primary-color);
-}
-
 .tc-box {
   position: relative;
   width: 100%;

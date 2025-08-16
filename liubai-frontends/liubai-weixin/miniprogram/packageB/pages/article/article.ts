@@ -2,6 +2,8 @@ import { envData } from "~/packageB/config/env-data"
 import type { ArticleKey } from "./tools/types"
 import type { UserLoginAPI } from "~/packageB/requests/req-types"
 import { Loginer } from "~/packageB/utils/login/Loginer"
+import APIs from "~/packageB/requests/APIs"
+import { LiuReq } from "~/packageB/requests/LiuReq"
 
 Component({
 
@@ -32,9 +34,7 @@ Component({
     },
 
     onWebViewMessage(e: any) {
-      console.log("onWebViewMessage: ", e)
       const { data } = e.detail
-      console.log("data: ", data)
       if(!data || data.length === 0) return
       
       const msg = data[0] as UserLoginAPI.Res_WxGzhForMini
@@ -48,6 +48,7 @@ Component({
       const { nickname, headimgurl } = msg
       if(!nickname) return
 
+      // 1. save locally
       const loginData = await Loginer.getLoginData()
       if(!loginData) return
 
@@ -58,6 +59,15 @@ Component({
         loginData.avatarUrl = headimgurl
       }
       await Loginer.setLoginData(loginData)
+
+      // 2. save to cloud
+      const url2 = APIs.USER_SETTINGS
+      const w2 = {
+        operateType: "member-name",
+        name: nickname,
+        memberId: loginData.memberId,
+      }
+      await LiuReq.request(url2, w2)
     },
 
     

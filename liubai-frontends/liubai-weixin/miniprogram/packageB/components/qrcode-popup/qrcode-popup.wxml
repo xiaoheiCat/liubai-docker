@@ -1,0 +1,26 @@
+<view class="liu-{{theme}} qp-container {{show ? 'qp-container_shown' : ''}}" 
+  wx:if="{{enable}}"
+>
+
+  <view class="qp-bg" catchtap="onTapBackground"></view>
+
+  <view class="qp-box {{show ? 'qp-box_shown' : ''}}">
+
+    <!-- QR Code -->
+    <view class="qr-image-box" hover-class="qr-image-box_hover">
+      <image src="{{picUrl}}" class="qp-qrcode" mode="aspectFit" 
+        show-menu-by-longpress 
+      />
+    </view>
+
+    <!-- Title -->
+    <view class="qp-title">
+      <text>{{t1.title}}</text>
+    </view>
+
+    <view class="qp-tip">
+      <text>{{t1.tip}}</text>
+    </view>
+
+  </view>
+</view>

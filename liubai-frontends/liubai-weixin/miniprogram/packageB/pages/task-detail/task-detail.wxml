@@ -48,6 +48,60 @@
         <text>{{t1.closed_1}}</text>
       </view>
 
+      <view class="td-virtual-30" />
+
+      <!-- When -->
+      <view wx:if="{{detail.whenStr}}" class="tc-box">
+        <view class="tc-first-bar">
+          <text>{{t1.when}}</text>
+        </view>
+
+        <!-- Date & Time -->
+        <view class="td-box-bar" catchtap="onTapRemindMe">
+          <view class="tdbb-icon-box">
+            <image src="{{imagePath}}schedule.png" class="tdbb-icon" />
+          </view>
+          <view class="td-box-bar-text">
+            <text>{{detail.whenStr}}</text>
+          </view>
+        </view>
+
+        <!-- Remind -->
+        <view wx:if="{{detail.remindStr}}" class="td-box-bar" catchtap="onTapRemindMe">
+          <view class="tdbb-icon-box">
+            <image src="{{imagePath}}notification.png" class="tdbb-icon" />
+          </view>
+          <view class="td-box-bar-text">
+            <text>{{detail.remindStr}}</text>
+          </view>
+        </view>
+
+        <!-- AI -->
+         <view wx:if="{{detail.aiHelpStr}}" class="td-box-bar" catchtap="onTapAI">
+          <view class="tdbb-icon-box">
+            <image src="{{imagePath}}wand_stars.png" class="tdbb-icon" />
+          </view>
+          <view class="td-box-bar-text">
+            <text>{{detail.aiHelpStr}}</text>
+          </view>
+        </view>
+        
+      </view>
+
+      <view class="td-virtual-15" wx:if="{{detail.whenStr}}" />
+
+      <!-- note -->
+      <view class="tc-box" wx:if="{{detail.note}}">
+        <view class="tc-first-bar">
+          <text>{{t1.note_title}}</text>
+        </view>
+        <view class="td-box-bar" catchtap="onTapNote">
+          <footer-box content="{{detail.note}}" />
+        </view>
+      </view>
+
+      <view class="td-virtual-15" wx:if="{{detail.note}}" />
+
       <!-- Assign to -->
       <view wx:if="{{detail.assignees.length > 0}}" class="tc-box">
         <view class="tc-first-bar">
@@ -61,7 +115,10 @@
               data-idx="{{index}}" catchtap="onTapOneAssignee"
             >
               <open-data-item class="tc-assignee-avatar" type="userAvatar" index="{{index}}" />
-              <open-data-item class="tc-assignee-name" type="userNickName" index="{{index}}" />
+              <span class="tc-assignee-name">
+                <open-data-item type="userNickName" index="{{index}}" />
+              </span>
+              <view class="tc-assignee-fade"></view>
               <view class="tc-assignee-checked" wx:if="{{detail.assigneeList[index].doneStamp}}">
                 <image src="{{imagePath}}checked.png" class="tc-assignee-checked-icon" />
               </view>
@@ -72,79 +129,45 @@
         
       </view>
 
-      <!-- Buttons for owner -->
-      <view wx:if="{{!detail.closedStamp && detail.isMine}}" class="td-buttons">
+      <view class="td-virtual-15" wx:if="{{detail.assignees.length > 0}}" />
 
-        <!-- Reminder -->
-        <custom-button wx:if="{{detail.hasAnyIncomplete}}" catchtap="onTapReminder">
-          <text wx:if="{{chatInfo.opengid}}">{{t1.remind_them}}</text>
-          <text wx:else>{{t1.remind_ta}}</text>
-        </custom-button>
+      <!-- Buttons -->
+      <view class="td-buttons" wx:if="{{btnList.length > 0}}">
+        <block wx:for="{{btnList}}" wx:key="*this">
 
-        <!-- or Share -->
-        <custom-button wx:else catchtap="onTapShare">
-          <text wx:if="{{chatInfo.opengid}}">{{t1.share_to_group}}</text>
-          <text wx:else>{{t1.share_to_ta}}</text>
-        </custom-button>
+          <custom-button btn-type="{{index > 0 ? 'normal' : 'main'}}" 
+            catchtap="onTap{{item}}"
+          >
+            <text wx:if="{{item === 'Reminder'}}">
+              <text wx:if="{{chatInfo.opengid}}">{{t1.remind_them}}</text>
+              <text wx:else>{{t1.remind_ta}}</text>
+            </text>
 
-        <!-- Complete -->
-        <custom-button wx:if="{{detail.canIComplete}}" btn-type="normal"
-          catchtap="onTapCompleteTask"
-        >
-          <text>{{t1.complete_task}}</text>
-        </custom-button>
+            <text wx:elif="{{item === 'Urge'}}">
+              <text wx:if="{{chatInfo.opengid}}">{{t1.urge_them}}</text>
+              <text wx:else>{{t1.urge_ta}}</text>
+            </text>
 
-        <!-- Close the task -->
-        <custom-button btn-type="normal" catchtap="onTapCloseTask">
-          <text>{{t1.close_task}}</text>
-        </custom-button>
+            <text wx:elif="{{item === 'Share'}}">
+              <text wx:if="{{chatInfo.opengid}}">{{t1.share_to_group}}</text>
+              <text wx:else>{{t1.share_to_ta}}</text>
+            </text>
 
-        <!-- Create Other -->
-        <custom-button btn-type="normal" catchtap="onTapCreateTask">
-          <text>{{t1.create_other}}</text>
-        </custom-button>
+            <text wx:elif="{{item === 'CompleteTask'}}">{{t1.complete_task}}</text>
+            <text wx:elif="{{item === 'CreateTask'}}">{{t1.create_other}}</text>
+            <text wx:elif="{{item === 'CloseTask'}}">{{t1.close_task}}</text>
+
+            <text wx:elif="{{item === 'AddNote'}}">
+              <text wx:if="{{detail.note}}">{{t1.edit_note}}</text>
+              <text wx:else>{{t1.add_note}}</text>
+            </text>
+            <text wx:elif="{{item === 'More'}}">{{t1.more}}</text>
+            
+          </custom-button>
+
+        </block>
 
       </view>
-
-      <!-- Buttons during available period -->
-      <view wx:elif="{{!detail.closedStamp && detail.hasAnyIncomplete}}" class="td-buttons">
-        <!-- Complete -->
-        <custom-button wx:if="{{detail.canIComplete}}" catchtap="onTapCompleteTask">
-          <text>{{t1.complete_task}}</text>
-        </custom-button>
-
-        <!-- or Urge -->
-        <custom-button wx:else catchtap="onTapReminder">
-          <text wx:if="{{chatInfo.opengid}}">{{t1.urge_them}}</text>
-          <text wx:else>{{t1.urge_ta}}</text>
-        </custom-button>
-
-        <!-- Share -->
-        <custom-button 
-          btn-type="normal" catchtap="onTapShare"
-        >
-          <text>{{t1.share}}</text>
-        </custom-button>
-
-        <!-- Create Other -->
-        <custom-button btn-type="normal" catchtap="onTapCreateTask">
-          <text>{{t1.create_other}}</text>
-        </custom-button>
-      </view>
-
-      <!-- Buttons for the rest -->
-      <view wx:else class="td-buttons">
-        <!-- Create others -->
-        <custom-button catchtap="onTapCreateTask">
-          <text>{{t1.create_other}}</text>
-        </custom-button>
-
-        <!-- Share -->
-        <custom-button btn-type="normal" catchtap="onTapShare">
-          <text>{{t1.share}}</text>
-        </custom-button>
-      </view>
-
 
     </view>
   </view>
@@ -155,3 +178,7 @@
   visible="{{visible}}" always-go-home="{{alwaysGoHome}}"
   always-arrow-back="{{alwaysArrowBack}}"
 ></custom-navibar>
+
+<qrcode-popup open="{{openBindingPopup}}" pic-url="{{qrCodePicUrl}}"
+  catch:close="toCloseQrCodePopup"
+></qrcode-popup>

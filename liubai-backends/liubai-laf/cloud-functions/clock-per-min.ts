@@ -9,6 +9,9 @@ import type {
   Table_Content,
   RequireSth,
   SupportedLocale,
+  Table_WxTask,
+  Table_WxBond,
+  Wx_Param_Msg_Templ_Send,
 } from "@/common-types";
 import { 
   decryptEncData,
@@ -43,7 +46,18 @@ interface RemindAtom {
   timezone?: string
 }
 
+interface TaskRemindAtom {
+  taskId: string
+  userId: string
+  title: string
+  calendarStamp: number
+  wx_gzh_openid?: string
+  locale?: SupportedLocale
+  timezone?: string
+}
+
 type RemindAtom_2 = RequireSth<RemindAtom, "wx_gzh_openid">
+type TaskRemindAtom_2 = RequireSth<TaskRemindAtom, "wx_gzh_openid">
 
 interface AuthorAtom {
   userId: string
@@ -55,6 +69,13 @@ interface AuthorAtom {
 }
 
 type AuthorAtom_2 = RequireSth<AuthorAtom, "locale">
+
+interface TaskAuthorAtom {
+  userId: string
+  wx_gzh_openid: string
+  locale: SupportedLocale
+  timezone?: string
+}
 
 type Field_User = {
   [key in keyof Table_User]?: 0 | 1
@@ -69,6 +90,7 @@ type Field_Member = {
 export async function main(ctx: FunctionContext) {
 
   await handle_remind()
+  await handle_task_remind()
   await handle_system_two()
   await handle_update_unionid()
 
@@ -82,16 +104,6 @@ async function handle_system_two() {
   const remainder = min % 5
   if(remainder !== 3) return
   await invoke_by_clock()
-}
-
-async function handle_count_unionid() {
-  const w1 = {
-    wx_unionid: _.exists(true),
-  }
-  const uCol = db.collection("User")
-  const res1 = await uCol.where(w1).count()
-  console.log("see res1: ", res1)
-  return { code: "0000", data: res1 }
 }
 
 async function handle_update_unionid() {
@@ -165,6 +177,146 @@ async function handle_update_unionid() {
 }
 
 
+async function handle_task_remind() {
+  // 1. get tmplId
+  const _env = process.env
+  const tmplId = _env.LIU_WX_GZ_TMPL_ID_1
+  if(!tmplId) {
+    return false
+  }
+
+  // 2. get startStamp and endStamp
+  let startDate = addSeconds(new Date(), -59)
+  startDate = date_fn_set(startDate, { seconds: 55, milliseconds: 0 })
+  const endDate = addSeconds(startDate, 59)
+  const startStamp = startDate.getTime()
+  const endStamp = endDate.getTime()
+
+  // 3. find atoms
+  const atoms = await get_task_atoms(startStamp, endStamp)
+  if(atoms.length < 1) {
+    return true
+  }
+
+  // 4. find authors
+  const atoms2 = await find_task_authors(atoms)
+  if(atoms2.length < 1) {
+    return true
+  }
+
+  // 5. get access token
+  const access_token = await checkAndGetWxGzhAccessToken()
+  if(!access_token) {
+    return false
+  }
+  
+  // 6. batch send
+  await batch_send_for_tasks(access_token, atoms2)
+}
+
+
+async function find_task_authors(
+  atoms: TaskRemindAtom[],
+) {
+  const userIds = valTool.uniqueArray(atoms.map(v => v.userId))
+  const authors: TaskAuthorAtom[] = []
+
+  const uCol = db.collection("User")
+  let runTimes = 0
+  const NUM_ONCE = 50
+  const MAX_TIMES = 100
+
+  // to find authors
+  while(userIds.length > 0 && runTimes < MAX_TIMES) {
+    const tmpUserIds = userIds.splice(0, NUM_ONCE)
+    const w = {
+      oState: "NORMAL",
+      _id: _.in(tmpUserIds),
+    }
+    const f: Field_User = {
+      _id: 1,
+      oState: 1,
+      thirdData: 1,
+      wx_gzh_openid: 1,
+      language: 1,
+      systemLanguage: 1,
+      timezone: 1,
+    }
+    const res1 = await uCol.where(w).field(f).get<Table_User>()
+    const results1 = res1.data
+
+    for(let i=0; i<results1.length; i++) {
+      const user = results1[i]
+      const wx_gzh_openid = user.wx_gzh_openid
+      if(!wx_gzh_openid) continue
+      const author: TaskAuthorAtom = {
+        userId: user._id,
+        wx_gzh_openid,
+        locale: getCurrentLocale({ user }),
+        timezone: user.timezone,
+      }
+      authors.push(author)
+    }
+    
+    runTimes++
+  }
+
+  // match authors for atoms
+  const newAtoms: TaskRemindAtom_2[] = []
+  for(let i=0; i<atoms.length; i++) {
+    const atom = atoms[i]
+    const author = authors.find(v => v.userId === atom.userId)
+    if(author) {
+      newAtoms.push({ ...atom, ...author })
+    }
+  }
+  
+  return newAtoms
+}
+
+
+async function get_task_atoms(
+  startStamp: number,
+  endStamp: number,
+) {
+  let runTimes = 0
+  const NUM_ONCE = 50
+  const MAX_TIMES = 100
+
+  const w1 = {
+    oState: "OK",
+    taskState: "DEFAULT",
+    remindStamp: _.and(_.gte(startStamp), _.lte(endStamp)),
+  }
+  const wtCol = db.collection("WxTask")
+  const atoms: TaskRemindAtom[] = []
+
+  while(runTimes < MAX_TIMES) {
+    let q = wtCol.where(w1).orderBy("remindStamp", "asc")
+    if(runTimes > 0) {
+      q = q.skip(runTimes * NUM_ONCE)
+    }
+    const res = await q.limit(NUM_ONCE).get<Table_WxTask>()
+    const tmpList = res.data
+    const tLength = tmpList.length
+
+    for(let i=0; i<tLength; i++) {
+      const v = tmpList[i]
+      const newAtoms = await turnTaskIntoAtoms(v)
+      if(newAtoms) {
+        atoms.push(...newAtoms)
+      }
+    }
+
+    if(tLength < NUM_ONCE) break
+    runTimes++
+  }
+
+  return atoms
+}
+
+
+
 async function handle_remind() {
 
   // check out if the tmplId is enabled
@@ -188,9 +340,6 @@ async function handle_remind() {
 
   const atoms2 = await find_remind_authors(atoms)
   if(atoms2.length < 1) {
-    console.warn("there is no atoms2")
-    console.log("see atoms: ")
-    console.log(atoms)
     return true
   }
 
@@ -223,7 +372,55 @@ async function batch_send(
       await valTool.waitMilli(200)
     }
   }
-  
+}
+
+async function batch_send_for_tasks(
+  access_token: string,
+  atoms: TaskRemindAtom_2[],
+) {
+  const numMap = new Map<string, number>()
+
+  for(let i=0; i<atoms.length; i++) {
+    const v = atoms[i]
+    const userId = v.userId
+    const num = numMap.get(userId) ?? 0
+    if(num > 3) continue
+    numMap.set(userId, num + 1)
+    await send_for_task(access_token, v)
+  }
+}
+
+
+async function send_for_task(
+  access_token: string,
+  atom: TaskRemindAtom_2,
+) {
+  const obj = { ...wx_reminder_tmpl } as Wx_Param_Msg_Templ_Send
+  const _env = process.env
+  const domain = _env.LIU_DOMAIN
+  const tmplId = _env.LIU_WX_GZ_TMPL_ID_1 ?? ""
+  const miniAppId = _env.LIU_WX_MINI_APPID ?? ""
+  obj.template_id = tmplId
+  const { taskId, locale, wx_gzh_openid, calendarStamp, timezone } = atom
+  obj.touser = wx_gzh_openid
+  obj.url = `${domain}`
+  obj.miniprogram = {
+    appid: miniAppId,
+    pagepath: `pages/index/index?task=${taskId}`,
+  }
+
+  let title = atom.title
+  if(title.length > 20) {
+    title = title.substring(0, 17) + "..."
+  }
+  title = title.replace(/\n/g, " ")
+  obj.data.thing18.value = title
+  const str_time = LiuDateUtil.displayTime(calendarStamp, locale, timezone)
+  obj.data.time4.value = str_time
+
+  const res = await WxGzhSender.sendTemplateMessage(access_token, obj)
+  console.log("send_for_task res: ", res)
+  return true
 }
 
 async function send_wx_message(
@@ -451,6 +648,37 @@ function packAuthors1(
   return tmpList as AuthorAtom_2[]
 }
 
+async function turnTaskIntoAtoms(
+  task: Table_WxTask,
+) {
+  const calendarStamp = task.calendarStamp
+  if(!calendarStamp) return
+
+  const group_openids = task.assigneeList.map(v1 => v1.group_openid)
+  const w1 = {
+    infoType: "chat-tool",
+    group_openid: _.in(group_openids),
+  }
+  const wbCol = db.collection("WxBond")
+  const res1 = await wbCol.where(w1).get<Table_WxBond>()
+  const bonds = res1.data
+
+  let userIds = bonds.map(v => v.userId)
+  if(!userIds.includes(task.owner_userid)) {
+    userIds.push(task.owner_userid)
+  }
+
+  const atoms = userIds.map(v => {
+    const atom: TaskRemindAtom = {
+      taskId: task._id,
+      userId: v,
+      title: task.desc,
+      calendarStamp,
+    }
+    return atom
+  })
+  return atoms
+}
 
 function turnContentIntoAtom(
   v: Table_Content,

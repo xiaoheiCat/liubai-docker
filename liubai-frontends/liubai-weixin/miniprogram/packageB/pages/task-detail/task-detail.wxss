@@ -34,12 +34,17 @@
   border-radius: 50%;
   overflow: hidden;
   margin-right: 15px;
+  flex: none;
 }
 
 .td-owner-name {
   font-size: var(--title-font);
   color: var(--main-text);
   font-weight: 700;
+  max-width: 80%;
+  text-overflow: ellipsis;
+  display: inline-block;
+  overflow: hidden;
 }
 
 
@@ -78,13 +83,11 @@
 /** assignees */
 
 .tc-box {
-  margin-top: 30px;
   position: relative;
   width: 100%;
   border-radius: 30px;
   overflow: hidden;
   background-color: var(--card-bg);
-  margin-bottom: 10px;
   box-sizing: border-box;
   padding: 15px 0 20px;
 }
@@ -97,6 +100,40 @@
   box-sizing: border-box;
   font-size: var(--mini-font);
   color: var(--main-note);
+}
+
+.td-box-bar {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+  position: relative;
+  padding: 10px 20px;
+  box-sizing: border-box;
+  align-items: flex-start;
+}
+
+.tdbb-icon-box {
+  width: 30px;
+  height: 30px;
+  margin-right: 15px;
+  overflow: hidden;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tdbb-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.td-box-bar-text {
+  line-height: 30px;
+  font-size: var(--btn-font);
+  color: var(--main-normal);
+  flex: 1;
+  font-weight: 700;
 }
 
 .tc-assignees {
@@ -129,7 +166,23 @@
   font-size: var(--btn-font);
   font-weight: 700;
   color: var(--main-normal);
-  flex: 1;
+  width: calc(100% - 30px - 28px - 2px);
+  max-width: 90%;
+  min-width: 50px;
+  overflow: hidden;
+  position: relative;
+  display: inline-block;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.tc-assignee-fade {
+  width: 28px;
+  margin-left: -26px;
+  height: 30px;
+  background: var(--gradient-one);
+  flex: none;
 }
 
 .tc-assignee-checked {
@@ -140,7 +193,7 @@
   justify-content: center;
   transition: .15s;
   flex: none;
-  margin-right: -8px;
+  transform: translateX(8px);
 }
 
 .tc-assignee-checked-icon {
@@ -158,9 +211,19 @@
   height: 60px;
 }
 
+.td-virtual-30 {
+  width: 100%;
+  height: 30px;
+}
+
+.td-virtual-15 {
+  width: 100%;
+  height: 15px;
+}
+
 .td-buttons {
-  margin-top: 60px;
+  margin-top: 30px;
   width: 100%;
   position: relative;
-  padding-bottom: 60px;
+  padding-bottom: 90px;
 }

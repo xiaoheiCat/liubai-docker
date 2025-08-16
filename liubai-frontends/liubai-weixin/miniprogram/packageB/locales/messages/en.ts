@@ -19,6 +19,10 @@ export default {
     "copied_link": "Link Copied",
     "open_it_with_browser": "Open it with browser",
     "updating": "Updating..",
+    "copy": "📋 Copy",
+    "edit": "✏️ Edit",
+    "call": "📞 Call",
+    "sms": "💬 Text",
   },
   "err": {
     "no_data": "Nothing Here",
@@ -88,9 +92,60 @@ export default {
     "updated": "Updated",
     "updated_tip": "Share please, otherwise they won't know about this update",
     "updated_prefix": "Task Updated: {desc}",
+    "when": "When",
+    "more": "More",
+    "add_note": "Add note",
+    "edit_note": "Edit note",
+    "read_clipboard_tip": "Read clipboard content?\nThis can quickly paste meeting info",
+    "note_title": "INFO",
+    "remind_1": "You've followed us 👍",
+    "remind_2": "You'll be reminded through 留白记事 Service Account on WeChat."
+  },
+  "ai-related": {
+    "help_to_organize": "Organized by {name}",
+    "your_task": "Your task supported by AI 🪄",
+    "your_task_tip": "Model: {model}\nProvider: {provider}",
+  },
+  "computing_provider": {
+    "aliyun-bailian": "Aliyun",
+    "deepseek": "DeepSeek",
+    "tencent-hunyuan": "Tencent Hunyuan",
+    "minimax": "MiniMax",
+    "moonshot": "Moonshot",
+    "stepfun": "Stepfun",
+    "zhipu": "Zhipu",
+    "siliconflow": "SiliconCloud",
+    "gitee-ai": "Gitee AI",
+    "tencent-lkeap": "Tencent LKEAP"
+  },
+  "ai-character": {
+    "deepseek": "DeepSeek",
+    "kimi": "Kimi",
+    "tongyi-qwen": "Qwen",
+    "hailuo": "MiniMax",
+    "yuewen": "Stepfun",
+    "hunyuan": "Hunyuan",
+    "zhipu": "Zhipu"
   },
   "date": {
-    "show_1": "{yyyy}-{mm}-{dd} {hr}:{min}",
+    "show_1": "{mm}-{dd} ({day}) {hr}:{min}",
     "show_2": "{yyyy}-{mm}-{dd} {hr}:{min}",
-  }
+    "day_0": "Su",
+    "day_1": "Mo",
+    "day_2": "Tu",
+    "day_3": "We",
+    "day_4": "Th",
+    "day_5": "Fr",
+    "day_6": "Sa",
+  },
+  "qrcode": {
+    "title": "Long Press to Scan",
+    "tip": "After following, you will be reminded automatically ⏰",
+    "bound_msg": "Awesome! You've bound it 💐",
+  },
+  "task-add-note": {
+    "title": "📝 Note",
+    "placeholder": "Enter note (e.g. meeting info)",
+    "confirm": "Confirm",
+  },
 }

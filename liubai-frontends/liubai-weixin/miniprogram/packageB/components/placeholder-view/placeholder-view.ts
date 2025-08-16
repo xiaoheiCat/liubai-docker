@@ -5,17 +5,19 @@ import { defaultData } from "../../config/default-data"
 import { LiuApi } from "~/packageB/utils/LiuApi"
 import valTool from "~/packageB/utils/val-tool"
 import { LiuUtil } from "~/packageB/utils/liu-util/index"
+import { themeBehavior } from "~/packageB/behaviors/theme-behavior"
 
 const TRANSITION_MS = 300
 
 Component({
 
   options: {
-    pureDataPattern: /^_/, // 指定所有 _ 开头的数据字段为纯数据字段
+    pureDataPattern: /^_/,
   },
 
   behaviors: [
-    i18nBehavior("err")
+    i18nBehavior("err"),
+    themeBehavior(),
   ],
 
   properties: {

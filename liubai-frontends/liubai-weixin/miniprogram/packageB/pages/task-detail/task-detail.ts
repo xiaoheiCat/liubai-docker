@@ -13,13 +13,23 @@ import {
   afterCompleteTask,
   toCreateOtherTask,
   toUpdateTitle,
+  getBindingStatus,
+  whenTapAI,
+  getQrCodePicUrlForBindingWx,
+  toAddNote,
+  whenTapNote,
 } from "./tools/useTaskDetail";
+import { getMoreBtnList, handleBtnList } from "./tools/handleBtnList";
 import { LiuTunnel } from "~/packageB/utils/LiuTunnel";
-import type { JustCreateTask, PleaseCreateTask } from "~/packageB/types/types-tunnel";
+import type {
+  HasNewTaskNote,
+  JustCreateTask, 
+  PleaseCreateTask,
+} from "~/packageB/types/types-tunnel";
 import { LiuApi } from "~/packageB/utils/LiuApi";
 import { pageStates } from "~/packageB/utils/atom-util";
 import type { WxMiniAPI } from "~/packageB/types/types-wx";
-import type { TaskDetail } from "./tools/types";
+import type { BtnType, TaskDetail } from "./tools/types";
 import { LiuUtil } from "~/packageB/utils/liu-util/index";
 import valTool from "~/packageB/utils/val-tool";
 import { useI18n } from "~/packageB/locales/index";
@@ -30,6 +40,7 @@ import { pageBehavior } from "~/packageB/behaviors/page-behavior";
 import { checkNameExisted } from "../shared/some-funcs";
 import { defaultData } from "~/packageB/config/default-data";
 import type { PeopleTasksAPI } from "~/packageB/requests/req-types";
+import type { BindingStatus } from "./tools/types";
 
 Component({
 
@@ -54,6 +65,10 @@ Component({
     errTip: "",
     chatInfo: null as WxMiniAPI.ChatInfo | null,
     alwaysGoHome: false,
+    bindingStatus: undefined as BindingStatus | undefined,
+    openBindingPopup: false,
+    qrCodePicUrl: "",
+    btnList: [] as BtnType[],
   },
 
   methods: {
@@ -80,20 +95,52 @@ Component({
       const justOnLoad = LiuTime.isWithinMillis(stamp1, 1500, true)
       if(justOnLoad) return
 
-      this.checkStateWhileShowing()
+      await this.checkBindingStatusWhileShowing()
+      await this.checkDetailWhileShowing()
     },
 
-    async checkStateWhileShowing() {
+    async checkDetailWhileShowing() {
       const res1 = await LiuTunnel.takeStuff<PleaseCreateTask>("please-create-task")
       if(res1) {
         const justPosting = LiuTime.isWithinMillis(res1.stamp, LiuTime.MINUTE)
         if(justPosting) {
-          waitForCreateTask()
+          waitForCreateTask(this)
           return
         }
       }
 
-      this.getTaskDetail(false)
+      const _id = this.data._id
+      const detail = this.data.detail
+      const res2 = await LiuTunnel.takeStuff<HasNewTaskNote>("has-new-task-note")
+      if(res2 && _id === res2.id && detail) {
+        const bind2: Record<string, any> = {}
+        bind2["detail.note"] = res2.note
+        this.setData(bind2)
+        return
+      }
+
+      await this.getTaskDetail(false)
+    },
+
+    async checkBindingStatusWhileShowing() {
+      const { qrCodePicUrl, openBindingPopup } = this.data
+      if(!qrCodePicUrl || !openBindingPopup) return
+
+      const res1 = await getBindingStatus(false)
+      if(!res1) return
+      const bind: Record<string, any> = {
+        bindingStatus: "unfollowed"
+      }
+      if(res1.wx_gzh_openid) {
+        bind.bindingStatus = "followed"
+        bind.openBindingPopup = false
+        LiuUtil.showCustomToast({ 
+          title_key: "qrcode.bound_msg",
+          duration: 2500,
+        })
+        LiuApi.vibrateShort({ type: "light" })
+      }
+      this.setData(bind)
     },
 
     async getTaskDetail(
@@ -129,25 +176,46 @@ Component({
         return
       }
       if(!data3) {
+        console.warn("data3 is empty!")
+        console.log("res3: ", res3)
+        console.log("id: ", id)
+        console.log("chatInfo: ", chatInfo)
         this.setData({ pState: pageStates.NO_AUTH, alwaysGoHome: true })
         return
       }
 
-      // 4. show
-      const detail = showDetail(data3, chatInfo)
-      this.setData({ detail, pState: pageStates.OK })
+      // 4.1 check whether the task is just created
+      const bind4: Record<string, any> = {
+        detail: showDetail(data3, chatInfo),
+        _justCreated: false,
+        pState: pageStates.OK,
+      }
+      const res4_1 = await LiuTunnel.takeStuff<JustCreateTask>("just-create-task")
+      if(res4_1 && res4_1.id === id) {
+        if(LiuTime.isWithinMillis(res4_1.stamp, LiuTime.MINUTE)) {
+          bind4._justCreated = true
+        }
+      }
+      bind4.btnList = handleBtnList(bind4.detail, bind4._justCreated)
+
+      // 4.2 show
+      this.setData(bind4)
+      console.log("let's go to update share menu")
       this.toUpdateShareMenu()
 
-      // 5. if just created
-      const res5 = await LiuTunnel.takeStuff<JustCreateTask>("just-create-task")
-      if(!res5 || res5.id !== id) return
-      if(!LiuTime.isWithinMillis(res5.stamp, LiuTime.MINUTE)) {
-        console.warn("over one minute!")
-        return
+      // 4.3 check out binding status
+      if(bind4.detail.remindStr) {
+        this.handleBindingStatus(true)
       }
 
-      // 6. show modal
-      await valTool.waitMilli(1500)
+      // 5. return if not just created
+      if(!bind4._justCreated) return
+      if(!bind4.detail.remindStr && justOnLoad) {
+        this.waitForAiThenLoadAgain()
+      }
+
+      // 6. show modal if you've just created the task
+      await valTool.waitMilli(900)
       const isGroup = Boolean(chatInfo.opengid)
       const res6 = await LiuUtil.showCustomModal({
         title_key: "task-detail.created_1",
@@ -155,12 +223,41 @@ Component({
         confirm_key: "shared.ok",
       })
       if(!res6.confirm) return
-      this.data._justCreated = true
 
       // 7. forward
-      toForward(id, detail.desc, true)
+      toForward(id, bind4.detail.desc, true)
     },
 
+    async waitForAiThenLoadAgain() {
+      await valTool.waitMilli(4000)
+      this.getTaskDetail(false)
+    },
+
+    whenChannelHasGettingRes(
+      res2_1: PeopleTasksAPI.Res_GetWxTask,
+    ) {
+      let bind2_1: Record<string, any> = { pState: pageStates.OK }
+      if(res2_1.isMine) {
+        bind2_1.chatInfo = {
+          group_openid: res2_1.owner_openid,
+          open_single_roomid: res2_1.open_single_roomid,
+          opengid: res2_1.opengid,
+          chat_type: res2_1.chat_type,
+        } as WxMiniAPI.ChatInfo
+        TaskManager.setChatInfo(bind2_1.chatInfo)
+        TaskManager.init()
+        bind2_1.detail = showDetail(res2_1, bind2_1.chatInfo)
+        bind2_1.btnList = handleBtnList(bind2_1.detail)
+        this.setData(bind2_1)
+        this.toUpdateShareMenu()
+        return true
+      }
+
+      bind2_1.detail = showDetail(res2_1)
+      bind2_1.btnList = handleBtnList(bind2_1.detail)
+      this.setData(bind2_1)
+      return false
+    },
 
     async initTaskDetail() {
       // 2.1 get detail from tunnel  
@@ -168,24 +265,8 @@ Component({
         "task-fr-list-to-detail"
       )
       if(res2_1) {
-        let bind2_1: Record<string, any> = { pState: pageStates.OK }
-        if(res2_1.isMine) {
-          bind2_1.chatInfo = {
-            group_openid: res2_1.owner_openid,
-            open_single_roomid: res2_1.open_single_roomid,
-            opengid: res2_1.opengid,
-            chat_type: res2_1.chat_type,
-          } as WxMiniAPI.ChatInfo
-          TaskManager.setChatInfo(bind2_1.chatInfo)
-          TaskManager.init()
-          bind2_1.detail = showDetail(res2_1, bind2_1.chatInfo)
-          this.setData(bind2_1)
-          this.toUpdateShareMenu()
-          return true
-        }
-
-        bind2_1.detail = showDetail(res2_1)
-        this.setData(bind2_1)
+        const res2_1_1 = this.whenChannelHasGettingRes(res2_1)
+        if(res2_1_1) return true
       }
 
       // 2.2 init task manager
@@ -200,7 +281,8 @@ Component({
         const chatInfo = TaskManager.getChatInfo()
         if(!chatInfo) return false
         const tmpDetail2_2 = showDetail(res2_1, chatInfo)
-        this.setData({ detail: tmpDetail2_2, chatInfo })
+        const btnList2_2 = handleBtnList(tmpDetail2_2)
+        this.setData({ detail: tmpDetail2_2, btnList: btnList2_2, chatInfo })
         this.toUpdateShareMenu()
       }
 
@@ -261,7 +343,6 @@ Component({
       const idx = e.currentTarget.dataset.idx
       const { detail } = this.data
       if(typeof idx !== "number" || !detail) return
-      console.log("onTapOneAssignee idx: ", idx)
       const doneStamp = detail.assigneeList[idx].doneStamp
       if(!doneStamp) {
         LiuUtil.showCustomToast({ 
@@ -289,6 +370,31 @@ Component({
       const { detail, _id } = this.data
       if(!detail || !_id) return
       toNotifyMembers(_id, detail)
+    },
+
+    onTapUrge() {
+      this.onTapReminder()
+    },
+    
+    onTapRemindMe() {
+      const detail = this.data.detail
+      if(!detail?.remindStr) return
+      LiuApi.vibrateShort({ type: "light" })
+      
+      const bs = this.data.bindingStatus
+      if(this.data.qrCodePicUrl && bs === "unfollowed") {
+        this.setData({ openBindingPopup: true })
+        return
+      }
+
+      if(bs === "followed") {
+        LiuUtil.showCustomModal({
+          title_key: "task-detail.remind_1",
+          content_key: "task-detail.remind_2",
+          showCancel: false,
+          confirm_key: "shared.ok",
+        })
+      }
     },
 
     onTapShare() {
@@ -320,7 +426,10 @@ Component({
       }
 
       const bind: Record<string, any> = {}
-      bind["detail.closedStamp"] = LiuTime.getTime()
+      const now2 = LiuTime.getTime()
+      detail.closedStamp = now2
+      bind["detail.closedStamp"] = now2
+      bind.btnList = handleBtnList(detail)
       this.setData(bind)
       
       const res2 = await fetchCloseTask(_id)
@@ -351,6 +460,7 @@ Component({
         cancel_key: "task-detail.it_is_not_true",
         success(res) {
           if(!res.confirm) return
+          LiuApi.vibrateShort({ type: "light" })
           _this.toCompleteTask(_id, idx)
         }
       })
@@ -383,10 +493,17 @@ Component({
       bind["detail.canIComplete"] = false
       bind[`detail.assigneeList[${idx}].doneStamp`] = now2
       this.setData(bind)
+
+      // 4. handle btnList
+      await LiuApi.nextTick()
+      const btnList = handleBtnList(
+        this.data.detail as TaskDetail,
+        this.data._justCreated,
+      )
+      this.setData({ btnList })
       
-      // 3. fetch
+      // 5. fetch
       const res5 = await fetchCompleteTask(id)
-      console.log("fetchCompleteTask res5: ", res5)
       const code5 = res5.code
       if(code5 === "0000" || code5 === "0001") {
         if(!needShare) {
@@ -433,6 +550,7 @@ Component({
       const id = this.data._id
       const detail = this.data.detail
       if(!detail) return
+      LiuApi.vibrateShort({ type: "light" })
       const newTitle = await toUpdateTitle(id, detail)
       if(!newTitle) return
 
@@ -441,7 +559,84 @@ Component({
       this.setData(bind)
     },
 
-  },
+    async onTapAddNote() {
+      const detail = this.data.detail
+      if(!detail) return
+      LiuApi.vibrateShort({ type: "medium" })
+      toAddNote(this.data._id, detail, true)
+    },
 
+    onTapMore() {
+      const { detail, btnList, _justCreated } = this.data
+      if(!detail) return
+      LiuApi.vibrateShort({ type: "medium" })
+
+      const res1 = getMoreBtnList(detail, btnList, _justCreated)
+      if(!res1) return
+      const { moreBtnList, itemKeyList } = res1
+
+      const _this = this
+      LiuUtil.showCustomActionSheet({
+        alert_text_key: "task-detail.more",
+        item_key_list: itemKeyList,
+        success(res) {
+          const idx = res.tapIndex
+          if(idx < 0) return
+          const btnType = moreBtnList[idx]
+          if(!btnType) return
+          try {
+            _this[`onTap${btnType}`]()
+          }
+          catch(err) {
+            console.warn("onTapMore error: ", err)
+          }
+        }
+      })
+    },
+
+    onTapAI() {
+      const { detail } = this.data
+      if(!detail) return
+      whenTapAI(detail)
+    },
+
+    async handleBindingStatus(
+      tryToOpenBindingPopup = false,
+    ) {
+      await valTool.waitMilli(500)
+      const res1 = await getBindingStatus()
+      if(!res1) return
+      let bindingStatus: BindingStatus = "unfollowed"
+      if(res1.wx_gzh_openid && res1.wx_gzh_subscribed && res1.wx_gzh_toggle) {
+        bindingStatus = "followed"
+      }
+      this.setData({ bindingStatus })
+      
+      if(tryToOpenBindingPopup && bindingStatus === "unfollowed") {
+        this.handleQrCode()
+      }
+    },
+
+    async handleQrCode() {
+      await valTool.waitMilli(500)
+      const qrCodePicUrl = await getQrCodePicUrlForBindingWx()
+      if(!qrCodePicUrl) return
+      await valTool.waitMilli(500)
+      this.setData({ openBindingPopup: true, qrCodePicUrl })
+    },
+
+    toCloseQrCodePopup() {
+      LiuApi.vibrateShort({ type: "light" })
+      this.setData({ openBindingPopup: false })
+    },
+
+    onTapNote() {
+      const { detail } = this.data
+      if(!detail || !detail.isMine) return
+      LiuApi.vibrateShort({ type: "light" })
+      whenTapNote(this.data._id, detail)
+    },
+
+  },  
 
 })

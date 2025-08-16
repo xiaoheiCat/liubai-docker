@@ -18,3 +18,22 @@ export type BaseIsOn = "Y" | "N"
 export type SubMsgItemType = "accept" | "reject" | "ban" | "filter"
 
 export type FilePurpose = "coupon-upload" | "coupon-tmp"
+
+export type LiuRemindLater = "30min" | "1hr" | "2hr" | "3hr" | "tomorrow_this_moment"
+
+// 必须是 number 因为可能跟其他系统对接，会有不同的提前时间（单位为 minute）
+export type LiuRemindEarly = number
+
+// "提醒我" 的结构
+export interface LiuRemindMe {
+  type: "early" | "later" | "specific_time"
+
+  // 提前多少分钟，若提前一天则为 1440
+  early_minute?: LiuRemindEarly   
+
+  // 30分钟后、1小时后、2小时后、3小时后、明天此刻
+  later?: LiuRemindLater
+
+  // 具体时间的时间戳
+  specific_stamp?: number
+}

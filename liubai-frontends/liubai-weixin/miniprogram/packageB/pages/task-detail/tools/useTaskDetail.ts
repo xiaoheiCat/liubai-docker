@@ -1,18 +1,22 @@
 import { LiuReq } from "~/packageB/requests/LiuReq";
 import APIs from "../../../requests/APIs";
 import type { WxMiniAPI } from "~/packageB/types/types-wx";
-import type { 
-  HappySystemAPI, 
+import type {
   PeopleTasksAPI,
+  Res_OC_BindWeChat,
+  Res_OC_GetWeChat,
 } from "~/packageB/requests/req-types";
 import type { TaskDetail } from "./types";
 import { DateUtil } from "~/packageB/utils/date-util";
 import valTool from "~/packageB/utils/val-tool";
 import { LiuApi } from "~/packageB/utils/LiuApi";
 import { useI18n } from "~/packageB/locales/index";
-import { LiuRewardedVideo } from "./liu-rewarded-video";
 import { LiuUtil } from "~/packageB/utils/liu-util/index";
 import { defaultData } from "~/packageB/config/default-data";
+import { Loginer } from "~/packageB/utils/login/Loginer";
+import { LiuTunnel } from "~/packageB/utils/LiuTunnel";
+import type { AddTaskNote } from "~/packageB/types/types-tunnel";
+import { LiuTime } from "~/packageB/utils/LiuTime";
 
 export async function fetchTaskDetail(
   id: string,
@@ -48,6 +52,28 @@ export function showDetail(
     }
     return false
   })
+
+  // when & remind
+  let whenStr: string | undefined
+  let remindStr: string | undefined
+  if(data.whenStamp) {
+    whenStr = DateUtil.showBasicTime(data.whenStamp)
+  }
+  if(data.remindMe && data.remindStamp) {
+    remindStr = DateUtil.getRemindMeStrAfterPost(
+      data.remindStamp, 
+      data.remindMe,
+    )
+  }
+
+  // ai help
+  const { t } = useI18n()
+  let aiHelpStr: string | undefined
+  if(data.aiWorker?.character) {
+    const aiName = t(`ai-character.${data.aiWorker.character}`)
+    aiHelpStr = t(`ai-related.help_to_organize`, { name: aiName })
+  }
+  
   
   // set detail
   const detail: TaskDetail = {
@@ -65,6 +91,12 @@ export function showDetail(
     hasAnyIncomplete,
     canIComplete,
     isActivity: data.infoType === "ACTIVITY",
+    whenStr,
+    remindStr,
+    aiHelpStr,
+    aiWorker: data.aiWorker,
+    each_other_openid: data.each_other_openid,
+    note: data.note,
   }
   return detail
 }
@@ -208,29 +240,7 @@ export async function fetchCompleteTask(id: string) {
 }
 
 export async function afterCompleteTask() {
-  // 1. pull ad
-  const req1 = { operateType: "get-ad-data" }
-  const url1 = APIs.HAPPY_SYSTEM
-  const res1 = await LiuReq.request<HappySystemAPI.Res_GetAdData>(url1, req1)
-  const rewardedAdUnitId = res1.data?.rewardedAdUnitId
-  if(!rewardedAdUnitId) return
-
-  let hasShownModal = false
-  const ad = LiuRewardedVideo.init(rewardedAdUnitId)
-  if(!ad) {
-    showYouAreGreat()
-    return
-  }
-  ad.onLoad(res => {
-    console.log("rewardedVideoAd onLoad......", res)
-    if(hasShownModal) return
-    hasShownModal = true
-    showYouAreGreat()
-  })
-  ad.onError(err => {
-    console.warn("rewardedVideoAd onError: ", err)
-  })
-  LiuRewardedVideo.tryToLoad() 
+  showYouAreGreat()
 }
 
 function showYouAreGreat() {
@@ -242,10 +252,6 @@ function showYouAreGreat() {
     title_key: "task-detail.done_it",
     content_key,
     showCancel: false,
-    success(res) {
-      if(!res.confirm) return
-      LiuRewardedVideo.showRewardedVideoAd()
-    }
   })
 }
 
@@ -346,4 +352,134 @@ export async function toUpdateTitle(
   })
 
   return newTitle
+}
+
+let hasCheckedBindingStatus = false
+export async function getBindingStatus(
+  judgeToggle = true,
+) {
+  if(judgeToggle) {
+    if(hasCheckedBindingStatus) return
+    hasCheckedBindingStatus = true
+  }
+
+  const loginData = await Loginer.getLoginData()
+  if(!loginData) return
+  const memberId = loginData.memberId
+  if(!memberId) return
+
+  const url1 = APIs.OPEN_CONNECT
+  const w1 = {
+    operateType: "get-wechat",
+    memberId,
+  }
+  const res1 = await LiuReq.request<Res_OC_GetWeChat>(url1, w1)
+  if(res1.code !== "0000" || !res1.data) return
+  return res1.data
+}
+
+export async function getQrCodePicUrlForBindingWx() {
+  const loginData = await Loginer.getLoginData()
+  const memberId = loginData?.memberId
+  if(!memberId) return
+
+  const url1 = APIs.OPEN_CONNECT
+  const w1 = {
+    operateType: "bind-wechat",
+    memberId,
+  }
+  const res1 = await LiuReq.request<Res_OC_BindWeChat>(url1, w1)
+  const data1 = res1.data
+  if(res1.code !== "0000" || !data1) return
+  const wx_qr_ticket = data1.wx_qr_ticket
+  if(!wx_qr_ticket) return
+  const ticket = encodeURIComponent(wx_qr_ticket)
+  const picUrl = `https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=${ticket}`
+  return picUrl
+}
+
+
+export function whenTapAI(
+  detail: TaskDetail,
+) {
+  LiuApi.vibrateShort({ type: "light" })
+  const aiWorker = detail.aiWorker
+  if(!aiWorker) return
+
+  const { t } = useI18n()
+  const provider = t(`computing_provider.${aiWorker.computingProvider}`)
+  if(!provider) return
+  const model = aiWorker.model
+
+  LiuUtil.showCustomModal({
+    title_key: "ai-related.your_task",
+    content_key: "ai-related.your_task_tip",
+    content_opt: { model, provider },
+    showCancel: false,
+  })
+}
+
+export function toAddNote(
+  id: string,
+  detail: TaskDetail,
+  promptToReadClipboard = false,
+) {
+  if(!promptToReadClipboard) {
+    jumpToAddNote(id, detail, false)
+    return
+  }
+  
+  LiuUtil.showCustomModal({
+    title: "📋",
+    content_key: "task-detail.read_clipboard_tip",
+    confirm_key: "shared.ok",
+    success(res) {
+      if(res.confirm) {
+        LiuApi.vibrateShort({ type: "light" })
+      }
+      jumpToAddNote(id, detail, res.confirm)
+    }
+  })
+}
+
+function jumpToAddNote(
+  id: string,
+  detail: TaskDetail,
+  read_clipboard: boolean,
+) {
+  const data: AddTaskNote = {
+    stamp: LiuTime.getTime(),
+    id,
+    note: detail.note,
+    read_clipboard,
+  }
+  LiuTunnel.setStuff("add-task-note", data)
+  LiuApi.navigateTo({ 
+    url: "/packageB/pages/task-add-note/task-add-note",
+    routeType: "wx://upwards",
+  })
+}
+
+export function whenTapNote(
+  id: string,
+  detail: TaskDetail,
+) {
+  LiuUtil.showCustomActionSheet({
+    alert_text_key: "task-detail.note_title",
+    item_key_list: [
+      "shared.copy",
+      "shared.edit",
+    ],
+    success(res) {
+      LiuApi.vibrateShort({ type: "light" })
+      const idx = res.tapIndex
+      if(idx === 0) {
+        LiuUtil.toCopy(detail.note ?? "")
+      }
+      else if(idx === 1) {
+        toAddNote(id, detail)
+      }
+    }
+  })
+
 }

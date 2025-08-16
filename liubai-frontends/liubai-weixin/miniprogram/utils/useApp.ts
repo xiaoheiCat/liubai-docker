@@ -106,7 +106,6 @@ export class LiuApp {
 
     // 6. listen to onApiCategoryChange
     LiuApi.onApiCategoryChange(res6 => {
-      console.log("onApiCategoryChange: ", res6)
       const newApiCategory = res6.apiCategory
       if(currentApiCategory === "browseOnly" && newApiCategory !== "browseOnly") {
         _whenCtxChange()

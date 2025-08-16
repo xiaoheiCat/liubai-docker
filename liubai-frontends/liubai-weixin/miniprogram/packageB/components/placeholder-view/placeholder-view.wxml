@@ -1,5 +1,5 @@
 
-<view class="pv-shell" wx:if="{{enable && canUseSkyline}}">
+<view class="liu-{{theme}} pv-shell" wx:if="{{enable && canUseSkyline}}">
   <view class="pv-container {{show ? '' : 'pv-container_hidden'}}"
     style="height: {{height3}}px; transition: {{TRANSITION_MS}}ms;"
   >
@@ -36,7 +36,7 @@
 </view>
 
 <!-- if we can not use skyline -->
-<view class="pv-shell" wx:elif="{{!canUseSkyline}}">
+<view class="liu-{{theme}} pv-shell" wx:elif="{{!canUseSkyline}}">
   <view class="pv-container pv-container2"
     style="height: {{height3}}px; transition: {{TRANSITION_MS}}ms;"
   >

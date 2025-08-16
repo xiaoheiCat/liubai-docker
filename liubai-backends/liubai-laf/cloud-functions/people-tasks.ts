@@ -18,6 +18,7 @@ import {
 import * as vbot from "valibot"
 import { getBasicStampWhileAdding, getNowStamp, HOUR } from "@/common-time"
 import { ppl_system_cfg } from "@/common-config"
+import { afterUpdatingTask } from "@/sync-after"
 
 const db = cloud.database()
 const _ = db.command
@@ -53,8 +54,55 @@ export async function main(ctx: FunctionContext) {
   else if(oT === "update-task-title") {
     res = await update_task_title(body, vRes)
   }
+  else if(oT === "update-task-note") {
+    res = await update_task_note(body, vRes)
+  }
+  
 
   return res
+}
+
+async function update_task_note(
+  body: Record<string, any>,
+  vRes: VerifyTokenRes_B,
+) {
+  const id = body.id
+  if(!valTool.isStringWithVal(id)) {
+    return { code: "E4000", errMsg: "no id" }
+  }
+  const note = body.note
+  if(typeof note !== "string") {
+    return { code: "E4000", errMsg: "the type of note is incorrect" }
+  }
+  if(note.length > 3000) {
+    return { code: "PT005", errMsg: "note is too long"  }
+  }
+  const userId = vRes.userData._id
+
+  // 1. get task
+  const wtCol = db.collection("WxTask")
+  const res1 = await wtCol.doc(id).get<Table_WxTask>()
+  const data1 = res1.data
+  if(!data1 || data1.oState !== "OK") {
+    return { code: "E4004", errMsg: "no such task" }
+  }
+  if(data1.owner_userid !== userId) {
+    return { code: "E4003", errMsg: "you are not the owner of this task" }
+  }
+  if(data1.note === note) {
+    return { code: "0001" }
+  }
+
+  // 2. update the task
+  const now2 = getNowStamp()
+  const w2: Partial<Table_WxTask> = {
+    note,
+    editedStamp: now2,
+    updatedStamp: now2,
+  }
+  await wtCol.doc(id).update(w2)
+
+  return { code: "0000" }
 }
 
 
@@ -71,7 +119,7 @@ async function update_task_title(
     return { code: "E4000", errMsg: "no title" }
   }
   if(title.length > 144) {
-    return { code: "E4000", errMsg: "title is too long" }
+    return { code: "PT004", errMsg: "title is too long" }
   }
   const userId = vRes.userData._id
 
@@ -93,9 +141,14 @@ async function update_task_title(
   const now2 = getNowStamp()
   const w2: Partial<Table_WxTask> = {
     desc: title,
+    editedStamp: now2,
     updatedStamp: now2,
   }
   await wtCol.doc(id).update(w2)
+
+  // 3. run syncAfter
+  const newTask = { ...data1, ...w2 } as Table_WxTask
+  await afterUpdatingTask(newTask)
 
   return { code: "0000" }
 }
@@ -378,7 +431,7 @@ async function get_wx_task(
     return { code: "E4000", errMsg }
   }
   const id = body.id as string
-  const chatInfo = body.chatInfo as WxMiniAPI.ChatInfo
+  let chatInfo = body.chatInfo as WxMiniAPI.ChatInfo | undefined
   const userId = vRes.userData._id
 
   // 2. get the task
@@ -388,26 +441,88 @@ async function get_wx_task(
   if(!data2 || data2.oState !== "OK") {
     return { code: "E4004", errMsg: "no such task" }
   }
-  if(data2.open_single_roomid) {
+  if(data2.open_single_roomid && chatInfo) {
     if(data2.open_single_roomid !== chatInfo.open_single_roomid) {
       return { code: "PT001", errMsg: "open_single_roomid is not matched" }
     }
   }
-  if(data2.opengid) {
+  if(data2.opengid && chatInfo) {
     if(data2.opengid !== chatInfo.opengid) {
       return { code: "PT001", errMsg: "opengid is not matched" }
     }
   }
 
-  // 3. package data
-  const list3 = packageWxTasks([data2], userId)
-  const item3 = list3[0]
-  const data3: PeopleTasksAPI.Res_GetWxTask = {
-    operateType: "get-wx-task",
-    ...item3,
+  // 3. check my auth if no chatInfo
+  if(!chatInfo) {
+    const wbCol = db.collection("WxBond")
+    const w3: Partial<Table_WxBond> = {
+      userId,
+      infoType: "chat-tool",
+    }
+    if(data2.open_single_roomid) {
+      w3.open_single_roomid = data2.open_single_roomid
+    }
+    if(data2.opengid) {
+      w3.opengid = data2.opengid
+    }
+    const res3 = await wbCol.where(w3).getOne<Table_WxBond>()
+    const data3 = res3.data
+    if(!data3) {
+      return { code: "E4003", errMsg: "you are not the member of this chat" }
+    }
+    chatInfo = {
+      opengid: data3.opengid,
+      open_single_roomid: data3.open_single_roomid,
+      group_openid: data3.group_openid,
+      chat_type: data3.chat_type,
+    }
   }
-  return { code: "0000", data: data3 }
+
+  // 4. package data
+  const list4 = packageWxTasks([data2], userId)
+  const item4 = list4[0]
+  const data4: PeopleTasksAPI.Res_GetWxTask = {
+    operateType: "get-wx-task",
+    ...item4,
+  }
+
+  // 5. get each_other_openid
+  if(chatInfo?.open_single_roomid) {
+    await handleEachOtherOpenid(data4, chatInfo)
+  }
+
+  return { code: "0000", data: data4 }
 }
+
+
+async function handleEachOtherOpenid(
+  res: PeopleTasksAPI.Res_GetWxTask,
+  chatInfo: WxMiniAPI.ChatInfo,
+) {
+  const roomid = chatInfo.open_single_roomid
+  if(!roomid) return
+
+  const myOpenid = chatInfo.group_openid
+  const assigneeList = res.assigneeList ?? []
+  const eachOther = assigneeList.find(v => v.group_openid !== myOpenid)
+  if(eachOther) {
+    res.each_other_openid = eachOther.group_openid
+    return
+  }
+
+  const wbCol = db.collection("WxBond")
+  const w2 = {
+    open_single_roomid: roomid,
+    infoType: "chat-tool",
+    group_openid: _.neq(myOpenid),
+  }
+  const res2 = await wbCol.where(w2).getOne<Table_WxBond>()
+  const data2 = res2.data
+  if(!data2) return
+  res.each_other_openid = data2.group_openid
+}
+
+
 
 async function create_wx_task(
   body: Record<string, any>,
@@ -485,6 +600,10 @@ async function create_wx_task(
   }
   checkTaskForSecurity(docId, desc, vRes.userData)
 
+  // 7. run syncAfter
+  const newTask = { ...data6, _id: docId } as Table_WxTask
+  await afterUpdatingTask(newTask)
+
   return { code: "0000", data: { id: docId } }
 }
 
@@ -550,6 +669,14 @@ function packageWxTasks(
       insertedStamp: v.insertedStamp,
       endStamp: v.endStamp,
       closedStamp: v.closedStamp,
+      editedStamp: v.editedStamp,
+
+      calendarStamp: v.calendarStamp,
+      remindStamp: v.remindStamp,
+      whenStamp: v.whenStamp,
+      remindMe: v.remindMe,
+      aiWorker: v.aiWorker,
+      note: v.note,
     }
     list.push(obj)
   }

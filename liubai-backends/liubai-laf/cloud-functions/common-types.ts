@@ -1048,8 +1048,11 @@ export interface CredentialMetaData {
   payment_timezone?: string
   plan?: string
   memberId?: string
+
   pic_url?: string
   qr_code?: string
+  wx_qr_ticket?: string
+
   ww_qynb_config_id?: string
   wx_gzh_openid?: string
 
@@ -1938,6 +1941,14 @@ export interface Table_WxTask extends BaseTable {
   activity_id?: string
   endStamp?: number
   closedStamp?: number
+  editedStamp?: number
+
+  calendarStamp?: number
+  remindStamp?: number
+  whenStamp?: number
+  remindMe?: LiuRemindMe
+  aiWorker?: LiuAi.AiWorker
+  note?: string
 }
 
 
@@ -2733,6 +2744,7 @@ export namespace SyncOperateAPI {
     remindStamp?: number
     whenStamp?: number
     remindMe?: LiuRemindMe
+    description?: string
   }
 
   export type ContentType = "note" | "todo" | "calendar"
@@ -2864,6 +2876,7 @@ export interface Res_OC_BindWeChat {
   operateType: "bind-wechat"
   qr_code: string
   credential: string
+  wx_qr_ticket?: string
 }
 
 export interface Res_OC_CheckWeChat {
@@ -3018,6 +3031,10 @@ export interface Wx_Param_Msg_Templ_Send {
   touser: string
   template_id: string
   url?: string
+  miniprogram?: {
+    appid: string
+    pagepath: string
+  }
   client_msg_id?: string
   data: Record<string, Record<"value", string>>
 }
@@ -4047,7 +4064,6 @@ export namespace LiuAi {
     stream?: boolean
   }
 
-
   export interface TextToSpeechOpt {
     room?: Table_AiRoom
   }
@@ -4364,6 +4380,7 @@ export namespace PeopleTasksAPI {
     | "complete-wx-task"
     | "list-wx-tasks"
     | "update-task-title"
+    | "update-task-note"
 
   export interface Res_EnterWxChatTool {
     operateType: "enter-wx-chat-tool"
@@ -4404,11 +4421,21 @@ export namespace PeopleTasksAPI {
     editedStamp?: number
     endStamp?: number
     closedStamp?: number
+
+    calendarStamp?: number
+    remindStamp?: number
+    whenStamp?: number
+    remindMe?: LiuRemindMe
+    aiWorker?: LiuAi.AiWorker
+
+    // it only exists when chatInfo.open_single_roomid has been set
+    each_other_openid?: string
+    note?: string
   }
 
   export const Sch_Param_GetWxTask = vbot.object({
     operateType: vbot.literal("get-wx-task"),
-    chatInfo: WxMiniAPI.Sch_ChatInfo,
+    chatInfo: vbot.optional(WxMiniAPI.Sch_ChatInfo),
     id: Sch_Id,
   })
 

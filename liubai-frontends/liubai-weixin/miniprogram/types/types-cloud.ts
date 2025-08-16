@@ -40,3 +40,28 @@ export interface UserSubscription {
 /*************************** 云存储 **********************/
 // 云存储服务
 export type CloudStorageService = "qiniu" | "tecent_cos" | "aliyun_oss"
+
+
+/*************************** AI ************************/
+export namespace LiuAi {
+
+  export type AiProvider = "aliyun-bailian" | "baichuan" | "deepseek" | "tencent-hunyuan" 
+  | "minimax" | "moonshot" | "stepfun" | "zero-one" | "zhipu" | "jina"
+
+  export type AiSecondaryProvider = "siliconflow" | "gitee-ai" | "qiniu" | "tencent-lkeap"
+  | "suanleme"
+
+  export type ComputingProvider = AiProvider | AiSecondaryProvider
+
+  // AiCharacter 不跟供应商绑定，它是角色，只不过现在各个供应商都有自己的 To C 角色罢了
+  export type AiCharacter = "baixiaoying" | "deepseek" | "hailuo" | "hunyuan" | "kimi" | "yuewen" | 
+  "wanzhi" | "zhipu" | "ds-reasoner" | "tongyi-qwen"
+
+  export interface AiWorker {
+    computingProvider: ComputingProvider
+    model: string
+    character?: AiCharacter
+    stream?: boolean
+  }
+
+}

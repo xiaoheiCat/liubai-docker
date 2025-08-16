@@ -12,6 +12,14 @@
   margin-bottom: 8px;
 }
 
+.liu-skyline-hover {
+  border-radius: 12px;
+}
+
+.liu-skyline-hover::before {
+  border-radius: 12px;
+}
+
 .task-card-title {
   font-size: var(--btn-font);
   color: var(--main-normal);

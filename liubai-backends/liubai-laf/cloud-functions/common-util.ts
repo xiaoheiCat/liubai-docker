@@ -3595,6 +3595,7 @@ export class AiToolUtil {
       remindStamp,
       whenStamp,
       remindMe,
+      description,
     }
     return { pass: true, data: waitingData }
   }
@@ -3684,6 +3685,7 @@ export class AiToolUtil {
     const d1: SyncOperateAPI.WaitingData = {
       title,
       liuDesc: liuDesc1,
+      description,
     }
     return { pass: true, data: d1 }
   }

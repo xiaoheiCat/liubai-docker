@@ -268,4 +268,15 @@ export class LiuUtil {
     })
   }
 
+  static async toCopy(text: string) {
+    try {
+      await LiuApi.setClipboardData({ data: text })
+      LiuUtil.showCustomToast({ title_key: "shared.copied" })
+    }
+    catch(err) {
+      console.warn("fail to set clipboard")
+      console.log(err)
+    }
+  }
+
 }

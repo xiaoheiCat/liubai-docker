@@ -623,6 +623,7 @@ async function handle_bind_wechat(
   const e4 = fir3?.expireStamp ?? 1
   const c4 = fir3?.credential
   const qr4 = fir3?.meta_data?.qr_code
+  const ticket4 = fir3?.meta_data?.wx_qr_ticket
   const diff4 = e4 - now4
   if(diff4 > MINUTE && c4 && qr4) {
     // if the rest of time is enough to bind
@@ -631,6 +632,7 @@ async function handle_bind_wechat(
       data: {
         operateType: "bind-wechat",
         qr_code: qr4,
+        wx_qr_ticket: ticket4,
         credential: c4,
       },
     }
@@ -671,6 +673,7 @@ async function handle_bind_wechat(
       errMsg: "creating QR code from wechat failed",
     }
   }
+  const wx_qr_ticket = res7.ticket
 
   // 8. add credential into db
   const expireStamp = getNowStamp() + MIN_10
@@ -679,6 +682,7 @@ async function handle_bind_wechat(
     meta_data: {
       memberId,
       qr_code: qr_code_7,
+      wx_qr_ticket,
       x_liu_theme: body["x_liu_theme"],
       x_liu_language: body["x_liu_language"],
     }
@@ -690,6 +694,7 @@ async function handle_bind_wechat(
       operateType: "bind-wechat",
       qr_code: qr_code_7,
       credential: cred,
+      wx_qr_ticket,
     }
   }
 }

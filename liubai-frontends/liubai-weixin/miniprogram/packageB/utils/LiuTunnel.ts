@@ -5,6 +5,8 @@ export type TunnelKey = "wx-chat-info"
   | "just-create-task"
   | "please-create-task"
   | "task-fr-list-to-detail"
+  | "add-task-note"
+  | "has-new-task-note"
 
 export class LiuTunnel {
 

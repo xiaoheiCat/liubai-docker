@@ -27,6 +27,7 @@ export interface CeData {
   more: boolean
   phoneBound?: BaseIsOn
   aiChatId?: string
+  overflowY: "auto" | "visible"
 }
 
 export const defaultData: CeData = {
@@ -38,6 +39,7 @@ export const defaultData: CeData = {
   showTitleBar: false,
   canSubmit: false,
   more: false,
+  overflowY: "auto",
 }
 
 export interface CeProps {

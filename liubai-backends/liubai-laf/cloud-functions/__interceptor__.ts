@@ -16,7 +16,7 @@ import * as vbot from "valibot"
 const MAXIMUM_IN_ONE_MINUTE = 60
 
 // 1s 内，最大访问次数
-const MAXIMUM_IN_ONE_SEC = 5
+const MAXIMUM_IN_ONE_SEC = 6
 
 // 收集最近多少个访问时间戳
 const VISITED_NUM = 60
