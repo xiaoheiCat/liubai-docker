@@ -148,7 +148,7 @@ async function update_task_title(
 
   // 3. run syncAfter
   const newTask = { ...data1, ...w2 } as Table_WxTask
-  await afterUpdatingTask(newTask)
+  afterUpdatingTask(newTask)
 
   return { code: "0000" }
 }
@@ -602,7 +602,7 @@ async function create_wx_task(
 
   // 7. run syncAfter
   const newTask = { ...data6, _id: docId } as Table_WxTask
-  await afterUpdatingTask(newTask)
+  afterUpdatingTask(newTask)
 
   return { code: "0000", data: { id: docId } }
 }
