@@ -200,7 +200,6 @@ Component({
 
       // 4.2 show
       this.setData(bind4)
-      console.log("let's go to update share menu")
       this.toUpdateShareMenu()
 
       // 4.3 check out binding status

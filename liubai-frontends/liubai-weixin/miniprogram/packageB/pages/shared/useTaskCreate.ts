@@ -70,14 +70,13 @@ export function prePost(
       LiuTunnel.setStuff("please-create-task", plzData)
       LiuApi.navigateBack()
       jumpToDetailFunc = "navigateBack"
+      return
     }
   }
   
   // 3. wait for createTaskPromise
   waitForCreateTask(ctx)
-  if(!jumpToDetailFunc) {
-    jumpToDetailFunc = "navigateTo"
-  }
+  jumpToDetailFunc = "navigateTo"
 }
 
 
@@ -100,7 +99,6 @@ export async function waitForCreateTask(
   if(!res1) return
   
   // 2. handle result
-  console.log("waitForCreateTask res1: ", res1)
   const code2 = res1.code
   const id = res1?.data?.id
   if(code2 !== "0000" || !id) {

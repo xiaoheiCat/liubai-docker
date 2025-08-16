@@ -62,6 +62,11 @@ const fastAiWorkers: LiuAi.AiWorker[] = [
     "character": "tongyi-qwen",
   },
   {
+    "computingProvider": "aliyun-bailian",
+    "model": "qwen3-235b-a22b-instruct-2507",
+    "character": "tongyi-qwen",
+  },
+  {
     "computingProvider": "zhipu",
     "model": "glm-4.5-x",
     "character": "zhipu",
@@ -669,7 +674,7 @@ class ClusterHelper {
       messages: prompts,
       model: aiWorker.model,
       stop: ["</output>"],
-      stream: true,
+      stream: aiWorker.stream,
     }
 
     // 2. add prefix for deepseek
