@@ -767,6 +767,7 @@ class ClusterHelper {
 class AiCluster2 {
   private _user: Table_User
   private _task: Table_WxTask
+  private _runTimes = 0
 
   constructor(
     user: Table_User,
@@ -776,13 +777,27 @@ class AiCluster2 {
     this._task = task
   }
 
-  async run() {
-    const aiCapsule = ClusterHelper.getAiWorker()
+  async run(
+    filterModels: string[] = [],
+  ) {
+    this._runTimes++
+    const aiCapsule = ClusterHelper.getAiWorker(filterModels)
     console.log("aiCapsule: ", aiCapsule)
     if(!aiCapsule) return false
 
     const msg = this._task.desc
-    await this.doItByWorker(msg, aiCapsule.worker, aiCapsule.apiEndpoint)
+    const res1 = await this.doItByWorker(
+      msg, 
+      aiCapsule.worker, 
+      aiCapsule.apiEndpoint,
+    )
+
+    if(!res1 && this._runTimes < 2) {
+      console.warn("AiCluster2 runs again.....")
+      filterModels.push(aiCapsule.worker.model)
+      await this.run(filterModels)
+      return
+    }
   }
 
   private async doItByWorker(
@@ -802,14 +817,15 @@ class AiCluster2 {
     // 7. turn into object 
     const res7 = await AiShared.turnOutputIntoObject(content6)
     if(!res7) {
-      ClusterHelper.toReport(content6, "xml2js failed in ai cluster", aiWorker)
+      const msg7 = "```\n" + content6 + "\n```"
+      ClusterHelper.toReport(msg7, "xml2js failed in ai cluster", aiWorker)
       return false
     }
     console.log("parsed object from LLM: ", res7)
 
     // 8.1 turn into waiting data if direction is 1
     const direction8 = res7.direction
-    if(direction8 !== "1") return false
+    if(direction8 !== "1") return true
     delete res7.direction
     const funcJson = res7
     const res8 = AiToolUtil.turnJsonToWaitingData(
@@ -837,7 +853,7 @@ class AiCluster2 {
       return false
     }
     const now8 = getNowStamp()
-    if(now8 >= calendarStamp) return
+    if(now8 >= calendarStamp) return false
     if(!waitingData.remindStamp || !waitingData.remindMe) {
       waitingData.remindStamp = calendarStamp
       waitingData.remindMe = {
@@ -854,6 +870,8 @@ class AiCluster2 {
     // 10. update user quota
     const userId = this._user._id
     await ClusterHelper.updateQuota(userId)
+
+    return true
   }
 
   private async updateTask(
