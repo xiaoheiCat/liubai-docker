@@ -71,6 +71,8 @@
         <text>{{t1.done}}</text>
       </custom-button>
 
+      <view class="tc-bottom"></view>
+
 
     </view>
   </view>
