@@ -1116,6 +1116,11 @@ export class AiShared {
   static fixOutputForLLM(content: string) {
     const res1 = content.startsWith("<output>")
     if(!res1) content = "<output>\n" + content
+
+    // fix for zhipu GLM 4.5
+    const res1_2 = content.endsWith("</output")
+    if(res1_2) content += ">"
+
     const res2 = content.endsWith("</output>")
     if(!res2) content += "\n</output>"
     return content
