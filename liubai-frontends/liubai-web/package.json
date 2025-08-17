@@ -1,7 +1,7 @@
 {
   "name": "liubai-web",
   "private": true,
-  "version": "0.20.1",
+  "version": "0.20.2",
   "description": "It's the frontend project for Liubai",
   "author": {
     "name": "yenche123",
