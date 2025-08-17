@@ -14,14 +14,15 @@
   <view class="liu-main-container">
     <view class="liu-main-box">
 
-      <input placeholder="{{t1.placeholder}}" maxlength="66"
-        class="tc-input"
+      <textarea placeholder="{{t1.placeholder}}" maxlength="66"
+        class="tc-textarea"
         placeholder-style="color: {{ colors.main_note }};"
         cursor-color="{{ colors.primary_color }}"
         focus="{{focus}}"
         bindinput="onInput"
         bindconfirm="onInput"
         value="{{inputValue}}"
+        auto-height
       />
 
       <!-- Assign to -->
@@ -69,6 +70,8 @@
       <custom-button catchtap="onTapPost" disabled="{{!canSubmit}}">
         <text>{{t1.done}}</text>
       </custom-button>
+
+      <view class="tc-bottom"></view>
 
 
     </view>
