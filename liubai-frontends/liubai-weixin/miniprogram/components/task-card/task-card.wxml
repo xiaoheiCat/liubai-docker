@@ -22,9 +22,10 @@
     >
       <open-data-item type="userNickName" index="{{0}}" />
     </open-data-list>
-
     <text wx:else>{{t1.from_single_chat}}</text>
-    <text wx:if="{{task.eachOtherDone}}">{{t1.each_other_done}}</text>
+    <text wx:if="{{task.eachOtherDone}}" 
+      class="{{locale === 'en' ? 'tcf-left-margin' : ''}}"
+    >{{t1.each_other_done}}</text>
   </view>
 
 </view>

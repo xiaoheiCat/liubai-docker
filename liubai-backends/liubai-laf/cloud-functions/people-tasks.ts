@@ -719,6 +719,20 @@ function packageWxTasks(
       note: v.note,
       each_other_openid: v.each_other_openid,
     }
+
+    // handle each_other_openid
+    if(v.open_single_roomid && v.assigneeList.length && !v.each_other_openid) {
+      const eachOther = v.assigneeList.find(v2 => {
+        if(v2.group_openid !== v.owner_openid) {
+          return true
+        }
+        return false
+      })
+      if(eachOther) {
+        obj.each_other_openid = eachOther.group_openid
+      }
+    }
+
     list.push(obj)
   }
   return list
