@@ -14,9 +14,17 @@
     </block>
 
   </view>
-  <text wx:elif="{{task.open_single_roomid}}" class="task-card-footer">
-    <text>{{t1.from_single_chat}}</text>
+  <view wx:elif="{{task.open_single_roomid}}" class="task-card-footer">
+
+    <open-data-list wx:if="{{task.each_other_openid}}"
+      members="{{[task.each_other_openid]}}"
+      type="groupMembers"
+    >
+      <open-data-item type="userNickName" index="{{0}}" />
+    </open-data-list>
+
+    <text wx:else>{{t1.from_single_chat}}</text>
     <text wx:if="{{task.eachOtherDone}}">{{t1.each_other_done}}</text>
-  </text>
+  </view>
 
 </view>
