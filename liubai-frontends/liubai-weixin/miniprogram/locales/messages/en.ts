@@ -37,7 +37,7 @@ export default {
     "come_later": "Come later please~",
     "video_err": "Video load failed",
     "err_reason": "Reason: {msg}; Status code: {code}",
-    "open_chat_tool_1": "It's not available for WeCom, File Transfer, or your personal WeChat.\nDo you want to delete this task?",
+    "open_chat_tool_1": "It's not available for WeCom, File Transfer, or your own WeChat account.\nDo you want to delete this task?",
   },
   "watch-video": {
     "rule": "You can earn {conversationToAd} conversation times by watching a video.",

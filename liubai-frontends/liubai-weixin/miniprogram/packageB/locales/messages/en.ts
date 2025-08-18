@@ -73,7 +73,7 @@ export default {
     "share": "Share",
     "close_1": "Are you sure to close the task?",
     "complete_1": "True or false 🤨",
-    "complete_2": "Is is true that you've completed the task?",
+    "complete_2": "Is it true that you've completed the task?",
     "it_is_true": "True",
     "it_is_not_true": "False",
     "done_it": "You've done it!",
