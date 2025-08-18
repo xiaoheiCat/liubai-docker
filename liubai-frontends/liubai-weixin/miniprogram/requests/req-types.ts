@@ -174,6 +174,11 @@ export namespace PeopleTasksAPI {
     group_openid: string
     doneStamp?: number
   }
+
+  export interface ParticipatorItem {
+    group_openid: string
+    engagedStamp?: number
+  }
   
   export interface Res_GetWxTask {
     operateType: "get-wx-task"
@@ -186,6 +191,33 @@ export namespace PeopleTasksAPI {
     open_single_roomid?: string
     chat_type: WxMiniAPI.ChatType
     assigneeList: AssigneeItem[]
+    participatorList?: ParticipatorItem[]
+    isMine?: boolean
+    insertedStamp: number
+    editedStamp?: number
+    endStamp?: number
+    closedStamp?: number
+
+    calendarStamp?: number
+    remindStamp?: number
+    whenStamp?: number
+    remindMe?: LiuRemindMe
+    aiWorker?: LiuAi.AiWorker
+    
+    note?: string
+  }
+
+  export interface WxTaskItem {
+    infoType: "TASK" | "ACTIVITY"
+    id: string
+    activity_id?: string
+    desc: string
+    owner_openid: string
+    opengid?: string
+    open_single_roomid?: string
+    chat_type: WxMiniAPI.ChatType
+    assigneeList: AssigneeItem[]
+    participatorList?: ParticipatorItem[]
     isMine?: boolean
     insertedStamp: number
     editedStamp?: number
@@ -198,11 +230,12 @@ export namespace PeopleTasksAPI {
     remindMe?: LiuRemindMe
     aiWorker?: LiuAi.AiWorker
 
+    // 仅在单聊时，可能有值，其值表示除了 owner_openid 以外
+    // 的另一位 group_openid，而非相对于当前用户的另一位！
     each_other_openid?: string
+    
     note?: string
   }
-
-  export type WxTaskItem = Omit<Res_GetWxTask, "operateType">
 
   export interface Res_ListWxTasks {
     operateType: "list-wx-tasks"

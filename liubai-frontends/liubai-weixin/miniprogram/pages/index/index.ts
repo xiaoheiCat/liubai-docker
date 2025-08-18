@@ -20,7 +20,7 @@ import {
   tryToOpenTaskDetail,
 } from "./tools/useIndexPage"
 import { pageBehavior } from "~/behaviors/page-behavior"
-import type { TaskItem } from "~/types/types-task"
+import type { TaskCard } from "~/types/types-task"
 import type { DeletedTaskEventDetail } from "~/components/task-card/tools/types"
 
 Component({
@@ -32,7 +32,7 @@ Component({
   data: {
     pageName: "index",
     canSearch: false,
-    myTasks: [] as TaskItem[],
+    myTasks: [] as TaskCard[],
     _key1: "",
     _key2: "",
     _taskId: "",

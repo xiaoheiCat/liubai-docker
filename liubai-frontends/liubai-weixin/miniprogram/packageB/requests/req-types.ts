@@ -100,6 +100,11 @@ export namespace PeopleTasksAPI {
     group_openid: string
     doneStamp?: number
   }
+
+  export interface ParticipatorItem {
+    group_openid: string
+    engagedStamp?: number
+  }
   
   export interface Res_GetWxTask {
     operateType: "get-wx-task"
@@ -112,6 +117,7 @@ export namespace PeopleTasksAPI {
     open_single_roomid?: string
     chat_type: WxMiniAPI.ChatType
     assigneeList: AssigneeItem[]
+    participatorList?: ParticipatorItem[]
     isMine?: boolean
     insertedStamp: number
     editedStamp?: number
@@ -124,7 +130,6 @@ export namespace PeopleTasksAPI {
     remindMe?: LiuRemindMe
     aiWorker?: LiuAi.AiWorker
 
-    each_other_openid?: string
     note?: string
   }
 

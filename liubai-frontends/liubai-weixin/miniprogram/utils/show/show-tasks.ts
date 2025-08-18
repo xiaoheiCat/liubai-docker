@@ -1,25 +1,36 @@
 import type { PeopleTasksAPI } from "~/requests/req-types";
-import type { TaskItem } from "~/types/types-task";
+import type { TaskCard } from "~/types/types-task";
 
 export function showTaskItems(
   tasks: PeopleTasksAPI.WxTaskItem[],
 ) {
-  const list: TaskItem[] = []
+  const list: TaskCard[] = []
 
   for(let i=0; i<tasks.length; i++) {
     const task = tasks[i]
-    const obj: TaskItem = {
+    const obj: TaskCard = {
       ...task,
       allDone: undefined,
       doneCount: undefined,
       eachOtherDone: undefined,
     }
+
+    // handle otherOpenidForMe
+    const isSingleChat = Boolean(task.open_single_roomid)
+    if(isSingleChat) {
+      if(task.isMine) {
+        obj.otherOpenidForMe = task.each_other_openid
+      }
+      else {
+        obj.otherOpenidForMe = task.owner_openid
+      }
+    }
+
     if(task.infoType !== "TASK" || task.assigneeList.length < 1) {
       list.push(obj)
       continue
     }
 
-    const isSingleChat = Boolean(task.open_single_roomid)
     obj.allDone = true
     obj.doneCount = 0
     task.assigneeList.forEach(v => {

@@ -1,14 +1,14 @@
 import { sharedBehavior } from "~/behaviors/shared-behavior";
 import { i18nBehavior } from "~/behaviors/i18n-behavior"
 import { LiuApi } from "~/utils/LiuApi";
-import type { TaskItem } from "~/types/types-task";
-import type { PeopleTasksAPI } from "~/requests/req-types";
+import type { TaskCard } from "~/types/types-task";
 import { LiuTunnel } from "~/utils/LiuTunnel";
 import type { WxMiniAPI } from "~/types/types-wx";
 import { LiuUtil } from "~/utils/liu-util/index";
 import { LiuReq } from "~/requests/LiuReq";
 import APIs from "~/requests/APIs";
 import type { DeletedTaskEventDetail } from "./tools/types";
+import { turnTaskCardToResGetWxTask } from "./tools/useTaskCard";
 
 Component({
 
@@ -32,14 +32,11 @@ Component({
     onTapCard() {
       // 1. vibrate
       LiuApi.vibrateShort({ type: "light" })
-      const obj = this.data.task as TaskItem
-      if(!obj) return
+      const obj = this.data.task as TaskCard
+      if(!obj?.id) return
       
       // 2. set tunnel
-      const obj2: PeopleTasksAPI.Res_GetWxTask = {
-        operateType: "get-wx-task",
-        ...obj,
-      }
+      const obj2 = turnTaskCardToResGetWxTask(obj)
       LiuTunnel.setStuff("task-fr-list-to-detail", obj2)
 
       // 3. open chat tool
@@ -78,7 +75,7 @@ Component({
     },
 
     async toDelete() {
-      const task = this.data.task as TaskItem
+      const task = this.data.task as TaskCard
       if(!task) return
 
       const id = task.id

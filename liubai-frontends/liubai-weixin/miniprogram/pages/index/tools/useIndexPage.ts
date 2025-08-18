@@ -1,7 +1,7 @@
 import APIs from "~/requests/APIs";
 import { LiuReq } from "~/requests/LiuReq";
 import type { PeopleTasksAPI } from "~/requests/req-types";
-import type { TaskItem } from "~/types/types-task";
+import type { TaskCard } from "~/types/types-task";
 import type { WxMiniAPI } from "~/types/types-wx";
 import { LiuApi } from "~/utils/LiuApi";
 import { LiuTunnel } from "~/utils/LiuTunnel";
@@ -104,12 +104,12 @@ export async function getMyTasks() {
 
 export async function getStoragedMyTasks() {
   const res = await LiuApi.getStorage({ key: "my-tasks" })
-  const data = res?.data as TaskItem[] | null
+  const data = res?.data as TaskCard[] | null
   if(!data) return
   return data
 }
 
-export async function setStoragedMyTasks(tasks: TaskItem[]) {
+export async function setStoragedMyTasks(tasks: TaskCard[]) {
   const res = await LiuApi.setStorage({ key: "my-tasks", data: tasks })
   return res
 }

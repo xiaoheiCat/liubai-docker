@@ -32,4 +32,9 @@
   font-size: var(--mini-font);
   color: var(--main-note);
   line-height: 1.45;
+  display: inline-flex;
+}
+
+.tcf-left-margin {
+  margin-left: 6px;
 }
