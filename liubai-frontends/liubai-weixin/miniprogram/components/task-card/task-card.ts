@@ -8,7 +8,7 @@ import { LiuUtil } from "~/utils/liu-util/index";
 import { LiuReq } from "~/requests/LiuReq";
 import APIs from "~/requests/APIs";
 import type { DeletedTaskEventDetail } from "./tools/types";
-import { turnTaskItemToResGetWxTask } from "./tools/useTaskCard";
+import { turnTaskCardToResGetWxTask } from "./tools/useTaskCard";
 
 Component({
 
@@ -36,7 +36,7 @@ Component({
       if(!obj?.id) return
       
       // 2. set tunnel
-      const obj2 = turnTaskItemToResGetWxTask(obj)
+      const obj2 = turnTaskCardToResGetWxTask(obj)
       LiuTunnel.setStuff("task-fr-list-to-detail", obj2)
 
       // 3. open chat tool

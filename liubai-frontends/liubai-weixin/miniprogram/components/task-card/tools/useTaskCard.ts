@@ -1,7 +1,7 @@
 import type { PeopleTasksAPI } from "~/requests/req-types";
 import type { TaskCard } from "~/types/types-task";
 
-export function turnTaskItemToResGetWxTask(
+export function turnTaskCardToResGetWxTask(
   obj: TaskCard,
 ) {
   const res: PeopleTasksAPI.Res_GetWxTask = {

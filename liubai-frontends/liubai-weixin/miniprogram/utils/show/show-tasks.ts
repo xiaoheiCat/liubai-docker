@@ -15,14 +15,14 @@ export function showTaskItems(
       eachOtherDone: undefined,
     }
 
-    // handle openidFromSingleChat
+    // handle otherOpenidForMe
     const isSingleChat = Boolean(task.open_single_roomid)
     if(isSingleChat) {
       if(task.isMine) {
-        obj.openidFromSingleChat = task.each_other_openid
+        obj.otherOpenidForMe = task.each_other_openid
       }
       else {
-        obj.openidFromSingleChat = task.owner_openid
+        obj.otherOpenidForMe = task.owner_openid
       }
     }
 

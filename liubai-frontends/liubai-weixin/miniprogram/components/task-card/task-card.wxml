@@ -16,8 +16,8 @@
   </view>
   <view wx:elif="{{task.open_single_roomid}}" class="task-card-footer">
 
-    <open-data-list wx:if="{{task.openidFromSingleChat}}"
-      members="{{[task.openidFromSingleChat]}}"
+    <open-data-list wx:if="{{task.otherOpenidForMe}}"
+      members="{{[task.otherOpenidForMe]}}"
       type="groupMembers"
     >
       <open-data-item type="userNickName" index="{{0}}" />
