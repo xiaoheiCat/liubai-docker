@@ -4,7 +4,9 @@
   class="liu-{{theme}} liu-{{locale}} liu-scroll-view"
   scroll-y 
   bindscrolltolower="onScrollToLower"
+  bindscrolltoupper="onScrollToUpper"
   lower-threshold="100"
+  upper-threshold="100"
 >
 
   <view class="index-container">

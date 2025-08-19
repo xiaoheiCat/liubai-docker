@@ -27,3 +27,8 @@ export const colorData = {
     main_note: "#686868",
   }
 }
+
+export const indexNumData = {
+  to_lower: 9,
+  to_upper: 16,
+}

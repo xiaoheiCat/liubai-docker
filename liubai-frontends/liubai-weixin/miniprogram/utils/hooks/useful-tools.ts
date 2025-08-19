@@ -1,9 +1,9 @@
 import { LiuTime } from "../LiuTime"
 
 
-
 const _throttleStamps = {
   "index-scroll-to-lower": 0,
+  "index-scroll-to-upper": 0,
 }
 
 function canIPassThrottle(

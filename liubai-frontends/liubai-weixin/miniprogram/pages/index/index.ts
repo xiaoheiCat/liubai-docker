@@ -4,7 +4,7 @@ import { i18nBehavior } from "~/behaviors/i18n-behavior"
 import { navibarBehavior } from "~/behaviors/navibar-behavior"
 import { sharedBehavior } from "~/behaviors/shared-behavior"
 import { themeBehavior } from "~/behaviors/theme-behavior"
-import { defaultData } from "~/config/default-data"
+import { defaultData, indexNumData } from "~/config/default-data"
 import { envData } from "~/config/env-data"
 import { useI18n } from "~/locales/index"
 import { LiuUtil } from "~/utils/liu-util/index"
@@ -17,6 +17,7 @@ import {
   getStoragedMyTasks, 
   handleGroupInfo, 
   handleScrollToLower, 
+  handleScrollToUpper, 
   setStoragedMyTasks,
   tryToOpenTaskDetail,
 } from "./tools/useIndexPage"
@@ -169,12 +170,16 @@ Component({
     },
 
     onShow() {
-      this.handleMyTasks()
+      this.getMyTasksWhileShowing()
     },
 
-    async handleMyTasks() {
+    async getMyTasksWhileShowing() {
       const res1 = LiuApi.getSkylineInfoSync()
       if(!res1.isSupported) return
+      const length1 = this.data.myTasks.length
+      if(length1 > indexNumData.to_upper) {
+        return
+      }
       const myTasks = await getMyTasks()
       if(!myTasks) return
       this.setData({ myTasks })
@@ -235,6 +240,13 @@ Component({
         title,
         imageUrl: "/images/shared/index-cover.jpg"
       }
+    },
+
+    async onScrollToUpper() {
+      const myTasks = await handleScrollToUpper(this.data.myTasks)
+      if(!myTasks) return
+      this.setData({ myTasks })
+      setStoragedMyTasks(myTasks)
     },
 
     async onScrollToLower() {

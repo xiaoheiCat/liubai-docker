@@ -1,3 +1,4 @@
+import { indexNumData } from "~/config/default-data";
 import APIs from "~/requests/APIs";
 import { LiuReq } from "~/requests/LiuReq";
 import type { PeopleTasksAPI } from "~/requests/req-types";
@@ -8,6 +9,7 @@ import { LiuApi } from "~/utils/LiuApi";
 import { LiuTunnel } from "~/utils/LiuTunnel";
 import { showTaskItems } from "~/utils/show/show-tasks";
 import { LiuApp } from "~/utils/useApp";
+import valTool from "~/utils/val-tool";
 
 export async function handleGroupInfo() {
 
@@ -111,7 +113,11 @@ export async function getStoragedMyTasks() {
 }
 
 export async function setStoragedMyTasks(tasks: TaskCard[]) {
-  const res = await LiuApi.setStorage({ key: "my-tasks", data: tasks })
+  let list = valTool.copyObject(tasks)
+  if(list.length > indexNumData.to_upper) {
+    list = list.slice(0, indexNumData.to_upper)
+  }
+  const res = await LiuApi.setStorage({ key: "my-tasks", data: list })
   return res
 }
 
@@ -151,12 +157,26 @@ export async function tryToOpenTaskDetail(taskId: string) {
   })
 }
 
+
+export async function handleScrollToUpper(
+  myTasks: TaskCard[],
+) {
+  // 1. get params and throttle
+  const length1 = myTasks.length
+  if(length1 < indexNumData.to_upper) return
+  if(!usefulTools.canIPassThrottle("index-scroll-to-upper")) return
+
+  // 2. fetch
+  const newTasks = await getMyTasks()
+  return newTasks
+}
+
 export async function handleScrollToLower(
   myTasks: TaskCard[],
 ) {
   // 1. get params and throttle
   const length1 = myTasks.length
-  if(length1 < 9) return
+  if(length1 < indexNumData.to_lower) return
   if(!usefulTools.canIPassThrottle("index-scroll-to-lower")) return
 
   // 2. load more
