@@ -7,16 +7,18 @@
   <virtual-navibar height1="{{height1}}" height2="{{height2}}"></virtual-navibar>
   <view class="liu-main-container">
     <view class="liu-main-box">
-      <textarea class="tan-textarea" maxlength="{{noteMaxLength}}"
+      <textarea 
+        class="tan-textarea {{updateType === 'title' ? 'tan-textarea_title' : ''}}" 
+        maxlength="{{updateType === 'title' ? titleMaxLength : noteMaxLength}}"
         focus="{{focus}}"
         auto-height
         cursor-spacing="20"
-        placeholder="{{ t1.placeholder }}"
+        placeholder="{{updateType === 'title' ? t1.placeholder_1 : t1.placeholder_2}}"
         placeholder-style="color: {{ colors.main_note }};"
         cursor-color="{{ colors.primary_color }}"
         bindinput="onInput"
         bindconfirm="onInput"
-        value="{{note}}"
+        value="{{text}}"
         confirm-hold
         adjust-keyboard-to="bottom"
       ></textarea>
@@ -33,5 +35,6 @@
 
 <custom-navibar 
   height1="{{height1}}" height2="{{height2}}" 
-  visible="{{visible}}" title="{{t1.title}}"
+  visible="{{visible}}" 
+  title="{{updateType === 'title' ? t1.title_1 : t1.title_2}}"
 ></custom-navibar>

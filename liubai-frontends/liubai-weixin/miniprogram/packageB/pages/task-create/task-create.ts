@@ -30,6 +30,7 @@ Component({
     canSubmit: false,
     assignees: [] as string[],
     inputValue: "",
+    titleMaxLength: defaultData.title_max_length,
     _val: "",
   },
 

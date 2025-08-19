@@ -87,8 +87,6 @@ export default {
     "create_for_current_group": "Current group",
     "create_for_others": "Other chats or groups",
     "title_for_guests": "Only creator can modify title",
-    "new_title_1": "Editing",
-    "new_title_2": "Please enter a new title",
     "updated": "Updated",
     "updated_tip": "Share please, otherwise they won't know about this update",
     "updated_prefix": "Task Updated: {desc}",
@@ -148,9 +146,11 @@ export default {
     "tip": "After following, you will be reminded automatically ⏰",
     "bound_msg": "Awesome! You've bound it 💐",
   },
-  "task-add-note": {
-    "title": "📝 Note",
-    "placeholder": "Enter note (e.g. meeting info)",
+  "task-update-text": {
+    "title_1": "Editing Title",
+    "title_2": "📝 Note",
+    "placeholder_1": "Enter a new title",
+    "placeholder_2": "Enter note (e.g. meeting info)",
     "confirm": "Confirm",
   },
 }

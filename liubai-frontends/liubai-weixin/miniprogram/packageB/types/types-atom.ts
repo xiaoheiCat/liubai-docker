@@ -37,3 +37,6 @@ export interface LiuRemindMe {
   // 具体时间的时间戳
   specific_stamp?: number
 }
+
+
+export type UpdateTaskTextType = "title" | "note"

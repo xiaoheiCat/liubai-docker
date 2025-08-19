@@ -15,8 +15,9 @@ import { LiuUtil } from "~/packageB/utils/liu-util/index";
 import { defaultData } from "~/packageB/config/default-data";
 import { Loginer } from "~/packageB/utils/login/Loginer";
 import { LiuTunnel } from "~/packageB/utils/LiuTunnel";
-import type { AddTaskNote } from "~/packageB/types/types-tunnel";
+import type { UpdateTaskText } from "~/packageB/types/types-tunnel";
 import { LiuTime } from "~/packageB/utils/LiuTime";
+import { TaskManager } from "../../shared/TaskManager";
 
 export async function fetchTaskDetail(
   id: string,
@@ -294,8 +295,47 @@ export function toCreateOtherTask(
   })
 }
 
+export async function checkForUpdatingTitle(
+  id: string,
+  newTitle: string,
+) {
+  // 1. wait and fetch
+  await valTool.waitMilli(1500)
+  const chatInfo = TaskManager.getChatInfo()
+  if(!chatInfo) {
+    console.warn("no chatInfo in checkForUpdatingTitle")
+    return
+  }
 
-export async function toUpdateTitle(
+  // 2. fetch
+  const res1 = await fetchTaskDetail(id, chatInfo)
+  const code1 = res1.code
+  const data1 = res1.data
+  if(code1 !== "0000" || !data1) return
+
+  // 3. check out desc (title)
+  if(data1.desc !== newTitle) {
+    console.warn("it's weird that the title is not the same")
+    console.log("desc after fetching: ", data1.desc)
+    console.log("newTitle: ", newTitle)
+    return
+  }
+
+  // 4. show modal
+  LiuUtil.showCustomModal({
+    title_key: "task-detail.updated",
+    content_key: "task-detail.updated_tip",
+    confirm_key: "shared.ok",
+    success(res3) {
+      if(!res3.confirm) return
+      const { t } = useI18n()
+      const title3 = t("task-detail.updated_prefix", { desc: newTitle })
+      toForward(id, title3)
+    }
+  })
+}
+
+export async function jumpToUpdateTitle(
   id: string,
   detail: TaskDetail,
 ) {
@@ -308,49 +348,15 @@ export async function toUpdateTitle(
     })
     return
   }
-
-  // 1. show modal to let user edit the title
-  const res1 = await LiuUtil.showCustomModal({
-    title_key: "task-detail.new_title_1",
-    placeholder_key: "task-detail.new_title_2",
-    editable: true,
-  })
-  if(!res1.confirm) return
-
-  const newTitle = res1.content?.trim()
-  if(!newTitle) return
-  if(newTitle === detail.desc) return
   
-
-  // 2. fetch
-  const url1 = APIs.PPL_TASKS
-  const w1 = {
-    operateType: "update-task-title",
+  const data: UpdateTaskText = {
+    stamp: LiuTime.getTime(),
     id,
-    title: newTitle,
+    updateType: "title",
+    text: detail.desc,
   }
-  LiuUtil.showCustomLoading({ title_key: "shared.updating" })
-  const res2 = await LiuReq.request(url1, w1)
-  LiuApi.hideLoading()
-
-  // 3. handle result
-  const code3 = res2.code
-  if(code3 !== "0000" && code3 !== "0001") {
-    return
-  }
-  LiuUtil.showCustomModal({
-    title_key: "task-detail.updated",
-    content_key: "task-detail.updated_tip",
-    confirm_key: "shared.ok",
-    success(res3) {
-      if(!res3.confirm) return
-      const { t } = useI18n()
-      const title3 = t("task-detail.updated_prefix", { desc: newTitle })
-      toForward(id, title3)
-    }
-  })
-
-  return newTitle
+  LiuTunnel.setStuff("update-task-text", data)
+  LiuUtil.navigateWithPopup("/packageB/pages/task-update-text/task-update-text")
 }
 
 export async function getBindingStatus() {
@@ -441,15 +447,16 @@ function jumpToAddNote(
   detail: TaskDetail,
   read_clipboard: boolean,
 ) {
-  const data: AddTaskNote = {
+  const data: UpdateTaskText = {
     stamp: LiuTime.getTime(),
     id,
-    note: detail.note,
+    updateType: "note",
+    text: detail.note,
     read_clipboard,
   }
-  LiuTunnel.setStuff("add-task-note", data)
+  LiuTunnel.setStuff("update-task-text", data)
   LiuApi.navigateTo({ 
-    url: "/packageB/pages/task-add-note/task-add-note",
+    url: "/packageB/pages/task-update-text/task-update-text",
     routeType: "wx://upwards",
   })
 }

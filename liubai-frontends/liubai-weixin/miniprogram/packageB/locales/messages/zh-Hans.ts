@@ -84,8 +84,6 @@ export default {
     "create_for_current_group": "当前群聊",
     "create_for_others": "其他会话或群聊",
     "title_for_guests": "只有创建者才能修改标题",
-    "new_title_1": "修改标题",
-    "new_title_2": "请输入新的标题",
     "updated": "已更新",
     "updated_tip": "请转发，否则他们会不知道",
     "updated_prefix": "任务有更新: {desc}",
@@ -145,9 +143,11 @@ export default {
     "tip": "绑定微信，到时会自动提醒你⏰",
     "bound_msg": "太好了！已绑定💐",
   },
-  "task-add-note": {
-    "title": "📝 备注一下",
-    "placeholder": "请输入备注（比如会议信息）",
+  "task-update-text": {
+    "title_1": "修改标题",
+    "title_2": "📝 备注一下",
+    "placeholder_1": "请输入新的标题",
+    "placeholder_2": "请输入备注（比如会议信息）",
     "confirm": "确定",
   },
 }
