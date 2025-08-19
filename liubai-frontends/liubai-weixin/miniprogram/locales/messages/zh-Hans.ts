@@ -11,7 +11,8 @@ export default {
     "my_tasks": "我的任务",
     "filter_for": "筛选出",
     "filter_1": "已完成或已结束",
-    "title_1": "已完成或已结束",
+    "title_1": "让它们随风而逝",
+    "no_inactive_tasks": "没有筛选出任何任务",
   },
   "shared": {
     "copied": "已复制",

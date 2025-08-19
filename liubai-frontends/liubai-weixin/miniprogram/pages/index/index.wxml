@@ -34,10 +34,29 @@
 
     <view class="index-tasks" wx:if="{{myTasks.length > 0}}">
 
-      <view class="index-task-title">
-        <text>{{t1.my_tasks}}</text>
+
+      <!-- Title & Filter -->
+      <view class="index-task-bar">
+        <view class="index-task-title">
+          <text wx:if="{{listType === 'available'}}">{{t1.my_tasks}}</text>
+          <text wx:else>{{t1.title_1}}</text>
+        </view>
+
+        <view class="index-task-filter" hover-class="liu-hover-class" 
+          catchtap="onTapFilter"
+        >
+
+          <image wx:if="{{listType === 'available'}}" 
+            src="{{imagePath}}filter-list.png" 
+            class="itf-image" 
+          />
+          <image wx:else src="{{imagePath}}close.png" class="itf-image" />
+
+        </view>
+
       </view>
 
+      <!-- Tasks -->
       <block wx:for="{{myTasks}}" wx:key="id">
 
         <task-card task="{{item}}"

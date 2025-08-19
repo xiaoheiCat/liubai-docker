@@ -24,6 +24,11 @@ export interface CustomLoadingOpt extends Partial<WechatMiniprogram.ShowLoadingO
   title_key?: string
 }
 
+export interface CustomActionSheetOpt extends Partial<WechatMiniprogram.ShowActionSheetOption> {
+  alert_text_key?: string
+  item_key_list?: string[]
+}
+
 export class LiuUtil {
 
   static getCharacteristic() {
@@ -141,6 +146,38 @@ export class LiuUtil {
 
     return res
   }
+
+  static showCustomActionSheet(opt: CustomActionSheetOpt) {
+      // 1. handle color
+      if(!opt.itemColor) {
+        const theme = LiuUtil.getCurrentTheme()
+        opt.itemColor = colorData[theme].primary_color
+      }
+  
+      // 2. i18n
+      const { t } = useI18n()
+  
+      // 2.1 handle alert_text_key
+      if(opt.alert_text_key) {
+        if(!opt.alertText) {
+          opt.alertText = t(opt.alert_text_key)
+        }
+        delete opt.alert_text_key
+      }
+  
+      // 2.2 handle itemList
+      if(opt.item_key_list) {
+        if(!opt.itemList) {
+          opt.itemList = opt.item_key_list.map((key) => {
+            return t(key)
+          })
+        }
+        delete opt.item_key_list
+      }
+  
+      const res = LiuApi.showActionSheet(opt as WechatMiniprogram.ShowActionSheetOption)
+      return res
+    }
 
   static async showCustomToast(opt: CustomToastOpt) {
     if(opt.title_key) {

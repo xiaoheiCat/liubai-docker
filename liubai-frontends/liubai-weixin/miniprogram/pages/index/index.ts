@@ -15,6 +15,7 @@ import { ShowTip } from "~/utils/managers/ShowTip"
 import { 
   getMyTasks, 
   getStoragedMyTasks, 
+  handleFilter, 
   handleGroupInfo, 
   handleScrollToLower, 
   handleScrollToUpper, 
@@ -182,7 +183,7 @@ Component({
       if(length1 > indexNumData.to_upper) {
         return
       }
-      const myTasks = await getMyTasks()
+      const myTasks = await getMyTasks(this.data.listType)
       if(!myTasks) return
       this.setData({ myTasks })
 
@@ -251,20 +252,28 @@ Component({
     },
 
     async onScrollToUpper() {
-      const myTasks = await handleScrollToUpper(this.data.myTasks)
-      if(!myTasks) return
-      this.setData({ myTasks })
+      const { listType, myTasks } = this.data
+      const newTasks = await handleScrollToUpper(myTasks, listType)
+      if(!newTasks) return
+      this.setData({ myTasks: newTasks })
 
       if(this.data.listType === "available") {
-        setStoragedMyTasks(myTasks)
+        setStoragedMyTasks(newTasks)
       }
     },
 
     async onScrollToLower() {
-      const newBind = await handleScrollToLower(this.data.myTasks)
+      const { listType, myTasks } = this.data
+      const newBind = await handleScrollToLower(myTasks, listType)
       if(!newBind) return
       this.setData(newBind)
-    }
+    },
+
+    async onTapFilter() {
+      const res = await handleFilter(this.data.listType)
+      if(!res) return
+      this.setData(res)
+    },
 
   },
 })

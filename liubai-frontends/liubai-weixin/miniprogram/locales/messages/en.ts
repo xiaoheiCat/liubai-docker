@@ -14,6 +14,7 @@ export default {
     "filter_for": "Filter for",
     "filter_1": "Completed or Finished",
     "title_1": "Inactive Tasks",
+    "no_inactive_tasks": "No inactive tasks",
   },
   "shared": {
     "copied": "Copied",

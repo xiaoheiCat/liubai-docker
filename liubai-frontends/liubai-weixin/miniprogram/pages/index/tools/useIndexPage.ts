@@ -5,6 +5,7 @@ import type { PeopleTasksAPI } from "~/requests/req-types";
 import type { TaskCard } from "~/types/types-task";
 import type { WxMiniAPI } from "~/types/types-wx";
 import usefulTools from "~/utils/hooks/useful-tools";
+import { LiuUtil } from "~/utils/liu-util/index";
 import { LiuApi } from "~/utils/LiuApi";
 import { LiuTunnel } from "~/utils/LiuTunnel";
 import { showTaskItems } from "~/utils/show/show-tasks";
@@ -88,13 +89,15 @@ async function fetchGroupInfo(
 }
 
 
-export async function getMyTasks() {
+export async function getMyTasks(
+  listType: PeopleTasksAPI.TaskListType = "available",
+) {
   const res1 = await LiuApp.autoLogin()
   if(!res1) return
 
   const u2 = {
     operateType: "list-wx-tasks",
-    listType: "available",
+    listType,
   }
   const url2 = APIs.PPL_TASKS
   const res2 = await LiuReq.request<PeopleTasksAPI.Res_ListWxTasks>(url2, u2)
@@ -160,6 +163,7 @@ export async function tryToOpenTaskDetail(taskId: string) {
 
 export async function handleScrollToUpper(
   myTasks: TaskCard[],
+  listType: PeopleTasksAPI.TaskListType,
 ) {
   // 1. get params and throttle
   const length1 = myTasks.length
@@ -167,12 +171,13 @@ export async function handleScrollToUpper(
   if(!usefulTools.canIPassThrottle("index-scroll-to-upper")) return
 
   // 2. fetch
-  const newTasks = await getMyTasks()
+  const newTasks = await getMyTasks(listType)
   return newTasks
 }
 
 export async function handleScrollToLower(
   myTasks: TaskCard[],
+  listType: PeopleTasksAPI.TaskListType,
 ) {
   // 1. get params and throttle
   const length1 = myTasks.length
@@ -182,7 +187,7 @@ export async function handleScrollToLower(
   // 2. load more
   const u2 = {
     operateType: "list-wx-tasks",
-    listType: "available",
+    listType,
     skip: length1,
   }
   const url2 = APIs.PPL_TASKS
@@ -201,5 +206,49 @@ export async function handleScrollToLower(
     newBind[`myTasks[${length3 + i}]`] = v
   })
 
+  return newBind
+}
+
+export async function handleFilter(
+  listType: PeopleTasksAPI.TaskListType,
+) {
+  const newBind: Record<string, any> = {}
+
+  // 1. reset
+  if(listType === "inactive") {
+    const myTasks = await getMyTasks()
+    if(!myTasks) return
+
+    newBind.listType = "available"
+    newBind.myTasks = myTasks
+
+    setStoragedMyTasks(myTasks)
+
+    return newBind
+  }
+
+  // 2. show actionsheet
+  let idx = -1
+  try {
+    const res2 = await LiuUtil.showCustomActionSheet({
+      alert_text_key: "index.filter_for",
+      item_key_list: ["index.filter_1"],
+    })
+    idx = res2.tapIndex
+  }
+  catch(err) {}
+  if(idx < 0) return
+
+  // 3. load inactive tasks
+  const newTasks = await getMyTasks("inactive")
+  if(!newTasks || newTasks.length < 1) {
+    LiuUtil.showCustomToast({
+      title_key: "index.no_inactive_tasks",
+    })
+    return
+  }
+
+  newBind.listType = "inactive"
+  newBind.myTasks = newTasks
   return newBind
 }

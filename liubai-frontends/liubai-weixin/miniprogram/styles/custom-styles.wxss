@@ -72,3 +72,7 @@
 .liu-skyline-hover2 {
   transform: scale(.95);
 }
+
+.liu-hover-class {
+  opacity: .75;
+}

@@ -66,13 +66,37 @@ page {
   padding-bottom: 20px;
 }
 
+.index-task-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+  padding-bottom: 12px;
+}
+
 .index-task-title {
   font-size: var(--title-font);
   color: var(--main-normal);
   font-weight: 700;
-  padding-bottom: 12px;
 }
 
+.index-task-filter {
+  width: 30px;
+  height: 30px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  margin-right: -4px;
+  transition: .15s;
+}
+
+.itf-image {
+  width: 24px;
+  height: 24px;
+}
 
 .index-footer-container {
   display: flex;
