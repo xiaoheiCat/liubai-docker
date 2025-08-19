@@ -18,6 +18,7 @@ export const defaultData = {
   issue_1: "https://developers.weixin.qq.com/community/develop/doc/000c6c6fe4cb584cc093b65b06bc00",
 
   note_max_length: 2000,
+  title_max_length: 66,
 }
 
 export const colorData = {

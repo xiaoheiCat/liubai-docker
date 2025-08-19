@@ -1,3 +1,4 @@
+import { UpdateTaskTextType } from "./types-atom"
 
 export interface JustCreateTask {
   stamp: number
@@ -8,14 +9,16 @@ export interface PleaseCreateTask {
   stamp: number
 }
 
-export interface AddTaskNote {
+export interface UpdateTaskText {
   stamp: number
   id: string
-  note?: string
+  updateType: UpdateTaskTextType
+  text?: string
   read_clipboard?: boolean
 }
 
-export interface HasNewTaskNote {
+export interface HasNewTaskText {
   id: string
-  note: string
+  text: string
+  updateType: UpdateTaskTextType
 }

@@ -12,17 +12,18 @@ import {
   fetchCompleteTask,
   afterCompleteTask,
   toCreateOtherTask,
-  toUpdateTitle,
+  jumpToUpdateTitle,
   getBindingStatus,
   whenTapAI,
   getQrCodePicUrlForBindingWx,
   toAddNote,
   whenTapNote,
+  checkForUpdatingTitle,
 } from "./tools/useTaskDetail";
 import { getMoreBtnList, handleBtnList } from "./tools/handleBtnList";
 import { LiuTunnel } from "~/packageB/utils/LiuTunnel";
 import type {
-  HasNewTaskNote,
+  HasNewTaskText,
   JustCreateTask, 
   PleaseCreateTask,
 } from "~/packageB/types/types-tunnel";
@@ -111,10 +112,17 @@ Component({
 
       const _id = this.data._id
       const detail = this.data.detail
-      const res2 = await LiuTunnel.takeStuff<HasNewTaskNote>("has-new-task-note")
+      const res2 = await LiuTunnel.takeStuff<HasNewTaskText>("has-new-task-text")
       if(res2 && _id === res2.id && detail) {
         const bind2: Record<string, any> = {}
-        bind2["detail.note"] = res2.note
+        if(res2.updateType === "title") {
+          const oldTitle = detail.desc
+          checkForUpdatingTitle(_id, oldTitle)
+          bind2["detail.desc"] = res2.text
+        }
+        else if(res2.updateType === "note") {
+          bind2["detail.note"] = res2.text
+        }
         this.setData(bind2)
         return
       }
@@ -550,12 +558,7 @@ Component({
       const detail = this.data.detail
       if(!detail) return
       LiuApi.vibrateShort({ type: "light" })
-      const newTitle = await toUpdateTitle(id, detail)
-      if(!newTitle) return
-
-      const bind: Record<string, any> = {}
-      bind["detail.desc"] = newTitle
-      this.setData(bind)
+      jumpToUpdateTitle(id, detail)
     },
 
     async onTapAddNote() {

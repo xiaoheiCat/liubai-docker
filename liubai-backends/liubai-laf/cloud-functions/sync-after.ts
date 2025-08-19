@@ -709,7 +709,7 @@ class ClusterHelper {
     // 4. fetch
     const llm = new BaseLLM(endpoint.apiKey, endpoint.baseURL)
     const t4_1 = getNowStamp()
-    const res4 = await llm.chat(param3, { timeoutSec: 45 })
+    const res4 = await llm.chat(param3, { timeoutSec: 15 })
     const t4_2 = getNowStamp()
     console.log("duration of ai cluster: ", t4_2 - t4_1)
     if(!res4) {
@@ -895,8 +895,7 @@ class AiCluster2 {
     }
     const wtCol = db.collection("WxTask")
     const taskId = this._task._id
-    const res1 = await wtCol.doc(taskId).update(w1)
-    console.log("updateTask res1: ", res1)
+    await wtCol.doc(taskId).update(w1)
     return true
   }
 

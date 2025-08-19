@@ -446,9 +446,9 @@ async function complete_wx_task(
     [myInfo],
     body,
   )
-  if(!res5.pass) {
-    console.warn("WxMiniHandler.setChatToolMsg failed", res5.err)
-  }
+  // if(!res5.pass) {
+  //   console.warn("WxMiniHandler.setChatToolMsg failed", res5.err)
+  // }
 
   return { code: "0000" }
 }

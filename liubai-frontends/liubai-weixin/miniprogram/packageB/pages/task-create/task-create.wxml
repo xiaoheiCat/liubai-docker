@@ -14,7 +14,8 @@
   <view class="liu-main-container">
     <view class="liu-main-box">
 
-      <textarea placeholder="{{t1.placeholder}}" maxlength="66"
+      <textarea placeholder="{{t1.placeholder}}" 
+        maxlength="{{titleMaxLength}}"
         class="tc-textarea"
         placeholder-style="color: {{ colors.main_note }};"
         cursor-color="{{ colors.primary_color }}"

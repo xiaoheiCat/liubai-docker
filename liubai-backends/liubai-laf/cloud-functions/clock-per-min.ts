@@ -418,8 +418,7 @@ async function send_for_task(
   const str_time = LiuDateUtil.displayTime(calendarStamp, locale, timezone)
   obj.data.time4.value = str_time
 
-  const res = await WxGzhSender.sendTemplateMessage(access_token, obj)
-  console.log("send_for_task res: ", res)
+  await WxGzhSender.sendTemplateMessage(access_token, obj)
   return true
 }
 

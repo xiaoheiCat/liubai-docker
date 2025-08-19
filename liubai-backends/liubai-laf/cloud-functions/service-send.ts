@@ -557,12 +557,12 @@ export class WxGzhSender {
       command: "Typing",
     }
     const res = await liuReq<Res_Common>(url, arg)
-    const { code, data } = res
-    if(code !== "0000" || data?.errcode !== 0) {
-      console.warn("sendTyping failed")
-      console.log(res)
-      console.log(arg)
-    }
+    // const { code, data } = res
+    // if(code !== "0000" || data?.errcode !== 0) {
+    //   console.warn("sendTyping failed")
+    //   console.log(res)
+    //   console.log(arg)
+    // }
     return res
   }
 

@@ -12,6 +12,14 @@
   caret-color: var(--primary-color);
 }
 
+.tan-textarea_title {
+  min-height: 50px;
+  font-size: var(--head-font);
+  color: var(--main-text);
+  line-height: 1.5;
+  font-weight: 700;
+}
+
 .tan-virtual {
   width: 100%;
   height: 300px;

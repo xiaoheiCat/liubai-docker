@@ -84,10 +84,8 @@ export default {
     "create_for_current_group": "當前群組",
     "create_for_others": "其他會話或群組",
     "title_for_guests": "只有創建人才能修改標題",
-    "new_title_1": "修改標題",
-    "new_title_2": "請輸入新的標題",
     "updated": "已更新",
-    "updated_tip": "請轉發，否則他們會不知道",
+    "updated_tip": "請轉發↗️，否則他們會不知道",
     "updated_prefix": "任務發生變化: {desc}",
     "when": "什麼時候",
     "more": "更多",
@@ -145,9 +143,11 @@ export default {
     "tip": "綁定微信，屆時將自動提醒你⏰",
     "bound_msg": "太好了！已綁定💐",
   },
-  "task-add-note": {
-    "title": "📝 備註一下",
-    "placeholder": "請輸入備註（比如會議資訊）",
+  "task-update-text": {
+    "title_1": "修改標題",
+    "title_2": "📝 備註一下",
+    "placeholder_1": "請輸入新的標題",
+    "placeholder_2": "請輸入備註（比如會議資訊）",
     "confirm": "確定",
   },
 }
