@@ -150,4 +150,11 @@ export default {
     "placeholder_2": "请输入备注（比如会议信息）",
     "confirm": "确定",
   },
+  "task-date-time": {
+    "title": "⏰ 什么时候呢",
+    "date": "日期",
+    "time": "时间",
+    "reminder": "提醒",
+    "confirm": "确定",
+  },
 }

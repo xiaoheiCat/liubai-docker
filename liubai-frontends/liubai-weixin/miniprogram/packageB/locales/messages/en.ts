@@ -153,4 +153,11 @@ export default {
     "placeholder_2": "Enter note (e.g. meeting info)",
     "confirm": "Confirm",
   },
+  "task-date-time": {
+    "title": "⏰ When?",
+    "date": "Date",
+    "time": "Time",
+    "reminder": "Reminder",
+    "confirm": "Confirm",
+  },
 }

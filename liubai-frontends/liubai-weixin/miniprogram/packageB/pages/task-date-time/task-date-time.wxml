@@ -1,0 +1,22 @@
+
+
+<scroll-view 
+  scroll-y
+  class="liu-{{theme}} liu-scroll-view"
+  type="custom"
+  associative-container="pop-gesture"
+>
+  <virtual-navibar height1="{{height1}}" height2="{{height2}}"></virtual-navibar>
+
+  <view class="liu-main-container">
+    <view class="liu-main-box">
+
+      
+    </view>
+  </view>
+</scroll-view>
+
+<custom-navibar 
+  height1="{{height1}}" height2="{{height2}}" 
+  visible="{{visible}}" title="{{t1.title}}"
+></custom-navibar>

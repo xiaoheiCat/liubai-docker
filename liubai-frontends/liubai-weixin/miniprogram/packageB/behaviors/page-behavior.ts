@@ -2,7 +2,7 @@ import { setNaviForNewTheme } from "../utils/theme-util"
 import valTool from "../utils/val-tool"
 
 async function waitAndUpdateNavibarColor() {
-  await valTool.waitMilli(600)
+  await valTool.waitMilli(456)
   setNaviForNewTheme()
 }
 

@@ -19,6 +19,7 @@
         "pages/task-create/task-create",
         "pages/task-detail/task-detail",
         "pages/task-update-text/task-update-text",
+        "pages/task-date-time/task-date-time",
         "pages/article/article",
         "pages/landing-premium/landing-premium"
       ],
