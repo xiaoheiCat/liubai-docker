@@ -5,12 +5,17 @@ import { pageBehavior } from "../../behaviors/page-behavior";
 import { 
   generateDateList, 
   generateHourMinute, 
-  generateRemindList, 
-  generateTimeValue,
+  generateRemindList,
+  getConfirmData,
+  initValues,
+  toConfirm,
 } from "./tools/useDateTime";
 import type { DateItem, RemindItem } from "./tools/types";
 import typeCheck from "~/packageB/utils/basic/type-check";
 import valTool from "~/packageB/utils/val-tool";
+import { LiuTunnel } from "~/packageB/utils/LiuTunnel";
+import type { OpenTaskDateTime } from "~/packageB/types/types-tunnel";
+import { LiuApi } from "~/packageB/utils/LiuApi";
 
 Component({
 
@@ -35,6 +40,8 @@ Component({
     dateValue: [0],  // set default value to tomorrow
     timeValue: [0, 0],
     remindValue: [0],  // set default value to "10 mins early"
+
+    _id: "",
   },
 
   methods: {
@@ -55,12 +62,11 @@ Component({
 
     async initValue() {
       await valTool.waitMilli(400)
-      const { timeValue } = generateTimeValue()
-      this.setData({
-        dateValue: [1],
-        timeValue,
-        remindValue: [1],
-      })
+      const res1 = await LiuTunnel.takeStuff<OpenTaskDateTime>("open-task-date-time")
+      const { dateList, remindList } = this.data
+      const bind1 = initValues(dateList, remindList, res1)
+      const bind2 = { _id: res1?.id, ...bind1 }
+      this.setData(bind2)
     },
 
     onDateChange(e: WechatMiniprogram.PickerViewChange) {
@@ -83,6 +89,24 @@ Component({
         this.data.remindValue = remindValue
       }
     },
+
+    onTapConfirm() {
+      const id = this.data._id
+      if(!id) return
+      const {
+        dateList,
+        dateValue,
+        timeValue,
+        remindList,
+        remindValue,
+      } = this.data
+      const data1 = getConfirmData(
+        dateList, dateValue, timeValue, remindList, remindValue,
+      )
+      if(!data1) return
+      LiuApi.vibrateShort({ type: "medium" })
+      toConfirm(id, data1)
+    }
 
   }
 

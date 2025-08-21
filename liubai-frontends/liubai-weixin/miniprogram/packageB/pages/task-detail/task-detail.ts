@@ -25,6 +25,7 @@ import { LiuTunnel } from "~/packageB/utils/LiuTunnel";
 import type {
   HasNewTaskText,
   JustCreateTask, 
+  OpenTaskDateTime, 
   PleaseCreateTask,
 } from "~/packageB/types/types-tunnel";
 import { LiuApi } from "~/packageB/utils/LiuApi";
@@ -381,6 +382,24 @@ Component({
 
     onTapUrge() {
       this.onTapReminder()
+    },
+
+    onTapDateTime() {
+      const { _id, detail} = this.data
+      if(!detail || !_id) return
+      LiuApi.vibrateShort({ type: "light" })
+
+      const tunnelData: OpenTaskDateTime = {
+        id: _id,
+        whenStamp: detail.whenStamp,
+        remindMe: detail.remindMe,
+      }
+      console.log("tunnelData: ", tunnelData)
+      LiuTunnel.setStuff("open-task-date-time", tunnelData)
+      LiuApi.navigateTo({ 
+        url: "/packageB/pages/task-date-time/task-date-time",
+        routeType: "wx://upwards",
+      })
     },
     
     onTapRemindMe() {

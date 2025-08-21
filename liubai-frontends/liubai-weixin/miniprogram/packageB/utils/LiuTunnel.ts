@@ -7,6 +7,8 @@ export type TunnelKey = "wx-chat-info"
   | "task-fr-list-to-detail"
   | "update-task-text"
   | "has-new-task-text"
+  | "open-task-date-time"
+  | "confirm-task-date-time"
 
 export class LiuTunnel {
 

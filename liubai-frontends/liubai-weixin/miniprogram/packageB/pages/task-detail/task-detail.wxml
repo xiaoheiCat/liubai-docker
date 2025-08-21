@@ -57,7 +57,7 @@
         </view>
 
         <!-- Date & Time -->
-        <view class="td-box-bar" catchtap="onTapRemindMe">
+        <view class="td-box-bar" catchtap="onTapDateTime">
           <view class="tdbb-icon-box">
             <image src="{{imagePath}}schedule.png" class="tdbb-icon" />
           </view>

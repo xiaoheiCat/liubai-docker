@@ -18,6 +18,7 @@ import { LiuTunnel } from "~/packageB/utils/LiuTunnel";
 import type { UpdateTaskText } from "~/packageB/types/types-tunnel";
 import { LiuTime } from "~/packageB/utils/LiuTime";
 import { TaskManager } from "../../shared/TaskManager";
+import type { LiuRemindMe } from "~/packageB/types/types-atom";
 
 export async function fetchTaskDetail(
   id: string,
@@ -57,14 +58,18 @@ export function showDetail(
   // when & remind
   let whenStr: string | undefined
   let remindStr: string | undefined
+  let whenStamp: number | undefined
+  let remindMe: LiuRemindMe | undefined
   if(data.whenStamp) {
     whenStr = DateUtil.showBasicTime(data.whenStamp)
+    whenStamp = data.whenStamp
   }
   if(data.remindMe && data.remindStamp) {
     remindStr = DateUtil.getRemindMeStrAfterPost(
       data.remindStamp, 
       data.remindMe,
     )
+    remindMe = data.remindMe
   }
 
   // ai help
@@ -94,6 +99,8 @@ export function showDetail(
     isActivity: data.infoType === "ACTIVITY",
     whenStr,
     remindStr,
+    whenStamp,
+    remindMe,
     aiHelpStr,
     aiWorker: data.aiWorker,
     note: data.note,

@@ -1,4 +1,4 @@
-
+import type { LiuRemindMe } from "~/packageB/types/types-atom"
 
 export interface DateItem {
   text: string
@@ -10,4 +10,10 @@ export interface DateItem {
 export interface RemindItem {
   text: string
   early_minute: number
+}
+
+export interface SubmitData {
+  whenStamp: number
+  remindStamp: number
+  remindMe: LiuRemindMe
 }

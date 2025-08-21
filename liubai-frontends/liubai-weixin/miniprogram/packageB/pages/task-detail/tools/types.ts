@@ -1,5 +1,6 @@
 import type { PeopleTasksAPI } from "~/packageB/requests/req-types"
-import { LiuAi } from "~/packageB/types/types-cloud"
+import type { LiuRemindMe } from "~/packageB/types/types-atom"
+import type { LiuAi } from "~/packageB/types/types-cloud"
 
 export interface TaskDetail {
   desc: string
@@ -22,6 +23,8 @@ export interface TaskDetail {
   isActivity: boolean
 
   // remind
+  whenStamp?: number
+  remindMe?: LiuRemindMe
   whenStr?: string
   remindStr?: string
   aiHelpStr?: string

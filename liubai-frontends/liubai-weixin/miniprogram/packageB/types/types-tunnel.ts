@@ -1,4 +1,4 @@
-import { UpdateTaskTextType } from "./types-atom"
+import type { LiuRemindMe, UpdateTaskTextType } from "./types-atom"
 
 export interface JustCreateTask {
   stamp: number
@@ -21,4 +21,14 @@ export interface HasNewTaskText {
   id: string
   text: string
   updateType: UpdateTaskTextType
+}
+
+export interface OpenTaskDateTime {
+  id: string
+  whenStamp?: number
+  remindMe?: LiuRemindMe
+}
+
+export interface ConfirmTaskDateTime {
+  id: string
 }
