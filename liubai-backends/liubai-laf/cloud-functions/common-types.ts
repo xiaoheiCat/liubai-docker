@@ -4383,6 +4383,7 @@ export namespace PeopleTasksAPI {
     | "update-task-title"
     | "update-task-note"
     | "delete-wx-task"
+    | "update-task-time"
 
   export interface Res_EnterWxChatTool {
     operateType: "enter-wx-chat-tool"
@@ -4478,6 +4479,14 @@ export namespace PeopleTasksAPI {
     operateType: vbot.literal("list-wx-tasks"),
     listType: vbot.picklist(taskListTypes),
     skip: Sch_Opt_Num,
+  })
+
+  export const Sch_Param_UpdateTaskTime = vbot.object({
+    operateType: vbot.literal("update-task-time"),
+    id: Sch_Id,
+    remindStamp: Sch_Opt_Num,
+    whenStamp: Sch_Opt_Num,
+    remindMe: vbot.optional(Sch_LiuRemindMe),
   })
 
 }

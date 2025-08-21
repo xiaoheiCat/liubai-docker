@@ -60,9 +60,52 @@ export async function main(ctx: FunctionContext) {
   else if(oT === "delete-wx-task") {
     res = await delete_wx_task(body, vRes)
   }
+  else if(oT === "update-task-time") {
+    res = await update_task_time(body, vRes)
+  }
 
   return res
 }
+
+async function update_task_time(
+  body: Record<string, any>,
+  vRes: VerifyTokenRes_B,
+) {
+  // 1. check out params
+  const res1 = vbot.safeParse(PeopleTasksAPI.Sch_Param_UpdateTaskTime, body)
+  if(!res1.success) {
+    const errMsg = checker.getErrMsgFromIssues(res1.issues)
+    return { code: "E4000", errMsg }
+  }
+  const { id, remindStamp, whenStamp, remindMe } = body
+  const userId = vRes.userData._id
+
+  // 2. get task
+  const wtCol = db.collection("WxTask")
+  const res2 = await wtCol.doc(id).get<Table_WxTask>()
+  const data2 = res2.data
+  if(!data2 || data2.oState !== "OK") {
+    return { code: "E4004", errMsg: "no such task" }
+  }
+  if(data2.owner_userid !== userId) {
+    return { code: "E4003", errMsg: "you are not the owner of this task" }
+  }
+
+  // 3. update the task
+  const w3: Partial<Table_WxTask> = {
+    remindStamp,
+    whenStamp,
+    remindMe,
+    updatedStamp: getNowStamp(),
+  }
+  if(whenStamp) {
+    w3.calendarStamp = whenStamp
+  }
+  await wtCol.doc(id).update(w3)
+
+  return { code: "0000" }
+}
+
 
 async function delete_wx_task(
   body: Record<string, any>,
