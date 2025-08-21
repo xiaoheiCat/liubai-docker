@@ -7,3 +7,7 @@ export interface DateItem {
   date: number
 }
 
+export interface RemindItem {
+  text: string
+  early_minute: number
+}

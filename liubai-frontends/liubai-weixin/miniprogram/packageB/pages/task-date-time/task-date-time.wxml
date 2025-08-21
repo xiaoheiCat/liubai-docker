@@ -11,6 +11,75 @@
   <view class="liu-main-container">
     <view class="liu-main-box">
 
+      <view class="liu-virtual" />
+
+      <!-- date -->
+      <view class="tdt-title">
+        <text>{{t1.date}}</text>
+      </view>
+      <picker-view class="tdt-picker" value="{{dateValue}}"
+        indicator-style="border-color: {{colors.primary_color}}; height: 40px;"
+        bindchange="onDateChange"
+      >
+        <picker-view-column>
+          <block wx:for="{{dateList}}" wx:key="text">
+            <view class="tdt-picker-item">
+              <text>{{item.text}}</text>
+            </view>
+          </block>
+        </picker-view-column>
+      </picker-view>
+
+      <!-- time -->
+      <view class="tdt-title">
+        <text>{{t1.time}}</text>
+      </view>
+      <picker-view class="tdt-picker" value="{{timeValue}}"
+        indicator-style="border-color: {{colors.primary_color}}; height: 40px;"
+        bindchange="onTimeChange"
+      >
+        <picker-view-column>
+          <block wx:for="{{hourList}}" wx:key="*this">
+            <view class="tdt-picker-item">
+              <text>{{item}}</text>
+            </view>
+          </block>
+        </picker-view-column>
+        <picker-view-column>
+          <block wx:for="{{minuteList}}" wx:key="*this">
+            <view class="tdt-picker-item">
+              <text>{{item}}</text>
+            </view>
+          </block>
+        </picker-view-column>
+      </picker-view>
+
+      <!-- reminder -->
+      <view class="tdt-title">
+        <text>{{t1.reminder}}</text>
+      </view>
+      <picker-view class="tdt-picker" value="{{remindValue}}"
+        indicator-style="border-color: {{colors.primary_color}}; height: 40px;"
+        bindchange="onRemindChange"
+      >
+        <picker-view-column>
+          <block wx:for="{{remindList}}" wx:key="text">
+            <view class="tdt-picker-item">
+              <text>{{item.text}}</text>
+            </view>
+          </block>
+        </picker-view-column>
+      </picker-view>
+
+      <view class="liu-virtual" style="height: 16px;" />
+
+      <!-- Confirm Button -->
+      <custom-button catchtap="onTapConfirm">
+        <text>{{t1.confirm}}</text>
+      </custom-button>
+
+      <view class="tdt-bottom"></view>
+
       
     </view>
   </view>

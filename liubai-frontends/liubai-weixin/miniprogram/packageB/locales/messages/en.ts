@@ -162,4 +162,12 @@ export default {
     "reminder": "Reminder",
     "confirm": "Confirm",
   },
+  "remind-early": {
+    "min_0": "On time",
+    "min_10": "10 mins early",
+    "min_30": "30 mins early",
+    "min_60": "1 hour early",
+    "min_120": "2 hours early",
+    "min_1440": "1 day early",
+  }
 }

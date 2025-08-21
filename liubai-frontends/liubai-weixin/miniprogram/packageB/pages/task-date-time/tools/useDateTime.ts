@@ -1,5 +1,5 @@
 import { LiuTime } from "~/packageB/utils/LiuTime";
-import type { DateItem } from "./types";
+import type { DateItem, RemindItem } from "./types";
 import valTool from "~/packageB/utils/val-tool";
 import { useI18n } from "~/packageB/locales/index";
 
@@ -71,4 +71,16 @@ export function generateTimeValue() {
   }
 
   return { timeValue: [hour, minIndex] }
+}
+
+export function generateRemindList() {
+  const { t } = useI18n()
+  const mins = [0, 10, 30, 60, 120, 1440]
+  const remindList: RemindItem[] = []
+  for(let i=0; i<mins.length; i++) {
+    const min = mins[i]
+    const text = t(`remind-early.min_${min}`)
+    remindList.push({ text, early_minute: min })
+  }
+  return { remindList }
 }
