@@ -1742,7 +1742,7 @@ export interface Table_Order extends BaseTable {
     jsapi_prepay_id?: string
     jsapi_created_stamp?: number
 
-    mini_out_trade_no?: string
+    mini_out_trade_no?: string         // format: w4xxxxLD......
     mini_openid?: string
     mini_prepay_id?: string
     mini_created_stamp?: number

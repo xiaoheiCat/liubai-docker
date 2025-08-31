@@ -206,8 +206,78 @@ async function handle_wxpay_mini(
   const now2 = getNowStamp()
   const plan_id = d1.plan_id as string
 
-  
-  
+  // 3. check out if we need to invoke JSAPI with miniprogram
+  const wxData = d1.wxpay_other_data ?? {}
+  const metaData = d1.meta_data ?? {}
+  let out_trade_no = wxData.mini_out_trade_no ?? ""
+  let openid = wxData.mini_openid ?? ""
+  let prepay_id = wxData.mini_prepay_id ?? ""
+  let created_stamp = wxData.mini_created_stamp ?? 1
+  const diff3 = now2 - created_stamp
+  if(!out_trade_no) prepay_id = ""
+  if(wx_mini_openid !== openid) prepay_id = ""
+  if(diff3 > MIN_15) prepay_id = ""
+
+  // 4. to get prepay_id
+  const _env = process.env
+  const appid = _env.LIU_WX_MINI_APPID as string
+  if(!prepay_id) {
+
+    // 4.1 get subscription plan
+    const subPlan = await getSubscriptionPlan(plan_id)
+    if(!subPlan) {
+      return { code: "E4004", errMsg: "fail to get sub plan" }
+    }
+    if(!subPlan.wxpay || subPlan.wxpay?.isOn !== "Y") {
+      return { code: "E4003", errMsg: "wxpay for this sub plan is not supported" }
+    }
+
+    // 4.2 get info
+    const res4_2 = getRequiredDataForPayment("wxpay_mini", d1, subPlan, body)
+    if(!res4_2.pass) return res4_2.err
+    const d4_2 = res4_2.data
+
+    // 4.3 get prepay_id
+    const now4_3 = getNowStamp()
+    const param4_3: WxpayOrderByJsapiParam = {
+      out_trade_no: d4_2.out_trade_no,
+      openid: wx_mini_openid,
+      appid,
+      fee: d4_2.fee,
+      description: d4_2.payment_title,
+      expireStamp: d4_2.expireStamp,
+    }
+    const res4_3 = await wxpayOrderByJsapi(param4_3)
+    const pass4_3 = res4_3.pass
+    if(!pass4_3) {
+      console.warn("fail to get prepay_id in wxpay_mini")
+      console.log(param4_3)
+      return res4_3.err
+    }
+    prepay_id = res4_3.data
+
+    // 4.4 storage prepay_id
+    const now4_4 = getNowStamp()
+    wxData.mini_out_trade_no = d4_2.out_trade_no
+    wxData.mini_openid = wx_mini_openid
+    wxData.mini_prepay_id = prepay_id
+    wxData.mini_created_stamp = now4_3
+    metaData.payment_timezone = userTimezone
+    const w4_4: Partial<Table_Order> = {
+      wxpay_other_data: wxData,
+      meta_data: metaData,
+      updatedStamp: now4_4,
+    }
+    const oCol = db.collection("Order")
+    oCol.doc(d1._id).update(w4_4)
+  }
+
+  // 5. get return data
+  const data5 = getWxpayJsapiParams(prepay_id, appid)
+  return {
+    code: "0000",
+    data: { operateType: "wxpay_mini", param: data5 },
+  }
 }
 
 async function handle_wxpay_jsapi(
@@ -239,7 +309,8 @@ async function handle_wxpay_jsapi(
   if(diff3 > MIN_15) prepay_id = ""
 
   // 4. to get prepay_id
-  const oCol = db.collection("Order")
+  const _env = process.env
+  const appid = _env.LIU_WX_GZ_APPID as string
   if(!prepay_id) {
 
     // 4.1 get subscription
@@ -261,6 +332,7 @@ async function handle_wxpay_jsapi(
     const param4_3: WxpayOrderByJsapiParam = {
       out_trade_no: d4_2.out_trade_no,
       openid: wx_gzh_openid,
+      appid,
       fee: d4_2.fee,
       description: d4_2.payment_title,
       expireStamp: d4_2.expireStamp,
@@ -286,14 +358,12 @@ async function handle_wxpay_jsapi(
       meta_data: metaData,
       updatedStamp: now4_4,
     }
+    const oCol = db.collection("Order")
     oCol.doc(d1._id).update(w4_4)
   }
 
   // 5. get return data
-  const _env = process.env
-  const appid = _env.LIU_WX_GZ_APPID as string
   const data5 = getWxpayJsapiParams(prepay_id, appid)
-
   return {
     code: "0000",
     data: {
@@ -553,7 +623,8 @@ interface RequiredDataForPayment {
   expireStamp: number
 }
 
-type PaymentType = "wxpay_jsapi" | "wxpay_h5" | "wxpay_native" | "alipay_wap"
+type PaymentType = "wxpay_jsapi" | "wxpay_h5"
+  | "wxpay_native" | "alipay_wap" | "wxpay_mini"
 
 function getRequiredDataForPayment(
   payment_type: PaymentType,
@@ -590,6 +661,10 @@ function getRequiredDataForPayment(
   else if(payment_type === "wxpay_native") {
     fee = sub_plan.wxpay?.amount_CNY ?? fee
     out_trade_no = `w3${nonce}${order_id}`
+  }
+  else if(payment_type === "wxpay_mini") {
+    fee = sub_plan.wxpay?.amount_CNY ?? fee
+    out_trade_no = `w4${nonce}${order_id}`
   }
   else if(payment_type === "alipay_wap") {
     fee = sub_plan.alipay?.amount_CNY ?? fee
@@ -641,6 +716,7 @@ function getTimeExpireForAlipay(
 interface WxpayOrderByJsapiParam {
   out_trade_no: string
   openid: string
+  appid: string
   fee: number      // unit: cent
   description: string
   attach?: string
@@ -652,19 +728,16 @@ async function wxpayOrderByJsapi(
 ): Promise<DataPass<string>> {
   // 1. get env
   const _env = process.env
-  const wx_appid = _env.LIU_WX_GZ_APPID as string
   const wx_mchid = _env.LIU_WXPAY_MCH_ID as string
   const wxpay_notify_url = _env.LIU_WXPAY_NOTIFY_URL as string
   let time_expire: string | undefined
   if(param.expireStamp) {
     time_expire = LiuDateUtil.transformStampIntoRFC3339(param.expireStamp)
-    console.log("wxpayOrderByJsapi time_expire: ")
-    console.log(time_expire)
   }
 
   // 2. construct body
   const body: Wxpay_Order_Jsapi = {
-    appid: wx_appid,
+    appid: param.appid,
     mchid: wx_mchid,
     notify_url: wxpay_notify_url,
     out_trade_no: param.out_trade_no,
