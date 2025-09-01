@@ -1,4 +1,6 @@
-<view class="task-card" hover-class="liu-skyline-hover" catchtap="onTapCard">
+<view class="task-card" hover-class="liu-skyline-hover" catchtap="onTapCard"
+  catchlongpress="onLongPressCard"
+>
 
   <view class="task-card-title">
     <text>{{task.desc}}</text>

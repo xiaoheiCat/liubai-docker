@@ -13,7 +13,7 @@ export default {
     "my_tasks": "My Tasks",
     "filter_for": "Filter for",
     "filter_1": "Completed or Finished",
-    "title_1": "Inactive Tasks",
+    "title_1": "📥 Archived",
     "no_inactive_tasks": "No inactive tasks",
   },
   "shared": {
@@ -31,6 +31,8 @@ export default {
     "open_mini_1": "Open MiniProgram",
     "open_mini_2": "Please click \"前往小程序\" on the bottom right corner",
     "yes": "Yes",
+    "delete": "Delete",
+    "deleted": "Deleted",
   },
   "err": {
     "no_data": "Nothing Here",

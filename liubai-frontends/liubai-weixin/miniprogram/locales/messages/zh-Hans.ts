@@ -11,7 +11,7 @@ export default {
     "my_tasks": "我的任务",
     "filter_for": "筛选出",
     "filter_1": "已完成或已结束",
-    "title_1": "让它们随风而逝",
+    "title_1": "📥 归档箱",
     "no_inactive_tasks": "没有找到，能留白就留白！",
   },
   "shared": {
@@ -29,6 +29,8 @@ export default {
     "open_mini_1": "前往小程序",
     "open_mini_2": "请点击右下角“前往小程序”",
     "yes": "是",
+    "delete": "删除",
+    "deleted": "已删除",
   },
   "err": {
     "no_data": "找不到耶",

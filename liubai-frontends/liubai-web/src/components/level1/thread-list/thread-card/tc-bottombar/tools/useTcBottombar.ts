@@ -39,7 +39,7 @@ const MENU_2: TcbMenuItem[] = [
     text_key: "common.delete_forever",
     operation: "delete_forever",
     iconName: "delete_forever_400",
-    color: "#dc1e30"
+    color: "var(--delete-btn)"
   }
 ]
 

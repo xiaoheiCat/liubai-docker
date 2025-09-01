@@ -236,7 +236,7 @@ const iconUrl = computed(() => modalData.iconUrl)
         }
 
         .cui-modal-btn_red:hover {
-          background-color: #c61d2e;
+          background-color: var(--delete-btn-hover);
         }
       }
 
@@ -278,10 +278,10 @@ const iconUrl = computed(() => modalData.iconUrl)
 
       .cui-modal-btn_red {
         color: white;
-        background-color: #dc1e30;
+        background-color: var(--delete-btn);
 
         &:active {
-          background-color: #c61d2e;
+          background-color: var(--delete-btn-hover);
         }
       }
 

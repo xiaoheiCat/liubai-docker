@@ -9,6 +9,7 @@ import { LiuReq } from "~/requests/LiuReq";
 import APIs from "~/requests/APIs";
 import type { DeletedTaskEventDetail } from "./tools/types";
 import { turnTaskCardToResGetWxTask } from "./tools/useTaskCard";
+import { colorData } from "~/config/default-data";
 
 Component({
 
@@ -64,6 +65,24 @@ Component({
       })
     },
 
+    onLongPressCard() {
+      const task = this.data.task as TaskCard
+      if(!task) return
+      if(!task.isMine) return
+      LiuApi.vibrateShort({ type: "medium" })
+
+      const _this = this
+      LiuUtil.showCustomActionSheet({
+        item_key_list: ["shared.delete"],
+        itemColor: colorData.shared.delete_btn,
+        success(res) {
+          LiuApi.vibrateShort({ type: "light" })
+          const idx = res.tapIndex
+          if(idx === 0) _this.toDelete(true)
+        }
+      })
+    },
+
     async failToOpenChatTool() {
       const res1 = await LiuUtil.showCustomModal({
         title_key: "shared.tip",
@@ -74,7 +93,9 @@ Component({
       this.toDelete()
     },
 
-    async toDelete() {
+    async toDelete(
+      showFinishedTip = false,
+    ) {
       const task = this.data.task as TaskCard
       if(!task) return
 
@@ -89,6 +110,10 @@ Component({
       this.triggerEvent<DeletedTaskEventDetail>(
         "deleted", { id, index: this.data.index }
       )
+
+      if(showFinishedTip) {
+        LiuUtil.showCustomToast({ title_key: "shared.deleted" })
+      }
     }
 
   },

@@ -11,7 +11,7 @@ export default {
     "my_tasks": "我的任務",
     "filter_for": "篩選出",
     "filter_1": "已完成或已結束",
-    "title_1": "讓它們隨風而逝",
+    "title_1": "📥 封存區",
     "no_inactive_tasks": "沒有找到，能留白就留白！",
   },
   "shared": {
@@ -29,6 +29,8 @@ export default {
     "open_mini_1": "前往小程式",
     "open_mini_2": "請輕觸右下角「前往小程式」",
     "yes": "是",
+    "delete": "刪除",
+    "deleted": "已刪除",
   },
   "err": {
     "no_data": "找不到耶",
