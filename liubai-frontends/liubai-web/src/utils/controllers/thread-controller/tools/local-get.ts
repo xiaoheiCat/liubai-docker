@@ -52,7 +52,6 @@ async function getList(
       _id, 
       stateId: stateOnThread,
       infoType,
-      updatedStamp,
     } = item
     
     if(infoType !== "THREAD") return false
@@ -76,8 +75,9 @@ async function getList(
     // 如果是已被移除的动态
     // REMOVING_DAYS 以外的就不展示
     if(item.oState === "REMOVED") {
-      const diff = now - updatedStamp
-      if(diff > REMOVING_DAYS * time.DAY) {
+      const removedDiff = now - (item.removedStamp ?? item.updatedStamp)
+      const removedDays = Math.floor(removedDiff / time.DAY)
+      if(removedDays >= REMOVING_DAYS) {
         return false
       }
     }

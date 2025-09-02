@@ -52,6 +52,7 @@ import * as vbot from "valibot"
 
 const db = cloud.database()
 const _ = db.command
+const DAY_30 = 30 * DAY
 
 export async function main(ctx: FunctionContext) {
   // 1. pre-check
@@ -597,20 +598,18 @@ async function toThreadListFromContent(
     spaceId,
   }
 
+  const now = getNowStamp()
   if(isCalendar) {
-    const now = getNowStamp()
     const s1 = now - DAY
     const s2 = now + DAY + (HOUR * 2)
     w.calendarStamp = _.and(_.gt(s1), _.lte(s2))
   }
   else if(isTodayFuture) {
     sort = "asc"
-    const now = getNowStamp()
     const s1 = now - DAY
     w.calendarStamp = _.gt(s1)
   }
   else if(isPast) {
-    const now = getNowStamp()
     w.calendarStamp = _.lt(now)
   }
   else if(isPin) {
@@ -620,7 +619,8 @@ async function toThreadListFromContent(
     w.pinStamp = _.or(_.eq(0), _.exists(false))
   }
   else if(isTrash) {
-    w.removedStamp = _.gt(0)
+    const THIRTY_DAYS_AGO = now - DAY_30
+    w.removedStamp = _.gte(THIRTY_DAYS_AGO)
   }
   else if(isKanban) {
     w.stateId = stateId
