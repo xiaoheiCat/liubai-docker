@@ -652,7 +652,7 @@ async function turnTaskIntoAtoms(
 ) {
   const {
     calendarStamp,
-    assigneeList,
+    assigneeList = [],
     owner_userid,
   } = task
   if(!calendarStamp) return

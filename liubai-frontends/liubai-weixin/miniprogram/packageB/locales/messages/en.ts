@@ -154,7 +154,7 @@ export default {
     "placeholder_2": "Enter note (e.g. meeting info)",
     "confirm": "Confirm",
     "paste_fr_clipboard": "Paste from clipboard",
-    "clean_text": "Clean Text",
+    "clean_text": "Clear text",
   },
   "task-date-time": {
     "title": "⏰ When?",

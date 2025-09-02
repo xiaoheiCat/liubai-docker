@@ -30,4 +30,4 @@ export const colorData = {
     primary_color: "#88d1ff",
     main_note: "#686868",
   }
-}
+} as const

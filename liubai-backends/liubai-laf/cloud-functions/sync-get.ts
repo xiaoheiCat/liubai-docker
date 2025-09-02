@@ -647,11 +647,12 @@ async function toThreadListFromContent(
   else if(isKanban) key = "stateStamp"
 
   if(lastItemStamp) {
-    if(sort === "desc") {
-      w[key] = _.lt(lastItemStamp)
+    const pageCond = sort === "desc" ? _.lt(lastItemStamp) : _.gt(lastItemStamp)
+    if(w[key]) {
+      w[key] = _.and(w[key], pageCond)
     }
     else {
-      w[key] = _.gt(lastItemStamp)
+      w[key] = pageCond
     }
   }
 

@@ -29,7 +29,7 @@ export const colorData = {
   shared: {
     delete_btn: "#dc1e30",
   }
-}
+} as const
 
 export const indexNumData = {
   to_lower: 9,
