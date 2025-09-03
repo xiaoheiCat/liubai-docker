@@ -170,7 +170,14 @@ export default {
   },
   "landing-premium": {
     "paid_hd": "已支付",
-    "paid_bd": "你已是尊貴的 Premium 會員🥂",
+    "paid_bd": "支付是一種交互方式！\n謝謝你用行動支持我們🥂",
     "back": "返回",
+    "three_things_hd": "事不過三",
+    "three_things_bd": "你已有三個任務未處理，我們要索取任務管理費喔！",
+    "old_school_hd": "這彷彿手工針織",
+    "old_school_bd": "AI 時代還想手動選擇時間？古法煉製法會增加我們的開發和維護成本，我們只好收取一點開發費用啦！",
+    "btn_title": "20 元",
+    "hint": "溫馨提示: \n1. 請放心，這不會連續自動扣款；\n2. 購買後，將解鎖留白記事 Premium 所有權益一個月。",
+    "learn_more": "了解詳情",
   },
 }

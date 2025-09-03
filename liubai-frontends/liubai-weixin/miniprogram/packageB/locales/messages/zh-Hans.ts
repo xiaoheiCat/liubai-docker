@@ -170,7 +170,14 @@ export default {
   },
   "landing-premium": {
     "paid_hd": "已支付",
-    "paid_bd": "你已是尊贵的 Premium 会员🥂",
+    "paid_bd": "支付是一种交互方式！\n谢谢你用行动支持我们🥂",
     "back": "返回",
+    "three_things_hd": "事不过三",
+    "three_things_bd": "你已有三个任务未处理，我们要索取任务管理费哦！",
+    "old_school_hd": "这仿佛手工针织",
+    "old_school_bd": "AI 时代还想手动选择时间？古法炼制法会增加我们的开发和维护成本，我们只好收取一点开发费用啦！",
+    "btn_title": "20 元",
+    "hint": "温馨提示: \n1. 请放心，这不会连续自动扣款；\n2. 购买后，将解锁留白记事 Premium 所有权益一个月。",
+    "learn_more": "了解详情",
   },
 }

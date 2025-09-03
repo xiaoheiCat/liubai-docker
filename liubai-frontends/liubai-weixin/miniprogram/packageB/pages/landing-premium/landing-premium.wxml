@@ -30,7 +30,39 @@
     </view>
 
     <!-- 2. UNPAID -->
-    <view wx:elif="{{key}}" class="liu-main-box">
+    <view wx:elif="{{key}}" class="liu-main-box lp-container">
+
+      <view class="lp-emoji">
+        <text wx:if="{{key === 'three-things'}}">👌</text>
+        <text wx:elif="{{key === 'old-school'}}">🧶</text>
+      </view>
+
+      <view class="lp-title">
+        <text wx:if="{{key === 'three-things'}}">{{t1.three_things_hd}}</text>
+        <text wx:elif="{{key === 'old-school'}}">{{t1.old_school_hd}}</text>
+      </view>
+
+      <view class="lp-tip">
+        <text wx:if="{{key === 'three-things'}}">{{t1.three_things_bd}}</text>
+        <text wx:elif="{{key === 'old-school'}}">{{t1.old_school_bd}}</text>
+      </view>
+
+      <view class="lp-buy-btn">
+        <custom-button catchtap="onTapBuy">
+          <text>{{t1.btn_title}}</text>
+        </custom-button>
+      </view>
+      
+
+      <view class="lp-footer-box">
+        <view class="lp-hint">
+          <text>{{t1.hint}}</text>
+        </view>
+        <view class="lp-learn-more" hover-class="liu-hover-class" catchtap="onTapLearnMore">
+          <text>{{t1.learn_more}}</text>
+        </view>
+      </view>
+
       
     </view>
 

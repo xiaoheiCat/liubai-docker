@@ -173,7 +173,14 @@ export default {
   },
   "landing-premium": {
     "paid_hd": "PAID",
-    "paid_bd": "You've already been our dear Premium 🥂",
+    "paid_bd": "Dealing is a way of interaction!\nThanks for your support 🥂",
     "back": "Back",
+    "three_things_hd": "事不过三",
+    "three_things_bd": "You have three tasks unhandled, so we try to charge you for task management!",
+    "old_school_hd": "这仿佛手工针织",
+    "old_school_bd": "AI 时代还想手动选择时间？古法炼制法会增加我们的开发和维护成本，我们只好收取一点开发费用啦！",
+    "btn_title": "¥20",
+    "hint": "Hint: \n1. We won't automatically deduct your account;\n2. After purchase, you will unlock all Premium features of Liubai for one month.",
+    "learn_more": "Learn more",
   },
 }
