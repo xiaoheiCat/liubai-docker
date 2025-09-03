@@ -2081,6 +2081,11 @@ export interface Res_PO_WxpayJsapi {
   param: Wxpay_Jsapi_Params
 }
 
+export interface Res_PO_WxpayMini {
+  operateType: "wxpay_mini"
+  param: Wxpay_Jsapi_Params
+}
+
 export interface Res_PO_AlipayWap {
   operateType: "alipay_wap"
   wap_url: string

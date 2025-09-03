@@ -24,6 +24,7 @@ import {
   type Wxpay_Jsapi_Params,
   type Wxpay_Order_Jsapi,
   type Res_PO_WxpayJsapi,
+  type Res_PO_WxpayMini,
   type Res_PO_GetOrder,
   type WxpayReqAuthorizationOpt,
   Sch_Param_PaymentOrder,
@@ -80,7 +81,7 @@ export async function main(ctx: FunctionContext) {
     res2 = await handle_wxpay_jsapi(body)
   }
   else if(oT === "wxpay_mini") {
-    handle_wxpay_mini(body)
+    res2 = await handle_wxpay_mini(body)
   }
   else if(oT === "alipay_wap") {
     res2 = await handle_alipay_wap(body)
@@ -192,7 +193,7 @@ async function handle_alipay_wap(
 
 async function handle_wxpay_mini(
   body: Record<string, any>,
-) {
+): Promise<LiuRqReturn<Res_PO_WxpayMini>> {
   const order_id = body.order_id as string
   const wx_mini_openid = body.wx_mini_openid as string
   const userTimezone = body.x_liu_timezone

@@ -170,5 +170,10 @@ export default {
     "min_60": "1 hour early",
     "min_120": "2 hours early",
     "min_1440": "1 day early",
-  }
+  },
+  "landing-premium": {
+    "paid_hd": "PAID",
+    "paid_bd": "You've already been our dear Premium 🥂",
+    "back": "Back",
+  },
 }

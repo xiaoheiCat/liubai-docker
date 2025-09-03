@@ -167,5 +167,10 @@ export default {
     "min_60": "提前 1 小時",
     "min_120": "提前 2 小時",
     "min_1440": "提前 1 天",
-  }
+  },
+  "landing-premium": {
+    "paid_hd": "已支付",
+    "paid_bd": "你已是尊貴的 Premium 會員🥂",
+    "back": "返回",
+  },
 }

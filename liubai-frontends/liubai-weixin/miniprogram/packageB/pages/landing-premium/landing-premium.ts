@@ -1,6 +1,9 @@
-import { navibarBehavior } from "~/behaviors/navibar-behavior"
-import { i18nBehavior } from "~/packageA/behaviors/i18n-behavior"
-import { themeBehavior } from "~/packageA/behaviors/theme-behavior"
+import { navibarBehavior } from "../../behaviors/navibar-behavior";
+import { i18nBehavior } from "../../behaviors/i18n-behavior";
+import { themeBehavior } from "../../behaviors/theme-behavior";
+import { pageBehavior } from "../../behaviors/page-behavior";
+import type { LpKey } from "./tools/types"
+import { LiuApi } from "~/packageB/utils/LiuApi";
 
 Component({
 
@@ -12,13 +15,24 @@ Component({
     i18nBehavior("landing-premium"),
     navibarBehavior(),
     themeBehavior(),
+    pageBehavior(),
   ],
   
   data: {
     pageName: "landing-premium",
+    key: undefined as LpKey | undefined,
+    hasPaid: true,
   },
 
   methods: {
+
+
+    onTapBackAfterPaid() {
+      LiuApi.vibrateShort({ type: "medium" })
+      LiuApi.navigateBack()
+    },
+
+
 
 
   },

@@ -1,0 +1,43 @@
+<scroll-view 
+  scroll-y
+  class="liu-{{theme}} liu-scroll-view"
+  type="custom"
+  associative-container="pop-gesture"
+>
+  <virtual-navibar height1="{{height1}}" height2="{{height2}}"></virtual-navibar>
+
+  <view class="liu-main-container">
+
+    <!-- 1. PAID -->
+    <view wx:if="{{hasPaid}}" class="liu-main-box lp-paid-container">
+
+      <image src="../../images/shared/smiling_face_3d.png" 
+        class="lp-paid-image"
+      />
+      
+      <view class="lp-paid-title">
+        <text>{{t1.paid_hd}}</text>
+      </view>
+
+      <view class="lp-paid-tip">
+        <text>{{t1.paid_bd}}</text>
+      </view>
+
+      <view class="lp-paid-btn">
+        <custom-button catchtap="onTapBackAfterPaid">{{t1.back}}</custom-button>
+      </view>
+      
+    </view>
+
+    <!-- 2. UNPAID -->
+    <view wx:elif="{{key}}" class="liu-main-box">
+      
+    </view>
+
+  </view>
+</scroll-view>
+
+<custom-navibar 
+  height1="{{height1}}" height2="{{height2}}" 
+  visible="{{visible}}"
+></custom-navibar>
