@@ -3,6 +3,8 @@ import type {
   CloudStorageService, 
   LiuAi, 
   LiuSpaceAndMember, 
+  SubscriptionPaymentCircle, 
+  SubscriptionWxpay, 
   UserSubscription,
 } from "../types/types-cloud"
 import type { LocalLocale } from "../types/types-locale"
@@ -61,7 +63,6 @@ export namespace UserSettingsAPI {
 
   export type Res_Latest = Omit<Res_Enter, "new_serial" | "new_token">
 }
-
 
 export namespace HappySystemAPI {
   export interface Res_GetAdData {
@@ -150,4 +151,32 @@ export interface Res_OC_GetWeChat {
   wx_gzh_openid?: string
   wx_gzh_toggle?: boolean
   wx_gzh_subscribed?: boolean
+}
+
+export interface Res_SubPlan_Info {
+  id: string
+  payment_circle: SubscriptionPaymentCircle
+  badge: string
+  title: string
+  desc: string
+  wxpay?: SubscriptionWxpay
+
+  // 以下价格是向用户在前端展示的价格，请使用用户能理解的常用单位
+  // 而非最终收费的单位
+  price: string
+  currency: string   // 三位英文大写字符组成
+  symbol: string     // 货币符号，比如 "¥"
+  original_price?: string
+}
+
+
+/************************ payment-order ********************/
+
+export interface Res_OrderData {
+  order_id: string
+}
+
+export interface Res_PO_CreateOrder {
+  operateType: "create_order"
+  orderData: Res_OrderData
 }

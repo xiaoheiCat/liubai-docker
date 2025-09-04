@@ -36,6 +36,22 @@ export interface UserSubscription {
   chargeTimes?: number
 }
 
+export interface SubscriptionWxpay {
+  isOn: BaseIsOn
+}
+
+export type SubscriptionPaymentCircle = "monthly" | "quarterly" | "yearly"
+
+/******************* Some Types from Wxpay  ****************/
+export interface Wxpay_Jsapi_Params {
+  appId: string
+  timeStamp: string
+  nonceStr: string
+  package: string
+  signType: string
+  paySign: string
+}
+
 /*************************** 云存储 **********************/
 // 云存储服务
 export type CloudStorageService = "qiniu" | "tecent_cos" | "aliyun_oss"

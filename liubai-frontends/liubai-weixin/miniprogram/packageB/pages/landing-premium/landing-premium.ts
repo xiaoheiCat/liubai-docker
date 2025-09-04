@@ -20,8 +20,12 @@ Component({
   
   data: {
     pageName: "landing-premium",
-    key: "old-school" as LpKey | undefined,
+    key: "add-calendar" as LpKey | undefined,
     hasPaid: false,
+    _wxpayData: {
+      stamp: 0,
+      orderId: "",
+    },
   },
 
   methods: {

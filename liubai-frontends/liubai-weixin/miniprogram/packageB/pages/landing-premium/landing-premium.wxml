@@ -35,16 +35,19 @@
       <view class="lp-emoji">
         <text wx:if="{{key === 'three-things'}}">👌</text>
         <text wx:elif="{{key === 'old-school'}}">🧶</text>
+        <text wx:elif="{{key === 'add-calendar'}}">🗓️</text>
       </view>
 
       <view class="lp-title">
         <text wx:if="{{key === 'three-things'}}">{{t1.three_things_hd}}</text>
         <text wx:elif="{{key === 'old-school'}}">{{t1.old_school_hd}}</text>
+        <text wx:elif="{{key === 'add-calendar'}}">{{t1.mobile_calendar_hd}}</text>
       </view>
 
       <view class="lp-tip">
         <text wx:if="{{key === 'three-things'}}">{{t1.three_things_bd}}</text>
         <text wx:elif="{{key === 'old-school'}}">{{t1.old_school_bd}}</text>
+        <text wx:elif="{{key === 'add-calendar'}}">{{t1.mobile_calendar_bd}}</text>
       </view>
 
       <view class="lp-buy-btn">

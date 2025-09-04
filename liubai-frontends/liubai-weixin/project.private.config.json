@@ -1,6 +1,18 @@
 {
   "libVersion": "3.9.1",
-  "condition": {},
+  "condition": {
+    "miniprogram": {
+      "list": [
+        {
+          "name": "Premium",
+          "pathName": "packageB/pages/landing-premium/landing-premium",
+          "query": "",
+          "scene": null,
+          "launchMode": "default"
+        }
+      ]
+    }
+  },
   "setting": {
     "urlCheck": false,
     "coverView": false,

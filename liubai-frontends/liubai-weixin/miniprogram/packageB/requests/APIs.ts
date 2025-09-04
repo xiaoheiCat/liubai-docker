@@ -11,4 +11,6 @@ export default {
   HAPPY_SYSTEM: d + "happy-system",
   PPL_TASKS: d + "people-tasks",
   OPEN_CONNECT: d + "open-connect",
+  SUBSCRIBE_PLAN: d + `subscribe-plan`,
+  PAYMENT_ORDER: d + `payment-order`,
 }

@@ -176,6 +176,8 @@ export default {
     "three_things_bd": "你已有三个任务未处理，我们要索取任务管理费哦！",
     "old_school_hd": "这仿佛手工针织",
     "old_school_bd": "AI 时代还想手动选择时间？古法炼制法会增加我们的开发和维护成本，我们只好收取一点开发费用啦！",
+    "mobile_calendar_hd": "添加到手机日历",
+    "mobile_calendar_bd": "这个功能需要计算 signature，会增加我们的开发工作量，所以是付费功能。有需要再开启。",
     "btn_title": "20 元",
     "hint": "温馨提示: \n1. 请放心，这不会连续自动扣款；\n2. 购买后，将解锁留白记事 Premium 所有权益一个月。",
     "learn_more": "了解详情",

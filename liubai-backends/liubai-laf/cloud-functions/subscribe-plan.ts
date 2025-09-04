@@ -57,6 +57,9 @@ export async function main(ctx: FunctionContext) {
   if(oT === "info") {
     res = await handle_info(ctx)
   }
+  else if(oT === "monthly_info") {
+    res = await monthly_info(ctx)
+  }
   else if(oT === "create_stripe") {
     res = await handle_create_stripe(body, user)
   }
@@ -372,20 +375,46 @@ async function requestStripeToRefund(
   return false
 }
 
+async function monthly_info(
+  ctx: FunctionContext,
+) {
+  const col = db.collection("Subscription")
+  const w1: Partial<Table_Subscription> = {
+    isOn: "Y",
+    payment_circle: "monthly",
+  }
+  const q1 = col.where(w1).orderBy("priority", "asc")
+  const res1 = await q1.getOne<Table_Subscription>()
+  const d = res1.data
+  if(!d) return { code: "E4004" }
+
+  const res2 = packageInfo(ctx, d)
+  return res2
+}
+
 
 /** 获取订阅方案的消息 */
 async function handle_info(
   ctx: FunctionContext,
 ) {
-  const _env = process.env
   const col = db.collection("Subscription")
   const q = col.where({ isOn: "Y", showInPricing: "Y" }).orderBy("priority", "asc")
-  const res = await q.limit(2).get<Table_Subscription>()
-  const list = res.data
+  const res1 = await q.limit(2).get<Table_Subscription>()
+  const list = res1.data
   if(list.length < 1) return { code: "E4004" }
   const d = list[0]
   if(!d) return { code: "E4004" }
 
+  const res2 = packageInfo(ctx, d)
+  return res2
+}
+
+
+function packageInfo(
+  ctx: FunctionContext,
+  d: Table_Subscription,
+): LiuRqReturn<Res_SubPlan_Info> {
+  const _env = process.env
   let currency = getSupportedCurrency(ctx)
 
   //@ts-ignore price
