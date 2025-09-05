@@ -1,3 +1,8 @@
+---
+title: Premium
+description: 我们的会员权益
+---
+
 # 留白记事 Premium
 
 以下是 `留白记事 Premium` 所有权益：
@@ -43,8 +48,6 @@
 |     [AI 分类](/guide/ide/how-to-use-vscode-ext#quick-note)      |        10 次/月      |         200 次/月      |
 
 ## 其他
-
-其他 Premium 权益：
 
 - 新功能抢先试用；
 - 会员专属群聊。
