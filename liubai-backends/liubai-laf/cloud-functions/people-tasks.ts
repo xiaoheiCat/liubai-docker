@@ -2,7 +2,7 @@
 // Function Name: people-tasks
 import cloud from "@lafjs/cloud"
 import { 
-  checker, getDocAddId, valTool, verifyToken, WxMiniHandler,
+  checker, checkIfUserSubscribed, getDocAddId, valTool, verifyToken, WxMiniHandler,
 } from "@/common-util"
 import { 
   type LiuRqReturn, 
@@ -63,8 +63,52 @@ export async function main(ctx: FunctionContext) {
   else if(oT === "update-task-time") {
     res = await update_task_time(body, vRes)
   }
+  else if(oT === "can-i-post-task") {
+    res = await can_i_post_task(body, vRes)
+  }
 
   return res
+}
+
+async function can_i_post_task(
+  body: Record<string, any>,
+  vRes: VerifyTokenRes_B,
+): Promise<LiuRqReturn<PeopleTasksAPI.Res_CanIPostTask>> {
+  // 1. define result
+  const data: PeopleTasksAPI.Res_CanIPostTask = {
+    operateType: "can-i-post-task",
+    status: "yes",
+  }
+
+  // 2. check out cache
+  const res2 = checkIfUserSubscribed(vRes.userData)
+  if(res2) {
+    return { code: "0000", data }
+  }
+
+  // 3. check out db
+  const userId = vRes.userData._id
+  const col = db.collection("User")
+  const res3 = await col.doc(userId).get<Table_User>()
+  const user = res3.data
+  if(!user) return { code: "E4004", errMsg: "no such user" }
+  const isPremium = checkIfUserSubscribed(user)
+  if(isPremium) {
+    return { code: "0000", data }
+  }
+
+  // 4. get active tasks
+  const body4 = {
+    operateType: "list-wx-tasks",
+    listType: "available",
+  }
+  const res4 = await list_wx_tasks(body4, vRes)
+  const tasks = res4.data?.tasks ?? []
+  console.log("tasks length: ", tasks.length)
+  if(tasks.length >= ppl_system_cfg.freemium_task_count) {
+    data.status = "no"
+  }
+  return { code: "0000", data }
 }
 
 async function update_task_time(

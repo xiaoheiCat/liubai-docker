@@ -4392,10 +4392,16 @@ export namespace PeopleTasksAPI {
     | "update-task-note"
     | "delete-wx-task"
     | "update-task-time"
+    | "can-i-post-task"
 
   export interface Res_EnterWxChatTool {
     operateType: "enter-wx-chat-tool"
     chatInfo: WxMiniAPI.ChatInfo
+  }
+
+  export interface Res_CanIPostTask { 
+    operateType: "can-i-post-task"
+    status: "yes" | "no"
   }
 
   export const Sch_Param_CreateWxTask = vbot.object({

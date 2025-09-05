@@ -51,6 +51,7 @@ export const ppl_system_cfg = {
   task_tmpl_id: "4A68CBB88A92B0A9311848DBA1E94A199B166463",
   activity_tmpl_id: "2A84254B945674A2F88CE4970782C402795EB607",
   coming_soom_hrs: 3,
+  freemium_task_count: 3,
 }
 
 
