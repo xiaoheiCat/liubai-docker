@@ -1,3 +1,3 @@
 
 
-export type ArticleKey = "wxmini-login" | ""
+export type ArticleKey = "wxmini-login" | "premium"

@@ -123,7 +123,9 @@ Component({
 
     onTapLearnMore() {
       LiuApi.vibrateShort({ type: "light" })
-
+      LiuApi.navigateTo({
+        url: "/packageB/pages/article/article?key=premium",
+      })
     },
 
 

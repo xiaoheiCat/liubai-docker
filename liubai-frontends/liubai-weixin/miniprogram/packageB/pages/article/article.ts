@@ -23,6 +23,9 @@ Component({
       if(key === "wxmini-login") {
         this.handleWxMiniLogin()
       }
+      else if(key === "premium") {
+        this.handlePremium()
+      }
 
     },
 
@@ -30,6 +33,13 @@ Component({
       let url = envData.LIU_WEB_DOMAIN
       if(!url) return
       url += "/wxmini-login"
+      this.setData({ url })
+    },
+
+    handlePremium() {
+      let url = envData.LIU_DOCS_DOMAIN
+      if(!url) return
+      url += "/guide/premium"
       this.setData({ url })
     },
 
