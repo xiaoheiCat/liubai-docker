@@ -231,7 +231,7 @@ Component({
       this.toUpdateShareMenu()
 
       // 4.3 check out binding status
-      if(bind4.detail.remindStr && justOnLoad) {
+      if(bind4.detail.remindStr && !this.data.bindingStatus) {
         this.handleBindingStatus()
       }
 
@@ -417,19 +417,29 @@ Component({
       LiuApi.vibrateShort({ type: "light" })
       
       const bs = this.data.bindingStatus
-      if(this.data.qrCodePicUrl && bs === "unfollowed") {
-        this.setData({ openBindingPopup: true })
+      console.log("bs: ", bs)
+
+      if(!bs) {
+        this.handleBindingStatus()
         return
       }
 
-      if(bs === "followed") {
-        LiuUtil.showCustomModal({
-          title_key: "task-detail.remind_1",
-          content_key: "task-detail.remind_2",
-          showCancel: false,
-          confirm_key: "shared.ok",
-        })
+      if(bs === "unfollowed") {
+        if(this.data.qrCodePicUrl) {
+          this.setData({ openBindingPopup: true })
+        }
+        else {
+          this.handleQrCode()
+        }
+        return
       }
+
+      LiuUtil.showCustomModal({
+        title_key: "task-detail.remind_1",
+        content_key: "task-detail.remind_2",
+        showCancel: false,
+        confirm_key: "shared.ok",
+      })
     },
 
     onTapShare() {

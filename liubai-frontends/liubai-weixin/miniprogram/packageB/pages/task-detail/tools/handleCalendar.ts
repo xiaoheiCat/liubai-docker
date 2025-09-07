@@ -27,8 +27,8 @@ export function toAddCalendarEvent(
   const startTime = Math.floor(whenStamp / 1000)
   const earlyMinute = detail.remindMe?.early_minute
   const alarmOffset = earlyMinute ? earlyMinute * 60 : 0
-  // console.log("path: ", detail.calendar_path)
-  // console.log("signature: ", detail.calendar_signature)
+  console.log("path: ", detail.calendar_path)
+  console.log("signature: ", detail.calendar_signature)
 
   // 1.2 check out premium
   const isPremium = Loginer.amIPremium()
@@ -74,8 +74,8 @@ export function toAddCalendarEvent(
     startTime,
     description,
     alarmOffset,
-    // path: detail.calendar_path,
-    // signature: detail.calendar_signature,
+    path: detail.calendar_path,
+    signature: detail.calendar_signature,
     success(res) {
       console.log("addPhoneCalendar success: ", res)
       _removeTimeout()
