@@ -40,7 +40,7 @@ export function toAddCalendarEvent(
   }
 
   // 2. set timeout to prompt for system bug
-  const delay2 = 1250
+  const delay2 = 1750
   let timeout2: LiuTimeout = setTimeout(() => {
     timeout2 = undefined
     const isJustHidden = LiuTime.isWithinMillis(
