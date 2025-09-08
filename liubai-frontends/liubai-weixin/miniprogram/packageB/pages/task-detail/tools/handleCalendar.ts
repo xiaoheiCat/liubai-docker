@@ -40,9 +40,11 @@ export function toAddCalendarEvent(
     return
   }
 
-  // 2. set timeout to prompt for system bug
-  const delay2 = 1750
+  // 2. show loading & set timeout to prompt for system bug
+  LiuUtil.showCustomLoading({ title_key: "shared.hold_on" })
+  const delay2 = 2000
   let timeout2: LiuTimeout = setTimeout(() => {
+    LiuApi.hideLoading()
     timeout2 = undefined
     const isJustHidden = LiuTime.isWithinMillis(
       lastShowHideToggleStamp, 
@@ -63,6 +65,7 @@ export function toAddCalendarEvent(
   }, delay2)
   const _removeTimeout = () => {
     if(timeout2) {
+      LiuApi.hideLoading()
       clearTimeout(timeout2)
       timeout2 = undefined
     }
