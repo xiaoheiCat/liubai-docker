@@ -4,6 +4,7 @@ import type { TaskDetail } from "./types"
 import { LiuUtil } from "~/packageB/utils/liu-util/index"
 import type { LiuTimeout } from "~/packageB/utils/basic/type-tool"
 import { Loginer } from "~/packageB/utils/login/Loginer"
+import { defaultData } from "~/packageB/config/default-data"
 
 let lastShowHideToggleStamp = 0
 
@@ -66,16 +67,24 @@ export function toAddCalendarEvent(
       timeout2 = undefined
     }
   }
+  
+  // 3. clear path & signature for dev
+  let path = detail.calendar_path
+  let signature = detail.calendar_signature
+  const accountInfo = LiuApi.getAccountInfoSync()
+  if(accountInfo?.miniProgram?.appId === defaultData.dev_appid) {
+    path = undefined
+    signature = undefined
+  }
 
-
-  // 3. to call API
+  // 4. to call API
   LiuApi.addPhoneCalendar({
     title,
     startTime,
     description,
     alarmOffset,
-    path: detail.calendar_path,
-    signature: detail.calendar_signature,
+    path,
+    signature,
     success(res) {
       console.log("addPhoneCalendar success: ", res)
       _removeTimeout()

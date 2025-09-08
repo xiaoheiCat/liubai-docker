@@ -19,6 +19,7 @@ export const defaultData = {
 
   note_max_length: 2000,
   title_max_length: 66,
+  dev_appid: "wx3dfa900a49a77d46",
 }
 
 export const colorData = {
