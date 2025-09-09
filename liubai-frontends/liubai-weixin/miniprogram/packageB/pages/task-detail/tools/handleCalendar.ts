@@ -5,6 +5,7 @@ import { LiuUtil } from "~/packageB/utils/liu-util/index"
 import type { LiuTimeout } from "~/packageB/utils/basic/type-tool"
 import { Loginer } from "~/packageB/utils/login/Loginer"
 import { defaultData } from "~/packageB/config/default-data"
+import { ShowTip } from "~/packageB/utils/managers/ShowTip"
 
 let lastShowHideToggleStamp = 0
 
@@ -28,8 +29,6 @@ export function toAddCalendarEvent(
   const startTime = Math.floor(whenStamp / 1000)
   const earlyMinute = detail.remindMe?.early_minute
   const alarmOffset = earlyMinute ? earlyMinute * 60 : 0
-  console.log("path: ", detail.calendar_path)
-  console.log("signature: ", detail.calendar_signature)
 
   // 1.2 check out premium
   const isPremium = Loginer.amIPremium()
@@ -99,8 +98,12 @@ export function toAddCalendarEvent(
     fail(err) {
       console.warn("addPhoneCalendar fail: ", err)
       _removeTimeout()
-      if(err && err.errMsg.includes("auth deny")) {
+      const errMsg = err?.errMsg
+      if(typeof errMsg === "string" && errMsg.includes("auth deny")) {
         needAuthForCalendar()
+      }
+      else {
+        ShowTip.showErrMsg("添加日历失败", err)
       }
     },
   })

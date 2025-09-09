@@ -103,7 +103,6 @@ export default {
     "bug_1": "友情提示🪧",
     "bug_2": "如果点击后没有反应，可能需要你在系统设置中打开完整的日历权限。",
     "added": "添加成功",
-
   },
   "ai-related": {
     "help_to_organize": "由 {name} 协助整理",

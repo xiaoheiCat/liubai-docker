@@ -1,7 +1,4 @@
-
-
 export default {
-  
   "shared": {
     "copied": "Copied",
     "tip": "Tip",
