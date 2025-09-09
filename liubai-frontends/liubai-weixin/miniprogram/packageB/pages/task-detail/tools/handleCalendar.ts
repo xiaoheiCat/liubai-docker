@@ -73,11 +73,17 @@ export function toAddCalendarEvent(
   // 3. clear path & signature for dev
   let path = detail.calendar_path
   let signature = detail.calendar_signature
-  const accountInfo = LiuApi.getAccountInfoSync()
-  if(accountInfo?.miniProgram?.appId === defaultData.dev_appid) {
-    path = undefined
-    signature = undefined
+  try {
+    const accountInfo = LiuApi.getAccountInfoSync()
+    if(accountInfo?.miniProgram?.appId === defaultData.dev_appid) {
+      path = undefined
+      signature = undefined
+    }
   }
+  catch(err) {
+    console.warn("get account info failed: ", err)
+  }
+  
 
   // 4. to call API
   LiuApi.addPhoneCalendar({
