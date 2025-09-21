@@ -15,6 +15,7 @@ import { qrcode } from 'vite-plugin-qrcode';
 import { visualizer } from "rollup-plugin-visualizer";
 import { VitePWA } from 'vite-plugin-pwa'
 import { sentryVitePlugin } from "@sentry/vite-plugin"
+import copy200Html from './deploy/vite-plugin-copy-200'
 
 const { version, author } = require("./package.json")
 const projectRoot = process.cwd()
@@ -74,6 +75,8 @@ const vitePlugins: UserConfig['plugins'] = [
     filename: "analysis.html", // 文件名称
     title: "Liubai Frontend Analysis",
   }) as unknown as PluginOption,
+
+  copy200Html(),
 
 ]
 
