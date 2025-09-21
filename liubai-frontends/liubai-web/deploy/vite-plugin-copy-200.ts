@@ -1,15 +1,23 @@
 import type { Plugin } from 'vite'
-import { promises as fs } from 'fs'
-import path from 'path'
+import { promises as fs } from 'node:fs'
+import path from 'node:path'
 
 // we have to copy index.html to 200.html, because surge.sh
 // https://surge.sh/help/adding-a-200-page-for-client-side-routing
 
 export default function copy200Html(): Plugin {
+
+  let distDir = ""
+
   return {
     name: 'copy-200-html',
+    apply: "build",
+    configResolved(resolved) {
+      const root = resolved.root
+      const outDir = resolved.build.outDir
+      distDir = path.join(root, outDir)
+    },
     closeBundle: async () => {
-      const distDir = path.resolve(__dirname, '../dist')
       const indexPath = path.join(distDir, 'index.html')
       const targetPath = path.join(distDir, '200.html')
 
