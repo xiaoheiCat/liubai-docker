@@ -416,6 +416,13 @@ export interface WorkspaceDingTalk {
   enc_webhook_url?: CryptoCipherAndIV
 }
 
+export interface WorkspaceFeishu {
+  enable?: BaseIsOn
+  enc_personal_base_token?: CryptoCipherAndIV
+  base_id?: string
+  table_id?: string
+}
+
 export interface WorkspaceVika {
   enable?: BaseIsOn
   enc_api_token?: CryptoCipherAndIV
@@ -1450,6 +1457,7 @@ export interface Table_Workspace extends BaseTable {
   // third party config
   wps?: WorkspaceWps
   dingtalk?: WorkspaceDingTalk
+  feishu?: WorkspaceFeishu
   vika?: WorkspaceVika
 }
 
@@ -2862,6 +2870,15 @@ export const Sch_Param_OC_SetWechat = vbot.object({
   wx_gzh_toggle: Sch_Opt_Bool,
 })
 
+export const Sch_Param_OC_SetFeishu = vbot.object({
+  operateType: vbot.literal("set-feishu"),
+  memberId: vbot.string(),
+  enable: Sch_BaseIsOn,
+  personal_base_token: Sch_Opt_Str,
+  base_id: Sch_Opt_Str,
+  table_id: Sch_Opt_Str,
+})
+
 export interface Res_OC_BindWeCom {
   operateType: "bind-wecom"
   pic_url: string
@@ -2910,6 +2927,14 @@ export interface Res_OC_GetDingTalk {
   operateType: "get-dingtalk"
   enable?: BaseIsOn
   plz_enc_webhook_url?: string
+}
+
+export interface Res_OC_GetFeishu {
+  operateType: "get-feishu"
+  enable?: BaseIsOn
+  plz_enc_personal_base_token?: string
+  base_id?: string
+  table_id?: string
 }
 
 export interface Res_OC_GetVika {

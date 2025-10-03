@@ -21,12 +21,14 @@ import {
   type Res_OC_CheckWeChat,
   type Param_OC_SetWechat,
   Sch_Param_OC_SetWechat,
+  Sch_Param_OC_SetFeishu,
   type Table_Workspace,
   type DataPass,
   type Res_OC_GetWps,
   type Res_OC_SetWps,
   type Res_OC_GetDingTalk,
   type Res_OC_GetVika,
+  type Res_OC_GetFeishu,
 } from "@/common-types"
 import { 
   checkAndGetWxGzhAccessToken,
@@ -88,6 +90,12 @@ export async function main(ctx: FunctionContext) {
   }
   else if(oT === "set-dingtalk") {
     res = await handle_set_dingtalk(vRes, body)
+  }
+  else if(oT === "get-feishu") {
+    res = await handle_get_feishu(vRes, body)
+  }
+  else if(oT === "set-feishu") {
+    res = await handle_set_feishu(vRes, body)
   }
   else if(oT === "get-vika") {
     res = await handle_get_vika(vRes, body)
@@ -246,6 +254,82 @@ async function handle_get_vika(
   return res4
 }
 
+async function handle_set_feishu(
+  vRes: VerifyTokenRes_B,
+  body: Record<string, any>,
+) {
+  // 0. decrypt body
+  const res0 = getDecryptedBody(body, vRes)
+  const newBody = res0.newBody
+  if(!newBody || res0.rqReturn) {
+    return res0.rqReturn ?? { code: "E5001" }
+  }
+  const res0_2 = vbot.safeParse(Sch_Param_OC_SetFeishu, newBody)
+  if(!res0_2.success) {
+    const err0 = checker.getErrMsgFromIssues(res0_2.issues)
+    return { code: "E4000", errMsg: err0 }
+  }
+
+  // 1. check out data
+  const enable = newBody.enable
+  const aesKey = getAESKey()
+  if(!aesKey) return { code: "E5001", errMsg: "getAESKey failed in set-feishu" }
+
+  // 1.1 checking whether personal_base_token is from feishu
+  const personal_base_token = newBody.personal_base_token
+  if(typeof personal_base_token === "string" && personal_base_token) {
+    const isFeishuPbt = WebhookHandler.isFeishuPersonalBaseToken(personal_base_token)
+    if(!isFeishuPbt) {
+      return { code: "E4000", errMsg: "personal_base_token is not from feishu" }
+    }
+  }
+
+  // 2. get workspace
+  const res2 = await getSharedData1(vRes, newBody)
+  if(!res2.pass) return res2.err
+  const space = res2.data
+
+  // 3. handle dingtalk config
+  const cfg = space.feishu ?? {}
+  let updated = false
+
+  // 3.1 for enable, base_id, table_id
+  if(cfg.enable !== enable) {
+    cfg.enable = enable
+    updated = true
+  }
+  if(cfg.base_id !== newBody.base_id) {
+    cfg.base_id = newBody.base_id
+    updated = true
+  }
+  if(cfg.table_id !== newBody.table_id) {
+    cfg.table_id = newBody.table_id
+    updated = true
+  }
+
+  // 3.2 for personal_base_token
+  let old_pbt = ""
+  if(cfg.enc_personal_base_token) {
+    const d3_2 = decryptCloudData<string>(cfg.enc_personal_base_token)
+    if(!d3_2.pass) return d3_2.err
+    old_pbt = d3_2.data ?? ""
+  }
+  if(typeof personal_base_token === "string") {
+    if(personal_base_token !== old_pbt) {
+      cfg.enc_personal_base_token = encryptDataWithAES(personal_base_token, aesKey)
+      updated = true
+    }
+  }
+
+  // 4. get to update
+  if(updated) {
+    const wCol = db.collection("Workspace")
+    await wCol.doc(space._id).update({ dingtalk: cfg })
+  }
+
+  return { code: "0000" }
+}
+
 async function handle_set_dingtalk(
   vRes: VerifyTokenRes_B,
   body: Record<string, any>,
@@ -310,6 +394,50 @@ async function handle_set_dingtalk(
   }
 
   return { code: "0000" }
+}
+
+async function handle_get_feishu(
+  vRes: VerifyTokenRes_B,
+  body: Record<string, any>,
+) {
+  // 1. checking out memberId
+  const res1 = await getSharedData1(vRes, body)
+  if(!res1.pass) return res1.err
+  const space = res1.data
+
+  // 2. handle return data
+  const returnData: Res_OC_GetFeishu = {
+    operateType: "get-feishu",
+  }
+  const cfg = space.feishu
+  if(!cfg) {
+    return {
+      code: "0000",
+      data: returnData,
+    }
+  }
+
+  // 3.1 decrypt enc_personal_base_token
+  if(cfg.enc_personal_base_token) {
+    const d1 = decryptCloudData<string>(cfg.enc_personal_base_token)
+    if(!d1.pass) {
+      console.warn("enc_personal_base_token decrypt failed in handle_get_feishu: ", d1.err)
+      return { 
+        code: "E4009", 
+        errMsg: "enc_personal_base_token decryption failed while getting feishu",
+      }
+    }
+    returnData.plz_enc_personal_base_token = d1.data
+  }
+
+  // 3.2 handle enable
+  returnData.enable = cfg.enable
+  returnData.base_id = cfg.base_id
+  returnData.table_id = cfg.table_id
+
+  // 4. encrypt data
+  const res4 = getSharedData2(vRes, returnData)
+  return res4
 }
 
 async function handle_get_dingtalk(
@@ -528,6 +656,11 @@ class WebhookHandler {
     const list = this.dingtalkDomains
     const res = this._checkWebhookUrl(link, list)
     return res
+  }
+
+  static isFeishuPersonalBaseToken(token: string) {
+    if(token.startsWith("pt")) return true
+    return false
   }
 
 }
