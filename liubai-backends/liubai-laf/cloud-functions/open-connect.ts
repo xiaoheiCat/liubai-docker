@@ -191,8 +191,7 @@ async function handle_set_vika(
 
   // 4. get to update
   if(updated) {
-    const wCol = db.collection("Workspace")
-    await wCol.doc(space._id).update({ vika: cfg })
+    await storageWorkspace(space._id, { vika: cfg })
   }
 
   return { code: "0000" }
@@ -323,12 +322,24 @@ async function handle_set_feishu(
 
   // 4. get to update
   if(updated) {
-    const wCol = db.collection("Workspace")
-    await wCol.doc(space._id).update({ dingtalk: cfg })
+    await storageWorkspace(space._id, { feishu: cfg })
   }
 
   return { code: "0000" }
 }
+
+async function storageWorkspace(
+  id: string,
+  updatedData: Partial<Table_Workspace>,
+) {
+  const wCol = db.collection("Workspace")
+  if(!updatedData.updatedStamp) {
+    updatedData.updatedStamp = getNowStamp()
+  }
+  await wCol.doc(id).update(updatedData)
+}
+
+
 
 async function handle_set_dingtalk(
   vRes: VerifyTokenRes_B,
@@ -389,8 +400,7 @@ async function handle_set_dingtalk(
 
   // 4. get to update
   if(updated) {
-    const wCol = db.collection("Workspace")
-    await wCol.doc(space._id).update({ dingtalk: cfg })
+    await storageWorkspace(space._id, { dingtalk: cfg })
   }
 
   return { code: "0000" }
@@ -559,8 +569,7 @@ async function handle_set_wps(
 
   // 4. get to update
   if(updated) {
-    const wCol = db.collection("Workspace")
-    await wCol.doc(space._id).update({ wps: wpsCfg })
+    await storageWorkspace(space._id, { wps: wpsCfg })
   }
 
   // 5. encrypt data

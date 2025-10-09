@@ -14,6 +14,7 @@ import {
   type WorkspaceDingTalk,
   type WorkspaceVika,
   type Table_WxTask,
+  type WorkspaceFeishu,
 } from '@/common-types'
 import { 
   AiToolUtil,
@@ -36,6 +37,13 @@ import {
 import { commonLang, i18nFill, useI18n } from '@/common-i18n'
 import { getNowStamp } from '@/common-time'
 import { LiuReporter } from '@/service-send'
+import { BaseClient as FeishuNodeSDK } from '@lark-base-open/node-sdk';
+
+type FeishuPushRes = {
+  code?: number
+  data?: Record<string, any>
+  msg?: string
+}
 
 const db = cloud.database()
 const _ = db.command
@@ -239,7 +247,73 @@ export class BackupToOthers {
     if(space.vika) {
       this.pushToVika(space.vika)
     }
+
+    // 2.4 feishu
+    if(space.feishu) {
+      this.pushToFeishu(space.feishu)
+    }
     
+  }
+  
+  private async pushToFeishu(cfg: WorkspaceFeishu) {
+    if(cfg.enable !== "Y") return "no_need"
+    const { enc_personal_base_token, base_id, table_id } = cfg
+    if(!enc_personal_base_token || !base_id || !table_id) return "no_need"
+
+    // 1. Let's decrypt
+    // 1.1 decrypt enc_personal_base_token
+    const d_token = decryptCloudData<string>(enc_personal_base_token)
+    if(!d_token.pass) {
+      console.warn("enc_personal_base_token decrypt failed in pushToFeishu: ", d_token.err)
+      this._callReporter("decrypt failed in pushToFeishu", d_token.err)
+      return "fail"
+    }
+    const personal_base_token = d_token.data
+    if(!personal_base_token) {
+      return "no_need"
+    }
+
+    // 2. create feishu SDK client
+    const client = new FeishuNodeSDK({
+      appToken: base_id,
+      personalBaseToken: personal_base_token,
+    })
+    const payload = valTool.copyObject(this._basicData)
+    const fields = {
+      "卡片唯一值": payload.id,
+      "内文": payload.desc,
+      "可选的标题": payload.title,
+      "接收时间": getNowStamp(),
+      "来源": payload.source,
+    }
+
+    let res2: FeishuPushRes | undefined
+    try {
+      res2 = await client.base.appTableRecord.create({
+        path: {
+          table_id,
+        },
+        data: {
+          fields,
+        }
+      })
+    }
+    catch(err) {
+      console.warn("pushing to feishu failed: ", err)
+      this._callReporter("pushing to feishu failed", err)
+      return "fail"
+    }
+
+    // 3. handle result
+    const code3 = res2?.code
+    if(code3 !== 0) {
+      console.warn("fail to push to feishu: ")
+      console.log(res2)
+      this._callReporter("fail to push to feishu", res2)
+      return "fail"
+    }
+    
+    return "success"
   }
 
   private async pushToVika(

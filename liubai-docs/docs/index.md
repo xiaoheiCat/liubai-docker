@@ -40,7 +40,7 @@ features:
       dark: /liu-assets/polyline_dark_theme.svg
       light: /liu-assets/polyline_light_theme.svg
     title: "第三方集成"
-    details: "连接微信、钉钉、WPS、维格云等丰富的第三方生态。"
+    details: "连接微信、钉钉、WPS、飞书等丰富的第三方生态。"
     link: /guide/connect
   - icon: 
       dark: /liu-assets/extension_dark_theme.svg

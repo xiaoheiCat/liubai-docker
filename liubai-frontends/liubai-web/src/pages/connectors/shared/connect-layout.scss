@@ -76,9 +76,16 @@
   margin-block-end: 16px;
   display: flex;
   align-items: center;
+  caret-color: var(--primary-color);
+  line-height: 1.5;
 
   &::placeholder {
     color: var(--main-note);
+  }
+
+  &::selection {
+    color: var(--on-primary);
+    background-color: var(--primary-active);
   }
 }
 
