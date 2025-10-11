@@ -88,7 +88,7 @@ export const aiBots: AiBot[] = [
     provider: "deepseek",
     model: "deepseek-reasoner",
     abilities: ["chat", "reasoning"],
-    alias: ["R1", "r1", "ds r1", "deep seek r1"],
+    alias: ["R1", "r1", "ds r1", "deep seek r1", "DeepSeek 推理者", "DeepSeek推理者"],
     maxWindowTokenK: 64,
     priority: 45,
     metaData: {
@@ -136,7 +136,7 @@ export const aiBots: AiBot[] = [
     provider: "deepseek",
     model: "deepseek-chat",
     abilities: ["chat", "tool_use"],
-    alias: ["深度求索", "ds", "v3", "deepseek", "deep seek"],
+    alias: ["深度求索", "ds", "v3", "deepseek", "deep seek", "v3.2"],
     priority: 70,
     maxWindowTokenK: 64,
   },

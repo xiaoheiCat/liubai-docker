@@ -664,7 +664,8 @@ export class AiShared {
   static getCharacterName(character?: AiCharacter) {
     if(!character) return
     let name = ""
-    const bot = aiBots.find(v => v.character === character)
+    const availableBots = AiShared.getAvailableBots()
+    const bot = availableBots.find(v => v.character === character)
     if(bot) name = bot.name
     return name
   }
