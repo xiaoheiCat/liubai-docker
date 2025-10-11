@@ -625,8 +625,9 @@ export class AiShared {
 
   static getAvailableBots() {
     const bots: AiBot[] = []
-    for(let i=0; i<aiBots.length; i++) {
-      const bot = aiBots[i]
+    const tmpBots = [...aiBots].sort((a, b) => b.priority - a.priority)
+    for(let i=0; i<tmpBots.length; i++) {
+      const bot = tmpBots[i]
       const existedBot = bots.find(v => v.character === bot.character)
       if(existedBot) continue
       const apiData = AiShared.getApiEndpointFromBot(bot)
