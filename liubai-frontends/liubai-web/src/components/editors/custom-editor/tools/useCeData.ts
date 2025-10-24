@@ -417,7 +417,7 @@ async function toSave(ctx: CesCtx) {
   }
 
   const { local_id: userId } = localCache.getPreference()
-  let liuDesc: TipTapJSONContent[] | undefined = undefined
+  let liuDesc: TipTapJSONContent[] | undefined 
   if(ceData.editorContent?.json) {
     const { type, content } = ceData.editorContent.json
     if(type === "doc" && content) liuDesc = content

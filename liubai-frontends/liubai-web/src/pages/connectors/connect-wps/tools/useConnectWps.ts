@@ -57,7 +57,7 @@ export function useConnectWps() {
   }
 
   const onWebhookUrlInput = (e: Event) => {
-    //@ts-ignore
+    //@ts-expect-error
     const val = e.target.value ?? ""
     const newUrl = val.trim()
     const oldUrl = cwData.original_webhook_url ?? ""

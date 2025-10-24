@@ -23,13 +23,13 @@ export function resToAtoms(
     const { title, desc } = _getTitleAndDesc(v, keyword)
 
     // 处理图片
-    let imgShow: ImageShow | undefined = undefined
+    let imgShow: ImageShow | undefined 
     if(v.images?.length) {
       imgShow = imgHelper.imageStoreToShow(v.images[0])
     }
 
     // 处理 commentId threadId
-    let commentId: string | undefined = undefined
+    let commentId: string | undefined 
     let threadId = v.parentThread ?? ""
     if(threadId) {
       commentId = v._id

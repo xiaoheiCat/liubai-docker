@@ -44,7 +44,7 @@ export async function equipThreads(
     if(infoType !== "THREAD") continue
 
     const _collections = collections.filter(v2 => v2.content_id === _id)
-    let creator: MemberShow | undefined = undefined
+    let creator: MemberShow | undefined 
     if(member) {
       creator = memberShows.find(v2 => v2._id === member)
     }

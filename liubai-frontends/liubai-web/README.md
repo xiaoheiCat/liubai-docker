@@ -11,8 +11,14 @@
 ```bash
 git clone git@github.com:yenche123/liubai.git
 cd liubai/liubai-frontends/liubai-web/
+
+# 使用 pnpm
 pnpm i
-pnpm dev
+pnpm run dev
+
+# 或者使用 bun
+bun i
+bun run dev
 ```
 
 无需配置任何环境变量，即可拥有一个完全本地版的留白。

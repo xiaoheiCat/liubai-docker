@@ -80,7 +80,7 @@ const getBattery = async () => {
     return false
   }
 
-  //@ts-ignore
+  //@ts-expect-error
   const res = await navigator.getBattery() as BatteryManager
   return res
 }
@@ -136,7 +136,6 @@ const setAppBadge = async (val?: number) => {
   const supported = "setAppBadge" in navigator
   if(!supported) return false
 
-  //@ts-ignore
   const res = await navigator.setAppBadge(val)
   return res
 }
@@ -146,7 +145,6 @@ const clearAppBadge = async () => {
   const supported = "clearAppBadge" in navigator
   if(!supported) return false
 
-  //@ts-ignore
   const res = await navigator.clearAppBadge()
   return res
 }

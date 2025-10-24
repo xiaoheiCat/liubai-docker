@@ -45,7 +45,7 @@ export function getBriefing(
   const magicNum = getMagicNum(opt)
   _magicNum = magicNum
 
-  let requiredBrief = _isRequiredBriefing(newLiuDesc)
+  const requiredBrief = _isRequiredBriefing(newLiuDesc)
   if(!requiredBrief) return
 
   // 开始计算 briefing

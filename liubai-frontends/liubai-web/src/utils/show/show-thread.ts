@@ -59,7 +59,7 @@ function packThread(
     newDesc?.length ? { type: "doc", content: newDesc } : undefined
 
   let tags: TagShow[] = []
-  let stateShow: StateShow | undefined = undefined
+  let stateShow: StateShow | undefined 
   // 判断当前工作区与当前动态是否匹配，若匹配则可展示标签和状态
   const canTag = spaceId === opt.wStore.spaceId
   // 如果动态所属的工作区与当前工作区匹配

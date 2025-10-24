@@ -96,12 +96,12 @@ async function whenA2HS(
     return
   }
 
-  //@ts-ignore
+  //@ts-expect-error
   dp.prompt()
 
   const installStamp = time.getTime()
 
-  //@ts-ignore
+  //@ts-expect-error
   const userChoice = await dp.userChoice
   const outcome = userChoice?.outcome
 

@@ -52,7 +52,7 @@ export async function selectState(
   }
 
   // 4. 操作 thread.stateShow 字段
-  let tmpStateShow: StateShow | undefined = undefined
+  let tmpStateShow: StateShow | undefined 
   if(res.action === "confirm" && newStateId) {
     tmpStateShow = commonPack.getStateShow(newStateId, wStore)
     newThread.stateShow = tmpStateShow

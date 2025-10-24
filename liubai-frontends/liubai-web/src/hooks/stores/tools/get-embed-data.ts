@@ -220,7 +220,7 @@ export function getEmbedData(
         isGMaps: true
       }
     }
-    const gMapsReg1 = /\/maps\/embed[\/\?]+/g
+    const gMapsReg1 = /\/maps\/embed[/?]+/g
     const gMapsMatch1 = originUrl.match(gMapsReg1)
     if(gMapsMatch1) return gMapsRes
   }
@@ -403,7 +403,7 @@ export function getEmbedData(
     // [\w\-]{2,6} 匹配地区码   
     // [^\s\/]+ 匹配专辑名称   
     // \d{6,16} 匹配专辑 id
-    const apMusicReg1 = /\/[\w\-]{2,6}\/album\/[^\s\/]+\/\d{6,16}/g
+    const apMusicReg1 = /\/[\w-]{2,6}\/album\/[^\s/]+\/\d{6,16}/g
     const apMusicMatch1 = p.match(apMusicReg1)
     if(apMusicMatch1) {
       url.hostname = apMusicEmbed.hostname
@@ -427,7 +427,7 @@ export function getEmbedData(
     // [\w\-]{2,6} 匹配地区码
     // [^\s\/]+ 匹配单集名称  
     // id\d{6,16} 匹配播客id
-    const apPodcastReg1 = /\/[\w\-]{2,6}\/podcast\/[^\s\/]+\/id\d{6,16}/g
+    const apPodcastReg1 = /\/[\w-]{2,6}\/podcast\/[^\s/]+\/id\d{6,16}/g
     const apPodcastMatch1 = p.match(apPodcastReg1)
     if(apPodcastMatch1) {
       url.hostname = apPodcastEmbed.hostname
@@ -481,7 +481,7 @@ export function getEmbedData(
   const firesidePlayer = new URL(thirdLink.FIRESIDE_PLAYER)
   const isFireside1 = valTool.isInDomain(h, firesideShare.hostname)
   if(isFireside1) {
-    const firesideReg1 = /\/episode\/[\w\-\+]{16,32}/g
+    const firesideReg1 = /\/episode\/[\w\-+]{16,32}/g
     const firesideMatch1 = p.match(firesideReg1)
     if(firesideMatch1) {
       const firesideId = firesideMatch1[0]?.substring(9)

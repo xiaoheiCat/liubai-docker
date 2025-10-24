@@ -47,6 +47,51 @@ https://webkit.org/blog/12445/new-webkit-features-in-safari-15-4/#:~:text=takes%
 13. 使用 `pnpm biome-lint` 去进行 `src/` 文件夹下的代码检查，并自动修改不合规范的文件。
 
 
+## 使用 bun
+
+### 安装依赖
+
+```bash
+bun i  # 安装依赖
+```
+
+### 运行命令或脚本
+
+```bash
+# 运行 package.json 里 "scripts" 下的 dev 命令
+bun run dev  
+```
+
+```bash
+# 运行 script.ts 脚本
+bun run ./script.ts
+```
+
+### 升级依赖
+
+```bash
+
+# 升级特定依赖
+bun update <依赖名a> <依赖名b> ...
+
+# 升级所有依赖
+bun update
+
+# 升级某个依赖至最新版
+bun update <依赖名> --latest
+
+# 使用交互式命令，选择升级哪些依赖
+bun update -i
+```
+
+### 查看某个依赖的关系
+
+```bash
+# 用于得知某个依赖为什么存在
+# 以及它的树状关系
+bun why <依赖名>
+```
+
 ## 彻底解决 pnpm 网络请求超时的问题
 
 > [!WARNING]
