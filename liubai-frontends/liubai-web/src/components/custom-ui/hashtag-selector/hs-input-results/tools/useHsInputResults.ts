@@ -223,7 +223,7 @@ function initOnInput(
   hsirData: HsirData,
 ) {
   const onInput = (e: Event) => {
-    //@ts-ignore
+    //@ts-expect-error
     hsirData.nativeInputTxt = e.target.value
     hsirData.lastOnInputStamp = time.getLocalTime()
 

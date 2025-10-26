@@ -2,7 +2,7 @@
 import { useI18n } from "vue-i18n";
 import { useLightBox } from "~/hooks/elements/useLightBox";
 import { toRef } from "vue";
-import { IbChildEmits, IbChildProps } from "../tools/types";
+import type { IbChildEmits, IbChildProps } from "../tools/types";
 import { useIbChild } from "../tools/useIbChild";
 
 const props = defineProps<IbChildProps>()

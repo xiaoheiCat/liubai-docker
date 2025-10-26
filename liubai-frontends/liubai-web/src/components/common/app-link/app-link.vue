@@ -7,7 +7,7 @@ defineOptions({
 })
 
 const props = defineProps({
-  //@ts-ignore
+  //@ts-expect-error
   ...RouterLink.props,
   inactiveClass: String,
 })

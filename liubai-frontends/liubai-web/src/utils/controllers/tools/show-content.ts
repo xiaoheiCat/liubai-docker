@@ -122,7 +122,7 @@ function checkPhoneNumber(
   startIdx: number,
 ) {
   // 1. 检查是否为日期格式 YYYY-MM-DD
-  const regDate = /\d{4}\-\d{2}-\d{2}/
+  const regDate = /\d{4}-\d{2}-\d{2}/
   const isYYYYMMDD = regDate.test(mTxt)
   if(isYYYYMMDD) {
     return false

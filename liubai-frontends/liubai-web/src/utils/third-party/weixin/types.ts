@@ -1,4 +1,4 @@
-import _wx from "weixin-js-sdk"
+import type _wx from "weixin-js-sdk"
 
 type OriginalWx = typeof _wx
 export interface LiuWx extends OriginalWx {

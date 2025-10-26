@@ -43,7 +43,7 @@ export function isSpecialLink(
   const calendly1 = new URL(thirdLink.CALENDLY_COM)
   const isCalendly = valTool.isInDomain(h, calendly1.hostname)
   if(isCalendly) {
-    const calendlyReg1 = /^\/[\w\-]{2,32}\/[\w\-]{2,32}(?!=\/)/g
+    const calendlyReg1 = /^\/[\w-]{2,32}\/[\w-]{2,32}(?!\/)/g
     const calendlyMatch1 = p.match(calendlyReg1)
     console.log("看一下 calendlyMatch1: ")
     console.log(calendlyMatch1)

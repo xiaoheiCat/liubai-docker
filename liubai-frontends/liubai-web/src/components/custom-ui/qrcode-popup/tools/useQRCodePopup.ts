@@ -482,7 +482,7 @@ function startToListenToViewport(
     [newV1, newV2, newV3],
     [oldV1, oldV2, oldV3],
   ) => {
-    _check([oldV1, oldV2, oldV3])
+    _check([oldV1 as DocumentVisibilityState, oldV2, oldV3])
   })
 }
 

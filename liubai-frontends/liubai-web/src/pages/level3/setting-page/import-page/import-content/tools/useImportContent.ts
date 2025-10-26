@@ -95,7 +95,7 @@ async function loadZip(f: File, ctx: IcCtx) {
   const reg = new RegExp(rStr)
   const regCardJSON = new RegExp(rStr + "card\\.json$")
   const regAssets = new RegExp(rStr + "assets\\/")
-  const regDate = /contents\/(\d{4}\-\d{2}\-\d{2}\s\d{2}_\d{2}_\d{2})\//
+  const regDate = /contents\/(\d{4}-\d{2}-\d{2}\s\d{2}_\d{2}_\d{2})\//
 
   let tmpAtom: ImportedAtom = {}
   const atoms: ImportedAtom[] = []

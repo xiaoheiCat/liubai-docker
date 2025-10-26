@@ -121,7 +121,7 @@ export async function getThreadsByCollection(
 
     const { member, user } = v
     const _collections = [c]
-    let creator: MemberShow | undefined = undefined
+    let creator: MemberShow | undefined 
     if(member) {
       creator = memberShows.find(v2 => v2._id === member)
     }

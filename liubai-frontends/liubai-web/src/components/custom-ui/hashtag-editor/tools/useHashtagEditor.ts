@@ -155,7 +155,7 @@ function reset(
 
 
 function onInput(e: Event) {
-  //@ts-ignore
+  //@ts-expect-error
   hteData.nativeInputTxt = e.target.value
   hteData.lastOnInputStamp = time.getLocalTime()
   let val = hteData.inputTxt.trim()

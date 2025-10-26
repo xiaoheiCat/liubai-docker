@@ -157,7 +157,7 @@ export default {
       const originalText = attrs.originalText
       if(originalText) return originalText
 
-      //@ts-ignore
+      //@ts-expect-error
       const c = liuUtil.toRawData(props.node.content) as CbcFragment
       const text = c?.content?.[0].text
       return text
