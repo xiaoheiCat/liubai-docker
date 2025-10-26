@@ -31,6 +31,7 @@ export function useTcTopbar(
     const a = _td.aiCharacter
     if(!a) return
     if(a === "baixiaoying") return "baichuan.svg"
+    if(a === "bailing") return "bailing.png"
     if(a === "deepseek") return "deepseek.svg"
     if(a === "ds-reasoner") return "ds_r.png"
     if(a === "hailuo") return "hailuo.svg"

@@ -156,6 +156,17 @@ export const aiBots: AiBot[] = [
     }
   },
   {
+    name: "百灵",
+    character: "bailing",
+    provider: "antgroup",
+    secondaryProvider: "siliconflow",
+    model: "inclusionAI/Ling-1T",
+    abilities: ["chat", "tool_use"],
+    alias: ["蚂蚁", "蚂蚁百灵", "蚂蚁金服", "ling", "蚂蚁集团", "inclusionAI", "inclusion"],
+    maxWindowTokenK: 128,
+    priority: 10,
+  },
+  {
     name: "海螺",
     character: "hailuo",
     provider: "minimax",
@@ -432,6 +443,29 @@ ${system_settings}
 ${system_last_request}
 `
 
+const wx_bailing_system_1 = `
+你叫百灵，是由蚂蚁金服开发的人工智能助手。
+你将协同应用“留白记事”，为人们提供信息检索、内容整理、待办创建、查看最近的日程等服务，帮助每个人都成为超级个体！
+
+【留白记事介绍】
+${system_intro}
+
+【当前环境】
+${system_wx_env}
+
+【常用入口、捷径、网址】
+${system_wx_entry}
+
+【问答示例】
+${system_example}
+
+【你的设定】
+${system_settings}
+
+【最后的请求】
+${system_last_request}
+`
+
 const wx_deepseek_system_1 = `
 你叫 DeepSeek，是由深度求索公司开发的人工智能助手。
 你将协同应用“留白记事”，为人们提供信息检索、内容整理、待办创建、查看最近的日程等服务，帮助每个人都成为超级个体！
@@ -666,6 +700,9 @@ ${system_last_request}
 const wx_gzh_prompts = {
   "baixiaoying": {
     "system_1": wx_baixiaoying_system_1
+  },
+  "bailing": {
+    "system_1": wx_bailing_system_1
   },
   "deepseek": {
     "system_1": wx_deepseek_system_1

@@ -685,6 +685,7 @@
   },
   "ai_character": {
     "baixiaoying": "百小應",
+    "bailing": "百靈",
     "deepseek": "DeepSeek",
     "ds-reasoner": "DeepSeek R1",
     "hailuo": "海螺",
@@ -697,6 +698,7 @@
   },
   "ai_provider": {
     "baixiaoying": "百川智能",
+    "bailing": "螞蟻金服",
     "deepseek": "深度求索",
     "ds-reasoner": "深度求索",
     "hailuo": "MiniMax",
@@ -710,6 +712,7 @@
   "computing_provider": {
     "aliyun-bailian": "阿里雲百煉",
     "baichuan": "百川智能",
+    "antgroup": "螞蟻金服",
     "deepseek": "深度求索",
     "tencent-hunyuan": "騰訊混元",
     "minimax": "MiniMax",

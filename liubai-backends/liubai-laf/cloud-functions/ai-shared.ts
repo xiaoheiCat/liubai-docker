@@ -1388,6 +1388,9 @@ export class TellUser {
     if(c === "baixiaoying") {
       return _env.LIU_WXGZH_KF_BAIXIAOYING
     }
+    if(c === "bailing") {
+      return _env.LIU_WXGZH_KF_BAILING
+    }
     if(c === "deepseek") {
       return _env.LIU_WXGZH_KF_DEEPSEEK
     }
