@@ -273,7 +273,12 @@ function mapBots(
     const proBaichuan = botBaichuan.run(aiParam)
     promises.push(proBaichuan)
   }
-  if(c === "deepseek") {
+  else if(c === "bailing") {
+    const botBailing = new BotBailing(user)
+    const proBailing = botBailing.run(aiParam)
+    promises.push(proBailing)
+  }
+  else if(c === "deepseek") {
     const bot1 = new BotDeepSeek(user)
     const pro1 = bot1.run(aiParam)
     promises.push(pro1)
@@ -1709,6 +1714,47 @@ class BotBaichuan extends BaseBot {
       model,
       tools,
     }
+    const chatCompletion = await this.chat(chatParam, bot)
+    
+    // 6. post run
+    const postParam: PostRunParam = {
+      aiParam,
+      chatParam,
+      chatCompletion,
+      bot,
+    }
+    const res6 = await this.postRun(postParam)
+    return res6
+  }
+}
+
+class BotBailing extends BaseBot {
+  constructor(user?: Table_User) {
+    super("bailing", user)
+  }
+
+  async run(aiParam: LiuAi.RunParam): Promise<LiuAi.RunSuccess | undefined> {
+    // 1. pre run
+    const res1 = this.preRun(aiParam)
+    if(!res1) return
+    const { prompts, totalToken, bot, chats, tools } = res1
+
+    // 2. get other params
+    const model = bot.model
+
+    // 3. handle other things
+
+    // 4. calculate maxTokens
+    const maxToken = AiHelper.getMaxToken(totalToken, chats[0], bot)
+
+    // 5. to chat
+    const chatParam: OaiCreateParam = {
+      messages: prompts,
+      max_tokens: maxToken,
+      model,
+      tools,
+    }
+    console.log("看一下 bailing 的 prompts: ", prompts)
     const chatCompletion = await this.chat(chatParam, bot)
     
     // 6. post run
@@ -3534,7 +3580,7 @@ class AiHelper {
       }
       return false
     }
-    return false
+    return true
   }
 
   // 调用完工具后，将返回结果返回 LLM 时，若当前模型不支持 tool_use
@@ -3926,6 +3972,7 @@ class AiHelper {
     if(secondaryProvider === "suanleme") return "算了么"
     if(provider === "aliyun-bailian") return "阿里云"
     if(provider === "baichuan") return "北京百川智能"
+    if(provider === "antgroup") return "蚂蚁金服"
     if(provider === "deepseek") return "杭州深度求索"
     if(provider === "minimax") return "上海稀宇科技"
     if(provider === "moonshot") return "北京月之暗面"

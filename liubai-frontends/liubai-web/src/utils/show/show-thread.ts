@@ -123,7 +123,7 @@ function packThread(
     stateStamp: v.stateStamp,
     stateShow,
     config: v.config,
-    aiCharacter: v.aiCharacter,
+    aiCharacter: v.aiCharacter ?? "bailing",
     aiReadable: v.aiReadable,
     ideType: v.ideType,
     computingProvider: v.computingProvider,

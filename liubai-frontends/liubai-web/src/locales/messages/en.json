@@ -685,6 +685,7 @@
   },
   "ai_character": {
     "baixiaoying": "Ying",
+    "bailing": "Ling",
     "deepseek": "DeepSeek",
     "ds-reasoner": "DeepSeek R1",
     "hailuo": "Hailuo",
@@ -697,6 +698,7 @@
   },
   "ai_provider": {
     "baixiaoying": "Baichuan",
+    "bailing": "Ant Group",
     "deepseek": "DeepSeek",
     "ds-reasoner": "DeepSeek",
     "hailuo": "MiniMax",
@@ -710,6 +712,7 @@
   "computing_provider": {
     "aliyun-bailian": "Aliyun Bailian",
     "baichuan": "Baichuan",
+    "antgroup": "Ant Group",
     "deepseek": "DeepSeek",
     "tencent-hunyuan": "Tencent Hunyuan",
     "minimax": "MiniMax",
