@@ -1,6 +1,6 @@
 # AI 使用说明书
 
-留白记事当前的 AI 功能叫作“三个助手”，它让你直接在微信上和多个大模型互动，最多同时与 3 名 AI 聊天！
+留白记事的聊天 AI 功能叫“三个助手”，它让你直接在微信上和多个大模型互动，最多同时与 3 名 AI 聊天！
 
 <img src="../article/2024/assets1220/10.gif" width="330">
 
@@ -26,6 +26,7 @@
 
 目前支持的 AI 有:
 
+- 百灵 (来自 [蚂蚁金服](https://alipaytbox.yuque.com/sxs0ba/ling))
 - DeepSeek (来自 [深度求索](https://api-docs.deepseek.com/zh-cn/))，已适配至 [V3.2](https://api-docs.deepseek.com/zh-cn/news/news250929)
 - 海螺 (来自 [MiniMax](https://minimaxi.com/))，已支持语音回复你。
 - 混元 (来自[腾讯](https://hunyuan.tencent.com/))
@@ -41,6 +42,8 @@
 ### 召唤... {#call}
 
 你可以在对话框中回复
+
+`召唤百灵`: 使用来自蚂蚁集团的百灵大模型。此指令等效于 `召唤蚂蚁` / `召唤ling`
 
 `召唤ds` / `召唤deepseek`: 使用 DeepSeek V3.2 非思考模式
 

@@ -159,10 +159,12 @@ export const aiBots: AiBot[] = [
     name: "百灵",
     character: "bailing",
     provider: "antgroup",
-    secondaryProvider: "siliconflow",
-    model: "inclusionAI/Ling-1T",
+    model: "Ling-1T",
     abilities: ["chat", "tool_use"],
-    alias: ["蚂蚁", "蚂蚁百灵", "蚂蚁金服", "ling", "蚂蚁集团", "inclusionAI", "inclusion"],
+    alias: [
+      "蚂蚁", "蚂蚁百灵", "蚂蚁金服", "ling", "蚂蚁集团", 
+      "inclusionAI", "inclusion", "Ling-1T", "ling1t"
+    ],
     maxWindowTokenK: 128,
     priority: 10,
   },

@@ -542,6 +542,10 @@ export class AiShared {
       apiKey = _env.LIU_BAICHUAN_API_KEY
       baseURL = _env.LIU_BAICHUAN_BASE_URL
     }
+    else if(p === "antgroup") {
+      apiKey = _env.LIU_ANTGROUP_API_KEY
+      baseURL = _env.LIU_ANTGROUP_BASE_URL
+    }
     else if(p === "deepseek") {
       apiKey = _env.LIU_DEEPSEEK_API_KEY
       baseURL = _env.LIU_DEEPSEEK_BASE_URL

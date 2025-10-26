@@ -148,6 +148,8 @@ declare global {
       /** Official LLMs */
       LIU_ALIYUN_BAILIAN_BASE_URL?: string   // 阿里云百炼 base url
       LIU_ALIYUN_BAILIAN_API_KEY?: string    // 阿里云百炼 api key
+      LIU_ANTGROUP_BASE_URL?: string         // ling.tbox.cn base url
+      LIU_ANTGROUP_API_KEY?: string          // ling.tbox.cn api key
       LIU_BAICHUAN_BASE_URL?: string         // 百川 AI 的 base url
       LIU_BAICHUAN_API_KEY?: string          // 百川 AI 的 api key
       LIU_DEEPSEEK_BASE_URL?: string         // DeepSeek AI 的 base url

@@ -2311,7 +2311,7 @@ class AiController {
     if(hasReasoningModel) return 0
 
     // 2. randomly wait for a while
-    const r = Math.floor((Math.random() * 3)) + 2
+    const r = Math.floor((Math.random() * 3)) + 1
     return r
   }
 
