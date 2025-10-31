@@ -172,11 +172,24 @@ export const aiBots: AiBot[] = [
     name: "海螺",
     character: "hailuo",
     provider: "minimax",
-    model: "MiniMax-Text-01",
-    abilities: ["chat", "tool_use", "image_to_text", "input_audio"],
-    alias: ["海螺AI", "minimax"],
-    maxWindowTokenK: 1000,
+    model: "MiniMax-M2",
+    abilities: ["chat", "tool_use", "reasoning"],
+    alias: ["海螺AI", "minimax", "M2", "minimax-m2"],
+    maxWindowTokenK: 200,
     priority: 10,
+    metaData: {
+      onlyOneSystemRoleMsg: true,
+    }
+  },
+  {
+    name: "海螺",
+    character: "hailuo",
+    provider: "minimax",
+    model: "MiniMax-Text-01",
+    abilities: ["chat", "tool_use", "image_to_text"],
+    alias: ["海螺AI", "minimax"],
+    maxWindowTokenK: 200,
+    priority: 5,
     metaData: {
       onlyOneSystemRoleMsg: true,
     }
