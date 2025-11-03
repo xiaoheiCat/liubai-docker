@@ -13,6 +13,9 @@ export function useGlobalLoading() {
   let timeout: LiuTimeout
 
   const _beforeEach = async () => {
+    if(timeout) {
+      clearTimeout(timeout)
+    }
     timeout = setTimeout(() => {
       timeout = undefined
       showGlobalLoading()
