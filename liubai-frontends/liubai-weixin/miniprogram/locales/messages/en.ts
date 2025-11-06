@@ -18,7 +18,7 @@ export default {
   },
   "shared": {
     "copied": "Copied",
-    "tip": "Tip 🥮",
+    "tip": "Tip 🥑",
     "long_press": "Long press to recognize QR code",
     "confirm": "Confirm",
     "cancel": "Cancel",

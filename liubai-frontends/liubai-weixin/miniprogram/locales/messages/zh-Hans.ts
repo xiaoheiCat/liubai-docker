@@ -16,7 +16,7 @@ export default {
   },
   "shared": {
     "copied": "已复制",
-    "tip": "提示🥮",
+    "tip": "提示 🥑",
     "long_press": "请长按图片，识别二维码",
     "confirm": "确定",
     "cancel": "取消",
