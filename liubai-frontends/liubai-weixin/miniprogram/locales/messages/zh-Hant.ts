@@ -16,7 +16,7 @@ export default {
   },
   "shared": {
     "copied": "已複製",
-    "tip": "提示🥮",
+    "tip": "提示 🥑",
     "long_press": "請長按圖片，識別 QR Code",
     "confirm": "確定",
     "cancel": "取消",

@@ -561,6 +561,7 @@ class AiDirective {
     let addedList = await AiHelper.getNonUsedCharacters(roomId)
     addedList = addedList.filter(v => !Boolean(oldCharacters.includes(v)))
     addedList = addedList.filter(v => !Boolean(charactersTakingARest.includes(v)))
+    addedList = addedList.filter(v => !ai_cfg.retired_ai.includes(v))
     const reservedNum = newCharacters.length < 1 ? 4 : 3
     if(addedList.length > reservedNum) {
       addedList.splice(reservedNum, addedList.length - reservedNum)
