@@ -5,7 +5,7 @@ import ScrollView from "~/components/common/scroll-view/scroll-view.vue";
 import TagContent from "./tag-content/tag-content.vue";
 import { useMainVice } from "~/hooks/useMainVice";
 import { useTagPage } from "./tools/useTagPage";
-import type { TrueOrFalse } from "~/types/types-basic";
+import liuUtil from "~/utils/liu-util";
 
 const { 
   hiddenScrollBar, 
@@ -23,7 +23,7 @@ const { tpData, onTapFab, onScroll } = useTagPage()
       <div class="liu-view" v-show="item.show">
         <scroll-view 
           :hidden-scroll-bar="item.show && hiddenScrollBar" 
-          :show-txt="(String(item.show) as TrueOrFalse)"
+          :show-txt="liuUtil.check.turnBoolToStr(item.show)"
           @scroll="onScroll"
           :go-to-top="item.goToTop"
         >
@@ -34,7 +34,7 @@ const { tpData, onTapFab, onScroll } = useTagPage()
           <TagContent 
             v-if="item.state < 0"
             :tag-id="item.id"
-            :show-txt="(String(item.show) as TrueOrFalse)"
+            :show-txt="liuUtil.check.turnBoolToStr(item.show)"
           ></TagContent>
         </scroll-view>
         <navi-bar 

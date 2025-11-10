@@ -4,9 +4,8 @@ import ViceView from "~/views/vice-view/vice-view.vue";
 import ScrollView from "~/components/common/scroll-view/scroll-view.vue";
 import DetailContent from "./detail-content/detail-content.vue";
 import { useMainVice } from "~/hooks/useMainVice";
-import { useI18n } from "vue-i18n";
 import { useDetailPage } from "./tools/useDetailPage";
-import type { TrueOrFalse } from "~/types/types-basic"
+import liuUtil from "~/utils/liu-util";
 
 const { 
   hiddenScrollBar, 
@@ -17,9 +16,6 @@ const {
   dpData,
 } = useDetailPage()
 
-
-const { t } = useI18n()
-
 </script>
 <template>
 
@@ -29,7 +25,7 @@ const { t } = useI18n()
       <div class="liu-view" v-show="item.show">
         <scroll-view 
           :hidden-scroll-bar="item.show && hiddenScrollBar" 
-          :show-txt="(String(item.show) as TrueOrFalse)"
+          :show-txt="liuUtil.check.turnBoolToStr(item.show)"
         >
           <navi-virtual></navi-virtual>
           <detail-content :thread-id="item.id"></detail-content>

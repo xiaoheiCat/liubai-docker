@@ -46,7 +46,7 @@ const {
 } = useSearchItem(props)
 
 const { t } = useI18n()
-const iconColor = "var(--main-code)"
+const iconColor = "var(--liquid-glass3)"
 
 </script>
 <template>
@@ -174,16 +174,16 @@ const iconColor = "var(--main-code)"
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: var(--card-bg);
+  background-color: var(--liquid-glass5);
   opacity: 0;
 }
 
 .si-container_selected {
-  box-shadow: 1px 2px 3px rgba(0, 0, 0, .03);
+  box-shadow: 2px 4px 0px rgba(0, 0, 0, .03);
 }
 
 .si-container_selected::before {
-  opacity: .6;
+  opacity: .11;
 }
 
 .si-img-box {
@@ -243,7 +243,7 @@ const iconColor = "var(--main-code)"
 
 .si-title {
   font-size: var(--btn-font);
-  color: var(--main-normal);
+  color: var(--liquid-glass2);
   max-width: 100%;
   line-height: 1.2;
   display: inline-block;
@@ -253,13 +253,13 @@ const iconColor = "var(--main-code)"
   padding-block: 4px;
 
   .si-placeholder {
-    color: var(--liu-quote);
+    color: var(--liquid-glass6);
   }
 }
 
 .si-desc {
   font-size: var(--mini-font);
-  color: var(--liu-quote);
+  color: var(--liquid-glass6);
   max-width: 100%;
   display: inline-block;
   white-space: nowrap;
