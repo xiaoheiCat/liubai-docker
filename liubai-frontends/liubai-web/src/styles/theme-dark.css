@@ -126,6 +126,17 @@
     rgba(41, 43, 45, .99) 50%
   );
 
+  /************ Liquid-glass ***********/
+  --liquid-glass1: rgba(0, 0, 0, 0.45);
+  --liquid-glass2: #f1f1f1;
+  --liquid-glass3: #aaa;
+  --liquid-glass4: #555;
+  --liquid-glass5: #fff;
+  --liquid-glass6: #aaa;
+  --liquid-glass7: linear-gradient(to bottom, #ffffff50, #00000010);
+  --liquid-glass8: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  --liquid-select: rgba(61, 82, 89, 0.99);
+
   /********* 导入页: 「查看更多」的背景 *******/
   --mask-bg: linear-gradient(0deg, rgba(42, 44, 46, 1) 40%, rgba(42, 44, 46, 0) 95%);
 

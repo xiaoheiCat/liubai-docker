@@ -1,8 +1,14 @@
 import reg_exp from "~/config/regular-expressions";
-import type { StorageState } from "~/types/types-basic";
+import type { StorageState, TrueOrFalse } from "~/types/types-basic";
 import type { CommentShow, ThreadShow } from "~/types/types-content";
 import type { ContentLocalTable } from "~/types/types-table";
 import time from "../basic/time";
+
+
+function turnBoolToStr(val: boolean) {
+  const str = String(val) as TrueOrFalse
+  return str
+}
 
 
 /**
@@ -80,6 +86,7 @@ function isJustAppSetup(
 
 
 export default {
+  turnBoolToStr,
   isEmail,
   isAllNumber,
   hasEverSynced,

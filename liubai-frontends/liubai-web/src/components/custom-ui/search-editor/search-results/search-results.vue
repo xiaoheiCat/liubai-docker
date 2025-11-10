@@ -140,7 +140,7 @@ const { isMobile } = liuApi.getCharacteristic()
 .sr-container {
   width: 100%;
   position: relative;
-  border-top: 0.6px solid var(--main-tip);
+  border-top: 0.6px solid var(--liquid-glass4);
   overflow-y: auto;
   max-height: max(66vh, 300px);
 
@@ -152,7 +152,7 @@ const { isMobile } = liuApi.getCharacteristic()
   }
 
   &::-webkit-scrollbar-thumb {
-    background: var(--main-note);
+    background: var(--liquid-glass6);
   }
 }
 
@@ -170,7 +170,7 @@ const { isMobile } = liuApi.getCharacteristic()
 
 .sri-title {
   font-weight: 700;
-  color: var(--liu-quote);
+  color: var(--liquid-glass2);
   letter-spacing: 1px;
   font-size: var(--mini-font);
   margin-inline-start: 10px;
@@ -185,7 +185,7 @@ const { isMobile } = liuApi.getCharacteristic()
   align-items: center;
   justify-content: center;
   font-size: var(--mini-font);
-  color: var(--main-note);
+  color: var(--liquid-glass3);
 }
 
 @media screen and (max-width: 600px) {

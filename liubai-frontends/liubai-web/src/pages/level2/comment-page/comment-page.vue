@@ -7,7 +7,7 @@ import CommentContent from "./comment-content/comment-content.vue";
 import { useMainVice } from "~/hooks/useMainVice";
 import { useI18n } from "vue-i18n";
 import { useCommentPage } from "./tools/useCommentPage";
-import type { TrueOrFalse } from "~/types/types-basic";
+import liuUtil from "~/utils/liu-util";
 
 const { 
   hiddenScrollBar, 
@@ -29,7 +29,7 @@ const { t } = useI18n()
       <div class="liu-view" v-show="item.show">
         <scroll-view 
           :hidden-scroll-bar="item.show && hiddenScrollBar"
-          :show-txt="(String(item.show) as TrueOrFalse)"
+          :show-txt="liuUtil.check.turnBoolToStr(item.show)"
         >
           <navi-virtual></navi-virtual>
           <CommentContent
