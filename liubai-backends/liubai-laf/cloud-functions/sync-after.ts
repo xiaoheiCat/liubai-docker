@@ -95,11 +95,6 @@ const fastAiWorkers: LiuAi.AiWorker[] = [
     "character": "kimi",
   },
   {
-    "computingProvider": "moonshot",
-    "model": "kimi-k2-turbo-preview",
-    "character": "kimi",
-  },
-  {
     "computingProvider": "siliconflow",
     "model": "moonshotai/Kimi-K2-Instruct-0905",
     "character": "kimi",

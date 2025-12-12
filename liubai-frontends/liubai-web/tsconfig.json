@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "target": "ESNext",
     "useDefineForClassFields": true,
     "module": "ESNext",
@@ -16,10 +15,11 @@
     "types": [
       "./node_modules/user-agent-data-types",
       "google.accounts",
-      "vite-plugin-pwa/client"
+      "vite-plugin-pwa/client",
+      "unplugin-turbo-console/client"
     ],
     "paths": {
-      "~/*": ["src/*"]
+      "~/*": ["./src/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],

@@ -2921,9 +2921,9 @@ export class TextToSpeech {
 
     // 2. get voice
     const voicePreference = this._room?.voicePreference ?? ai_cfg.default_voice
-    // 龙小诚 vs. 龙小夏
-    const voice_id = voicePreference === "male" ? "longxiaocheng" : "longxiaoxia"
-    const model = voicePreference === "male" ? "cosyvoice-v1" : "cosyvoice-v1"
+    // 龙安洋 vs. 龙安雅
+    const voice_id = voicePreference === "male" ? "longanyang" : "longanya_v3"
+    const model = "cosyvoice-v3-flash"
 
     const task_id = createRandom()
     const url = "wss://dashscope.aliyuncs.com/api-ws/v1/inference/"

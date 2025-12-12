@@ -214,7 +214,7 @@ export const aiBots: AiBot[] = [
     model: "kimi-latest",
     abilities: ["chat", "tool_use"],
     alias: ["Moonshot", "月之暗面"],
-    maxWindowTokenK: 8,
+    maxWindowTokenK: 32,
     priority: 10,
   },
   {
