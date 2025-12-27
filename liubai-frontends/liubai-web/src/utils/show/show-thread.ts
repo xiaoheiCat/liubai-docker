@@ -125,7 +125,7 @@ function packThread(
     config: v.config,
     aiCharacter: v.aiCharacter,
     aiReadable: v.aiReadable,
-    ideType: v.ideType,
+    ideType: v.ideType ?? "antigravity",
     computingProvider: v.computingProvider,
     aiModel: v.aiModel,
   }

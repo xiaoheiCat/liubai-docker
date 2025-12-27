@@ -5,6 +5,7 @@ export const appMap: Record<LiuAppType, string> = {
   "vscode-insiders": "VS Code - Insiders",
   "cursor": "Cursor",
   "windsurf": "Windsurf",
+  "antigravity": "Antigravity",
   "vscodium": "VSCodium",
   "github.dev": "github.dev",
   "vscode.dev": "vscode.dev",

@@ -50,6 +50,11 @@ const ideName = computed(() => {
         :color="fontColor"
       ></svg-icon>
 
+      <!-- icon for antigravity -->
+      <div v-else-if="ideType === 'antigravity'" 
+        class="liu-bg-img ib-icon ib-icon_antigravity"
+      ></div>
+
       <!-- icon for github.dev -->
       <svg-icon v-else-if="ideType === 'github.dev'"
         class="ib-icon"
@@ -114,6 +119,10 @@ const ideName = computed(() => {
   width: 14px;
   height: 14px;
   margin-inline-end: 6px;
+}
+
+.ib-icon_antigravity {
+  background-image: url("/images/third-party/antigravity.png");
 }
 
 .ib-icon_trae {
