@@ -104,6 +104,7 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: "如何使用插件", link: "/guide/ide/how-to-use-vscode-ext" },
+                { text: "Antigravity", link: "/guide/ide/antigravity" },
                 { text: "Cursor", link: "/guide/ide/cursor" },
                 { text: "Windsurf", link: "/guide/ide/windsurf" },
                 { text: "VS Code", link: "/guide/ide/vscode" },
@@ -111,7 +112,6 @@ export default defineConfig({
                 { text: "Trae", link: "/guide/ide/trae" },
                 { text: "github.dev", link: "/guide/ide/github-dev" },
                 { text: "cnb.cool", link: "/guide/ide/cnb-cool" },
-                { text: "Project IDX", link: "/guide/ide/project-idx" },
                 { text: "gitpod.io", link: "/guide/ide/gitpod-io" },
                 { text: "vscode.dev", link: "/guide/ide/vscode-dev" },
               ]

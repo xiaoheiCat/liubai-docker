@@ -61,11 +61,12 @@ export function useTcTopbar(
     if(ideType === "stackblitz.com") return `${prefix}stackblitz`
     if(ideType === "tencent-cloud-studio") return `${prefix}tencent-cloud-studio`
     if(ideType === "trae") return `${prefix}trae`
-    if(ideType === "vscode") return `${prefix}vscode`
-    if(ideType === "vscode.dev") return `${prefix}vscode`
     if(ideType === "vscode-insiders") return `${prefix}vscode-insiders`
     if(ideType === "vscodium") return `${prefix}vscodium`
     if(ideType === "windsurf") return `${prefix}windsurf`
+
+    // 使用 vscode 兜底
+    return `${prefix}vscode`
   })
 
   const showTopbar = computed(() => {

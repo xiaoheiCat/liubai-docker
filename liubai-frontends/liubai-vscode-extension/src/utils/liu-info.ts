@@ -25,6 +25,7 @@ const getIdeType = (): LiuIDEType | undefined => {
   if(appName === "Visual Studio Code - Insiders") return "vscode-insiders"
   if(appName === "Cursor") return "cursor"
   if(appName === "Windsurf") return "windsurf"
+  if(appName === "Antigravity") return "antigravity"
   if(appName === "VSCodium") return "vscodium"
   if(appName === "Gitpod Code" || appHost === "Gitpod") return "gitpod.io"
   if(appName === "StackBlitz") return "stackblitz.com"
@@ -32,6 +33,7 @@ const getIdeType = (): LiuIDEType | undefined => {
 
   // Products from Tencent Coding Group
   if(uriScheme === "cloud-studio") return "tencent-cloud-studio"
+  if(uriScheme === "antigravity") return "antigravity"
   if(remoteName?.endsWith(".cnb.cool")) return "cnb.cool"
   if(remoteName?.endsWith(".cnb.space")) return "cnb.cool"
   if(appName === "code-server" && uriScheme === "code-oss") return "cnb.cool"

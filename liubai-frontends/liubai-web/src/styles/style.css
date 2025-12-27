@@ -289,3 +289,9 @@ input {
   transition-timing-function: cubic-bezier(0.05, 1, 1, 1);
   flex: none;
 }
+
+.liu-bg-img {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}

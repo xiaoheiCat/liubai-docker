@@ -99,6 +99,9 @@ const {
           name="logos-windsurf"
           color="#58E5BB"
         ></svg-icon>
+        <div v-else-if="appType === 'antigravity'" 
+          class="liu-bg-img av-antigravity"
+        ></div>
         <svg-icon v-else-if="appType === 'vscodium'"  class="av-vscodium-svg"
           name="logos-vscodium"
           :coverFillStroke="false"
@@ -294,6 +297,12 @@ const {
 .av-trae-svg {
   width: 50%;
   height: 50%;
+}
+
+.av-antigravity {
+  width: 60%;
+  height: 60%;
+  background-image: url("/images/third-party/antigravity.png");
 }
 
 .av-title {

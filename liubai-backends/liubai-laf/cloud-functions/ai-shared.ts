@@ -124,7 +124,7 @@ export const txt2TxtAiWorkers: LiuAi.AiWorker[] = [
   },
   {
     computingProvider: "zhipu",
-    model: "glm-4.6",
+    model: "glm-4.7",
     character: "zhipu",
     stream: true,
   }

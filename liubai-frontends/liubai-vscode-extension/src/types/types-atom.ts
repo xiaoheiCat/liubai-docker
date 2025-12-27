@@ -127,6 +127,7 @@ export const liuIDETypes = [
   "vscode-insiders",
   "cursor",
   "windsurf",
+  "antigravity",
   "vscodium",
   "github.dev",
   "vscode.dev",

@@ -2,6 +2,10 @@
 
 选择你常用的 IDE:
 
+<a href="./antigravity">
+  <img src="./assets-ide/banner-antigravity.jpg" alt="antigravity" width="330" style="margin-block-end: 10px; border-radius: 10px;">
+</a>
+
 <a href="./cursor">
   <img src="./assets-ide/banner-cursor.jpg" alt="cursor" width="330" style="margin-block-end: 10px; border-radius: 10px;">
 </a>
