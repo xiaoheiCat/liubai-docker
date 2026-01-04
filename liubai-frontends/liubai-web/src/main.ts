@@ -10,7 +10,6 @@ import './styles/theme-dark.css'
 import './styles/custom-style.css'
 import 'floating-vue/dist/style.css'
 import 'vue-draggable-resizable/style.css'
-import '~console/theme-detect'
 
 import App from './App.vue'
 import { i18n } from './locales'

@@ -15,8 +15,7 @@
     "types": [
       "./node_modules/user-agent-data-types",
       "google.accounts",
-      "vite-plugin-pwa/client",
-      "unplugin-turbo-console/client"
+      "vite-plugin-pwa/client"
     ],
     "paths": {
       "~/*": ["./src/*"]

@@ -1,7 +1,7 @@
 {
   "name": "liubai-web",
   "private": true,
-  "version": "0.27.1",
+  "version": "0.27.2",
   "description": "It's the frontend project for Liubai",
   "author": {
     "name": "yenche123",
@@ -91,7 +91,6 @@
     "sass": "^1.95.1",
     "surge": "^0.24.6",
     "typescript": "^5.9.3",
-    "unplugin-turbo-console": "^2.3.0",
     "user-agent-data-types": "^0.4.2",
     "vite": "^7.2.7",
     "vite-plugin-compression2": "^2.4.0",

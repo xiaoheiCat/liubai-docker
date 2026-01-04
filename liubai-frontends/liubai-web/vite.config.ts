@@ -16,7 +16,6 @@ import { visualizer } from "rollup-plugin-visualizer";
 import { VitePWA } from 'vite-plugin-pwa'
 import { sentryVitePlugin } from "@sentry/vite-plugin"
 import copy200Html from './deploy/vite-plugin-copy-200'
-import TurboConsole from 'unplugin-turbo-console/vite'
 
 const { version, author } = require("./package.json")
 const projectRoot = process.cwd()
@@ -78,13 +77,6 @@ const vitePlugins: UserConfig['plugins'] = [
   }) as unknown as PluginOption,
 
   copy200Html(),
-
-  // 美化 console.log
-  TurboConsole({
-    highlight: {
-      themeDetect: true,
-    }
-  }),
 
 ]
 
