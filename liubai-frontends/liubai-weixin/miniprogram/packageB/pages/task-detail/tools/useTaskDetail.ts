@@ -172,9 +172,9 @@ export function toForward(
     title = t("task-detail.forward_2")
   }
   const path = `packageB/pages/task-detail/task-detail?id=${id}`
-  let imageUrl = "/packageB/images/shared/task-reminder.jpg"
+  let imageUrl = "/packageB/images/shared/task-reminder2.jpg"
   if(justCreated) {
-    imageUrl = "/packageB/images/shared/you-have-a-new-task.jpg"
+    imageUrl = "/packageB/images/shared/todo-with-friends.jpg"
   }
 
   LiuApi.shareAppMessageToGroup({ 
