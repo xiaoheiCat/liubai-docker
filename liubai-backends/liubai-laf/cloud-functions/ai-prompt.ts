@@ -211,10 +211,10 @@ export const aiBots: AiBot[] = [
     name: "Kimi",
     character: "kimi",
     provider: "moonshot",
-    model: "kimi-latest",
-    abilities: ["chat", "tool_use"],
+    model: "kimi-k2.5",
+    abilities: ["chat", "tool_use", "image_to_text"],
     alias: ["Moonshot", "月之暗面"],
-    maxWindowTokenK: 32,
+    maxWindowTokenK: 128,
     priority: 10,
   },
   {
@@ -274,16 +274,6 @@ export const aiBots: AiBot[] = [
     metaData: {
       onlyOneSystemRoleMsg: true,
     }
-  },
-  {
-    name: "Kimi",
-    character: "kimi",
-    provider: "moonshot",
-    model: "kimi-latest",
-    abilities: ["chat", "tool_use", "image_to_text"],
-    alias: ["Moonshot", "月之暗面"],
-    maxWindowTokenK: 16,
-    priority: 10,
   },
   {
     name: "通义千问",
