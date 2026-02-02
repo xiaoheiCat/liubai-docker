@@ -216,6 +216,10 @@ async function initEditorContent(
 
   if(!res) {
     if(props.commentId) {
+      if(props.initialContent || props.initialImages?.length || props.initialFiles?.length) {
+        setEditorContentFromProps(props, ctx, editor)
+        return
+      }
       initEditorContentFromDB(props, ctx, editor)
       return
     }
@@ -295,6 +299,43 @@ async function initEditorContentFromDB(
     ctx.isToolbarTranslateY = false
     ctx.releasedData.files = valTool.copyObject(files)
   }
+
+  ctx.numWhenSet++
+}
+
+
+function setEditorContentFromProps(
+  props: CeProps,
+  ctx: CeCtx,
+  editor: TipTapEditor,
+) {
+  const { initialContent, initialImages, initialFiles } = props
+
+  // 由于是 "已发表后的编辑" 态，canSubmit 默认为 false
+  ctx.canSubmit = false
+  ctx.releasedData = {}
+
+  if(initialContent) {
+    const text = transferUtil.tiptapToText(initialContent.content ?? [])
+    editor.commands.setContent(initialContent)
+    ctx.editorContent = { text, json: initialContent }
+    ctx.isToolbarTranslateY = false
+    ctx.releasedData.text = text.trim()
+  }
+
+  if(initialImages?.length) {
+    ctx.images = valTool.copyObject(initialImages)
+    ctx.isToolbarTranslateY = false
+    ctx.releasedData.images = valTool.copyObject(initialImages)
+  }
+  if(initialFiles?.length) {
+    ctx.files = valTool.copyObject(initialFiles)
+    ctx.isToolbarTranslateY = false
+    ctx.releasedData.files = valTool.copyObject(initialFiles)
+  }
+
+  ctx.numWhenSet++
+  checkCanSubmit(props, ctx)
 }
 
 
