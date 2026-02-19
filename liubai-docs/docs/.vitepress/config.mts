@@ -24,9 +24,9 @@ export default defineConfig({
 
     nav: [
       { text: "指南", link: "/guide/what-is-liubai", activeMatch: "/guide/" },
-      { 
-        text: "文章", 
-        link: "/article/2025/weixin-task", 
+      {
+        text: "文章",
+        link: "/article/2026/mac-apps",
         activeMatch: "/(tool-review|article)/"
       },
       { text: "网页版", link: "https://my.liubai.cc" },
@@ -40,7 +40,7 @@ export default defineConfig({
             { text: "简介", link: "/guide/what-is-liubai" },
             { text: "社区", link: "/guide/community" },
             { text: "AI 说明书", link: "/guide/three-assistants" },
-            { 
+            {
               text: "亮点",
               link: "/guide/impressive",
               items: [
@@ -144,6 +144,10 @@ export default defineConfig({
 
       "/article/": [
         {
+          text: "macOS 装机必备",
+          link: "/article/2026/mac-apps",
+        },
+        {
           text: "微信任务",
           link: "/article/2025/weixin-task",
         },
@@ -230,11 +234,11 @@ export default defineConfig({
   },
 
   transformHead(context) {
-    if(nodeEnv !== "production") return
+    if (nodeEnv !== "production") return
 
     const umamiSrc = _env.VITE_UMAMI_SRC
     const umamiId = _env.VITE_UMAMI_ID
-    if(!umamiSrc || !umamiId) return
+    if (!umamiSrc || !umamiId) return
 
     return [
 

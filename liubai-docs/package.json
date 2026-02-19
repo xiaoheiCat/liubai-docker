@@ -18,12 +18,12 @@
   },
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
-    "@types/node": "^22.13.14",
+    "@types/node": "^22.19.11",
     "vitepress": "^1.6.4",
-    "vitepress-plugin-llms": "^1.8.0"
+    "vitepress-plugin-llms": "^1.11.0"
   },
   "dependencies": {
     "howxm-js": "^0.0.10",
-    "vue": "^3.5.22"
+    "vue": "^3.5.28"
   }
 }

@@ -71,12 +71,6 @@
 
 `liubai-vscode-extension` 为 vscode 插件根目录，使用 typescript 编写，[esbuild](https://code.visualstudio.com/api/working-with-extensions/bundling-extension#using-esbuild) 打包，[vsce](https://code.visualstudio.com/api/working-with-extensions/publishing-extension#vsce) 发布。该插件除了能在常见的 node 环境运行，还支持 [vscode for web](https://code.visualstudio.com/docs/editor/vscode-web)，让你在 github.dev / gitpod.io / codespaces 等浏览器 IDE 环境中也能使用。
 
-> [!NOTE]
-> 另外还有 `memory-bank/` 目录，这是实验性目录，一个完全由 AI 自主迭代的工作区，里面没有任何一行文字由人类编写。
->
-> 我目前只是参考 [Cline 的这份 prompt](https://docs.cline.bot/improving-your-prompting-skills/cline-memory-bank)，将之交给 GitHub Copilot，并启用 Agent Mode，他就开始吭哧吭哧写出了 `memory-bank` 下你所看到的这些文档。
-
-
 ## 保持联络 👋
 
 <p>
