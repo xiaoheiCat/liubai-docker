@@ -1,6 +1,6 @@
 // Function Name: ai-prompt
 
-import { 
+import {
   aiToolAddCalendarSpecificDates,
   aiToolAddCalendarEarlyMinutes,
   aiToolAddCalendarLaterHours,
@@ -8,9 +8,9 @@ import {
   aiToolGetScheduleSpecificDates,
   aiToolGetCardTypes,
   aiImageSizeTypes,
-  type AiBot, 
-  type AiI18nChannelParam, 
-  type AiI18nSharedParam, 
+  type AiBot,
+  type AiI18nChannelParam,
+  type AiI18nSharedParam,
   type T_I18N,
   type OaiTool,
 } from "@/common-types"
@@ -162,7 +162,7 @@ export const aiBots: AiBot[] = [
     model: "Ling-1T",
     abilities: ["chat", "tool_use"],
     alias: [
-      "蚂蚁", "蚂蚁百灵", "蚂蚁金服", "ling", "蚂蚁集团", 
+      "蚂蚁", "蚂蚁百灵", "蚂蚁金服", "ling", "蚂蚁集团",
       "inclusionAI", "inclusion", "Ling-1T", "ling1t"
     ],
     maxWindowTokenK: 128,
@@ -251,10 +251,10 @@ export const aiBots: AiBot[] = [
     name: "智谱",
     character: "zhipu",
     provider: "zhipu",
-    model: "glm-4.7",
+    model: "glm-5",
     abilities: ["chat", "tool_use", "reasoning"],
-    alias: ["智谱AI", "智谱清言", "ChatGLM", "zp", "glm"],
-    maxWindowTokenK: 128,
+    alias: ["智谱AI", "智谱清言", "ChatGLM", "zp", "glm", "z-ai"],
+    maxWindowTokenK: 64,
     priority: 10,
     metaData: {
       zhipuWebSearch: true,
@@ -299,7 +299,7 @@ export const aiBots: AiBot[] = [
     name: "万知",
     character: "wanzhi",
     provider: "zero-one",
-    model: "yi-vision-v2",                
+    model: "yi-vision-v2",
     abilities: ["chat", "image_to_text"],
     alias: ["零一万物", "01.ai", "01", "零一", "万只", "yi", "lywu"],
     maxWindowTokenK: 16,
@@ -311,7 +311,7 @@ export const aiBots: AiBot[] = [
     provider: "zhipu",
     model: "glm-4.6v",
     abilities: ["chat", "tool_use", "image_to_text", "reasoning"],
-    alias: ["智谱AI", "智谱清言", "ChatGLM", "zp", "glm"],
+    alias: ["智谱AI", "智谱清言", "ChatGLM", "zp", "glm", "z-ai"],
     maxWindowTokenK: 16,
     priority: 10,
     metaData: {
@@ -825,13 +825,13 @@ const translate_prompts = {
 
 function _get_p(thePrompts: Record<string, string>) {
   const p: T_I18N = (key, opt2) => {
-    if(!thePrompts) return ""
+    if (!thePrompts) return ""
     let res = thePrompts[key]
-    if(!res) return ""
-     res = i18nFill(res, opt2 ?? {})
-     return res.trim()
+    if (!res) return ""
+    res = i18nFill(res, opt2 ?? {})
+    return res.trim()
   }
-  
+
   return { p }
 }
 
@@ -841,10 +841,10 @@ export function aiI18nShared(
 ) {
   const theType = param.type
   let thePrompts: Record<string, string> = {}
-  if(theType === "compress") {
+  if (theType === "compress") {
     thePrompts = compress_prompts
   }
-  else if(theType === "translate") {
+  else if (theType === "translate") {
     thePrompts = translate_prompts
   }
   const res = _get_p(thePrompts)
@@ -857,7 +857,7 @@ export function aiI18nChannel(
 ) {
   const c = param.bot.character
   let thePrompts: Record<string, string> = {}
-  if(param.entry.wx_gzh_openid) {
+  if (param.entry.wx_gzh_openid) {
     thePrompts = wx_gzh_prompts[c]
   }
 
@@ -869,7 +869,7 @@ export function aiI18nChannel(
 /***************************** Tools ***************************/
 
 export const aiTools: OaiTool[] = [
-  
+
   /** Web Search */
   {
     type: "function",

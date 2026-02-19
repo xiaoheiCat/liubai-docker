@@ -39,26 +39,8 @@ Extension ID: `jock.svg`
 
 用于预览 svg 文件
 
-### 2. Material Icon Theme
-
-Extension ID: `PKief.material-icon-theme`
-
-用于让 Explorer 文件树上的文件夹和文件有个小图标，方便辨识。
-
-### 3. Image Preview
+### 2. Image Preview
 
 Extension ID: `kisstkondoros.vscode-gutter-preview`
 
 用于在代码编辑区域的行数边上，显示图片缩略图
-
-### 4. Bundle Size
-
-Extension ID: `ambar.bundle-size`
-
-在编辑器上展示被引入的第三方依赖之体积
-
-### 5. Codeium
-
-Extension ID: `Codeium.codeium`
-
-基于 AI 的代码自动补全插件，辅助你写代码。
