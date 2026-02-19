@@ -39,23 +39,8 @@ Extension ID: `jock.svg`
 
 用于预览 svg 文件
 
-### 2. Vira Theme
-
-Extension ID: `vira.vsc-vira-theme`
-
-一个很好看的主题。
-
-- Theme，我通常用它的 `Vira Graphene High Contrast`。
-- File Icon Theme，我通常用它的 `Vira Icons Deepforest`。
-
-### 3. Image Preview
+### 2. Image Preview
 
 Extension ID: `kisstkondoros.vscode-gutter-preview`
 
 用于在代码编辑区域的行数边上，显示图片缩略图
-
-### 4. Bundle Size
-
-Extension ID: `ambar.bundle-size`
-
-在编辑器上展示被引入的第三方依赖之体积
