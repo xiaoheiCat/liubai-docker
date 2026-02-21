@@ -1,8 +1,8 @@
 // Function Name: ai-shared
 
 import cloud from "@lafjs/cloud"
-import { 
-  type LiuAi, 
+import {
+  type LiuAi,
   type AiBot,
   type AiEntry,
   type AiCharacter,
@@ -44,7 +44,7 @@ import {
   type Wx_Res_GzhUploadMedia,
 } from "@/common-types"
 import { LiuReporter, WxGzhSender } from "@/service-send"
-import { 
+import {
   checkAndGetWxGzhAccessToken,
   checker,
   decryptEncData,
@@ -62,8 +62,8 @@ import {
 import { aiBots, aiI18nShared } from "@/ai-prompt"
 import { useI18n, aiLang, getCurrentLocale, commonLang, getAppName } from "@/common-i18n"
 import { WxGzhUploader } from "@/file-utils"
-import { 
-  getBasicStampWhileAdding, 
+import {
+  getBasicStampWhileAdding,
   getNowStamp,
   localizeStamp,
   HOUR,
@@ -96,19 +96,21 @@ export const txt2TxtAiWorkers: LiuAi.AiWorker[] = [
   },
   {
     computingProvider: "aliyun-bailian",
-    model: "qwen-plus-2025-09-11",
+    model: "qwen-plus-2025-12-01",
     character: "tongyi-qwen",
     stream: true,
   },
   {
     computingProvider: "aliyun-bailian",
-    model: "qwen-plus-2025-07-28",
+    model: "qwen3.5-plus",
     character: "tongyi-qwen",
+    stream: true,
   },
   {
     computingProvider: "aliyun-bailian",
-    model: "qwen3-next-80b-a3b-instruct",
+    model: "qwen3.5-plus-2026-02-15",
     character: "tongyi-qwen",
+    stream: true,
   },
   {
     computingProvider: "aliyun-bailian",
@@ -118,7 +120,7 @@ export const txt2TxtAiWorkers: LiuAi.AiWorker[] = [
   },
   {
     computingProvider: "aliyun-bailian",
-    model: "qwen3-235b-a22b",
+    model: "qwen3.5-397b-a17b",
     character: "tongyi-qwen",
     stream: true,
   },
@@ -129,14 +131,6 @@ export const txt2TxtAiWorkers: LiuAi.AiWorker[] = [
     stream: true,
   }
 ]
-
-// export const txt2TxtAiWorkers: LiuAi.AiWorker[] = [
-//   {
-//     computingProvider: "minimax",
-//     model: "MiniMax-M1",
-//     character: "hailuo",
-//   }
-// ]
 
 
 export const img2TxtWorkers: LiuAi.AiWorker[] = [
@@ -151,34 +145,33 @@ export const img2TxtWorkers: LiuAi.AiWorker[] = [
     character: "hailuo",
   },
 
-  // qwen vl
-  // https://bailian.console.aliyun.com/?tab=model#/model-market/detail/qwen-vl-max?modelGroup=qwen-vl-max
   {
     computingProvider: "aliyun-bailian",
-    model: "qwen-vl-max",
-    character: "tongyi-qwen",
-  },
-  {
-    computingProvider: "aliyun-bailian",
-    model: "qwen3-vl-plus-2025-09-23",
-    character: "tongyi-qwen",
-  },
-  {
-    computingProvider: "aliyun-bailian",
-    model: "qwen-vl-max-2025-08-13",
-    character: "tongyi-qwen",
-  },
-
-  // qvq
-  {
-    computingProvider: "aliyun-bailian",
-    model: "qvq-max-2025-03-25",
+    model: "qwen3.5-397b-a17b",
     character: "tongyi-qwen",
     stream: true,
   },
   {
     computingProvider: "aliyun-bailian",
-    model: "qvq-max-latest",
+    model: "qwen3-vl-plus-2025-12-19",
+    character: "tongyi-qwen",
+    stream: true,
+  },
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen3-vl-flash-2026-01-22",
+    character: "tongyi-qwen",
+    stream: true,
+  },
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen3.5-plus",
+    character: "tongyi-qwen",
+    stream: true,
+  },
+  {
+    computingProvider: "aliyun-bailian",
+    model: "qwen3.5-plus-2026-02-15",
     character: "tongyi-qwen",
     stream: true,
   }
@@ -191,7 +184,7 @@ export class BaseLLM {
   private _isStepfun = false
 
   constructor(
-    apiKey?: string, 
+    apiKey?: string,
     baseURL?: string,
     defaultHeaders?: Record<string, string>,
   ) {
@@ -199,12 +192,12 @@ export class BaseLLM {
     try {
       this._client = new OpenAI({ apiKey, baseURL, defaultHeaders })
     }
-    catch(err) {
+    catch (err) {
       console.warn("BaseLLM constructor gets client error: ")
       console.log(err)
     }
 
-    if(baseURL && baseURL.includes("api.stepfun.com")) {
+    if (baseURL && baseURL.includes("api.stepfun.com")) {
       this._isStepfun = true
     }
   }
@@ -222,7 +215,7 @@ export class BaseLLM {
     const _wait = async (a: BaseChatResolver) => {
       // 1. set timeout
       let timeout = setTimeout(() => {
-        if(hasReturn) return
+        if (hasReturn) return
         console.log("custom timeout occurs!")
         hasReturn = true
         a(undefined)
@@ -230,7 +223,7 @@ export class BaseLLM {
 
       // 2. to chat
       let res: OaiChatCompletion | undefined
-      if(params.stream) {
+      if (params.stream) {
         res = await _this._streamChat(params, opt)
       }
       else {
@@ -238,7 +231,7 @@ export class BaseLLM {
       }
 
       // 3. decide to continue
-      if(hasReturn) return
+      if (hasReturn) return
       hasReturn = true
       clearTimeout(timeout)
 
@@ -255,14 +248,14 @@ export class BaseLLM {
   ) {
     const _this = this
     const client = _this._client
-    if(!client) return
+    if (!client) return
 
     _this._tryTimes++
     const copiedParams = valTool.copyObject(params)
     copiedParams.stream_options = { include_usage: true }
 
     // special case for qwen: enable_thinking
-    if(copiedParams.model.startsWith("qwen")) {
+    if (copiedParams.model.startsWith("qwen")) {
       //@ts-expect-error enable_thinking
       copiedParams.enable_thinking = true
     }
@@ -278,13 +271,13 @@ export class BaseLLM {
 
     const _handleOtherData = (chunk: OaiChatCompletionChunk) => {
       const tmpChoice = chunk.choices?.[0] as any
-      if(chunk.usage) usage = chunk.usage
-      else if(tmpChoice?.usage) usage = tmpChoice.usage
+      if (chunk.usage) usage = chunk.usage
+      else if (tmpChoice?.usage) usage = tmpChoice.usage
 
-      if(chunk.id) id = chunk.id
-      if(chunk.model) model = chunk.model
-      if(chunk.created) created = chunk.created
-      if(chunk.system_fingerprint) {
+      if (chunk.id) id = chunk.id
+      if (chunk.model) model = chunk.model
+      if (chunk.created) created = chunk.created
+      if (chunk.system_fingerprint) {
         system_fingerprint = chunk.system_fingerprint
       }
     }
@@ -297,7 +290,7 @@ export class BaseLLM {
         const aChoice = chunk.choices[0]
 
         // if no choice
-        if(!aChoice) {
+        if (!aChoice) {
           _handleOtherData(chunk)
           continue
         }
@@ -305,50 +298,50 @@ export class BaseLLM {
         // handle delta
         const delta = aChoice.delta as OaiStreamChoiceDelta
         // console.log("delta: ", delta)
-        if(delta.reasoning_content) {
+        if (delta.reasoning_content) {
           // console.log("delta.reasoning_content: ", delta.reasoning_content)
           reasoningContent += delta.reasoning_content
         }
-        else if(delta.content) {
+        else if (delta.content) {
           // console.log("delta.content: ", delta.content)
           answerContent += delta.content
         }
-        else if(_this._isStepfun && delta.reasoning) {
+        else if (_this._isStepfun && delta.reasoning) {
           reasoningContent += delta.reasoning
         }
 
         // handle finish_reason
         const reason = aChoice.finish_reason
-        if(reason) {
+        if (reason) {
           finishReason = AiShared.getAiFinishReason(reason)
           _handleOtherData(chunk)
         }
       }
 
     }
-    catch(err) {
+    catch (err) {
       console.warn("BaseLLM streamChat error: ", err)
       return
     }
     const t2 = getNowStamp()
 
-    if(!usage) {
+    if (!usage) {
       console.warn("no usage in streamChat")
       return
     }
-    if(!created) {
+    if (!created) {
       console.warn("no created in streamChat")
       return
     }
-    if(!id) {
+    if (!id) {
       console.warn("no id in streamChat")
       return
     }
-    if(!model) {
+    if (!model) {
       console.warn("no model in streamChat")
       return
     }
-    if(!finishReason) {
+    if (!finishReason) {
       console.warn("no finishReason in streamChat")
       return
     }
@@ -357,7 +350,7 @@ export class BaseLLM {
       content: answerContent,
       role: "assistant"
     } as DsReasonerMessage
-    if(reasoningContent) {
+    if (reasoningContent) {
       message.reasoning_content = reasoningContent
     }
 
@@ -385,15 +378,15 @@ export class BaseLLM {
   private _processChatCompletion(
     chatCompletion: any,
   ) {
-    if(!chatCompletion) return
-    if(!this._isStepfun) return
+    if (!chatCompletion) return
+    if (!this._isStepfun) return
 
     // 1. turn reasoning into reasoning_content for step-r1-v-mini
     const theChoice = chatCompletion?.choices?.[0]
-    if(!theChoice) return
+    if (!theChoice) return
     const message = theChoice?.message as any
-    if(!message) return
-    if(typeof message.reasoning === "string" && !message.reasoning_content) {
+    if (!message) return
+    if (typeof message.reasoning === "string" && !message.reasoning_content) {
       message.reasoning_content = message.reasoning
       delete message.reasoning
     }
@@ -405,7 +398,7 @@ export class BaseLLM {
   ): Promise<OaiChatCompletion | undefined> {
     const _this = this
     const client = _this._client
-    if(!client) return
+    if (!client) return
 
     _this._tryTimes++
     const copiedParams = valTool.copyObject(params)
@@ -421,7 +414,7 @@ export class BaseLLM {
       _this._log(chatCompletion as any, t2 - t1, opt)
       return chatCompletion as OaiChatCompletion
     }
-    catch(err) {
+    catch (err) {
       console.warn("BaseLLM chat error: ")
       console.log(err)
 
@@ -429,35 +422,35 @@ export class BaseLLM {
       const errType = typeof err
       const errMsg = errType === "string" ? err : err?.toString?.()
 
-      if(typeof errMsg === "string") {
+      if (typeof errMsg === "string") {
         // for baichuan
-        if(!isRateLimit) {
+        if (!isRateLimit) {
           isRateLimit = errMsg.includes("Rate limit reached for requests")
         }
 
         // for zhipu
-        if(!isRateLimit) {
+        if (!isRateLimit) {
           isRateLimit = errMsg.includes("当前API请求过多，请稍后重试")
         }
-        
+
         // for moonshot
-        if(!isRateLimit) {
+        if (!isRateLimit) {
           isRateLimit = errMsg.includes("please try again after 1 seconds")
         }
 
         // fallback
-        if(!isRateLimit) {
+        if (!isRateLimit) {
           isRateLimit = errMsg.includes("RateLimitError: 429")
         }
 
-        if(errMsg.includes("undefined message role")) {
+        if (errMsg.includes("undefined message role")) {
           LogHelper.printLastItems(params.messages)
         }
-        
+
       }
 
       const maxTryTimes = opt?.maxTryTimes ?? 2
-      if(_this._tryTimes < maxTryTimes && isRateLimit) {
+      if (_this._tryTimes < maxTryTimes && isRateLimit) {
         console.log("getting to try again!")
         await valTool.waitMilli(1000)
         const triedRes = await _this.chat(copiedParams, opt)
@@ -472,7 +465,7 @@ export class BaseLLM {
     opt?: LiuAi.BaseLLMChatOpt,
   ) {
     const usage = chatCompletion?.usage
-    if(!usage) return
+    if (!usage) return
 
     const logCol = db.collection("LogAi")
     const b1 = getBasicStampWhileAdding()
@@ -511,112 +504,112 @@ export class AiShared {
     const _env = process.env
 
     // If secondaryProvider exists, use it first
-    if(p === "siliconflow") {
+    if (p === "siliconflow") {
       apiKey = _env.LIU_SILICONFLOW_API_KEY
       baseURL = _env.LIU_SILICONFLOW_BASE_URL
     }
-    else if(p === "gitee-ai") {
+    else if (p === "gitee-ai") {
       apiKey = _env.LIU_GITEE_AI_API_KEY
       baseURL = _env.LIU_GITEE_AI_BASE_URL
     }
-    else if(p === "qiniu") {
+    else if (p === "qiniu") {
       apiKey = _env.LIU_QINIU_LLM_API_KEY
       baseURL = _env.LIU_QINIU_LLM_BASE_URL
     }
-    else if(p === "tencent-lkeap") {
+    else if (p === "tencent-lkeap") {
       apiKey = _env.LIU_TENCENT_LKEAP_API_KEY
       baseURL = _env.LIU_TENCENT_LKEAP_BASE_URL
     }
-    else if(p === "suanleme") {
+    else if (p === "suanleme") {
       apiKey = _env.LIU_SUANLEME_API_KEY
       baseURL = _env.LIU_SUANLEME_BASE_URL
     }
-    else if(p === "aliyun-bailian") {
+    else if (p === "aliyun-bailian") {
       apiKey = _env.LIU_ALIYUN_BAILIAN_API_KEY
       baseURL = _env.LIU_ALIYUN_BAILIAN_BASE_URL
     }
-    else if(p === "baichuan") {
+    else if (p === "baichuan") {
       apiKey = _env.LIU_BAICHUAN_API_KEY
       baseURL = _env.LIU_BAICHUAN_BASE_URL
     }
-    else if(p === "antgroup") {
+    else if (p === "antgroup") {
       apiKey = _env.LIU_ANTGROUP_API_KEY
       baseURL = _env.LIU_ANTGROUP_BASE_URL
     }
-    else if(p === "deepseek") {
+    else if (p === "deepseek") {
       apiKey = _env.LIU_DEEPSEEK_API_KEY
       baseURL = _env.LIU_DEEPSEEK_BASE_URL
     }
-    else if(p === "tencent-hunyuan") {
+    else if (p === "tencent-hunyuan") {
       apiKey = _env.LIU_TENCENT_HUNYUAN_API_KEY
       baseURL = _env.LIU_TENCENT_HUNYUAN_BASE_URL
     }
-    else if(p === "minimax") {
+    else if (p === "minimax") {
       apiKey = _env.LIU_MINIMAX_API_KEY
       baseURL = _env.LIU_MINIMAX_BASE_URL
     }
-    else if(p === "moonshot") {
+    else if (p === "moonshot") {
       apiKey = _env.LIU_MOONSHOT_API_KEY
       baseURL = _env.LIU_MOONSHOT_BASE_URL
     }
-    else if(p === "stepfun") {
+    else if (p === "stepfun") {
       apiKey = _env.LIU_STEPFUN_API_KEY
       baseURL = _env.LIU_STEPFUN_BASE_URL
     }
-    else if(p === "zero-one") {
+    else if (p === "zero-one") {
       apiKey = _env.LIU_YI_API_KEY
       baseURL = _env.LIU_YI_BASE_URL
     }
-    else if(p === "zhipu") {
+    else if (p === "zhipu") {
       apiKey = _env.LIU_ZHIPU_API_KEY
       baseURL = _env.LIU_ZHIPU_BASE_URL
     }
-    else if(p === "jina") {
+    else if (p === "jina") {
       apiKey = _env.LIU_JINA_APIKEY
       baseURL = _env.LIU_JINA_BASE_URL
     }
 
-    if(apiKey && baseURL) {
+    if (apiKey && baseURL) {
       return { apiKey, baseURL }
     }
 
   }
 
   static fillCharacters() {
-      const all_characters = AiShared.getAvailableCharacters()
-      if(all_characters.length <= MAX_CHARACTERS) {
-        return all_characters
-      }
-      const copied_characters = [...all_characters].splice(0, MAX_CHARACTERS)
-  
-      let tryTimes = 0
-      const my_characters: AiCharacter[] = []
-      for(let i=0; i<MAX_CHARACTERS; i++) {
-        // 1. to avoid dead loop
-        tryTimes++
-        if(tryTimes > 10) break
-  
-        // 2. get a random character
-        const r = Math.floor(Math.random() * all_characters.length)
-        const c = all_characters[r]
-  
-        // 3. to skip a bot taking a rest
-        if(charactersTakingARest.includes(c)) {
-          i--
-          continue
-        }
-  
-        my_characters.push(c)
-        all_characters.splice(r, 1)
-      }
-  
-      // return copied characters if my_characters is empty
-      if(my_characters.length < 1) {
-        return copied_characters
-      }
-  
-      return my_characters
+    const all_characters = AiShared.getAvailableCharacters()
+    if (all_characters.length <= MAX_CHARACTERS) {
+      return all_characters
     }
+    const copied_characters = [...all_characters].splice(0, MAX_CHARACTERS)
+
+    let tryTimes = 0
+    const my_characters: AiCharacter[] = []
+    for (let i = 0; i < MAX_CHARACTERS; i++) {
+      // 1. to avoid dead loop
+      tryTimes++
+      if (tryTimes > 10) break
+
+      // 2. get a random character
+      const r = Math.floor(Math.random() * all_characters.length)
+      const c = all_characters[r]
+
+      // 3. to skip a bot taking a rest
+      if (charactersTakingARest.includes(c)) {
+        i--
+        continue
+      }
+
+      my_characters.push(c)
+      all_characters.splice(r, 1)
+    }
+
+    // return copied characters if my_characters is empty
+    if (my_characters.length < 1) {
+      return copied_characters
+    }
+
+    return my_characters
+  }
 
   static getAvailableCharacters() {
     const bots = AiShared.getAvailableBots()
@@ -627,12 +620,12 @@ export class AiShared {
   static getAvailableBots() {
     const bots: AiBot[] = []
     const tmpBots = [...aiBots].sort((a, b) => b.priority - a.priority)
-    for(let i=0; i<tmpBots.length; i++) {
+    for (let i = 0; i < tmpBots.length; i++) {
       const bot = tmpBots[i]
       const existedBot = bots.find(v => v.character === bot.character)
-      if(existedBot) continue
+      if (existedBot) continue
       const apiData = AiShared.getApiEndpointFromBot(bot)
-      if(apiData) {
+      if (apiData) {
         bots.push(bot)
       }
     }
@@ -648,14 +641,14 @@ export class AiShared {
     let defaultHeaders = bot.metaData?.defaultHeaders
 
     let apiEndpoint: LiuAi.ApiEndpoint | undefined
-    if(p2) {
+    if (p2) {
       apiEndpoint = AiShared.getEndpointFromProvider(p2)
     }
-    if(!apiEndpoint) {
+    if (!apiEndpoint) {
       apiEndpoint = AiShared.getEndpointFromProvider(p)
     }
 
-    if(apiEndpoint) {
+    if (apiEndpoint) {
       apiEndpoint.defaultHeaders = defaultHeaders
     }
 
@@ -663,19 +656,19 @@ export class AiShared {
   }
 
   static getCharacterName(character?: AiCharacter) {
-    if(!character) return
+    if (!character) return
     let name = ""
     const availableBots = AiShared.getAvailableBots()
     const bot = availableBots.find(v => v.character === character)
-    if(bot) name = bot.name
+    if (bot) name = bot.name
     return name
   }
 
   static getAiFinishReason(
     reason: string
   ): AiFinishReason | undefined {
-    if(reason === "stop" || reason === "length") return reason
-    if(reason === "tool_calls") return reason
+    if (reason === "stop" || reason === "length") return reason
+    if (reason === "tool_calls") return reason
   }
 
   static getFinishReason(
@@ -689,8 +682,8 @@ export class AiShared {
     chatCompletion: OaiChatCompletion,
   ) {
     const theChoice = chatCompletion?.choices?.[0]
-    if(!theChoice) return
-    if(theChoice.finish_reason === "stop") {
+    if (!theChoice) return
+    if (theChoice.finish_reason === "stop") {
       theChoice.finish_reason = "length"
     }
   }
@@ -698,7 +691,7 @@ export class AiShared {
   private static extractThinkContent(text: string): ThinkTagContent[] {
     const regex = /<think>([\s\S]*?)<\/think>/g;
     const results: ThinkTagContent[] = []
-    
+
     let match: RegExpExecArray | null
     let tryTimes = 0
     while ((match = regex.exec(text)) !== null && tryTimes < 10) {
@@ -709,7 +702,7 @@ export class AiShared {
       })
       tryTimes++
     }
-    
+
     return results
   }
 
@@ -722,29 +715,29 @@ export class AiShared {
 
     // 1. extract <think>......</think>
     const thinkContents = AiShared.extractThinkContent(content)
-    if(thinkContents.length > 0) {
+    if (thinkContents.length > 0) {
       const thinkContent = thinkContents[0]
       content = content.substring(thinkContent.endIndex)
       reasoning_content = thinkContent.content
       return { content, reasoning_content }
     }
-    
+
     // 2. starts with <think>
-    if(content.startsWith("<think>")) {
+    if (content.startsWith("<think>")) {
       reasoning_content = content.substring(7)
       content = ""
       AiShared.setFinishReasonToLength(res)
       return { content, reasoning_content }
     }
-    
+
     // 3. starts with "好的，" /  "嗯，" / "好，"
     const thinkingInContent = bot?.metaData?.thinkingInContent
     const finishReason = AiShared.getFinishReason(res)
     const mightHaveReasoningContent = Boolean(finishReason === "length" && !thinkingInContent)
-    if(mightHaveReasoningContent) {
+    if (mightHaveReasoningContent) {
       const alrightList = ["Alright, ", "好的，", "嗯，", "好，", "好吧，", "用户问"]
       const res3 = alrightList.some(x => content.startsWith(x))
-      if(res3) {
+      if (res3) {
         reasoning_content = content
         content = ""
       }
@@ -760,20 +753,20 @@ export class AiShared {
   ) {
     // 1. check out params
     const choices = res?.choices
-    if(!choices || choices.length < 1) {
+    if (!choices || choices.length < 1) {
       console.warn("no choices in getContentFromLLM")
       console.log(res)
       return {}
     }
 
     const theChoice = choices[0]
-    if(!theChoice) {
+    if (!theChoice) {
       console.warn("no choice in getContentFromLLM")
       console.log(choices)
       return {}
     }
     const message = theChoice.message as DsReasonerMessage
-    if(!message) {
+    if (!message) {
       console.warn("no message in getContentFromLLM")
       console.log(choices)
       return {}
@@ -782,8 +775,8 @@ export class AiShared {
     // 2. get original content & reasoning_content
     let content = message.content ?? ""
     let reasoning_content = message.reasoning_content ?? ""
-    if(!content) {
-      if(!reasoning_content) {
+    if (!content) {
+      if (!reasoning_content) {
         console.warn("no content and reasoning_content in getContentFromLLM")
         return {}
       }
@@ -791,14 +784,14 @@ export class AiShared {
     }
 
     // 3. remove "?" in the beginning for zhipu
-    if(bot?.character === "zhipu") {
+    if (bot?.character === "zhipu") {
       let err1 = content.startsWith("？")
-      if(err1) content = content.substring(1)
+      if (err1) content = content.substring(1)
     }
-    
+
     // 4. handle isReasoning
-    if(typeof isReasoning === "undefined") {
-      if(bot) {
+    if (typeof isReasoning === "undefined") {
+      if (bot) {
         isReasoning = Boolean(AiShared.isReasoningBot(bot))
       }
       else {
@@ -808,7 +801,7 @@ export class AiShared {
     }
 
     // 5. extract reasoning content from content
-    if(!reasoning_content && isReasoning) {
+    if (!reasoning_content && isReasoning) {
       const res5 = AiShared.handleContentForReasoning(
         res,
         content,
@@ -836,9 +829,9 @@ export class AiShared {
 
   static calculateTextToken(text: string) {
     let token = 0
-    for(let i=0; i<text.length; i++) {
+    for (let i = 0; i < text.length; i++) {
       const char = text[i]
-      if(valTool.isLatinChar(char)) {
+      if (valTool.isLatinChar(char)) {
         token += 0.4
       }
       else {
@@ -852,32 +845,32 @@ export class AiShared {
   static calculateChatToken(
     chat: Table_AiChat,
   ) {
-    const { 
-      infoType, 
-      usage, 
-      text, 
+    const {
+      infoType,
+      usage,
+      text,
       imageUrl,
     } = chat
-    if(infoType === "assistant" || infoType === "summary") {
+    if (infoType === "assistant" || infoType === "summary") {
       const token1 = usage?.completion_tokens
-      if(token1) return token1
+      if (token1) return token1
     }
 
     let token = 0
-    if(text) {
+    if (text) {
       token = AiShared.calculateTextToken(text)
     }
-    else if(imageUrl) {
+    else if (imageUrl) {
       token += 600
     }
-    
-    if(infoType === "tool_use") {
+
+    if (infoType === "tool_use") {
       const toolToken1 = usage?.completion_tokens ?? 0
       let toolToken2 = 0
-      if(chat.funcName) {
+      if (chat.funcName) {
         toolToken2 += AiShared.calculateTextToken(chat.funcName)
       }
-      if(chat.funcJson) {
+      if (chat.funcJson) {
         const jsonStr = valTool.objToStr(chat.funcJson)
         toolToken2 += AiShared.calculateTextToken(jsonStr)
       }
@@ -892,21 +885,21 @@ export class AiShared {
     prompt: OaiPrompt,
   ) {
     const content = prompt.content
-    if(!content) return 0
-    if(typeof content === "string") {
+    if (!content) return 0
+    if (typeof content === "string") {
       return AiShared.calculateTextToken(content)
     }
 
     let token = 0
-    for(let i=0; i<content.length; i++) {
+    for (let i = 0; i < content.length; i++) {
       const v = content[i]
-      if(v.type === "text") {
+      if (v.type === "text") {
         token += AiShared.calculateTextToken(v.text)
       }
-      else if(v.type === "image_url") {
+      else if (v.type === "image_url") {
         token += 600
       }
-      else if(v.type === "input_audio") {
+      else if (v.type === "input_audio") {
         token += 1000
       }
     }
@@ -918,7 +911,7 @@ export class AiShared {
     prompts: OaiPrompt[],
   ) {
     let token = 0
-    for(let i=0; i< prompts.length; i++) {
+    for (let i = 0; i < prompts.length; i++) {
       const v = prompts[i]
       token += AiShared.calculatePromptToken(v)
     }
@@ -929,7 +922,7 @@ export class AiShared {
     const col = db.collection("AiChat")
     const res1 = await col.add(data)
     const chatId = getDocAddId(res1)
-    if(!chatId) {
+    if (!chatId) {
       console.warn("cannot get chatId while adding chat error")
       console.log(res1)
       console.log("data: ")
@@ -938,9 +931,9 @@ export class AiShared {
     }
     return chatId
   }
-  
+
   static async updateAiChat(id: string, data: Partial<Table_AiChat>) {
-    if(!data.updatedStamp) data.updatedStamp = getNowStamp()
+    if (!data.updatedStamp) data.updatedStamp = getNowStamp()
     const cCol = db.collection("AiChat")
     const res = await cCol.doc(id).update(data)
     return res
@@ -982,27 +975,27 @@ export class AiShared {
         toolMsg = { role: "tool", content: t("not_agree_yet"), tool_call_id }
       }
     }
-    else if(funcName === "web_search") {
-      if(v.text && v.webSearchData && v.webSearchProvider) {
+    else if (funcName === "web_search") {
+      if (v.text && v.webSearchData && v.webSearchProvider) {
         toolMsg = { role: "tool", content: v.text, tool_call_id }
       }
       else {
         toolMsg = { role: "tool", content: t("fail_to_search"), tool_call_id }
       }
     }
-    else if(funcName === "parse_link") {
-      if(v.text) {
+    else if (funcName === "parse_link") {
+      if (v.text) {
         toolMsg = { role: "tool", content: v.text, tool_call_id }
       }
       else {
         toolMsg = { role: "tool", content: t("fail_to_parse_link"), tool_call_id }
       }
     }
-    else if(funcName === "draw_picture") {
-      if(v.text && v.drawPictureUrl) {
-        toolMsg = { 
-          role: "tool", 
-          content: `[Finish to draw]`, 
+    else if (funcName === "draw_picture") {
+      if (v.text && v.drawPictureUrl) {
+        toolMsg = {
+          role: "tool",
+          content: `[Finish to draw]`,
           tool_call_id,
         }
       }
@@ -1014,8 +1007,8 @@ export class AiShared {
         }
       }
     }
-    else if(funcName === "get_cards") {
-      if(v.text) {
+    else if (funcName === "get_cards") {
+      if (v.text) {
         toolMsg = {
           role: "tool",
           content: v.text,
@@ -1023,8 +1016,8 @@ export class AiShared {
         }
       }
     }
-    else if(funcName === "get_schedule") {
-      if(v.text) {
+    else if (funcName === "get_schedule") {
+      if (v.text) {
         toolMsg = {
           role: "tool",
           content: v.text,
@@ -1032,7 +1025,7 @@ export class AiShared {
         }
       }
     }
-    else if(funcName?.startsWith("maps_") && v.mapSearchData) {
+    else if (funcName?.startsWith("maps_") && v.mapSearchData) {
       toolMsg = {
         role: "tool",
         content: valTool.objToStr(v.mapSearchData),
@@ -1055,13 +1048,13 @@ export class AiShared {
       name: assistantName,
     }
 
-    if(funcName === "draw_picture" && text) {
+    if (funcName === "draw_picture" && text) {
       const aToolCall = tool_calls[0]
-      if(!aToolCall) return msg
+      if (!aToolCall) return msg
       const theFunc = aToolCall["function"]
-      if(!theFunc) return msg
+      if (!theFunc) return msg
       const drawArgsStr = theFunc["arguments"]
-      if(!drawArgsStr) return msg
+      if (!drawArgsStr) return msg
       const drawArgs = valTool.strToObj(drawArgsStr)
       drawArgs.prompt = text
       const drawArgsStr2 = valTool.objToStr(drawArgs)
@@ -1074,47 +1067,47 @@ export class AiShared {
   static turnBaseUrlToProvider(
     url?: string,
   ): LiuAi.ComputingProvider | undefined {
-    if(!url) return
+    if (!url) return
 
-    if(url.includes("dashscope.aliyuncs.com")) return "aliyun-bailian"
-    if(url.includes("api.baichuan-ai.com")) return "baichuan"
-    if(url.includes("api.deepseek.com")) return "deepseek"
-    if(url.includes("api.hunyuan.cloud.tencent.com")) return "tencent-hunyuan"
-    if(url.includes("api.minimax.chat")) return "minimax"
-    if(url.includes("api.moonshot.cn")) return "moonshot"
-    if(url.includes("api.stepfun.com")) return "stepfun"
-    if(url.includes("api.lingyiwanwu.com")) return "zero-one"
-    if(url.includes("open.bigmodel.cn")) return "zhipu"
-    if(url.includes("api.siliconflow.cn")) return "siliconflow"
-    if(url.includes("ai.gitee.com")) return "gitee-ai"
-    if(url.includes("api.qnaigc.com")) return "qiniu"
-    if(url.includes("api.lkeap.cloud.tencent.com")) return "tencent-lkeap"
-    if(url.includes("api.suanli.cn")) return "suanleme"
-    if(url.includes("ling.tbox.cn")) return "antgroup"
-    
+    if (url.includes("dashscope.aliyuncs.com")) return "aliyun-bailian"
+    if (url.includes("api.baichuan-ai.com")) return "baichuan"
+    if (url.includes("api.deepseek.com")) return "deepseek"
+    if (url.includes("api.hunyuan.cloud.tencent.com")) return "tencent-hunyuan"
+    if (url.includes("api.minimax.chat")) return "minimax"
+    if (url.includes("api.moonshot.cn")) return "moonshot"
+    if (url.includes("api.stepfun.com")) return "stepfun"
+    if (url.includes("api.lingyiwanwu.com")) return "zero-one"
+    if (url.includes("open.bigmodel.cn")) return "zhipu"
+    if (url.includes("api.siliconflow.cn")) return "siliconflow"
+    if (url.includes("ai.gitee.com")) return "gitee-ai"
+    if (url.includes("api.qnaigc.com")) return "qiniu"
+    if (url.includes("api.lkeap.cloud.tencent.com")) return "tencent-lkeap"
+    if (url.includes("api.suanli.cn")) return "suanleme"
+    if (url.includes("ling.tbox.cn")) return "antgroup"
+
   }
 
   static storageAiModel(
     model?: string,
   ) {
-    if(!model) return
+    if (!model) return
 
-    if(model === "deepseek-chat") return "deepseek-v3"
-    if(model === "deepseek-reasoner") return "deepseek-r1"
+    if (model === "deepseek-chat") return "deepseek-v3"
+    if (model === "deepseek-reasoner") return "deepseek-r1"
 
     return model
   }
 
   static fixOutputForLLM(content: string) {
     const res1 = content.startsWith("<output>")
-    if(!res1) content = "<output>\n" + content
+    if (!res1) content = "<output>\n" + content
 
     // fix for zhipu GLM 4.5
     const res1_2 = content.endsWith("</output")
-    if(res1_2) content += ">"
+    if (res1_2) content += ">"
 
     const res2 = content.endsWith("</output>")
-    if(!res2) content += "\n</output>"
+    if (!res2) content += "\n</output>"
     return content
   }
 
@@ -1127,8 +1120,8 @@ export class AiShared {
     const len1 = outputStr1.length
     const len2 = outputStr2.length
     const tmpLength = content.length
-    if(tmpLength <= len1 + len2) return
-    
+    if (tmpLength <= len1 + len2) return
+
     content = "<xml>" + content.substring(len1)
     content = content.substring(0, content.length - len2) + "</xml>"
 
@@ -1139,7 +1132,7 @@ export class AiShared {
       const { xml } = await parser.parseStringPromise(content)
       res2 = xml
     }
-    catch(err) {
+    catch (err) {
       console.warn("AiShared turnOutputIntoObject xml2js.Parser error: ", content)
       return
     }
@@ -1152,7 +1145,7 @@ export class AiShared {
     const len1 = outputStr1.length
     const len2 = outputStr2.length
     const tmpLength = content.length
-    if(tmpLength <= len1 + len2) return
+    if (tmpLength <= len1 + len2) return
     const newContent = `<xml>${content}</xml>`
     const parser = new xml2js.Parser({ explicitArray: false })
 
@@ -1161,14 +1154,14 @@ export class AiShared {
       const { xml } = await parser.parseStringPromise(newContent)
       res2 = xml
     }
-    catch(err) {
+    catch (err) {
       console.warn("AiShared turnOutputIntoStr xml2js.Parser error: ", newContent)
       return
     }
 
     console.log("turnOutputIntoStr res2: ", res2)
     const res3 = res2.output
-    if(valTool.isStringWithVal(res3)) {
+    if (valTool.isStringWithVal(res3)) {
       return res3
     }
   }
@@ -1193,32 +1186,32 @@ export class TellUser {
     let res0: Wx_Res_GzhUploadMedia | undefined
 
     // 1. for weixin
-    if(wx_gzh_openid) {
+    if (wx_gzh_openid) {
       // 1.1 upload file to weixin server
 
-      if(param.response) {
+      if (param.response) {
         res0 = await WxGzhUploader.mediaByResponse(param.response, {
           type: "voice",
           filename: "upload.mp3"
         })
       }
-      else if(param.hex) {
+      else if (param.hex) {
         res0 = await WxGzhUploader.mediaByHex(param.hex, {
           type: "voice",
           filename: "upload.mp3",
           contentType: "audio/mpeg",
         })
       }
-      else if(param.buffer) {
+      else if (param.buffer) {
         res0 = await WxGzhUploader.mediaByBuffer(param.buffer, {
           type: "voice",
           filename: "upload.mp3",
           contentType: "audio/mpeg",
         })
       }
-      
+
       const media_id = res0?.media_id
-      if(!media_id) return
+      if (!media_id) return
 
       const obj1: Wx_Gzh_Send_Msg = {
         msgtype: "voice",
@@ -1228,18 +1221,18 @@ export class TellUser {
       const res1 = await this._sendToWxGzh(wx_gzh_openid, obj1)
       return res1
     }
-    
+
   }
 
   static async text(
-    entry: AiEntry, 
+    entry: AiEntry,
     text: string,
     opt?: LiuAi.TellUserOpt,
   ) {
     const { wx_gzh_openid } = entry
 
     // 1. send to wx gzh
-    if(wx_gzh_openid) {
+    if (wx_gzh_openid) {
       // console.warn("markdown: ")
       // console.log(text)
       text = MarkdownParser.mdToWxGzhText(text)
@@ -1265,10 +1258,10 @@ export class TellUser {
     const { wx_gzh_openid } = entry
 
     // 1. send to wx gzh
-    if(wx_gzh_openid) {
+    if (wx_gzh_openid) {
       const res1 = await WxGzhUploader.mediaByUrl(imageUrl)
       const media_id = res1?.media_id
-      if(!media_id) return
+      if (!media_id) return
 
       const obj2: Wx_Gzh_Send_Msg = {
         msgtype: "image",
@@ -1294,37 +1287,37 @@ export class TellUser {
 
     // 1. localize the menuList
     const wx_menu_list: Wx_Gzh_Send_Msgmenu_Item[] = []
-    for(let i=0; i<menuList.length; i++) {
+    for (let i = 0; i < menuList.length; i++) {
       const v = menuList[i]
       const { operation, character } = v
 
-      if(operation === "clear_history") {
+      if (operation === "clear_history") {
         wx_menu_list.push({ id: "clear_history", content: t("clear_context") })
         continue
       }
 
-      if(operation === "kick" && character) {
+      if (operation === "kick" && character) {
         const characterName = AiShared.getCharacterName(character)
-        if(!characterName) continue
+        if (!characterName) continue
         wx_menu_list.push({ id: "kick_" + character, content: t("kick") + characterName })
       }
 
-      if(operation === "add" && character) {
+      if (operation === "add" && character) {
         const characterName = AiShared.getCharacterName(character)
-        if(!characterName) continue
+        if (!characterName) continue
         wx_menu_list.push({ id: "add_" + character, content: t("add") + characterName })
       }
 
-      if(operation === "continue" && character) {
+      if (operation === "continue" && character) {
         const characterName = AiShared.getCharacterName(character)
-        if(!characterName) continue
+        if (!characterName) continue
         wx_menu_list.push({
           id: "continue_" + character,
           content: t("continue_bot", { botName: characterName })
         })
 
         // turn markdown to plain-text for wx gzh
-        if(wx_gzh_openid) {
+        if (wx_gzh_openid) {
           prefixMessage = MarkdownParser.mdToWxGzhText(prefixMessage)
         }
       }
@@ -1332,8 +1325,8 @@ export class TellUser {
     }
 
     // 2. send to wx gzh
-    if(wx_gzh_openid) {
-      if(gzhType === "subscription_account") {
+    if (wx_gzh_openid) {
+      if (gzhType === "subscription_account") {
         console.warn("we cannot send the menu to the user due to subscription_account")
         console.log("prefixMessage: ", prefixMessage)
         console.log("menuList: ", menuList)
@@ -1353,7 +1346,7 @@ export class TellUser {
       const res2 = await this._sendToWxGzh(wx_gzh_openid, obj2)
       return res2
     }
-    
+
 
   }
 
@@ -1361,9 +1354,9 @@ export class TellUser {
     const { wx_gzh_openid } = entry
 
     // 1. to wx gzh
-    if(wx_gzh_openid) {
+    if (wx_gzh_openid) {
       const wxGzhAccessToken = await checkAndGetWxGzhAccessToken()
-      if(!wxGzhAccessToken) return
+      if (!wxGzhAccessToken) return
       WxGzhSender.sendTyping(wx_gzh_openid, wxGzhAccessToken)
     }
   }
@@ -1373,7 +1366,7 @@ export class TellUser {
     opt?: LiuAi.TellUserOpt,
   ) {
     const kf_account = this._getWxGzhKfAccount(opt)
-    if(kf_account) {
+    if (kf_account) {
       obj.customservice = { kf_account }
     }
   }
@@ -1384,40 +1377,40 @@ export class TellUser {
     let c = opt?.fromBot?.character ?? opt?.fromCharacter
 
     const _env = process.env
-    if(opt?.fromSystem2) {
+    if (opt?.fromSystem2) {
       return _env.LIU_WXGZH_KF_SYSTEM2
     }
-    if(c === "baixiaoying") {
+    if (c === "baixiaoying") {
       return _env.LIU_WXGZH_KF_BAIXIAOYING
     }
-    if(c === "bailing") {
+    if (c === "bailing") {
       return _env.LIU_WXGZH_KF_BAILING
     }
-    if(c === "deepseek") {
+    if (c === "deepseek") {
       return _env.LIU_WXGZH_KF_DEEPSEEK
     }
-    if(c === "ds-reasoner") {
+    if (c === "ds-reasoner") {
       return _env.LIU_WXGZH_KF_DS_REASONER
     }
-    if(c === "hailuo") {
+    if (c === "hailuo") {
       return _env.LIU_WXGZH_KF_HAILUO
     }
-    if(c === "hunyuan") {
+    if (c === "hunyuan") {
       return _env.LIU_WXGZH_KF_HUNYUAN
     }
-    if(c === "kimi") {
+    if (c === "kimi") {
       return _env.LIU_WXGZH_KF_KIMI
     }
-    if(c === "tongyi-qwen") {
+    if (c === "tongyi-qwen") {
       return _env.LIU_WXGZH_KF_TONGYI_QWEN
     }
-    if(c === "wanzhi") {
+    if (c === "wanzhi") {
       return _env.LIU_WXGZH_KF_WANZHI
     }
-    if(c === "yuewen") {
+    if (c === "yuewen") {
       return _env.LIU_WXGZH_KF_YUEWEN
     }
-    if(c === "zhipu") {
+    if (c === "zhipu") {
       return _env.LIU_WXGZH_KF_ZHIPU
     }
   }
@@ -1427,7 +1420,7 @@ export class TellUser {
     obj: Wx_Gzh_Send_Msg,
   ) {
     const accessToken = await checkAndGetWxGzhAccessToken()
-    if(!accessToken) return
+    if (!accessToken) return
     const res = await WxGzhSender.sendMessage(wx_gzh_openid, accessToken, obj)
     return res
   }
@@ -1443,7 +1436,7 @@ export class WebSearch {
     const zhipuApiKey = _env.LIU_ZHIPU_API_KEY
 
     let searchRes: LiuAi.SearchResult | undefined
-    if(zhipuUrl && zhipuApiKey) {
+    if (zhipuUrl && zhipuApiKey) {
       searchRes = await this.runByZhipu(q, zhipuUrl, zhipuApiKey)
     }
 
@@ -1466,18 +1459,18 @@ export class WebSearch {
     }
     try {
       const res = await liuReq<Ns_Zhipu.WebSearchChatCompletion>(
-        url, 
-        body, 
+        url,
+        body,
         { headers }
       )
-      if(res.code === "0000" && res.data) {
+      if (res.code === "0000" && res.data) {
         const parseResult = this._parseFromZhipu(q, res.data)
         return parseResult
       }
       console.warn("web-search runByZhipu got an unexpected result: ")
       console.log(res)
     }
-    catch(err) {
+    catch (err) {
       console.warn("web-search runByZhipu error: ")
       console.log(err)
     }
@@ -1490,18 +1483,18 @@ export class WebSearch {
   ): LiuAi.SearchResult | undefined {
     // 1. get results
     const theChoice = chatCompletion.choices[0]
-    if(!theChoice) return
+    if (!theChoice) return
     const { finish_reason, message } = theChoice
-    if(finish_reason !== "stop") {
+    if (finish_reason !== "stop") {
       console.warn(`web-search finish reason is not stop: ${finish_reason}`)
       console.log(theChoice)
       return
     }
     const tool_calls = message?.tool_calls ?? []
-    if(!tool_calls.length) return
+    if (!tool_calls.length) return
     const resultData = tool_calls.find(v => v.type === "search_result")
     const results = resultData?.search_result ?? []
-    if(results.length < 1) {
+    if (results.length < 1) {
       return {
         markdown: `搜索：${q}\n结果：查无任何结果`,
         provider: "zhipu",
@@ -1516,10 +1509,10 @@ export class WebSearch {
 
     let md = ""
     // 3. add intent
-    if(theIntent) {
+    if (theIntent) {
       md += `【关键词】：${theIntent.keywords}\n`
       md += `【原始意图】：${theIntent.query}\n`
-      if(theIntent.intent === "SEARCH_ALL") {
+      if (theIntent.intent === "SEARCH_ALL") {
         md += `【搜索范围】：全网搜索\n`
       }
     }
@@ -1530,7 +1523,7 @@ export class WebSearch {
 
     // 4. add results
     const maxLength = Math.min(results.length, 10)
-    for(let i=0; i<maxLength; i++) {
+    for (let i = 0; i < maxLength; i++) {
       const r = results[i]
       md += `#### ${r.title}\n`
       md += `【链接】：${r.link}\n`
@@ -1558,13 +1551,13 @@ class GeoLocation {
   }
 
   preCheck() {
-    if(!this._amapApiKey) {
+    if (!this._amapApiKey) {
       return checker.getErrResult("amap api key is not set", "E5001")
     }
   }
 
   postCheck(res: LiuRqReturn) {
-    if(res.code !== "0000" || !res.data) {
+    if (res.code !== "0000" || !res.data) {
       const err = checker.getErrResult(
         res.errMsg ?? "network error",
         res.code,
@@ -1579,7 +1572,7 @@ class GeoLocation {
   ) {
     const errCode = result.code
     console.warn("err code: ", errCode)
-    if(errCode !== "B0003") return
+    if (errCode !== "B0003") return
     await valTool.waitMilli(2202)
     const newResult = await liuReq(reqLink, undefined, { method: "GET" })
     return newResult
@@ -1591,13 +1584,13 @@ class GeoLocation {
   ): Promise<DataPass<LiuAi.MapResult>> {
     // 1. check if error
     const err1 = this.postCheck(result)
-    if(err1) {
+    if (err1) {
       const newResult = await this._handleReqError(result, reqLink)
-      if(!newResult) return err1
+      if (!newResult) return err1
 
       // 2. check if err again
       const err2 = this.postCheck(newResult)
-      if(err2) return err2
+      if (err2) return err2
 
       result = newResult
     }
@@ -1612,11 +1605,11 @@ class GeoLocation {
     console.warn("maps result: ", data2)
 
     // 4. check more
-    if(data2.status !== "1") {
+    if (data2.status !== "1") {
       const reporter = new LiuReporter()
       reporter.sendAny(
-        "Fetching Amap Error", 
-        data2, 
+        "Fetching Amap Error",
+        data2,
         `request link: ${reqLink}`
       )
     }
@@ -1636,18 +1629,18 @@ class GeoLocation {
     extensions: "all" | "base",
   ): Promise<DataPass<LiuAi.MapResult>> {
     const err1 = this.preCheck()
-    if(err1) return err1
+    if (err1) return err1
 
     const { latitude, longitude } = funcJson
     const res2_1 = ValueTransform.str2Num(latitude)
     const res2_2 = ValueTransform.str2Num(longitude)
-    if(!res2_1.pass || !res2_2.pass) {
+    if (!res2_1.pass || !res2_2.pass) {
       const err2 = checker.getErrResult(
         "latitude and longitude are not numbers",
       )
       return err2
     }
-    
+
     const location = `${res2_2.data},${res2_1.data}`
     const url = new URL("https://restapi.amap.com/v3/geocode/regeo")
     url.searchParams.set("key", this._amapApiKey)
@@ -1669,10 +1662,10 @@ class GeoLocation {
     funcJson: Record<string, any>,
   ) {
     const err1 = this.preCheck()
-    if(err1) return err1
+    if (err1) return err1
 
     const res1 = vbot.safeParse(Ns_MapTool.Sch_GeoParam, funcJson)
-    if(!res1.success) {
+    if (!res1.success) {
       console.warn("cannot parse maps_geo param: ")
       console.log(funcJson)
       console.log(res1.issues)
@@ -1682,9 +1675,9 @@ class GeoLocation {
     }
 
     const url = new URL("https://restapi.amap.com/v3/geocode/geo")
-    url.searchParams.set("key",  this._amapApiKey)
+    url.searchParams.set("key", this._amapApiKey)
     url.searchParams.set("address", funcJson.address)
-    if(funcJson.city) {
+    if (funcJson.city) {
       url.searchParams.set("city", funcJson.city)
     }
     const link = url.toString()
@@ -1701,7 +1694,7 @@ class GeoLocation {
     funcJson: Record<string, any>,
   ) {
     const err1 = this.preCheck()
-    if(err1) return err1
+    if (err1) return err1
 
     const url = new URL("https://restapi.amap.com/v5/direction/driving")
     const sp = url.searchParams
@@ -1723,7 +1716,7 @@ class GeoLocation {
     funcJson: Record<string, any>,
   ) {
     const err1 = this.preCheck()
-    if(err1) return err1
+    if (err1) return err1
 
     const url = new URL("https://restapi.amap.com/v5/direction/walking")
     const sp = url.searchParams
@@ -1746,7 +1739,7 @@ class GeoLocation {
     funcJson: Record<string, any>,
   ) {
     const err1 = this.preCheck()
-    if(err1) return err1
+    if (err1) return err1
 
     const url = new URL("https://restapi.amap.com/v5/direction/bicycling")
     const sp = url.searchParams
@@ -1767,7 +1760,7 @@ class GeoLocation {
     funcJson: Record<string, any>,
   ) {
     const err1 = this.preCheck()
-    if(err1) return err1
+    if (err1) return err1
 
     const url = new URL("https://restapi.amap.com/v5/direction/electrobike")
     const sp = url.searchParams
@@ -1787,8 +1780,8 @@ class GeoLocation {
     funcJson: Record<string, any>,
   ) {
     const err1 = this.preCheck()
-    if(err1) return err1
-    if(!funcJson.city) {
+    if (err1) return err1
+    if (!funcJson.city) {
       const errRes = checker.getErrResult("the param city is required")
       return errRes
     }
@@ -1799,9 +1792,9 @@ class GeoLocation {
     sp.set("origin", funcJson.origin)
     sp.set("destination", funcJson.destination)
     sp.set("city", funcJson.city)
-    if(funcJson.cityd) sp.set("cityd", funcJson.cityd)
-    if(funcJson.date) sp.set("date", funcJson.date)
-    if(funcJson.time) sp.set("time", funcJson.time)
+    if (funcJson.cityd) sp.set("cityd", funcJson.cityd)
+    if (funcJson.date) sp.set("date", funcJson.date)
+    if (funcJson.time) sp.set("time", funcJson.time)
     const link = url.toString()
     // console.log("maps_direction_transit link::: ", link)
     const res3 = await liuReq(link, undefined, { method: "GET" })
@@ -1815,8 +1808,8 @@ class GeoLocation {
     funcJson: Record<string, any>,
   ) {
     const err1 = this.preCheck()
-    if(err1) return err1
-    if(!funcJson.city1 || !funcJson.city2) {
+    if (err1) return err1
+    if (!funcJson.city1 || !funcJson.city2) {
       const errRes = checker.getErrResult("the params city1 and city2 are required")
       return errRes
     }
@@ -1828,8 +1821,8 @@ class GeoLocation {
     sp.set("destination", funcJson.destination)
     sp.set("city1", funcJson.city1)
     sp.set("city2", funcJson.city2)
-    if(funcJson.date) sp.set("date", funcJson.date)
-    if(funcJson.time) sp.set("time", funcJson.time)
+    if (funcJson.date) sp.set("date", funcJson.date)
+    if (funcJson.time) sp.set("time", funcJson.time)
     const link = url.toString()
     // console.log("maps_direction_transit_more link::: ", link)
     const res3 = await liuReq(link, undefined, { method: "GET" })
@@ -1846,10 +1839,10 @@ class GeoLocation {
     funcJson: Record<string, any>,
   ) {
     const err1 = this.preCheck()
-    if(err1) return err1
+    if (err1) return err1
 
     const res1 = vbot.safeParse(Ns_MapTool.Sch_TextSearchParam, funcJson)
-    if(!res1.success) {
+    if (!res1.success) {
       console.warn("cannot parse maps_text_search param: ")
       console.log(funcJson)
       console.log(res1.issues)
@@ -1861,7 +1854,7 @@ class GeoLocation {
     const url = new URL("https://restapi.amap.com/v5/place/text")
     url.searchParams.set("key", this._amapApiKey)
     url.searchParams.set("keywords", funcJson.keywords)
-    if(funcJson.region) {
+    if (funcJson.region) {
       url.searchParams.set("region", funcJson.region)
       url.searchParams.set("city_limit", "true")
     }
@@ -1877,10 +1870,10 @@ class GeoLocation {
     funcJson: Record<string, any>,
   ) {
     const err1 = this.preCheck()
-    if(err1) return err1
+    if (err1) return err1
 
     const res1 = vbot.safeParse(Ns_MapTool.Sch_AroundSearchParam, funcJson)
-    if(!res1.success) {
+    if (!res1.success) {
       console.warn("cannot parse maps_around_search param: ")
       console.log(funcJson)
       console.log(res1.issues)
@@ -1888,20 +1881,20 @@ class GeoLocation {
       errRes.err.errMsg = checker.getErrMsgFromIssues(res1.issues)
       return errRes
     }
-    
+
     const url = new URL("https://restapi.amap.com/v5/place/around")
     const sp = url.searchParams
     sp.set("key", this._amapApiKey)
     sp.set("location", funcJson.location)
-    if(funcJson.radius) {
+    if (funcJson.radius) {
       const radiusRes = ValueTransform.str2Num(funcJson.radius)
-      if(!radiusRes.pass) {
+      if (!radiusRes.pass) {
         const errRes = checker.getErrResult("radius is not a number")
         return errRes
       }
       sp.set("radius", radiusRes.data.toString())
     }
-    if(funcJson.sortrule) {
+    if (funcJson.sortrule) {
       sp.set("sortrule", funcJson.sortrule)
     }
     const link = url.toString()
@@ -1911,7 +1904,7 @@ class GeoLocation {
     const res4 = await this._afterFetchMaps(res3, link)
     return res4
   }
-  
+
 }
 
 /******************** shared tools ************************/
@@ -1936,7 +1929,7 @@ export class ToolShared {
 
     // 2. handle botName
     let botName = opt?.bot?.name ?? ""
-    if(opt?.fromSystem2) {
+    if (opt?.fromSystem2) {
       const { t } = useI18n(aiLang, { user })
       botName = t("system2_r1")
       this._isSystem2 = true
@@ -1949,14 +1942,14 @@ export class ToolShared {
   ): Promise<DataPass<LiuAi.SearchResult>> {
     // 1. get q
     const q = funcJson.q
-    if(typeof q !== "string") {
+    if (typeof q !== "string") {
       console.warn("web_search q is not string")
       return checker.getErrResult("web_search q is not string")
     }
 
     // 2. call WebSearch.run
     const searchRes = await WebSearch.run(q)
-    if(!searchRes) {
+    if (!searchRes) {
       console.warn("fail to search on web")
       return checker.getErrResult("fail to search on web", "E5004")
     }
@@ -1968,22 +1961,22 @@ export class ToolShared {
     funcJson: Record<string, any>
   ): Promise<DataPass<LiuAi.ReadCardsSharedRes>> {
     // 0. normalize for bots which are not so smart
-    if(funcJson.specificDate === "dayAfterTomorrow") {
+    if (funcJson.specificDate === "dayAfterTomorrow") {
       funcJson.specificDate = "day_after_tomorrow"
     }
-    if(typeof funcJson.hoursFromNow === "number") {
+    if (typeof funcJson.hoursFromNow === "number") {
       funcJson.hoursFromNow = String(funcJson.hoursFromNow)
     }
 
     // 1. checking out param
     const res1 = vbot.safeParse(Sch_AiToolGetScheduleParam, funcJson)
-    if(!res1.success) {
+    if (!res1.success) {
       console.warn("cannot parse get_schedule param, so we make it default")
       console.log(res1.issues)
       funcJson = {}
     }
-    const { 
-      hoursFromNow: strHoursFromNow, 
+    const {
+      hoursFromNow: strHoursFromNow,
       specificDate,
     } = funcJson as AiToolGetScheduleParam
     const resHoursFromNow = ValueTransform.str2Num(strHoursFromNow)
@@ -2010,8 +2003,8 @@ export class ToolShared {
     let textToUser = t("bot_read_future", { bot: botName })
 
     // 3. handle hoursFromNow
-    if(hoursFromNow) {
-      if(hoursFromNow < 0) {
+    if (hoursFromNow) {
+      if (hoursFromNow < 0) {
         sortWay = "desc"
         const command3_1 = _.lt(now)
         const command3_2 = _.gte(now + hoursFromNow * HOUR)
@@ -2028,10 +2021,10 @@ export class ToolShared {
       }
     }
 
-     // 4. handle specificDate
-     if(specificDate) {
+    // 4. handle specificDate
+    if (specificDate) {
       const res4 = this._handleGetScheduleForSpecificDate(specificDate)
-      if(res4) {
+      if (res4) {
         const command4_1 = _.gte(res4.fromStamp)
         const command4_2 = _.lt(res4.toStamp)
         q2.calendarStamp = _.and(command4_1, command4_2)
@@ -2048,18 +2041,18 @@ export class ToolShared {
 
     // 6. package
     let msg6 = ""
-    for(let i=0; i<list5.length; i++) {
+    for (let i = 0; i < list5.length; i++) {
       const v = list5[i]
       const card = TransformContent.getCardData(v)
-      if(!card) continue
+      if (!card) continue
       const msg6_1 = TransformContent.toPlainText(card, user)
-      if(!msg6_1) continue
+      if (!msg6_1) continue
       msg6 += msg6_1
     }
 
     // 7. has data
     const hasData = Boolean(msg6)
-    if(hasData) {
+    if (hasData) {
       textToBot += msg6
     }
     else {
@@ -2095,9 +2088,9 @@ export class ToolShared {
     let textToUser = ""
     let fromStamp: number | undefined
     let toStamp: number | undefined
-    
+
     // 4. if yesterday
-    if(specificDate === "yesterday") {
+    if (specificDate === "yesterday") {
       const yesterdayDate = addDays(todayDate, -1)
       fromStamp = yesterdayDate.getTime() - diffStampBetweenUserAndServer
       toStamp = todayStamp
@@ -2108,9 +2101,9 @@ export class ToolShared {
 
     const tomorrowDate = addDays(todayDate, 1)
     const tomorrowStamp = tomorrowDate.getTime() - diffStampBetweenUserAndServer
-    
+
     // 5. if today
-    if(specificDate === "today") {
+    if (specificDate === "today") {
       fromStamp = todayStamp
       toStamp = tomorrowStamp
       textToBot = t("today_schedule")
@@ -2122,7 +2115,7 @@ export class ToolShared {
     const dayAfterTomorrowStamp = dayAfterTomorrow.getTime() - diffStampBetweenUserAndServer
 
     // 6. if tomorrow
-    if(specificDate === "tomorrow") {
+    if (specificDate === "tomorrow") {
       fromStamp = tomorrowStamp
       toStamp = dayAfterTomorrowStamp
       textToBot = t("tomorrow_schedule")
@@ -2134,7 +2127,7 @@ export class ToolShared {
     const day3Stamp = day3.getTime() - diffStampBetweenUserAndServer
 
     // 7. if day_after_tomorrow
-    if(specificDate === "day_after_tomorrow") {
+    if (specificDate === "day_after_tomorrow") {
       fromStamp = dayAfterTomorrowStamp
       toStamp = day3Stamp
       textToBot = t("day2_schedule")
@@ -2145,12 +2138,12 @@ export class ToolShared {
     // 8. calculate this or next week
     const DAY_LIST = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
     const idx8 = DAY_LIST.indexOf(specificDate)
-    if(idx8 < 0) return
+    if (idx8 < 0) return
     const dayStr = t(specificDate)
 
     const currentDay = currentDate.getDay()
     let diffDays = idx8 - currentDay
-    if(diffDays <= 0) {
+    if (diffDays <= 0) {
       // next week
       diffDays += 7
       textToBot = t("schedule_next_week", { day: dayStr })
@@ -2175,7 +2168,7 @@ export class ToolShared {
 
     // 1. checking out param
     const res1 = vbot.safeParse(Sch_AiToolGetCardsParam, funcJson)
-    if(!res1.success) {
+    if (!res1.success) {
       console.warn("cannot parse get_cards param: ")
       console.log(funcJson)
       console.log(res1.issues)
@@ -2205,21 +2198,21 @@ export class ToolShared {
 
     // 3. get contents
     const cCol = db.collection("Content")
-    if(cardType === "TODO" || cardType === "FINISHED") {
+    if (cardType === "TODO" || cardType === "FINISHED") {
       q2.stateId = cardType
       const q3_0 = cCol.where(q2).orderBy("stateStamp", "desc").limit(10)
       const res3_0 = await q3_0.get<Table_Content>()
       contents = res3_0.data
-      if(cardType === "TODO") {
+      if (cardType === "TODO") {
         textToBot = t("todo_cards")
         textToUser = t("bot_read_todo", { bot: botName })
       }
-      else if(cardType === "FINISHED") {
+      else if (cardType === "FINISHED") {
         textToBot = t("finished_cards")
         textToUser = t("bot_read_finished", { bot: botName })
       }
     }
-    else if(cardType === "EVENT") {
+    else if (cardType === "EVENT") {
       q2.calendarStamp = _.gt(getNowStamp() - DAY)
       const q3_1 = cCol.where(q2).orderBy("createdStamp", "desc").limit(10)
       const res3_1 = await q3_1.get<Table_Content>()
@@ -2237,18 +2230,18 @@ export class ToolShared {
 
     // 6. package
     let msg6 = ""
-    for(let i=0; i<contents.length; i++) {
+    for (let i = 0; i < contents.length; i++) {
       const v = contents[i]
       const card = TransformContent.getCardData(v)
-      if(!card) continue
+      if (!card) continue
       const msg6_1 = TransformContent.toPlainText(card, user)
-      if(!msg6_1) continue
+      if (!msg6_1) continue
       msg6 += msg6_1
     }
 
     // 7. has data
     const hasData = Boolean(msg6)
-    if(hasData) {
+    if (hasData) {
       textToBot += msg6
     }
     else {
@@ -2266,14 +2259,14 @@ export class ToolShared {
   ): Promise<DataPass<LiuAi.ParseLinkResult>> {
     // 1. check out if the link is valid
     const link = funcJson.link
-    if(!valTool.isStringWithVal(link)) {
+    if (!valTool.isStringWithVal(link)) {
       console.warn("it is not a valid link:", funcJson)
       return checker.getErrResult("parameter link is not valid")
     }
 
     // 2. to fetch
     const url = `https://r.jina.ai/${link}`
-    const res2 = await liuFetch(url, { 
+    const res2 = await liuFetch(url, {
       method: "POST",
       headers: {
         "X-Timeout": "30",
@@ -2282,12 +2275,12 @@ export class ToolShared {
 
     // 3. handle result
     let text3 = res2.data?.text
-    if(!text3) {
+    if (!text3) {
       console.warn("parsing link failed!")
       console.log(res2)
       return checker.getErrResult("parsing link failed", "E5004")
     }
-    
+
     return {
       pass: true,
       data: {
@@ -2318,15 +2311,15 @@ export class ToolShared {
     funcJson: Record<string, any>,
     assistantChatId: string,
   ) {
-    const { 
-      t, 
-      agreeLink, 
-      editLink, 
+    const {
+      t,
+      agreeLink,
+      editLink,
       botName,
     } = this.getEssentialReplyData(assistantChatId)
     let msg = ""
     const { title, description } = funcJson
-    if(title) {
+    if (title) {
       msg = t("add_note_with_title", { botName, title, desc: description, agreeLink, editLink })
     }
     else {
@@ -2339,10 +2332,10 @@ export class ToolShared {
     assistantChatId: string,
     funcJson: Record<string, any>,
   ) {
-    const { 
-      t, 
-      agreeLink, 
-      editLink, 
+    const {
+      t,
+      agreeLink,
+      editLink,
       botName,
     } = this.getEssentialReplyData(assistantChatId)
     const { title } = funcJson
@@ -2354,10 +2347,10 @@ export class ToolShared {
     assistantChatId: string,
     funcJson: Record<string, any>,
   ) {
-    const { 
-      t, 
-      agreeLink, 
-      editLink, 
+    const {
+      t,
+      agreeLink,
+      editLink,
       botName,
     } = this.getEssentialReplyData(assistantChatId)
     const {
@@ -2370,7 +2363,7 @@ export class ToolShared {
       laterHour: strLaterHour,
     } = funcJson as AiToolAddCalendarParam
     let msg = t("add_calendar_1", { botName })
-    if(title) {
+    if (title) {
       msg += t("add_calendar_2", { title })
     }
     msg += t("add_calendar_3", { desc: description })
@@ -2384,16 +2377,16 @@ export class ToolShared {
      */
     // 3.1 handle date
     let hasAddedDate = false
-    if(date) {
+    if (date) {
       const dateObj = LiuDateUtil.distractFromYYYY_MM_DD(date)
-      if(dateObj) {
+      if (dateObj) {
         hasAddedDate = true
         msg += t("add_calendar_4", { date })
       }
     }
-    if(specificDate && !hasAddedDate) {
+    if (specificDate && !hasAddedDate) {
       const strDate = t(specificDate)
-      if(strDate) {
+      if (strDate) {
         hasAddedDate = true
         msg += t("add_calendar_4", { date: strDate })
       }
@@ -2401,43 +2394,43 @@ export class ToolShared {
 
     // 3.2 handle time
     let hasAddedTime = false
-    if(time) {
+    if (time) {
       const timeObj = LiuDateUtil.distractFromhh_mm(time)
-      if(timeObj) {
+      if (timeObj) {
         hasAddedTime = true
         msg += t("add_calendar_5", { time })
       }
     }
-    if(earlyMinute && hasAddedTime) {
+    if (earlyMinute && hasAddedTime) {
       let strReminder = ""
-      if(earlyMinute < 60) {
+      if (earlyMinute < 60) {
         strReminder = t("early_min", { min: earlyMinute })
       }
-      else if(earlyMinute === 60 || earlyMinute === 120) {
+      else if (earlyMinute === 60 || earlyMinute === 120) {
         const tmpHrs = Math.round(earlyMinute / 60)
         strReminder = t("early_hr", { hr: tmpHrs })
       }
-      else if(earlyMinute === 1440) {
+      else if (earlyMinute === 1440) {
         strReminder = t("early_day", { day: 1 })
       }
-      if(strReminder) {
+      if (strReminder) {
         msg += t("add_calendar_6", { str: strReminder })
       }
     }
 
     // 3.3 handle later
-    if(laterHour && !hasAddedTime && !hasAddedDate) {
+    if (laterHour && !hasAddedTime && !hasAddedDate) {
       let strLater = ""
-      if(laterHour === 0.5) {
+      if (laterHour === 0.5) {
         strLater = t("later_min", { min: 30 })
       }
-      else if(laterHour < 24) {
+      else if (laterHour < 24) {
         strLater = t("later_hr", { hr: laterHour })
       }
-      else if(laterHour === 24) {
+      else if (laterHour === 24) {
         strLater = t("later_day", { day: 1 })
       }
-      if(strLater) {
+      if (strLater) {
         msg += t("add_calendar_6", { str: strLater })
       }
     }
@@ -2455,7 +2448,7 @@ export class ToolShared {
     // 1. call GeoLocation
     const geo = new GeoLocation()
     const res1 = await geo.maps_regeo(funcJson, extensions)
-    if(!res1.pass) return res1
+    if (!res1.pass) return res1
 
     // 2. add textToUser
     const bot = this._botName
@@ -2467,7 +2460,7 @@ export class ToolShared {
     const location = `${funcJson.longitude},${funcJson.latitude}`
     url3.searchParams.set("location", location)
     textToUser = this.packageLinkForAmap(url3, textToUser, "0")
-    
+
     res1.data.textToUser = textToUser
     return res1
   }
@@ -2476,7 +2469,7 @@ export class ToolShared {
     // 1. call GeoLocation
     const geo = new GeoLocation()
     const res1 = await geo.maps_geo(funcJson)
-    if(!res1.pass) return res1
+    if (!res1.pass) return res1
 
     // 2. add textToUser
     const bot = this._botName
@@ -2487,7 +2480,7 @@ export class ToolShared {
     const url3 = new URL("https://uri.amap.com/search")
     url3.searchParams.set("keyword", funcJson.address)
     url3.searchParams.set("view", "map")
-    if(funcJson.city) {
+    if (funcJson.city) {
       url3.searchParams.set("city", funcJson.city)
     }
     textToUser = this.packageLinkForAmap(url3, textToUser)
@@ -2500,7 +2493,7 @@ export class ToolShared {
     // 1. call GeoLocation
     const geo = new GeoLocation()
     const res1 = await geo.maps_text_search(funcJson)
-    if(!res1.pass) return res1
+    if (!res1.pass) return res1
 
     // 2. add textToUser
     const bot = this._botName
@@ -2514,7 +2507,7 @@ export class ToolShared {
     // 1. call GeoLocation
     const geo = new GeoLocation()
     const res1 = await geo.maps_around_search(funcJson)
-    if(!res1.pass) return res1
+    if (!res1.pass) return res1
 
     // 2. add textToUser
     const bot = this._botName
@@ -2538,7 +2531,7 @@ export class ToolShared {
     // 1. check out params
     const sch1 = this._isSystem2 ? Ns_MapTool.Sch_RouteParam : Ns_MapTool.Sch_DirectionParam
     const res1 = vbot.safeParse(sch1, funcJson)
-    if(!res1.success) {
+    if (!res1.success) {
       console.warn("cannot parse maps_direction param:")
       console.log(funcJson)
       const errMsg = checker.getErrMsgFromIssues(res1.issues)
@@ -2550,7 +2543,7 @@ export class ToolShared {
     const { origin, destination } = funcJson
     const origin2 = ValueTransform.splitInto2Num(origin)
     const destination2 = ValueTransform.splitInto2Num(destination)
-    if(!origin2 || !destination2) {
+    if (!origin2 || !destination2) {
       console.warn("cannot parse origin or destination")
       const errRes = checker.getErrResult("fail to parse origin or destination")
       return errRes
@@ -2560,32 +2553,32 @@ export class ToolShared {
     const d = funcJson.direction as Ns_MapTool.DirectionType
     let res3: DataPass<LiuAi.MapResult> | undefined
     const geo = new GeoLocation()
-    if(d === "driving") {
+    if (d === "driving") {
       res3 = await geo.maps_direction_driving(funcJson)
     }
-    else if(d === "walking") {
+    else if (d === "walking") {
       res3 = await geo.maps_direction_walking(funcJson)
     }
-    else if(d === "bicycling") {
+    else if (d === "bicycling") {
       res3 = await geo.maps_direction_bicycling(funcJson)
     }
-    else if(d === "electrobike") {
+    else if (d === "electrobike") {
       res3 = await geo.maps_direction_electrobike(funcJson)
     }
-    else if(d === "transit") {
-      if(this._isSystem2) {
+    else if (d === "transit") {
+      if (this._isSystem2) {
         res3 = await geo.maps_direction_transit_more(funcJson)
       } else {
         res3 = await geo.maps_direction_transit(funcJson)
       }
     }
-    if(!res3) {
-      return { 
-        pass: false, 
+    if (!res3) {
+      return {
+        pass: false,
         err: { code: "E4000", errMsg: "direction is not legal" },
       }
     }
-    if(!res3.pass) return res3
+    if (!res3.pass) return res3
 
     // 4. add textToUser
     const bot = this._botName
@@ -2636,9 +2629,9 @@ export class Palette {
     const sfUrl = _env.LIU_SILICONFLOW_BASE_URL
     const sfApiKey = _env.LIU_SILICONFLOW_API_KEY
     const sfModel = _env.LIU_SILICONFLOW_IMAGE_GENERATION_MODEL
-    
+
     // 1. run by siliconflow
-    if(sfUrl && sfApiKey && sfModel) {
+    if (sfUrl && sfApiKey && sfModel) {
       const opt1: PaletteSpecificOpt = {
         apiKey: sfApiKey,
         baseUrl: sfUrl,
@@ -2657,7 +2650,7 @@ export class Palette {
     const _env = process.env
     const apiKey = _env.LIU_STEPFUN_API_KEY
     const baseUrl = _env.LIU_STEPFUN_BASE_URL
-    if(!apiKey || !baseUrl) {
+    if (!apiKey || !baseUrl) {
       console.warn("there is no apiKey or baseUrl of stepfun in Palette")
       return
     }
@@ -2677,20 +2670,20 @@ export class Palette {
     try {
       const stamp1 = getNowStamp()
       const res = await liuReq<Ns_Stepfun.ImagesGenerationsRes>(
-        url, 
-        body, 
+        url,
+        body,
         { headers }
       )
       const stamp2 = getNowStamp()
       const durationStamp = stamp2 - stamp1
-      if(res.code === "0000" && res.data) {
+      if (res.code === "0000" && res.data) {
         const parseResult = this._parseFromStepfun(res.data, model, durationStamp, prompt)
         return parseResult
       }
       console.warn("palette runByStepfun got an unexpected result: ")
       console.log(res)
     }
-    catch(err) {
+    catch (err) {
       console.warn("palette runByStepfun error: ")
       console.log(err)
     }
@@ -2705,7 +2698,7 @@ export class Palette {
   ): LiuAi.PaletteResult | undefined {
     // 1. get duration
     const duration = valTool.numToFix(durationStamp, 2)
-    if(isNaN(duration)) {
+    if (isNaN(duration)) {
       console.warn("cannot parse duration in _parseFromStepfun: ")
       console.log(res)
       return
@@ -2717,7 +2710,7 @@ export class Palette {
     // 2. get img
     const theImg = res.data?.[0]
     const url = theImg?.url
-    if(!url) {
+    if (!url) {
       console.warn("cannot get the image url in _parseFromStepfun: ")
       console.log(res)
       return
@@ -2740,7 +2733,7 @@ export class Palette {
     const _env = process.env
     const apiKey = _env.LIU_ZHIPU_API_KEY
     const baseUrl = _env.LIU_ZHIPU_BASE_URL
-    if(!apiKey || !baseUrl) {
+    if (!apiKey || !baseUrl) {
       console.warn("there is no apiKey or baseUrl of zhipu in Palette")
       return
     }
@@ -2754,27 +2747,27 @@ export class Palette {
       prompt,
       size: sizeType === "square" ? "1024x1024" : "768x1344",
     }
-    
+
     console.warn("start to draw with ", model)
     console.log(prompt)
 
     try {
       const stamp1 = getNowStamp()
       const res = await liuReq<Ns_Zhipu.ImagesGenerationsRes>(
-        url, 
-        body, 
+        url,
+        body,
         { headers }
       )
       const stamp2 = getNowStamp()
       const durationStamp = stamp2 - stamp1
-      if(res.code === "0000" && res.data) {
+      if (res.code === "0000" && res.data) {
         const parseResult = this._parseFromZhipu(res.data, model, durationStamp, prompt)
         return parseResult
       }
       console.warn("palette runByZhipu got an unexpected result: ")
       console.log(res)
     }
-    catch(err) {
+    catch (err) {
       console.warn("palette runByZhipu error: ")
       console.log(err)
     }
@@ -2788,7 +2781,7 @@ export class Palette {
   ): LiuAi.PaletteResult | undefined {
     // 1. get duration
     const duration = valTool.numToFix(durationStamp, 2)
-    if(isNaN(duration)) {
+    if (isNaN(duration)) {
       console.warn("cannot parse duration in _parseFromZhipu: ")
       console.log(res)
       return
@@ -2798,7 +2791,7 @@ export class Palette {
     const successRes = res as Ns_Zhipu.ImagesGenerationsRes
     const failRes = res as Ns_Zhipu.ErrorResponse
     const url = successRes.data?.[0]?.url
-    if(!url) {
+    if (!url) {
       console.warn("cannot get the image url in _parseFromZhipu: ")
       console.log(failRes)
       return
@@ -2833,9 +2826,9 @@ export class Palette {
     }
 
     // 2.1 for stable diffusion
-    if(opt.model.includes("stable-diffusion")) {
+    if (opt.model.includes("stable-diffusion")) {
       body.batch_size = 1
-      body.guidance_scale = 7.5 
+      body.guidance_scale = 7.5
     }
 
     console.warn("start to draw with ", opt.model)
@@ -2844,12 +2837,12 @@ export class Palette {
     // 3. to fetch
     try {
       const res3 = await liuReq<Ns_SiliconFlow.ImagesGenerationsRes>(
-        url, 
-        body, 
+        url,
+        body,
         { headers }
       )
 
-      if(res3.code === "0000" && res3.data) {
+      if (res3.code === "0000" && res3.data) {
         const parseResult = this._parseFromSiliconflow(res3.data, opt.model, prompt)
         return parseResult
       }
@@ -2857,7 +2850,7 @@ export class Palette {
       console.warn("palette runBySiliconflow got an unexpected result: ")
       console.log(res3)
     }
-    catch(err) {
+    catch (err) {
       console.warn("palette runBySiliconflow error: ")
       console.log(err)
     }
@@ -2869,18 +2862,18 @@ export class Palette {
     prompt: string,
   ): LiuAi.PaletteResult | undefined {
     const img = data.images?.[0]
-    if(!img) return
+    if (!img) return
     const inference = data.timings?.inference
-    if(!inference) return
+    if (!inference) return
     const url = img.url
 
-    if(model.indexOf("/") > 0) {
+    if (model.indexOf("/") > 0) {
       const tmpList = model.split("/")
       model = tmpList[tmpList.length - 1]
     }
 
     const duration = valTool.numToFix(inference, 2)
-    if(isNaN(duration)) {
+    if (isNaN(duration)) {
       console.warn("cannot parse duration from siliconflow: ")
       console.log(data)
       return
@@ -2914,7 +2907,7 @@ export class TextToSpeech {
     // 1. get api key and base url
     const _env = process.env
     const apiKey = _env.LIU_ALIYUN_BAILIAN_API_KEY
-    if(!apiKey) {
+    if (!apiKey) {
       console.warn("there is no apiKey of tongyi in tts")
       return
     }
@@ -2970,11 +2963,11 @@ export class TextToSpeech {
       })
 
       const _handleBinaryData = (data: any) => {
-        if(Buffer.isBuffer(data)) {
+        if (Buffer.isBuffer(data)) {
           audioChunks.push(data)
           return
         }
-        if(data instanceof ArrayBuffer) {
+        if (data instanceof ArrayBuffer) {
           audioChunks.push(Buffer.from(data))
           return
         }
@@ -2983,7 +2976,7 @@ export class TextToSpeech {
           const buffer = Buffer.from(data)
           audioChunks.push(buffer)
         }
-        catch(err) {
+        catch (err) {
           console.warn("fail to handle binary data")
           console.log(err)
         }
@@ -3024,7 +3017,7 @@ export class TextToSpeech {
       }
 
       ws.on("message", (data, isBinary) => {
-        if(isBinary) {
+        if (isBinary) {
           _handleBinaryData(data)
           return
         }
@@ -3039,17 +3032,17 @@ export class TextToSpeech {
          *   task-failed: 任务失败
          */
 
-        if(evt === "task-started") {
+        if (evt === "task-started") {
           _sendContinueTask()
           return
         }
-        if(evt === "task-finished") {
+        if (evt === "task-finished") {
           ws.close()
           const audioBuffer = Buffer.concat(audioChunks)
           a(audioBuffer)
           return
         }
-        if(evt === "task-failed") {
+        if (evt === "task-failed") {
           console.warn("fail to tts by tongyi")
           console.log("message.header: ", message.header)
           ws.close()
@@ -3070,7 +3063,7 @@ export class TextToSpeech {
     const _env = process.env
     const apiKey = _env.LIU_MINIMAX_API_KEY
     const groupId = _env.LIU_MINIMAX_GROUPID
-    if(!apiKey || !groupId) {
+    if (!apiKey || !groupId) {
       console.warn("there is no apiKey or groupId of minimax in tts")
       return
     }
@@ -3109,12 +3102,12 @@ export class TextToSpeech {
     // 3. to request
     const res3 = await liuReq(link3, body, { headers })
     const data3 = res3.data as Ns_MiniMax.TtsRes
-    if(res3.code !== "0000" || !data3) {
+    if (res3.code !== "0000" || !data3) {
       console.warn("fail to tts by minimax: ")
       console.log(res3)
       return
     }
-    if(!data3.data.audio) {
+    if (!data3.data.audio) {
       console.warn("no audio in tts by minimax")
       console.log(data3)
     }
@@ -3128,7 +3121,7 @@ export class TextToSpeech {
     const _env = process.env
     const apiKey = _env.LIU_STEPFUN_API_KEY
     const baseUrl = _env.LIU_STEPFUN_BASE_URL
-    if(!apiKey || !baseUrl) {
+    if (!apiKey || !baseUrl) {
       console.warn("there is no apiKey or baseUrl of stepfun in tts")
       return
     }
@@ -3138,7 +3131,7 @@ export class TextToSpeech {
     // 爽快男声 vs. 活力女声
     // @reference: https://platform.stepfun.com/docs/guide/tts
     const voice = voicePreference === "male" ? "shuangkuainansheng" : "huolinvsheng"
-    
+
     // 3. to request
     const client = new OpenAI({ apiKey, baseURL: baseUrl })
     const body = {
@@ -3154,7 +3147,7 @@ export class TextToSpeech {
       const mp3 = await client.audio.speech.create(body)
       return mp3
     }
-    catch(err) {
+    catch (err) {
       console.warn("fail to run client.audio.speech.create by stepfun")
       console.log(err)
     }
@@ -3183,16 +3176,16 @@ export class Translator {
     let apiEndpoint: LiuAi.ApiEndpoint | undefined
     const bot = this._bot
     const canUseChat = bot?.abilities.includes("chat")
-    if(canUseChat && bot) {
+    if (canUseChat && bot) {
       apiEndpoint = AiShared.getApiEndpointFromBot(bot)
     }
     let model = bot?.model
-    if(!apiEndpoint || !model) {
+    if (!apiEndpoint || !model) {
       const _env = process.env
       const baseURL = _env.LIU_TRANSLATION_BASE_URL
       const apiKey = _env.LIU_TRANSLATION_API_KEY
       model = _env.LIU_TRANSLATION_MODEL
-      if(!apiKey || !baseURL || !model) {
+      if (!apiKey || !baseURL || !model) {
         console.warn("there is no apiKey or baseUrl in Translator")
         return
       }
@@ -3200,7 +3193,7 @@ export class Translator {
     }
 
     // 2. get prompts
-    const { p } = aiI18nShared({ type: "translate", user: this._user})
+    const { p } = aiI18nShared({ type: "translate", user: this._user })
     const prompts: OaiPrompt[] = [
       { role: "system", content: p("system") },
       { role: "user", content: p("user_1") },
@@ -3221,7 +3214,7 @@ export class Translator {
     // 3. chat 
     const llm = new BaseLLM(apiEndpoint.apiKey, apiEndpoint.baseURL)
     const res3 = await llm.chat({ model, messages: prompts })
-    if(!res3) {
+    if (!res3) {
       console.warn("no res3 in Translator")
       return
     }
@@ -3230,7 +3223,7 @@ export class Translator {
     const {
       content: translatedText,
     } = AiShared.getContentFromLLM(res3, this._bot)
-    if(!translatedText) {
+    if (!translatedText) {
       console.warn("no translatedText in Translator")
       return
     }
@@ -3253,7 +3246,7 @@ export class TransformContent {
 
   static getCardData(v: Table_Content) {
     const data = decryptEncData(v)
-    if(!data.pass) return
+    if (!data.pass) return
     const summary = RichTexter.getSummary(data.liuDesc)
     const obj: LiuAi.CardData = {
       title: data.title ?? "",
@@ -3271,28 +3264,28 @@ export class TransformContent {
     let msg = ""
 
     // title
-    if(v.title) {
+    if (v.title) {
       msg += `  <title>${v.title}</title>\n`
     }
 
     // summary
-    if(v.summary) {
+    if (v.summary) {
       msg += `  <summary>${v.summary}</summary>\n`
     }
-    else if(v.hasImage) {
+    else if (v.hasImage) {
       msg += `  <summary>[Image]</summary>\n`
     }
-    else if(v.hasFile) {
+    else if (v.hasFile) {
       msg += `  <summary>[File]</summary>\n`
     }
 
     // calendarStamp
     const locale = getCurrentLocale({ user })
-    if(v.calendarStamp) {
+    if (v.calendarStamp) {
       const dateStr = LiuDateUtil.displayTime(v.calendarStamp, locale, user?.timezone)
       msg += `  <date>${dateStr}</date>\n`
     }
-    if(!msg) return
+    if (!msg) return
 
     // created
     const createdStr = LiuDateUtil.displayTime(v.createdStamp, locale, user?.timezone)
@@ -3308,7 +3301,7 @@ export class TransformContent {
   ) {
     // 1. try to structure text first
     const txt1 = this.structureText(text, user)
-    if(txt1 !== text) return txt1
+    if (txt1 !== text) return txt1
     const originalText = text
 
     /**
@@ -3325,27 +3318,27 @@ export class TransformContent {
      */
     const idx2_1 = originalText.indexOf("{")
     const idx2_2 = originalText.indexOf("}")
-    if(idx2_1 < 0 || idx2_2 < 1) return text
-    if(idx2_1 > idx2_2) return text
+    if (idx2_1 < 0 || idx2_2 < 1) return text
+    if (idx2_1 > idx2_2) return text
     const str2 = originalText.substring(idx2_1, idx2_2 + 1)
     const txt2 = this.structureText(str2, user)
 
     // 3.1 如果结构化“失败”，代表文本出现乱码（错误的代码）
     // 返回 undefined 这样就不会传给用户
-    if(!txt2) return
+    if (!txt2) return
 
     // 3.2 如果文本长度前后一致，代表没有进行结构化，返回原文本
-    if(txt2.length === str2.length) return txt2
+    if (txt2.length === str2.length) return txt2
 
     // 3.3 如果文本长度前后不一致，看看原文本尾部还有没有消息
     // 若还存有一些消息量，将消息添加到结构化后的文本后面
-    if(originalText.length > idx2_2 + 1) {
+    if (originalText.length > idx2_2 + 1) {
       const txt3 = originalText.substring(idx2_2 + 1).trim()
-      if(txt3.length > 5) {
+      if (txt3.length > 5) {
         return txt2 + "\n\n" + txt3
       }
     }
-    
+
     return txt2
   }
 
@@ -3359,20 +3352,20 @@ export class TransformContent {
     text: string,
     user?: Table_User,
   ) {
-    if(!text.startsWith("{")) return text
-    if(!text.endsWith("}")) return text
+    if (!text.startsWith("{")) return text
+    if (!text.endsWith("}")) return text
     let newText = text
 
     // 1. structure text to location
     const res1 = valTool.strToObj(text)
-    
+
     // 2. if it's a location
-    if(res1.msgtype === "location") {
+    if (res1.msgtype === "location") {
       const res2 = this._turnIntoMapInfo(res1, user)
-      if(!res2) return
+      if (!res2) return
       newText = res2
     }
-    
+
     return newText
   }
 
@@ -3386,8 +3379,8 @@ export class TransformContent {
     // 1. check out params
     const res1 = ValueTransform.str2Num(latitude)
     const res2 = ValueTransform.str2Num(longitude)
-    if(!res1.pass || !res2.pass) return
-    if(!title || typeof title !== "string") return
+    if (!res1.pass || !res2.pass) return
+    if (!title || typeof title !== "string") return
 
     // 2. init msg
     const { t: t1 } = useI18n(aiLang, { user })
@@ -3399,7 +3392,7 @@ export class TransformContent {
 
     // 2.2 add address
     let hasAddress = Boolean(address && typeof address === "string" && address !== title)
-    if(hasAddress) {
+    if (hasAddress) {
       msg += (address + "\n")
     }
     msg += "\n"
@@ -3419,7 +3412,7 @@ export class TransformContent {
     const baiduSp = baiduUrl.searchParams
     baiduSp.set("location", `${latitude},${longitude}`)
     baiduSp.set("title", title)
-    if(hasAddress) {
+    if (hasAddress) {
       baiduSp.set("content", address)
     }
     else {
@@ -3475,7 +3468,7 @@ export class LogHelper {
   ) {
     const msgLength = messages.length
     // console.log(`print last ${lastNum} prompts: `)
-    if(msgLength > lastNum) {
+    if (msgLength > lastNum) {
       const messages2 = messages.slice(msgLength - lastNum)
       const printMsg = valTool.objToStr({ messages: messages2 })
       console.log(printMsg)
@@ -3491,7 +3484,7 @@ export class LogHelper {
     lastNum = 1000,
   ) {
     const tLength = text.length
-    if(tLength <= lastNum) {
+    if (tLength <= lastNum) {
       console.log(text)
       return
     }
@@ -3519,11 +3512,11 @@ export class LiuEmbedding {
 
     // 1. using jina first
     let res = await this.runByJina(input)
-    if(res) return res
+    if (res) return res
 
     // 2. using tongyi
     res = await this.runByTongyi(input)
-    if(res) return res
+    if (res) return res
 
     // 3. using zhipu
     res = await this.runByZhipu(input)
@@ -3548,7 +3541,7 @@ export class LiuEmbedding {
       console.log(`${model} using OpenAICompatible cost ${t2 - t1} ms`)
       return res as LiuAi.EmbeddingResult
     }
-    catch(err) {
+    catch (err) {
       console.warn("fail to get embedding by openai compatible")
       console.log(err)
     }
@@ -3560,7 +3553,7 @@ export class LiuEmbedding {
     baseUrl: string,
   ) {
     const usage = res.usage
-    if(!usage) return
+    if (!usage) return
 
     const logCol = db.collection("LogAi")
     const b1 = getBasicStampWhileAdding()
@@ -3596,9 +3589,9 @@ export class LiuEmbedding {
       const t2 = getNowStamp()
       const durationStamp = t2 - t1
       console.log(`${model} cost ${durationStamp} ms`)
-  
+
       const rData = res1.data as LiuAi.EmbeddingResult
-      if(res1.code !== "0000" || !rData) {
+      if (res1.code !== "0000" || !rData) {
         console.warn(`${model} fail to get embedding`)
         console.log(res1)
         return
@@ -3606,7 +3599,7 @@ export class LiuEmbedding {
       this._log(rData, durationStamp, url)
       return rData
     }
-    catch(err) {
+    catch (err) {
       console.warn("fail to get embedding by liuReq")
       console.log(err)
     }
@@ -3622,9 +3615,9 @@ export class LiuEmbedding {
     }
 
     // 1. get apiEndpoint if not provided
-    if(!apiEndpoint) {
+    if (!apiEndpoint) {
       apiEndpoint = AiShared.getEndpointFromProvider("zhipu")
-      if(!apiEndpoint) {
+      if (!apiEndpoint) {
         console.warn("there is no api key and base url for zhipu")
         return totalResult
       }
@@ -3634,14 +3627,14 @@ export class LiuEmbedding {
     let hasOtherOutOfText = false
     const texts: string[] = []
     input.forEach(v => {
-      if(v && (v as any).text) {
+      if (v && (v as any).text) {
         texts.push((v as any).text)
       }
       else {
         hasOtherOutOfText = true
       }
     })
-    if(hasOtherOutOfText) {
+    if (hasOtherOutOfText) {
       console.warn("zhipu only supports texts for embedding")
       return totalResult
     }
@@ -3666,9 +3659,9 @@ export class LiuEmbedding {
     }
 
     // 1. get apiEndpoint if not provided
-    if(!apiEndpoint) {
+    if (!apiEndpoint) {
       apiEndpoint = AiShared.getEndpointFromProvider("aliyun-bailian")
-      if(!apiEndpoint) {
+      if (!apiEndpoint) {
         console.warn("there is no api key and base url for aliyun-bailian")
         return totalResult
       }
@@ -3678,7 +3671,7 @@ export class LiuEmbedding {
     const allText: string[] = []
     let usingMulti = false
     input.forEach(v => {
-      if(v && (v as any).text) {
+      if (v && (v as any).text) {
         allText.push((v as any).text)
       }
       else {
@@ -3687,7 +3680,7 @@ export class LiuEmbedding {
     })
 
     // 3. using multi model
-    if(usingMulti) {
+    if (usingMulti) {
       const res3 = await this._runWithLiuReq(
         this._tongyi_multi_url,
         apiEndpoint.apiKey,
@@ -3712,21 +3705,21 @@ export class LiuEmbedding {
     input: LiuAi.EmbeddingInput[],
     apiEndpoint?: LiuAi.ApiEndpoint,
   ) {
-    
+
     // 1. check out if we can use gitee ai
     const allText: string[] = []
     let usingMulti = false
     input.forEach(v => {
-      if(v && (v as any).text) {
+      if (v && (v as any).text) {
         allText.push((v as any).text)
       }
       else {
         usingMulti = true
       }
     })
-    if(!usingMulti) {
+    if (!usingMulti) {
       const res2 = await this.runByGiteeAI(allText)
-      if(res2?.originalResult?.data) {
+      if (res2?.originalResult?.data) {
         return res2
       }
     }
@@ -3737,9 +3730,9 @@ export class LiuEmbedding {
     }
 
     // 3. using Provider Jina
-    if(!apiEndpoint) {
+    if (!apiEndpoint) {
       apiEndpoint = AiShared.getEndpointFromProvider("jina")
-      if(!apiEndpoint) {
+      if (!apiEndpoint) {
         console.warn("there is no api key and base url for jina")
         return totalResult
       }
@@ -3760,9 +3753,9 @@ export class LiuEmbedding {
     const totalResult: LiuAi.Res_Embedding = {
       computingProvider: "gitee-ai",
     }
-    if(!apiEndpoint) {
+    if (!apiEndpoint) {
       apiEndpoint = AiShared.getEndpointFromProvider("gitee-ai")
-      if(!apiEndpoint) {
+      if (!apiEndpoint) {
         console.warn("there is no api key and base url for gitee ai")
         return totalResult
       }
@@ -3777,11 +3770,11 @@ export class LiuEmbedding {
     totalResult.originalResult = res2
     return totalResult
   }
-  
+
 
   getOutputs(res: LiuAi.Res_Embedding) {
     const data = res?.originalResult?.data
-    if(!data || data.length < 1) return
+    if (!data || data.length < 1) return
     return data
   }
 
@@ -3794,7 +3787,7 @@ export class WorkerBase {
   private _current: LiuAi.AiWorker | undefined
 
   constructor(type: "txt2txt" | "img2txt") {
-    if(type === "img2txt") {
+    if (type === "img2txt") {
       this._workers = valTool.copyObject(img2TxtWorkers)
     }
     else {
@@ -3809,7 +3802,7 @@ export class WorkerBase {
   getWorker() {
     const workers = this._workers
     const len = workers.length
-    if(len <= 0) return
+    if (len <= 0) return
     const idx = Math.floor(Math.random() * len)
     const theWorker = workers[idx]
     this._deleteProvider(theWorker.computingProvider)
@@ -3824,14 +3817,14 @@ export class WorkerBase {
   async justDoIt(messages: OaiPrompt[]) {
     // 1. get a worker
     const worker = this.getWorker()
-    if(!worker) return
+    if (!worker) return
     let apiEndpoint = AiShared.getEndpointFromProvider(worker.computingProvider)
-    if(!apiEndpoint) return
+    if (!apiEndpoint) return
 
     // 2. run by BaseLLM
     const llm = new BaseLLM(apiEndpoint.apiKey, apiEndpoint.baseURL)
-    const result = await llm.chat({ 
-      messages, 
+    const result = await llm.chat({
+      messages,
       model: worker.model,
       stream: worker.stream,
     })
@@ -3872,7 +3865,8 @@ export class Img2Txt {
             type: "image_url",
             image_url: { url }
           },
-          { type: "text", 
+          {
+            type: "text",
             text: this._prompt || ai_cfg.img2text_prompt,
           },
         ]
@@ -3884,16 +3878,16 @@ export class Img2Txt {
     let chatRes: OaiChatCompletion | undefined
     let worker: LiuAi.AiWorker | undefined
     let res2 = await workerBase.justDoIt(messages)
-    if(!res2 || !res2.result) {
+    if (!res2 || !res2.result) {
       res2 = await workerBase.justDoIt(messages)
     }
     worker = res2?.worker
     chatRes = res2?.result
-    if(!chatRes) return
-    
+    if (!chatRes) return
+
     // 3. get text
     const res3 = AiShared.getContentFromLLM(chatRes)
-    if(!res3.content) return
+    if (!res3.content) return
 
     return {
       text: res3.content,

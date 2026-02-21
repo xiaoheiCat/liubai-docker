@@ -1,8 +1,8 @@
 // Function Name: sync-after
 import cloud from '@lafjs/cloud'
-import { 
+import {
   aiToolAddCalendarSpecificDates,
-  type Table_Content, 
+  type Table_Content,
   type Table_User,
   type LiuAi,
   type OaiPrompt,
@@ -16,21 +16,21 @@ import {
   type Table_WxTask,
   type WorkspaceFeishu,
 } from '@/common-types'
-import { 
+import {
   AiToolUtil,
-  checkIfUserSubscribed, 
-  decryptCloudData, 
-  decryptEncData, 
-  encryptDataWithAES, 
-  getAESKey, 
-  LiuDateUtil, 
-  liuReq, 
-  RichTexter, 
-  valTool, 
+  checkIfUserSubscribed,
+  decryptCloudData,
+  decryptEncData,
+  encryptDataWithAES,
+  getAESKey,
+  LiuDateUtil,
+  liuReq,
+  RichTexter,
+  valTool,
   type DecryptEncData_B,
 } from '@/common-util'
-import { 
-  AiShared, 
+import {
+  AiShared,
   BaseLLM,
   LogHelper,
 } from '@/ai-shared'
@@ -56,22 +56,22 @@ const fastAiWorkers: LiuAi.AiWorker[] = [
   },
   {
     "computingProvider": "aliyun-bailian",
-    "model": "qwen-plus-2025-09-11",
+    "model": "qwen-plus-2025-12-01",
     "character": "tongyi-qwen",
   },
   {
     "computingProvider": "aliyun-bailian",
-    "model": "qwen-plus-2025-07-14",
+    "model": "qwen3.5-plus",
     "character": "tongyi-qwen",
   },
   {
     "computingProvider": "aliyun-bailian",
-    "model": "qwen-plus-2025-07-28",
+    "model": "qwen3.5-plus-2026-02-15",
     "character": "tongyi-qwen",
   },
   {
     "computingProvider": "aliyun-bailian",
-    "model": "qwen3-235b-a22b-instruct-2507",
+    "model": "qwen3.5-397b-a17b",
     "character": "tongyi-qwen",
   },
   {
@@ -134,34 +134,34 @@ export async function afterPostingThread(
   const cCol = db.collection("Content")
   const res1 = await cCol.doc(id).get<Table_Content>()
   const thread = res1.data
-  if(!thread) return
-  if(thread.oState !== "OK") return
+  if (!thread) return
+  if (thread.oState !== "OK") return
 
   // 1.2 decrypt data
   const res1_2 = decryptEncData(thread)
-  if(!res1_2.pass) return
+  if (!res1_2.pass) return
 
   // 2. get user
   const userId = thread.user
   const uCol = db.collection("User")
   const res2 = await uCol.doc(userId).get<Table_User>()
   const user = res2.data
-  if(!user) return
-  if(user.oState !== "NORMAL") return
+  if (!user) return
+  if (user.oState !== "NORMAL") return
 
   // 3.1 decide whether to go to cluster
   let goToCluster = true
-  if(opt?.disableAiCluster) goToCluster = false
+  if (opt?.disableAiCluster) goToCluster = false
   const quota = user.quota
   const aiClusterCount = quota?.aiClusterCount ?? 0
   const hasSubscribed = checkIfUserSubscribed(user)
-  if(aiClusterCount >= AI_CLUSTER_FREE && !hasSubscribed) {
+  if (aiClusterCount >= AI_CLUSTER_FREE && !hasSubscribed) {
     goToCluster = false
   }
-  if(thread.calendarStamp) goToCluster = false
+  if (thread.calendarStamp) goToCluster = false
 
   // 3.2 go to cluster
-  if(goToCluster) {
+  if (goToCluster) {
     const aiCluster = new AiCluster(thread, user, res1_2)
     aiCluster.run(2)
   }
@@ -181,8 +181,8 @@ export async function afterUpdatingTask(
   const uCol = db.collection("User")
   const res2 = await uCol.doc(userId).get<Table_User>()
   const user = res2.data
-  if(!user) return
-  if(user.oState !== "NORMAL") return
+  if (!user) return
+  if (user.oState !== "NORMAL") return
 
   const cluster2 = new AiCluster2(user, task)
   await cluster2.run()
@@ -223,48 +223,48 @@ export class BackupToOthers {
     const wCol = db.collection("Workspace")
     const res1 = await wCol.doc(spaceId).get<Table_Workspace>()
     const space = res1.data
-    if(!space) return false
-    if(space.oState !== "OK") return false
+    if (!space) return false
+    if (space.oState !== "OK") return false
 
     // 2. start to push to outside services
 
     // 2.1 wps
-    if(space.wps) {
+    if (space.wps) {
       this.pushToWPS(space.wps)
     }
 
     // 2.2 dingtalk
-    if(space.dingtalk) {
+    if (space.dingtalk) {
       this.pushToDingTalk(space.dingtalk)
     }
 
     // 2.3 vika
-    if(space.vika) {
+    if (space.vika) {
       this.pushToVika(space.vika)
     }
 
     // 2.4 feishu
-    if(space.feishu) {
+    if (space.feishu) {
       this.pushToFeishu(space.feishu)
     }
-    
+
   }
-  
+
   private async pushToFeishu(cfg: WorkspaceFeishu) {
-    if(cfg.enable !== "Y") return "no_need"
+    if (cfg.enable !== "Y") return "no_need"
     const { enc_personal_base_token, base_id, table_id } = cfg
-    if(!enc_personal_base_token || !base_id || !table_id) return "no_need"
+    if (!enc_personal_base_token || !base_id || !table_id) return "no_need"
 
     // 1. Let's decrypt
     // 1.1 decrypt enc_personal_base_token
     const d_token = decryptCloudData<string>(enc_personal_base_token)
-    if(!d_token.pass) {
+    if (!d_token.pass) {
       console.warn("enc_personal_base_token decrypt failed in pushToFeishu: ", d_token.err)
       this._callReporter("decrypt failed in pushToFeishu", d_token.err)
       return "fail"
     }
     const personal_base_token = d_token.data
-    if(!personal_base_token) {
+    if (!personal_base_token) {
       return "no_need"
     }
 
@@ -293,7 +293,7 @@ export class BackupToOthers {
         }
       })
     }
-    catch(err) {
+    catch (err) {
       console.warn("pushing to feishu failed: ", err)
       this._callReporter("pushing to feishu failed", err)
       return "fail"
@@ -301,45 +301,45 @@ export class BackupToOthers {
 
     // 3. handle result
     const code3 = res2?.code
-    if(code3 !== 0) {
+    if (code3 !== 0) {
       console.warn("fail to push to feishu: ")
       console.log(res2)
       this._callReporter("fail to push to feishu", res2)
       return "fail"
     }
-    
+
     return "success"
   }
 
   private async pushToVika(
     cfg: WorkspaceVika,
   ) {
-    if(cfg.enable !== "Y") return "no_need"
+    if (cfg.enable !== "Y") return "no_need"
     const { enc_api_token, enc_datasheet_id } = cfg
-    if(!enc_api_token || !enc_datasheet_id) return "no_need"
+    if (!enc_api_token || !enc_datasheet_id) return "no_need"
 
     // 1. Let's decrypt
     // 1.1 decrypt enc_api_token
     const d_token = decryptCloudData<string>(enc_api_token)
-    if(!d_token.pass) {
+    if (!d_token.pass) {
       console.warn("enc_api_token decrypt failed in pushToVika: ", d_token.err)
       this._callReporter("decrypt failed in pushToVika", d_token.err)
       return "fail"
     }
     const api_token = d_token.data
-    if(!api_token) {
+    if (!api_token) {
       return "no_need"
     }
 
     // 1.2 decrypt enc_datasheet_id
     const d_datasheet_id = decryptCloudData<string>(enc_datasheet_id)
-    if(!d_datasheet_id.pass) {
+    if (!d_datasheet_id.pass) {
       console.warn("enc_datasheet_id decrypt failed in pushToVika: ", d_datasheet_id.err)
       this._callReporter("decrypt failed in pushToVika", d_datasheet_id.err)
       return "fail"
     }
     const datasheet_id = d_datasheet_id.data
-    if(!datasheet_id) {
+    if (!datasheet_id) {
       return "no_need"
     }
 
@@ -369,12 +369,12 @@ export class BackupToOthers {
     // 3. handle result
     const code3 = res2?.code
     const data3 = res2?.data
-    if(code3 !== "0000" || !data3) {
+    if (code3 !== "0000" || !data3) {
       console.warn("fail to fetch vika: ", res2)
       this._callReporter("fail to fetch vika 1", res2)
       return "fail"
     }
-    if(!data3.success) {
+    if (!data3.success) {
       console.warn("fail to fetch vika: ", data3)
       this._callReporter("fail to fetch vika 2", data3)
       return "fail"
@@ -386,20 +386,20 @@ export class BackupToOthers {
   private async pushToDingTalk(
     cfg: WorkspaceDingTalk,
   ) {
-    if(cfg.enable !== "Y") return "no_need"
+    if (cfg.enable !== "Y") return "no_need"
     const { enc_webhook_url } = cfg
-    if(!enc_webhook_url) return "no_need"
+    if (!enc_webhook_url) return "no_need"
 
     // 1. Let's decrypt
     // 1.1 decrypt enc_webhook_url
     const d_url = decryptCloudData<string>(enc_webhook_url)
-    if(!d_url.pass) {
+    if (!d_url.pass) {
       console.warn("enc_webhook_url decrypt failed in pushToWPS: ", d_url.err)
       this._callReporter("decrypt failed in pushToWPS", d_url.err)
       return "fail"
     }
     const webhook_url = d_url.data
-    if(!webhook_url) {
+    if (!webhook_url) {
       return "no_need"
     }
 
@@ -411,12 +411,12 @@ export class BackupToOthers {
     // 3. handle result
     const code3 = res2?.code
     const data3 = res2?.data
-    if(code3 !== "0000" || !data3) {
+    if (code3 !== "0000" || !data3) {
       console.warn("fail to fetch dingtalk: ", res2)
       this._callReporter("fail to fetch dingtalk 1", res2)
       return "fail"
     }
-    if(!data3.success) {
+    if (!data3.success) {
       console.warn("fail to fetch dingtalk: ", data3)
       this._callReporter("fail to fetch dingtalk 2", data3)
       return "fail"
@@ -428,35 +428,35 @@ export class BackupToOthers {
   private async pushToWPS(
     cfg: WorkspaceWps,
   ): Promise<RunningStatus> {
-    if(cfg.enable !== "Y") return "no_need"
+    if (cfg.enable !== "Y") return "no_need"
     const {
       enc_webhook_url,
       enc_webhook_password,
     } = cfg
-    if(!enc_webhook_url || !enc_webhook_password) return "no_need"
+    if (!enc_webhook_url || !enc_webhook_password) return "no_need"
 
     // 1. Let's decrypt
     // 1.1 decrypt enc_webhook_url
     const d_url = decryptCloudData<string>(enc_webhook_url)
-    if(!d_url.pass) {
+    if (!d_url.pass) {
       console.warn("enc_webhook_url decrypt failed in pushToWPS: ", d_url.err)
       this._callReporter("decrypt failed in pushToWPS", d_url.err)
       return "fail"
     }
     const webhook_url = d_url.data
-    if(!webhook_url) {
+    if (!webhook_url) {
       return "no_need"
     }
 
     // 1.2 decrypt enc_webhook_password
     const d_password = decryptCloudData<string>(enc_webhook_password)
-    if(!d_password.pass) {
+    if (!d_password.pass) {
       console.warn("enc_webhook_password decrypt failed in pushToWPS: ", d_password.err)
       this._callReporter("decrypt failed in pushToWPS", d_password.err)
       return "fail"
     }
     const webhook_password = d_password.data
-    if(!webhook_password) {
+    if (!webhook_password) {
       console.warn("no webhook_password in pushToWPS")
       this._callReporter("no webhook_password in pushToWPS", enc_webhook_password)
       return "fail"
@@ -475,12 +475,12 @@ export class BackupToOthers {
     const res3 = await liuReq(webhook_url, payload, { headers })
     const code3 = res3?.code
     const data3 = res3?.data
-    if(code3 !== "0000" || !data3) {
+    if (code3 !== "0000" || !data3) {
       console.warn("fail to fetch wps: ", res3)
       this._callReporter("fail to fetch wps 1", res3)
       return "fail"
     }
-    if(data3.code !== 0) {
+    if (data3.code !== 0) {
       console.warn("fail to fetch wps: ", data3)
       this._callReporter("fail to fetch wps 2", data3)
       return "fail"
@@ -502,7 +502,7 @@ export class BackupToOthers {
     const reporter = new LiuReporter()
     reporter.sendAny(title, data, footer)
   }
-  
+
 
   private _getBasicData() {
     const {
@@ -514,21 +514,21 @@ export class BackupToOthers {
 
     // handle desc
     let desc = ""
-    if(liuDesc) {
+    if (liuDesc) {
       desc = RichTexter.turnDescToText(liuDesc)
     }
-    if(!desc) {
+    if (!desc) {
       const user = this._user
       const { t } = useI18n(commonLang, { user })
       const imgLength = images?.length ?? 0
       const fileLength = files?.length ?? 0
-      if(fileLength && imgLength) {
+      if (fileLength && imgLength) {
         desc = `[${t("image")} + ${t("file")}]`
       }
-      else if(imgLength) {
+      else if (imgLength) {
         desc = `[${t("image")}]`
       }
-      else if(fileLength) {
+      else if (fileLength) {
         desc = `[${t("file")}]`
       }
     }
@@ -730,16 +730,16 @@ class ClusterHelper {
     const workers = valTool.copyObject(fastAiWorkers)
 
     let runTimes = 0
-    while(workers.length > 0) {
+    while (workers.length > 0) {
       runTimes++
-      if(runTimes > 10) return
+      if (runTimes > 10) return
       const r = Math.random()
       const index = Math.floor(r * workers.length)
       const worker = workers[index]
       const cp = worker.computingProvider
       const apiEndpoint = AiShared.getEndpointFromProvider(cp)
       const filtered = filterModels.includes(worker.model)
-      if(apiEndpoint && !filtered) {
+      if (apiEndpoint && !filtered) {
         return { worker, apiEndpoint }
       }
       workers.splice(index, 1)
@@ -763,7 +763,7 @@ class ClusterHelper {
 
     // 2. add prefix for deepseek
     const provider = aiWorker.computingProvider
-    if(provider === "deepseek") {
+    if (provider === "deepseek") {
       const prompt_31 = {
         "role": "assistant",
         "content": "<output>\n",
@@ -774,16 +774,16 @@ class ClusterHelper {
     }
 
     // 3.1 add partial for kimi
-    if(provider === "moonshot") {
+    if (provider === "moonshot") {
       const prompt_32 = {
         "role": "assistant",
         "content": "<output>\n",
         "partial": true,
       }
-      prompts.push(prompt_32 as OaiPrompt) 
+      prompts.push(prompt_32 as OaiPrompt)
     }
     // 3.2 close thinking for zhipu
-    if(provider === "zhipu" && aiWorker.model.startsWith("glm-")) {
+    if (provider === "zhipu" && aiWorker.model.startsWith("glm-")) {
       //@ts-expect-error thinking
       param3.thinking = { type: "disabled" }
     }
@@ -796,7 +796,7 @@ class ClusterHelper {
     const res4 = await llm.chat(param3, { timeoutSec: 15 })
     const t4_2 = getNowStamp()
     console.log("duration of ai cluster: ", t4_2 - t4_1)
-    if(!res4) {
+    if (!res4) {
       console.warn("no response in ai cluster!", aiWorker)
       LogHelper.printLastItems(prompts)
       return
@@ -806,7 +806,7 @@ class ClusterHelper {
     const res5 = AiShared.getContentFromLLM(res4)
     console.log("res5: ", res5)
     const content5 = res5.content
-    if(!content5) {
+    if (!content5) {
       console.warn("we cannot get content from llm: ", res5)
       return
     }
@@ -821,10 +821,10 @@ class ClusterHelper {
     title: string,
     aiWorker?: LiuAi.AiWorker,
   ) {
-    if(!title.includes("Liubai")) {
+    if (!title.includes("Liubai")) {
       title = "Liubai " + title
     }
-    if(aiWorker) {
+    if (aiWorker) {
       text += `\n\naiWorker: ${valTool.objToStr(aiWorker)}`
     }
 
@@ -839,7 +839,7 @@ class ClusterHelper {
     const uCol = db.collection("User")
     const res1 = await uCol.doc(userId).get<Table_User>()
     const user = res1.data
-    if(!user) return false
+    if (!user) return false
 
     // 2. update quota
     const now2 = getNowStamp()
@@ -872,16 +872,16 @@ class AiCluster2 {
     this._runTimes++
     const aiCapsule = ClusterHelper.getAiWorker(filterModels)
     console.log("aiCapsule: ", aiCapsule)
-    if(!aiCapsule) return false
+    if (!aiCapsule) return false
 
     const msg = this._task.desc
     const res1 = await this.doItByWorker(
-      msg, 
-      aiCapsule.worker, 
+      msg,
+      aiCapsule.worker,
       aiCapsule.apiEndpoint,
     )
 
-    if(!res1 && this._runTimes < 2) {
+    if (!res1 && this._runTimes < 2) {
       console.warn("AiCluster2 runs again.....")
       filterModels.push(aiCapsule.worker.model)
       await this.run(filterModels)
@@ -901,11 +901,11 @@ class AiCluster2 {
       endpoint,
       this._user,
     )
-    if(!content6) return false
+    if (!content6) return false
 
     // 7. turn into object 
     const res7 = await AiShared.turnOutputIntoObject(content6)
-    if(!res7) {
+    if (!res7) {
       const msg7 = "```\n" + content6 + "\n```"
       ClusterHelper.toReport(msg7, "xml2js failed in ai cluster", aiWorker)
       return false
@@ -914,15 +914,15 @@ class AiCluster2 {
 
     // 8.1 turn into waiting data if direction is 1
     const direction8 = res7.direction
-    if(direction8 !== "1") return true
+    if (direction8 !== "1") return true
     delete res7.direction
     const funcJson = res7
     const res8 = AiToolUtil.turnJsonToWaitingData(
-      "add_calendar", 
+      "add_calendar",
       funcJson,
       this._user,
     )
-    if(!res8.pass) {
+    if (!res8.pass) {
       const title8 = "turnJsonToWaitingData failed in ai cluster"
       let msg8 = `## ${title8}:\n\n`
       msg8 += (res8.err.errMsg ?? "")
@@ -935,15 +935,15 @@ class AiCluster2 {
     // 8.2 check out waiting data
     const waitingData = res8.data
     const calendarStamp = waitingData.calendarStamp
-    if(!calendarStamp) {
+    if (!calendarStamp) {
       const title8_2 = "waiting data is weird"
       const msg8_2 = valTool.objToStr(waitingData)
       ClusterHelper.toReport(msg8_2, title8_2, aiWorker)
       return false
     }
     const now8 = getNowStamp()
-    if(now8 >= calendarStamp) return false
-    if(!waitingData.remindStamp || !waitingData.remindMe) {
+    if (now8 >= calendarStamp) return false
+    if (!waitingData.remindStamp || !waitingData.remindMe) {
       waitingData.remindStamp = calendarStamp
       waitingData.remindMe = {
         type: "early",
@@ -955,7 +955,7 @@ class AiCluster2 {
 
     // 9. update task
     await this.updateTask(waitingData, aiWorker)
-    
+
     // 10. update user quota
     const userId = this._user._id
     await ClusterHelper.updateQuota(userId)
@@ -1006,16 +1006,16 @@ class AiCluster {
   private getInputMessage() {
     const title = this._decryptedData.title
     const liuDesc = this._decryptedData.liuDesc
-    if(!liuDesc || liuDesc.length > 1) return title
+    if (!liuDesc || liuDesc.length > 1) return title
     const item1 = liuDesc[0]
-    if(!item1 || item1.type !== "paragraph") return title
+    if (!item1 || item1.type !== "paragraph") return title
     const content1 = item1.content
-    if(!content1 || content1.length === 0) return title
+    if (!content1 || content1.length === 0) return title
     const { type: type1, text: text1 } = content1[0]
-    if(type1 !== "text" || !text1) return title
+    if (type1 !== "text" || !text1) return title
 
     // title is empty
-    if(!title) return text1
+    if (!title) return text1
 
     // title + desc
     return title + "\n" + text1
@@ -1033,11 +1033,11 @@ class AiCluster {
       endpoint,
       this._user,
     )
-    if(!content6) return false
+    if (!content6) return false
 
     // 7. turn into object
     const res7 = await AiShared.turnOutputIntoObject(content6)
-    if(!res7) {
+    if (!res7) {
       ClusterHelper.toReport(content6, "xml2js failed in ai cluster", aiWorker)
       return false
     }
@@ -1045,15 +1045,15 @@ class AiCluster {
 
     // 8.1 turn into waiting data if direction is 1
     const direction8 = res7.direction
-    if(direction8 !== "1") return false
+    if (direction8 !== "1") return false
     delete res7.direction
     const funcJson = res7
     const res8 = AiToolUtil.turnJsonToWaitingData(
-      "add_calendar", 
+      "add_calendar",
       funcJson,
       this._user,
     )
-    if(!res8.pass) {
+    if (!res8.pass) {
       const title8 = "turnJsonToWaitingData failed in ai cluster"
       let msg8 = `## ${title8}:\n\n`
       msg8 += (res8.err.errMsg ?? "")
@@ -1065,7 +1065,7 @@ class AiCluster {
 
     // 8.2 check out waiting data
     const waitingData = res8.data
-    if(!waitingData.calendarStamp) {
+    if (!waitingData.calendarStamp) {
       const title8_2 = "waiting data is weird"
       const msg8_2 = valTool.objToStr(waitingData)
       ClusterHelper.toReport(msg8_2, title8_2, aiWorker)
@@ -1074,7 +1074,7 @@ class AiCluster {
 
     // 9. to update thread
     const res9 = await this.updateThread(res8.data, aiWorker)
-    if(!res9) return false
+    if (!res9) return false
 
     // 10. to update quota for user
     const userId = this._user._id
@@ -1087,14 +1087,14 @@ class AiCluster {
   ) {
     // 1. get user's input
     const msg1 = this.getInputMessage()
-    if(!msg1) return false
+    if (!msg1) return false
 
     // 2. call ai worker to run
     let promises: Promise<boolean>[] = []
     let filterModels: string[] = []
-    for(let i=0; i<workerNum; i++) {
+    for (let i = 0; i < workerNum; i++) {
       const v = ClusterHelper.getAiWorker(filterModels)
-      if(!v) break
+      if (!v) break
       filterModels.push(v.worker.model)
       const aiWorker = v.worker
       const endpoint = v.apiEndpoint
@@ -1103,7 +1103,7 @@ class AiCluster {
     }
 
     // 3. handle promises
-    if(promises.length < 1) {
+    if (promises.length < 1) {
       return false
     }
     const res3 = await Promise.all(promises)
@@ -1117,7 +1117,7 @@ class AiCluster {
   ) {
     // 1. check out liuDesc
     const { liuDesc } = waitingData
-    if(!liuDesc || liuDesc.length < 1) {
+    if (!liuDesc || liuDesc.length < 1) {
       const msg1 = valTool.objToStr(waitingData)
       ClusterHelper.toReport(msg1, "liuDesc is empty in ai cluster")
       return false
@@ -1129,12 +1129,12 @@ class AiCluster {
     const cCol = db.collection("Content")
     const res2 = await cCol.doc(threadId).get<Table_Content>()
     const theThread = res2.data
-    if(!theThread) return false
-    if(theThread.oState !== "OK") return false
-    
+    if (!theThread) return false
+    if (theThread.oState !== "OK") return false
+
     // 3. encrypt data
     const aesKey = getAESKey()
-    if(!aesKey) {
+    if (!aesKey) {
       ClusterHelper.toReport("aesKey is empty in ai cluster", "aesKey is empty")
       return false
     }
