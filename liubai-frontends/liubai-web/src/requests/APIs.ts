@@ -24,4 +24,5 @@ export default {
   BIND_DATA: d + `user-settings`,
   AUTHORIZE: d + `user-settings`,
   AI_CONSOLE: d + `user-settings`,
+  WEB_PUSH_SUB: d + `user-settings`,
 }

@@ -1,7 +1,8 @@
 import { getWebPushSubscription } from "~/hooks/pwa/useWebPush";
 import time from "../basic/time";
 import localCache from "../system/local-cache";
-
+import APIs from "~/requests/APIs";
+import liuReq from "~/requests/liu-req";
 
 
 export async function handleWebPushSubscription(
@@ -21,15 +22,21 @@ export async function handleWebPushSubscription(
   if (!sub) return false
 
   // 3. 去存储到远端
-  const clientId = localCache.getClientId()
-  const endpoint = sub.endpoint
+  const res = await liuReq.request(APIs.WEB_PUSH_SUB, {
+    operateType: "save_webpush_sub",
+    subscription: sub.toJSON(),
+    userAgent: navigator.userAgent,
+  })
 
-  // ......
-
+  // 如果存储失败了
+  if (res.code !== "0000") {
+    console.warn("save web push fail: ", res)
+    return false
+  }
 
   // 4. 保存成功后，设置 lastSaveWebPushStamp
   localCache.setOnceData("lastSaveWebPushStamp", time.getTime())
 
-
+  return true
 
 }
