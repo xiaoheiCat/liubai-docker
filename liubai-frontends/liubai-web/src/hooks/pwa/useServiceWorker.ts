@@ -46,10 +46,6 @@ const _checkSW = async (r: ServiceWorkerRegistration) => {
   try {
     const resp = await fetch(swUrl, {
       cache: 'no-store',
-      headers: {
-        'cache': 'no-store',
-        'cache-control': 'no-cache',
-      },
     })
 
     if (resp?.status === 200) {
