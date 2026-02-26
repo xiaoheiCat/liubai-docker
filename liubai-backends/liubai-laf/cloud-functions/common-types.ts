@@ -89,8 +89,10 @@ export const sch_opt_num = (
   max?: number,
 ) => {
   let pipe: vbot.Pipe<any> | undefined
-  if (min) pipe = [vbot.minValue(min)]
-  if (max) {
+  if (min !== undefined) {
+    pipe = [vbot.minValue(min)]
+  }
+  if (max !== undefined) {
     const m = vbot.maxValue(max)
     pipe = pipe ? [...pipe, m] : [m]
   }
