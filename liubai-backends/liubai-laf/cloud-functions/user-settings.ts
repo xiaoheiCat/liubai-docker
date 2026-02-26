@@ -816,7 +816,7 @@ async function handle_logout(
   }
 
   // 2. remove for db
-  const res2 = await col.where({ _id: serial_id }).remove()
+  await col.where({ _id: serial_id }).remove()
 
   // 3. remove for cache
   const map = getLiuTokenUser()
@@ -824,7 +824,8 @@ async function handle_logout(
 
   // 4. remove web push sub for current device
   const userAgent = body.userAgent
-  if (userAgent && d.userId) {
+  const hasUA = valTool.isStringWithVal(userAgent)
+  if (hasUA && d.userId) {
     const wpsCol = db.collection("WebPushSub")
     await wpsCol.where({ userId: d.userId, userAgent }).remove()
   }

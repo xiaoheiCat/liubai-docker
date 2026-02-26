@@ -43,23 +43,27 @@ const _checkSW = async (r: ServiceWorkerRegistration) => {
   }
   localCache.setOnceData("lastCheckSWStamp", time.getTime())
 
-  const resp = await fetch(swUrl, {
-    cache: 'no-store',
-    headers: {
-      'cache': 'no-store',
-      'cache-control': 'no-cache',
-    },
-  })
+  try {
+    const resp = await fetch(swUrl, {
+      cache: 'no-store',
+      headers: {
+        'cache': 'no-store',
+        'cache-control': 'no-cache',
+      },
+    })
 
-  if (resp?.status === 200) {
-    console.time("r.update")
-    await r.update()
-    console.timeEnd("r.update")
-  }
-  else {
-    console.warn("fail to fetch the result from service worker:")
-    console.log(resp)
-    console.log(" ")
+    if (resp?.status === 200) {
+      console.time("r.update")
+      await r.update()
+      console.timeEnd("r.update")
+    }
+    else {
+      console.warn("fail to fetch the result from service worker:")
+      console.log(resp)
+      console.log(" ")
+    }
+  } catch (err) {
+    console.error("Error in _checkSW updates:", err)
   }
 }
 
