@@ -619,6 +619,21 @@ export class WxGzhSender {
   }
 }
 
+interface WebPushSubscription {
+  endpoint: string;
+  keys: {
+    p256dh: string;
+    auth: string;
+  };
+}
+
+interface WebPushRequestDetails {
+  method: 'POST';
+  headers: Record<string, string>;
+  body: Buffer | null;
+  endpoint: string;
+}
+
 export class WebPushSender {
   private static _isConfigured = false
 
@@ -672,75 +687,101 @@ export class WebPushSender {
   }
 
   static async sendNotification(
-    sub: any,
+    sub: any, // keeps any here as it comes from database/external
     title: string,
     body: string,
     navigateUrl: string,
     tag?: string,
     timestamp?: number
   ) {
-    const isConfigured = this._configure()
-    if (!isConfigured) return { code: "E5001", errMsg: "WebPush is not configured properly." }
-
-    const _env = process.env
-    const proxyHost = _env.LIU_WEB_PUSH_PROXY_HOST
-    let finalEndpoint = sub.endpoint
-
-    if (proxyHost && finalEndpoint.includes('fcm.googleapis.com')) {
-      try {
-        const url = new URL(finalEndpoint)
-        url.host = proxyHost
-        finalEndpoint = url.toString()
-        console.log(`webpush using proxy: ${proxyHost}, finalEndpoint: ${finalEndpoint}`)
-      } catch (err) {
-        console.warn("Failed to parse webpush endpoint for proxy:", err)
-      }
+    if (!this._configure()) {
+      return { code: "E5001", errMsg: "WebPush is not configured properly." }
     }
 
     const payload = this.formatPayload(title, body, navigateUrl, tag, timestamp)
-
+    const proxyHost = process.env.LIU_WEB_PUSH_PROXY_HOST
     const startStamp = Date.now()
+
+    const pushSubscription: WebPushSubscription = {
+      endpoint: sub.endpoint,
+      keys: { p256dh: sub.p256dh, auth: sub.auth }
+    }
+
     try {
-      // sub is expected to have { endpoint, keys: { p256dh, auth } }
-      const pushSubscription = {
-        endpoint: finalEndpoint,
-        keys: {
-          p256dh: sub.p256dh,
-          auth: sub.auth,
-        }
+      // 核心路经：如果是 FCM 且开启了代理，走手动 fetch 以兼容 VAPID Audience
+      const useProxy = !!(proxyHost && sub.endpoint.includes('fcm.googleapis.com'))
+
+      if (useProxy) {
+        await this._sendViaProxy(pushSubscription, payload, proxyHost!, startStamp)
+      } else {
+        await this._sendDirectly(pushSubscription, payload, startStamp)
       }
-
-      // Create a 10s timeout promise
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Web Push Request Timeout')), 10000)
-      })
-
-      // Race the actual webpush call against the timeout
-      const result = await Promise.race([
-        webpush.sendNotification(pushSubscription, payload),
-        timeoutPromise
-      ])
-      console.log(`webpush.sendNotification 耗时: ${Date.now() - startStamp}ms, result:`, result)
 
       return { code: "0000" }
     } catch (err: any) {
-      const duration = Date.now() - startStamp
-      if (err.statusCode === 410 || err.statusCode === 404) {
-        // Gone or Not Found - means the subscription is no longer valid
-        console.warn(`webpush returning ${err.statusCode}. deleting WebPushSub for user: ${sub.userId}, endpoint: ${sub.endpoint}, 耗时: ${duration}ms`)
-        console.log(`err: `, err)
-        if (sub._id) {
-          await db.collection("WebPushSub").doc(sub._id).remove()
-        }
-        return { code: "E4010", errMsg: "Subscription expired or unsubscribed." }
-      }
-      console.warn(`webpush.sendNotification failed or timed out. endpoint: ${sub.endpoint}, 耗时: ${duration}ms`, err.message || err)
-      return { code: "E5004", errMsg: "Failed to send web push notification.", data: err.message || err }
+      return await this._handleSendError(err, sub, startStamp)
     }
   }
+
+  /** [私有辅助] 通过代理发送 (修复 VAPID Audience 问题) */
+  private static async _sendViaProxy(sub: WebPushSubscription, payload: string, proxyHost: string, start: number) {
+    let finalUrl = sub.endpoint
+    try {
+      const url = new URL(sub.endpoint)
+      url.host = proxyHost
+      finalUrl = url.toString()
+      console.log(`webpush using proxy: ${proxyHost}, finalUrl: ${finalUrl}`)
+    } catch (err) {
+      console.warn("Failed to parse webpush endpoint for proxy:", err)
+    }
+
+    // Use type assertion to access generateRequestDetails if not in official types
+    const requestDetails = webpush.generateRequestDetails(sub, payload) as WebPushRequestDetails
+
+    const response = await valTool.promiseTimeout(
+      fetch(finalUrl, {
+        method: requestDetails.method,
+        headers: requestDetails.headers,
+        body: requestDetails.body as any, // fetch body accepts Buffer
+      }),
+      10000,
+      'Web Push Proxy Timeout'
+    )
+
+    console.log(`webpush via proxy status: ${response.status}, 耗时: ${Date.now() - start}ms`)
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw { statusCode: response.status, message: errorText }
+    }
+  }
+
+  /** [私有辅助] 直接发送 (Standard Web Push) */
+  private static async _sendDirectly(sub: any, payload: string, start: number) {
+    const result = await valTool.promiseTimeout(
+      webpush.sendNotification(sub, payload),
+      10000,
+      'Web Push Request Timeout'
+    )
+    console.log(`webpush direct, 耗时: ${Date.now() - start}ms, result:`, result)
+  }
+
+  /** [私有辅助] 统一处理错误 */
+  private static async _handleSendError(err: any, sub: any, start: number) {
+    const duration = Date.now() - start
+    const statusCode = err.statusCode || 0
+
+    // 处理 410 (Gone) 或 404 (Not Found) - 自动清理失效订阅
+    if (statusCode === 410 || statusCode === 404) {
+      console.warn(`webpush ${statusCode}, clearing sub: ${sub.endpoint}, 耗时: ${duration}ms`)
+      if (sub._id) await db.collection("WebPushSub").doc(sub._id).remove()
+      return { code: "E4010", errMsg: "Subscription expired or unsubscribed." }
+    }
+
+    console.warn(`webpush failed, endpoint: ${sub.endpoint}, 耗时: ${duration}ms, error:`, err.message || err || err.name)
+    return { code: "E5004", errMsg: "Failed to send web push notification.", data: err.message || err || err.name }
+  }
 }
-
-
 
 export class LiuReporter {
 

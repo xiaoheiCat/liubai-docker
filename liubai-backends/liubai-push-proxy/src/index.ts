@@ -15,15 +15,24 @@ export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 		const url = new URL(request.url);
 
-		// We expect the request to be sent to this worker with the original path
-		// Example: https://proxy-worker.subdomain.workers.dev/wp/v1/sub-id
-		// We need to forward it to: https://fcm.googleapis.com/wp/v1/sub-id
+		// 1. Block robots.txt and common bot paths
+		if (url.pathname === '/robots.txt' || url.pathname === '/robot.txt') {
+			return new Response("User-agent: *\nDisallow: /", {
+				headers: { "Content-Type": "text/plain" }
+			});
+		}
+
+		// 2. Only allow specific FCM/WebPush paths and POST method
+		const isWebPushPath = url.pathname.startsWith('/fcm/') || url.pathname.startsWith('/wp/v1/');
+		if (!isWebPushPath || request.method !== 'POST') {
+			return new Response("Not Found", { status: 404 });
+		}
 
 		const targetHost = 'fcm.googleapis.com';
 		const newUrl = new URL(url.pathname + url.search, `https://${targetHost}`);
 
-		console.log(`[Proxy] Incoming request: ${request.method} ${url.pathname}`);
-		console.log(`[Proxy] Forwarding to: ${newUrl.toString()}`);
+		console.log(`[Proxy 0227-v3] Incoming request: ${request.method} ${url.pathname}`);
+		console.log(`[Proxy 0227-v3] Forwarding to: ${newUrl.toString()}`);
 
 		// Create a new request based on the original one
 		const newRequest = new Request(newUrl, {
