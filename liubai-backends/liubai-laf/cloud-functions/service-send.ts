@@ -682,13 +682,28 @@ export class WebPushSender {
     const isConfigured = this._configure()
     if (!isConfigured) return { code: "E5001", errMsg: "WebPush is not configured properly." }
 
+    const _env = process.env
+    const proxyHost = _env.LIU_WEB_PUSH_PROXY_HOST
+    let finalEndpoint = sub.endpoint
+
+    if (proxyHost && finalEndpoint.includes('fcm.googleapis.com')) {
+      try {
+        const url = new URL(finalEndpoint)
+        url.host = proxyHost
+        finalEndpoint = url.toString()
+        console.log(`webpush using proxy: ${proxyHost}, finalEndpoint: ${finalEndpoint}`)
+      } catch (err) {
+        console.warn("Failed to parse webpush endpoint for proxy:", err)
+      }
+    }
+
     const payload = this.formatPayload(title, body, navigateUrl, tag, timestamp)
 
     const startStamp = Date.now()
     try {
       // sub is expected to have { endpoint, keys: { p256dh, auth } }
       const pushSubscription = {
-        endpoint: sub.endpoint,
+        endpoint: finalEndpoint,
         keys: {
           p256dh: sub.p256dh,
           auth: sub.auth,
@@ -712,14 +727,14 @@ export class WebPushSender {
       const duration = Date.now() - startStamp
       if (err.statusCode === 410 || err.statusCode === 404) {
         // Gone or Not Found - means the subscription is no longer valid
-        console.warn(`webpush returning ${err.statusCode}. deleting WebPushSub for user: ${sub.userId} 耗时: ${duration}ms`)
+        console.warn(`webpush returning ${err.statusCode}. deleting WebPushSub for user: ${sub.userId}, endpoint: ${sub.endpoint}, 耗时: ${duration}ms`)
         console.log(`err: `, err)
         if (sub._id) {
           await db.collection("WebPushSub").doc(sub._id).remove()
         }
         return { code: "E4010", errMsg: "Subscription expired or unsubscribed." }
       }
-      console.warn(`webpush.sendNotification failed or timed out. 耗时: ${duration}ms`, err.message || err)
+      console.warn(`webpush.sendNotification failed or timed out. endpoint: ${sub.endpoint}, 耗时: ${duration}ms`, err.message || err)
       return { code: "E5004", errMsg: "Failed to send web push notification.", data: err.message || err }
     }
   }

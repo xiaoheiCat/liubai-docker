@@ -1,0 +1,14 @@
+{
+    "name": "liubai-cf-proxy",
+    "version": "1.0.0",
+    "scripts": {
+        "login": "wrangler login",
+        "dev": "wrangler dev index.ts",
+        "deploy": "wrangler deploy index.ts"
+    },
+    "devDependencies": {
+        "@cloudflare/workers-types": "^4.20240108.0",
+        "typescript": "^5.3.3",
+        "wrangler": "^4.69.0"
+    }
+}

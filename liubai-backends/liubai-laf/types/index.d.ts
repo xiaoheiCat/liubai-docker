@@ -1,4 +1,4 @@
-import { 
+import {
   FunctionContext as _FunctionContext
 } from "@lafjs/cloud"
 import { ObjectId as _ObjectId } from "mongodb"
@@ -8,8 +8,8 @@ type LiuSwitch = "01" | "02" | undefined
 declare global {
   type FunctionContext = _FunctionContext
 
-  class ObjectId extends _ObjectId {}
-  
+  class ObjectId extends _ObjectId { }
+
   namespace NodeJS {
     interface ProcessEnv {
 
@@ -27,7 +27,7 @@ declare global {
       */
       LIU_CLOUD_LOGIN: LiuSwitch | "03"
 
-      LIU_ENV_STATE?: "prod" | "dev" 
+      LIU_ENV_STATE?: "prod" | "dev"
 
       /** 当前应用的域名 
        *  其结尾请不要添加路径的开头 `/`
@@ -45,10 +45,13 @@ declare global {
       LIU_VAPID_PUBLIC_KEY?: string
       LIU_VAPID_PRIVATE_KEY?: string
 
+      /** Web Push 代理主机，用于处理中国大陆地区无法访问 fcm.googleapis.com 的网络限制 */
+      LIU_WEB_PUSH_PROXY_HOST?: string
+
       /** 默认时区，比如 "8.5" 就是东 8.5 时区 */
       LIU_TIMEZONE?: string
       LIU_CURRENCY?: string   // 默认货币单位（兜底用，大写）
-                              // 比如 "CNY" / "USD" / "HKD" / "EUR" / "JPY" / "TWD" / "NZD" / "AUD"
+      // 比如 "CNY" / "USD" / "HKD" / "EUR" / "JPY" / "TWD" / "NZD" / "AUD"
 
       /** email */
       LIU_EMAIL_1?: string           // 商务合作
@@ -108,9 +111,9 @@ declare global {
       LIU_WX_MINI_TMPL_ID_1?: string       // 优惠券即将过期通知
       LIU_WX_MINI_TMPL_ID_2?: string       // 如果有相似的优惠券，要发送的通知
       LIU_WX_MINI_VERSION_TYPE?: "0" | "1" | "2"    // 0: 正式版
-                                                    // 1: 开发版
-                                                    // 2: 体验版
-      
+      // 1: 开发版
+      // 2: 体验版
+
 
       /** 企业微信 企业内部自建应用 */
       LIU_WECOM_QYNB_CORPID?: string
@@ -119,8 +122,8 @@ declare global {
       LIU_WECOM_QYNB_TOKEN?: string
       LIU_WECOM_QYNB_ENCODING_AESKEY?: string
       LIU_WECOM_QYNB_BOT_IDS?: string    // wecom's userIds where these wecom users
-                                         // can send & receive messages via our backend
-                                         // plz use comma（,） to split
+      // can send & receive messages via our backend
+      // plz use comma（,） to split
       // 企业微信 会话内容存档
       LIU_WECOM_CHAT_SYNC_TOKEN?: string
       LIU_WECOM_CHAT_SYNC_ENCODING_AESKEY?: string
@@ -236,7 +239,7 @@ declare global {
       /** Amap */
       LIU_AMAP_WEB_KEY?: string              // Web Key of Amap
 
-      /** Jina */ 
+      /** Jina */
       LIU_JINA_BASE_URL?: string             // Do not add a trailing slash: /
       LIU_JINA_APIKEY?: string
 
