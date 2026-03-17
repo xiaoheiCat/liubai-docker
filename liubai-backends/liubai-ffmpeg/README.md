@@ -40,4 +40,4 @@ ffmpeg -version                        # verify if installed successfully
 
 ## 启动服务
 
-`pnpm dev` 启动服务。
+`bun run dev` 启动服务。

@@ -65,7 +65,7 @@
 
 `liubai-docs` 为文档根目录，使用 [VitePress](https://vitepress.dev/) 构建。
 
-`liubai-web` 为前端根目录，主要基于 [Vue 3.x](https://vuejs.org/) + [Vite](https://vite.dev/) + [VueUse](https://vueuse.org/) + [TypeScript](https://www.typescriptlang.org/) + [Dexie.js](https://dexie.org/docs/) + [TipTap](https://tiptap.dev/) ...... 等一系列前端工具链构建，在该目录下运行 `pnpm i` 和 `pnpm dev` 即可启动留白前端。
+`liubai-web` 为前端根目录，主要基于 [Vue 3.x](https://vuejs.org/) + [Vite](https://vite.dev/) + [VueUse](https://vueuse.org/) + [TypeScript](https://www.typescriptlang.org/) + [Dexie.js](https://dexie.org/docs/) + [TipTap](https://tiptap.dev/) ...... 等一系列前端工具链构建，在该目录下运行 `bun install` 和 `bun run dev` 即可启动留白前端。
 
 `liubai-weixin` 微信小程序根目录，使用 Skyline + TypeScript + [Chat Tool API](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/chatTool.html) 构建，让你直接跟微信联络人一起做任务！
 

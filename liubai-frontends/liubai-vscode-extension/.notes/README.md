@@ -12,18 +12,35 @@
 
 ### 当 .env 环境变量有修改时
 
-请重新编辑: `pnpm compile`，否则直接 `Fn + F5` 容易报错。
+请重新编辑: `bun run compile`，否则直接 `Fn + F5` 容易报错。
 
 ### 在当前 IDE 中启动一个 Chromium 进行调试
 
-运行 `pnpm open-in-browser`
+运行 `bun run open-in-browser`
 
 ### 在 vscode.dev 中调试
+
+#### 前置条件
+
+安装 [mkdir](https://github.com/FiloSottile/mkcert#installation)，并且运行
+
+```bash
+mkdir -p $HOME/certs
+cd $HOME/certs
+mkcert -install
+mkcert localhost
+```
+
+详情见 [Test your web extension in vscode.dev](https://code.visualstudio.com/api/extension-guides/web-extensions#test-your-web-extension-in-vscode.dev)
+
+这个方法不适用于 `github.dev` 因为它有 CORS 的限制。
+
+#### 开始
 
 如何启动一个服务，让在线的 vscode.dev Web IDE 加载当前正在开发的 extension？运行
 
 ```bash
-npx serve --cors -l 5000 --ssl-cert $HOME/certs/localhost.pem --ssl-key $HOME/certs/localhost-key.pem
+bunx serve --cors -l 5000 --ssl-cert $HOME/certs/localhost.pem --ssl-key $HOME/certs/localhost-key.pem
 
 npx: installed 78 in 2.196s
 
@@ -41,18 +58,6 @@ npx: installed 78 in 2.196s
 
 把打印出来的 `https://localhost:5000` 填充进 `vscode.dev` 的 `Developer: Install Extension from Location...` 这个命令中。
 
-前置条件，已安装过 [mkdir](https://github.com/FiloSottile/mkcert#installation)，并且曾经运行过：
-
-```bash
-mkdir -p $HOME/certs
-cd $HOME/certs
-mkcert -install
-mkcert localhost
-```
-
-详情见 [Test your web extension in vscode.dev](https://code.visualstudio.com/api/extension-guides/web-extensions#test-your-web-extension-in-vscode.dev)
-
-这个方法不适用于 `github.dev` 因为它有 CORS 的限制。
 
 ### 在 VSCodium 中调试
 
@@ -65,7 +70,7 @@ mkcert localhost
 在 `liubai-vscode-extension` 目录下运行：
 
 ```shell
-pnpx @vscode/vsce package --no-dependencies
+bunx @vscode/vsce package --no-dependencies
 ```
 
 这个命令会检测 `package.json` 的 `scripts` 字段，找到 `vscode:prepublish` 命令，然后执行它。
@@ -93,11 +98,11 @@ pnpx @vscode/vsce package --no-dependencies
 }
 ```
 
-这会导致我们运行 `pnpm test` 时，实际执行流程为：
+这会导致我们运行 `bun run test` 时，实际执行流程为：
 
-1. pnpm 开始查找当前目录 `package.json` 中的 "test" 脚本
+1. bun 开始查找当前目录 `package.json` 中的 "test" 脚本
 2. 发现脚本内容是 "vscode-test"
-3. pnpm 会自动在以下位置按顺序查找可执行文件:
+3. bun 会自动在以下位置按顺序查找可执行文件:
    - 项目的 node_modules/.bin 目录
    - 全局安装的 node_modules/.bin 目录
    - 系统 PATH 环境变量

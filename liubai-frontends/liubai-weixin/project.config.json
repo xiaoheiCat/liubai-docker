@@ -49,8 +49,8 @@
   },
   "appid": "wx3dfa900a49a77d46",
   "scripts": {
-    "beforeCompile": "pnpm pre-build",
-    "beforePreview": "pnpm pre-build",
-    "beforeUpload": "pnpm pre-build --production"
+    "beforeCompile": "bun run pre-build",
+    "beforePreview": "bun run pre-build",
+    "beforeUpload": "bun run pre-build --production"
   }
 }

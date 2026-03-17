@@ -143,7 +143,6 @@ const icon_color = `var(--main-normal)`
   bottom: 0;
   height: 100%;
   padding-inline: 10px;
-  background: var(linear-gradient);
   display: flex;
   align-items: center;
 

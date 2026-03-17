@@ -40,11 +40,11 @@ Build! Anyway
 see: "manifest-declared icons"
 https://webkit.org/blog/12445/new-webkit-features-in-safari-15-4/#:~:text=takes%20precedence%20over-,manifest%2Ddeclared%20icons,-in%20order%20to
 
-11. 运行 `pnpm knip` 可以查看未被使用的死代码。
+11. 运行 `bun run knip` 可以查看未被使用的死代码。
 
 12. 如何在 `macOS` 上配置 `windsurf` 命令，实现类似于 `code .` 在 VS Code（换成 Windsurf）中打开当前文件夹的效果？输入一下命令，再输入本机密码即可: `sudo ln -s /Applications/Windsurf.app/Contents/Resources/app/bin/windsurf /usr/local/bin/windsurf`
 
-13. 使用 `pnpm biome-lint` 去进行 `src/` 文件夹下的代码检查，并自动修改不合规范的文件。
+13. 使用 `bun run biome-lint` 去进行 `src/` 文件夹下的代码检查，并自动修改不合规范的文件。
 
 
 ## 使用 bun
@@ -187,7 +187,7 @@ https://icon-sets.iconify.design/
 
 1. `vc-` 开头的 css 类名，会跟 `vconsole` 库的样式冲突，请避免使用。
 
-2. 升级 tiptap 下的依赖至最新，使用 `pnpm up "@tiptap/*" --latest`
+2. 升级 tiptap 下的依赖至最新，使用 `pnpm up "@tiptap/*" --latest`；bun 的方案：运行 `bun update -i` 然后敲击上下 ↕️ 键，使用 SPACE 空白键选中 tiptap 相关的依赖，最后 Enter 回车，即可升级 tiptap 的一系列依赖。
 
 3. 函数式获取应用个人信息（userId / memberId / spaceId / spaceType）上下文，使用 `checker.getMyContext()` 
 
@@ -195,7 +195,7 @@ https://icon-sets.iconify.design/
 
 5. `props` 有属性 `a` 是 `required: true` 时，不可以把 `props` 声明在 `types.ts` 文件里，因为 `.vue` 文件在 IDE 里读取时，会把 props 的实例读成类型的形式，这时会将 `a` 看成 `required: boolean` 而非 `required: true`，导致 TS 把 `props.a` 视作有可能为 `undefined`，造成后续编写代码需要多判断空值的问题。
 
-6. 定期执行 `pnpm run build` 虽然我们在开发时，运行 `pnpm run dev` 即可进行调试或预览，但是最终交给用户的代码依然需要运行前者这样的命令，若最终打包时出现大面积错误，修改起来会很痛苦，所以建议定期执行该命令，确保你所写的代码都能成功打包。
+6. 定期执行 `bun run build` 虽然我们在开发时，运行 `bun run dev` 即可进行调试或预览，但是最终交给用户的代码依然需要运行前者这样的命令，若最终打包时出现大面积错误，修改起来会很痛苦，所以建议定期执行该命令，确保你所写的代码都能成功打包。
 
 7. Keyboard Info: https://www.toptal.com/developers/keycode 可以查看键盘 keyboard 的 key; toptal 还提供 .gitignore 的模板 https://www.toptal.com/developers/gitignore ，真的非常棒！
 

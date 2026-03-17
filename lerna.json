@@ -1,6 +1,6 @@
 {
   "version": "0.29.1",
-  "npmClient": "pnpm",
+  "npmClient": "bun",
   "packages": [
     ".",
     "liubai-backends/*",

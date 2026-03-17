@@ -16,6 +16,11 @@
   ],
   "author": "yenche123 <tsuiyenche@outlook.com> (https://github.com/yenche123)",
   "license": "AGPL-3.0-or-later",
+  "workspaces": [
+    "liubai-backends/*",
+    "liubai-docs",
+    "liubai-frontends/*"
+  ],
   "devDependencies": {
     "lerna": "^8.2.1"
   }
