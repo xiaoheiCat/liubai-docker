@@ -22,7 +22,7 @@
 
 #### 前置条件
 
-安装 [mkdir](https://github.com/FiloSottile/mkcert#installation)，并且运行
+安装 [mkcert](https://github.com/FiloSottile/mkcert#installation)，并且运行
 
 ```bash
 mkdir -p $HOME/certs
