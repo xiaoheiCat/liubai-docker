@@ -151,6 +151,10 @@ export default defineConfig(({ command, mode }) => {
     build: {
       sourcemap: true,
     },
+
+    worker: {
+      format: "es",
+    },
   
     preview: {
       port: 4175,
