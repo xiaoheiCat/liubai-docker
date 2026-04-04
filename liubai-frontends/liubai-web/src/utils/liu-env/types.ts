@@ -6,6 +6,7 @@ export interface LiuSystemEnv {
   API_DOMAIN?: string
   APP_NAME?: string
   DOCUMENTATION_URL?: string
+  EMAIL_1?: string
 
   PAYMENT_PRIORITY?: "stripe" | "one-off"
   VAPID_PUBLIC_KEY?: string

@@ -64,7 +64,7 @@ export function useApp() {
   listenLoaded()
 
   // listen to wx jsbridge ready
-  if(cha.isWeChat) {
+  if (cha.isWeChat) {
     listenWxJSBridgeReady()
   }
 
@@ -86,7 +86,7 @@ export function useApp() {
 
 function initOnceData() {
   const onceData = localCache.getOnceData()
-  if(!onceData.launchStamp) {
+  if (!onceData.launchStamp) {
     const now = time.getTime()
     onceData.launchStamp = now
     localCache.setOnceData("launchStamp", now)
@@ -105,8 +105,67 @@ function initDeviceCha(cha: GetChaRes) {
 
 function printInit() {
   const version = LIU_ENV.version
-  const appName = liuEnv.getEnv().APP_NAME
-  console.log(`You are using ${appName} v${version}`)
+  const _env = liuEnv.getEnv()
+  const email = _env.EMAIL_1 ?? LIU_ENV.author?.email
+  const versionLabel = `v${version}`
+
+  // gradient title
+  const titleStyle = [
+    "font-family: 'Arial Black', 'Helvetica Neue', sans-serif",
+    "font-size: 56px",
+    "font-weight: 900",
+    "letter-spacing: 6px",
+    "line-height: 1.6",
+    "background: linear-gradient(135deg, #1c5671, #2a6885, #88d1ff, #bfdfed, #88d1ff, #2a6885)",
+    "color: transparent",
+    "-webkit-background-clip: text",
+    "background-clip: text",
+    "text-shadow: 0 2px 12px rgba(42, 104, 133, 0.3)",
+  ].join(";")
+
+  const versionStyle = [
+    "color: #88d1ff",
+    "font-family: Menlo, Monaco, 'Courier New', monospace",
+    "font-size: 11px",
+    "font-weight: 700",
+    "letter-spacing: 0.6px",
+    "background: linear-gradient(135deg, #1c5671, #2a6885)",
+    "padding: 3px 10px",
+    "border-radius: 10px",
+    "margin-left: 4px",
+  ].join(";")
+
+  const lines = [`%cLiUBAi %c${versionLabel}`]
+  const styles: string[] = [titleStyle, versionStyle]
+
+  if (email) {
+    lines.push(
+      `%c\n%c  We're recruiting!  %c  %c${email}`,
+    )
+    styles.push(
+      "",
+      [
+        "color: #fff",
+        "background: linear-gradient(135deg, #1c5671, #2a6885, #3a8aaa)",
+        "padding: 4px 12px",
+        "border-radius: 10px",
+        "font-family: 'Helvetica Neue', sans-serif",
+        "font-size: 11px",
+        "font-weight: 800",
+        "letter-spacing: 0.5px",
+      ].join(";"),
+      "",
+      [
+        "color: #2a6885",
+        "font-family: Menlo, Monaco, 'Courier New', monospace",
+        "font-size: 12px",
+        "font-weight: 600",
+        "letter-spacing: 0.3px",
+      ].join(";"),
+    )
+  }
+
+  console.log(lines.join(""), ...styles)
   console.log(" ")
 }
 
@@ -118,7 +177,7 @@ function initListenSelection() {
   // 但如果上一次选中的文字和这一次的都是空白的，那么则忽略
   const whenSelect = (e: Event) => {
     const nowText = liuApi.getSelectionText()
-    if(!nowText && !lastText) return
+    if (!nowText && !lastText) return
     lastText = nowText
     gStore.setLatestSelectionChange()
   }
@@ -138,7 +197,7 @@ async function initMobile(
   onceData: LocalOnceData,
 ) {
   // 1. lock screen orientation
-  if(cha.isMobile) {
+  if (cha.isMobile) {
     setTimeout(() => {
       toLockOrientation(cha)
     }, time.SECOND)
@@ -147,7 +206,7 @@ async function initMobile(
   // 2. open vconsole
   const _open = async () => {
     const VConsole = await getVConsole()
-    if(!VConsole) {
+    if (!VConsole) {
       printInit()
       console.warn("vconsole is unavailable in current environment")
       return
@@ -163,7 +222,7 @@ async function initMobile(
     import("~/styles/mobile-style.css")
   }
 
-  if(onceData.mobile_debug) {
+  if (onceData.mobile_debug) {
     _open()
     return
   }
@@ -180,7 +239,7 @@ async function toLockOrientation(
     orientation,
   } = useScreenOrientation()
 
-  if(!isSupported.value) {
+  if (!isSupported.value) {
     console.log("screen orientation is not supported")
     return
   }

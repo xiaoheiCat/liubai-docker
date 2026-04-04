@@ -16,7 +16,7 @@ function _redirectToCustomerService() {
     return
   }
   
-  const email = LIU_ENV.author?.email
+  const email = _env.EMAIL_1 ?? LIU_ENV.author?.email
   if(!email) return
   link = `mailto:${email}`
   console.log("link 222 ", link)
