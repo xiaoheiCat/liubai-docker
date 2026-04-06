@@ -18,6 +18,8 @@ import { LocalToCloud } from "~/utils/cloud/LocalToCloud";
 import { resetBasicCeData } from "./some-funcs";
 import cui from "~/components/custom-ui";
 import liuEnv from "~/utils/liu-env";
+import liuApi from "~/utils/liu-api";
+
 
 // 本文件处理发表的逻辑
 
@@ -47,6 +49,9 @@ export function useCeFinish(ctx: CepContext) {
     const { ceData } = ctx
     if(!member.value) return
     if(!ceData.canSubmit) return
+
+    liuApi.vibrate(20)
+
 
     // 2. check out phone bound
     if(PHONE_BOUND_REQUIRED) {

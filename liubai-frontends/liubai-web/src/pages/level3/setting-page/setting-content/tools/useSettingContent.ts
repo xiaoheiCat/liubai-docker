@@ -39,7 +39,7 @@ export function useSettingContent() {
   const _env = liuEnv.getEnv()
   const onceData = localCache.getOnceData()
   const contactLink = _env.CUSTOMER_SERVICE
-  const emailLink = LIU_ENV.author?.email
+  const emailLink = _env.EMAIL_1 ?? LIU_ENV.author?.email
 
   const data = reactive<SettingContentData>({
     language: "system",

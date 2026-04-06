@@ -1,4 +1,4 @@
-import Dexie, { type Table } from 'dexie';
+import Dexie, { type Table, type IndexableType, type PromiseExtended } from 'dexie';
 import type { 
   UserLocalTable, 
   WorkspaceLocalTable, 
@@ -9,6 +9,7 @@ import type {
   DownloadTaskLocalTable,
   UploadTaskLocalTable,
 } from "~/types/types-table"
+import type { DexieChanges } from "~/types/other/types-dexie";
 import { dbSchema, DB_VERSION } from './db-idx';
 
 /**
@@ -19,16 +20,28 @@ import { dbSchema, DB_VERSION } from './db-idx';
  *   4. 只提升 version 并不会造成原有数据丢失，除非 this.version(3).stores() 里头没有定义了
  */
 
+type LiuDexieTable<T, TKey extends IndexableType = string> =
+  Omit<Table<T, TKey, T>, "update" | "upsert" | "bulkUpdate"> & {
+    update(
+      key: TKey | T,
+      changes: DexieChanges<T> | ((obj: T, ctx: { value: any; primKey: IndexableType }) => void | boolean),
+    ): PromiseExtended<number>
+    upsert(key: TKey | T, changes: DexieChanges<T>): PromiseExtended<boolean>
+    bulkUpdate(
+      keysAndChanges: ReadonlyArray<{ key: TKey; changes: DexieChanges<T> }>
+    ): PromiseExtended<number>
+  }
+
 export class LiuDexie extends Dexie {
 
-  users!: Table<UserLocalTable>
-  workspaces!: Table<WorkspaceLocalTable>
-  members!: Table<MemberLocalTable>
-  drafts!: Table<DraftLocalTable>
-  contents!: Table<ContentLocalTable>
-  collections!: Table<CollectionLocalTable>
-  download_tasks!: Table<DownloadTaskLocalTable>
-  upload_tasks!: Table<UploadTaskLocalTable>
+  users!: LiuDexieTable<UserLocalTable>
+  workspaces!: LiuDexieTable<WorkspaceLocalTable>
+  members!: LiuDexieTable<MemberLocalTable>
+  drafts!: LiuDexieTable<DraftLocalTable>
+  contents!: LiuDexieTable<ContentLocalTable>
+  collections!: LiuDexieTable<CollectionLocalTable>
+  download_tasks!: LiuDexieTable<DownloadTaskLocalTable>
+  upload_tasks!: LiuDexieTable<UploadTaskLocalTable>
 
   constructor() {
     super('LiubaiDatabase')
@@ -38,4 +51,4 @@ export class LiuDexie extends Dexie {
 }
 
 export const db = new LiuDexie()
-export type DexieTable<T> = Table<T>
+export type DexieTable<T> = LiuDexieTable<T>

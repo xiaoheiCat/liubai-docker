@@ -33,7 +33,7 @@
 - Kimi（来自[月之暗面](https://www.moonshot.cn/)），已适配至 kimi-2.5
 - 通义千问（来自[阿里巴巴](https://tongyi.aliyun.com/welcome)）
 - 跃问（来自[阶跃星辰](https://www.stepfun.com/)）
-- 智谱（来自[智谱华章](https://bigmodel.cn/)），已适配至 GLM-5.1
+- 智谱（来自[智谱华章](https://bigmodel.cn/)）
 
 我们让你无需切换 APP，直接在微信里一次性体验世界顶尖大模型！
 

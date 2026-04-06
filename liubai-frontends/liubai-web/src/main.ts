@@ -1,4 +1,3 @@
-import 'virtual:svg-icons-register'
 import { createApp, defineAsyncComponent } from 'vue'
 
 // 引入 CSS
@@ -77,7 +76,10 @@ app.directive('liu-show', liuShowDirective)
 // 初始化主题，要在 pinia 之后
 useSystemStore()
 
-const runMain = () => {
+const runMain = async () => {
+  // Move the generated svg sprite out of the main entry chunk.
+  await import("virtual:svg-icons-register")
+
   // initialize sentry
   initSentry(app)
 
@@ -85,4 +87,4 @@ const runMain = () => {
   app.mount('#app')
 }
 
-runMain()
+void runMain()

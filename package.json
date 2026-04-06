@@ -1,7 +1,7 @@
 {
   "name": "liubai",
   "private": true,
-  "version": "0.29.2",
+  "version": "0.30.0",
   "description": "Supercharge yourself!",
   "main": "index.js",
   "scripts": {
@@ -22,6 +22,6 @@
     "liubai-frontends/*"
   ],
   "devDependencies": {
-    "lerna": "^8.2.1"
+    "lerna": "^8.2.4"
   }
 }

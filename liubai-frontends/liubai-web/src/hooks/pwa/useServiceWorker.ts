@@ -11,6 +11,7 @@ import { db } from '~/utils/db';
 const SEC_10 = 10 * time.SECOND
 const MIN_15 = 15 * time.MINUTE
 
+let _hasInitServiceWorker = false
 let _updateSW: SimplePromise | undefined
 let _swUrl: string | undefined
 let _swRegistration: ServiceWorkerRegistration | undefined
@@ -18,12 +19,12 @@ let _swRegistration: ServiceWorkerRegistration | undefined
 // Reference: 
 // https://vite-pwa-org.netlify.app/guide/periodic-sw-updates.html#handling-edge-cases
 const _checkSW = async (r: ServiceWorkerRegistration) => {
-  console.warn("see service-worker status: ")
-  console.log("r.installing: ", r.installing)
-  console.log("r.waiting: ", r.waiting)
-  console.log("r.active: ", r.active)
-  console.log("r.scope: ", r.scope)
-  console.log(" ")
+  // console.warn("see service-worker status: ")
+  // console.log("r.installing: ", r.installing)
+  // console.log("r.waiting: ", r.waiting)
+  // console.log("r.active: ", r.active)
+  // console.log("r.scope: ", r.scope)
+  // console.log(" ")
 
   const swUrl = _swUrl
   if (!swUrl) return
@@ -65,6 +66,8 @@ const _checkSW = async (r: ServiceWorkerRegistration) => {
 
 
 export function initServiceWorker() {
+  if (_hasInitServiceWorker) return
+  _hasInitServiceWorker = true
 
   const onRegisteredSW = (
     swUrl: string,
@@ -123,11 +126,13 @@ export function initServiceWorker() {
 
   const gStore = useGlobalStateStore()
 
-  watch([offlineReady, needRefresh], ([newV1, newV2]) => {
-    console.log("offlineReady: ", newV1)
-    console.log("needRefresh: ", newV2)
+  watch(() => needRefresh.value, (newV) => {
+    console.log("offlineReady: ", offlineReady.value)
+    console.log("needRefresh: ", newV)
     console.log(" ")
-    gStore.setNewVersion(newV2)
+    gStore.setNewVersion(newV)
+  }, {
+    immediate: true,
   })
 
   window.addEventListener('beforeunload', (event) => {
@@ -166,4 +171,3 @@ export function checkUpdateManually() {
 export function getSWRegistration() {
   return _swRegistration
 }
-
