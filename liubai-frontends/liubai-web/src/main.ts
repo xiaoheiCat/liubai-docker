@@ -8,6 +8,7 @@ import './styles/theme-light.css'
 import './styles/theme-dark.css'
 import './styles/custom-style.css'
 import 'floating-vue/dist/style.css'
+import '@he-tree/vue/style/default.css'
 import 'vue-draggable-resizable/style.css'
 
 import App from './App.vue'
