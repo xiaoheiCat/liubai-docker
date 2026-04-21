@@ -1,5 +1,6 @@
 import type { LocalTheme } from "~/types/types-atom"
 import type { LocalLocale } from "~/types/types-locale"
+import type { PreDownloadCheckpoint } from "~/utils/cloud/pre-download"
 
 export interface LocalPreference {
   theme?: LocalTheme
@@ -12,6 +13,12 @@ export interface LocalPreference {
 
   loginStamp?: number
   loadEditStamp?: number   // 上一次加载“最近编辑动态”的时间戳
+
+  // 未完成的 pre-download 进度，下次启动 App 时 resume
+  preDownloadCheckpoint?: PreDownloadCheckpoint
+
+  // 已完成 CREATE_FIRST 的 spaceId 列表，这些 space 不再重复跑历史回填
+  preDownloadCreateFirstDone?: string[]
 }
 
 export interface LocalOnceData {

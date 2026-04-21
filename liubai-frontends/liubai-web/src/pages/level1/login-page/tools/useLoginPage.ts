@@ -39,7 +39,6 @@ import {
   reactive,
   type WatchStopHandle,
   computed,
-  onMounted,
 } from "vue";
 import middleBridge from "~/utils/middle-bridge";
 import valTool from "~/utils/basic/val-tool";
@@ -62,8 +61,6 @@ const MIN_5 = 5 * time.MINUTE
 export function useLoginPage() {
 
   const rr = useRouteAndLiuRouter()
-  const { OPEN_WITH_BROWSER } = liuEnv.getEnv()
-
   const lpData = reactive<LpData>({
     enable: true,
     view: "main",
@@ -73,7 +70,6 @@ export function useLoginPage() {
     isSendingEmail: false,
     isSubmittingEmailCode: false,
     isSelectingAccount: false,
-    openWithBrowser: OPEN_WITH_BROWSER,
     isLoggingByPhone: false,
     smsSendingNum: 0,
   })

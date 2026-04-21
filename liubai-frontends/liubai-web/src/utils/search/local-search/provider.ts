@@ -35,9 +35,8 @@ class LocalWorkerSearchProvider implements SearchProvider {
   private syncTimer: ReturnType<typeof setTimeout> | undefined
 
   init() {
-    if(this.hasInit) return
+    if (this.hasInit) return
     this.hasInit = true
-    console.log("[local-search/provider] init")
     this.ensureWorker()
     this.initPromise = this.call("init", undefined)
       .then(() => {
@@ -53,17 +52,17 @@ class LocalWorkerSearchProvider implements SearchProvider {
   }
 
   async searchContents(opt: SearchOpt) {
-    if(this.isBroken) return []
+    if (this.isBroken) return []
 
     const initPromise = this.initPromise
-    if(initPromise) {
+    if (initPromise) {
       await initPromise
     }
 
-    if(this.isBroken) return []
+    if (this.isBroken) return []
 
     const text = opt.text?.trim()
-    if(!text) return []
+    if (!text) return []
 
     const stamp1 = performance.now()
     await this.waitPendingSync()
@@ -76,13 +75,7 @@ class LocalWorkerSearchProvider implements SearchProvider {
     })
 
     const ids = payload.ids
-    if(ids.length < 1) {
-      console.log("[local-search/provider] search", {
-        text,
-        mode: opt.mode,
-        hits: 0,
-        cost: `${(performance.now() - stamp1).toFixed(1)}ms`,
-      })
+    if (ids.length < 1) {
       return []
     }
 
@@ -90,48 +83,40 @@ class LocalWorkerSearchProvider implements SearchProvider {
     const rowMap = new Map(rows.map(v => [v._id, v]))
     const results: ContentLocalTable[] = []
 
-    for(let i = 0; i < ids.length; i++) {
+    for (let i = 0; i < ids.length; i++) {
       const row = rowMap.get(ids[i])
-      if(!row) continue
+      if (!row) continue
       results.push(row)
     }
-
-    console.log("[local-search/provider] search", {
-      text,
-      mode: opt.mode,
-      hits: results.length,
-      cost: `${(performance.now() - stamp1).toFixed(1)}ms`,
-    })
 
     return results
   }
 
   async clear() {
-    if(this.isBroken) return
-    if(this.syncTimer) {
+    if (this.isBroken) return
+    if (this.syncTimer) {
       clearTimeout(this.syncTimer)
       this.syncTimer = undefined
     }
     this.pendingUpserts.clear()
     this.pendingRemovals.clear()
     const initPromise = this.initPromise
-    if(initPromise) {
+    if (initPromise) {
       await initPromise
     }
     await this.call("clear", undefined)
   }
 
   private ensureWorker() {
-    if(this.worker) return this.worker
-    console.log("[local-search/provider] create worker")
+    if (this.worker) return this.worker
     const worker = new SearchWorker()
     worker.onmessage = (evt: MessageEvent<SearchWorkerResponse<SearchWorkerAction>>) => {
       const data = evt.data
       const pending = this.requestMap.get(data.id)
-      if(!pending) return
+      if (!pending) return
       this.requestMap.delete(data.id)
 
-      if(data.ok) {
+      if (data.ok) {
         pending.resolve(data.payload)
         return
       }
@@ -143,7 +128,7 @@ class LocalWorkerSearchProvider implements SearchProvider {
       console.warn("search worker crashed")
       console.log(evt)
       this.isBroken = true
-      for(const pending of this.requestMap.values()) {
+      for (const pending of this.requestMap.values()) {
         pending.reject(new Error("search worker crashed"))
       }
       this.requestMap.clear()
@@ -157,7 +142,7 @@ class LocalWorkerSearchProvider implements SearchProvider {
     action: T,
     payload: SearchWorkerRequestMap[T],
   ) {
-    if(this.isBroken) {
+    if (this.isBroken) {
       throw new Error("search worker is unavailable")
     }
 
@@ -177,7 +162,7 @@ class LocalWorkerSearchProvider implements SearchProvider {
   }
 
   private installHooks() {
-    if(this.hasHooks) return
+    if (this.hasHooks) return
     this.hasHooks = true
 
     db.contents.hook("creating", (_key, obj) => {
@@ -190,7 +175,7 @@ class LocalWorkerSearchProvider implements SearchProvider {
     })
 
     db.contents.hook("deleting", (key) => {
-      if(typeof key !== "string") return
+      if (typeof key !== "string") return
       this.queueRemove(key)
     })
   }
@@ -202,23 +187,23 @@ class LocalWorkerSearchProvider implements SearchProvider {
   ) {
     const nextObj = valTool.copyObject(oldObj)
     const keys = Object.keys(mods) as Array<keyof ContentLocalTable>
-    for(let i = 0; i < keys.length; i++) {
+    for (let i = 0; i < keys.length; i++) {
       const k = keys[i]
       nextObj[k] = mods[k] as never
     }
-    if(typeof key === "string") {
+    if (typeof key === "string") {
       nextObj._id = key
     }
     return nextObj
   }
 
   private queueContent(content: ContentLocalTable) {
-    if(this.isBroken) return
+    if (this.isBroken) return
 
     const doc = contentToSearchDoc(content)
     this.pendingRemovals.delete(doc.id)
 
-    if(!isIndexableDoc(doc)) {
+    if (!isIndexableDoc(doc)) {
       this.pendingUpserts.delete(doc.id)
       this.pendingRemovals.add(doc.id)
       this.scheduleSync()
@@ -230,14 +215,14 @@ class LocalWorkerSearchProvider implements SearchProvider {
   }
 
   private queueRemove(id: string) {
-    if(this.isBroken) return
+    if (this.isBroken) return
     this.pendingUpserts.delete(id)
     this.pendingRemovals.add(id)
     this.scheduleSync()
   }
 
   private scheduleSync() {
-    if(this.syncTimer) return
+    if (this.syncTimer) return
     this.syncTimer = setTimeout(() => {
       this.syncTimer = undefined
       this.flushSync()
@@ -245,8 +230,8 @@ class LocalWorkerSearchProvider implements SearchProvider {
   }
 
   private async flushSync() {
-    if(this.isBroken) return
-    if(this.pendingUpserts.size < 1 && this.pendingRemovals.size < 1) return
+    if (this.isBroken) return
+    if (this.pendingUpserts.size < 1 && this.pendingRemovals.size < 1) return
 
     const upsertCount = this.pendingUpserts.size
     const removalCount = this.pendingRemovals.size
@@ -256,11 +241,6 @@ class LocalWorkerSearchProvider implements SearchProvider {
     }
     this.pendingUpserts.clear()
     this.pendingRemovals.clear()
-
-    console.log("[local-search/provider] flush sync", {
-      upserts: upsertCount,
-      removals: removalCount,
-    })
 
     this.syncPromise = this.call("sync", payload)
       .then(() => {
@@ -279,12 +259,12 @@ class LocalWorkerSearchProvider implements SearchProvider {
   }
 
   private async waitPendingSync() {
-    if(this.syncTimer) {
+    if (this.syncTimer) {
       clearTimeout(this.syncTimer)
       this.syncTimer = undefined
       await this.flushSync()
     }
-    if(this.syncPromise) {
+    if (this.syncPromise) {
       await this.syncPromise
     }
   }
@@ -303,7 +283,7 @@ function contentToSearchDoc(content: ContentLocalTable): SearchIndexDoc {
 }
 
 function isIndexableDoc(doc: SearchIndexDoc) {
-  if(doc.oState !== "OK") return false
+  if (doc.oState !== "OK") return false
   return Boolean(doc.title || doc.body)
 }
 

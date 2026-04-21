@@ -10,9 +10,6 @@ export interface LpData {
   view: LpView
   accounts: MemberShow[]
 
-  // 一些配置
-  openWithBrowser: boolean
-
   // email 相关
   email: string
   isSendingEmail: boolean
@@ -37,8 +34,8 @@ export interface LpData {
   multi_credential?: string
   multi_credential_id?: string
   isSelectingAccount: boolean     // 是否已选择用户，并在等待后端响应
-  
+
   lastLogged?: number             // 已确定登录的时间戳，这个时候去等待 router 切换
-                                  // 这个时间戳是避免用户在等待时重复登录
+  // 这个时间戳是避免用户在等待时重复登录
 
 }

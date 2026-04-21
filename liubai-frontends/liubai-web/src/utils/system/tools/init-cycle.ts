@@ -20,17 +20,24 @@ import type {
 } from "~/utils/cloud/upload-tasks/tools/types"
 import { useSystemStore } from "~/hooks/stores/useSystemStore";
 import type { OState_Draft } from "~/types/types-basic";
+import { preDownloadResume, setupPreDownload } from "~/utils/cloud/pre-download";
 
 const MIN_3 = time.MINUTE * 3
 const MIN_20 = time.MINUTE * 20
 
 export function initCycle() {
 
+  // 注册 pre-download 的 visibilitychange 监听 (setup 上下文中只调一次)
+  setupPreDownload()
+
   useEnterIntoApp(async () => {
     await initHtmlLang()
 
     // 等个 2500 ms 再去处理这些背景操作
     await valTool.waitMilli(2500)
+
+    // 如果有未完成的 pre-download checkpoint，这里 fire-and-forget 地恢复
+    preDownloadResume()
 
     await handleDeletedContents()
     await handleRemovedContents()

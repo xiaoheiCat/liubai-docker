@@ -37,15 +37,15 @@ function getWorkerLikeWindow() {
 }
 
 async function ensureIndex() {
-  if(index) return index
-  if(initPromise) {
+  if (index) return index
+  if (initPromise) {
     await initPromise
-    if(index) return index
+    if (index) return index
   }
 
   initPromise = _initIndex()
   await initPromise
-  if(!index) {
+  if (!index) {
     throw new Error("search index failed to initialize")
   }
   return index
@@ -56,7 +56,7 @@ async function _initIndex() {
   await db.open()
 
   const workerWindow = getWorkerLikeWindow()
-  if(!workerWindow.window) {
+  if (!workerWindow.window) {
     workerWindow.window = workerWindow
   }
 
@@ -99,7 +99,7 @@ async function _initIndex() {
 }
 
 function isIndexableContent(content: ContentLocalTable | SearchIndexDoc) {
-  if(content.oState !== "OK") return false
+  if (content.oState !== "OK") return false
   const title = "title" in content ? content.title : ""
   const body = "body" in content ? content.body : ""
   return Boolean(title || body)
@@ -124,9 +124,9 @@ async function rebuildAll() {
 
   const allContents = await db.contents.toArray()
   let indexedCount = 0
-  for(let i = 0; i < allContents.length; i++) {
+  for (let i = 0; i < allContents.length; i++) {
     const doc = contentToSearchDoc(allContents[i])
-    if(!isIndexableContent(doc)) continue
+    if (!isIndexableContent(doc)) continue
     await target.add(doc)
     indexedCount++
   }
@@ -140,44 +140,37 @@ async function rebuildAll() {
 }
 
 async function ensureIndexInstanceForRebuild() {
-  if(index) return index
-  if(initPromise) {
+  if (index) return index
+  if (initPromise) {
     await initPromise
   }
-  if(index) return index
+  if (index) return index
   throw new Error("search index is unavailable")
 }
 
 async function handleSync(payload: SearchSyncPayload) {
-  console.time("[local-search/worker] sync")
   const target = await ensureIndex()
   const { removals = [], upserts = [] } = payload
 
-  for(let i = 0; i < removals.length; i++) {
+  for (let i = 0; i < removals.length; i++) {
     await target.remove(removals[i])
   }
 
-  for(let i = 0; i < upserts.length; i++) {
+  for (let i = 0; i < upserts.length; i++) {
     const doc = upserts[i]
     await target.remove(doc.id)
-    if(!isIndexableContent(doc)) continue
+    if (!isIndexableContent(doc)) continue
     await target.add(doc)
   }
 
   await target.commit()
-  console.timeEnd("[local-search/worker] sync")
-  console.log("[local-search/worker] sync result", {
-    upserts: upserts.length,
-    removals: removals.length,
-  })
 }
 
 async function handleSearch(params: WorkerSearchParams): Promise<WorkerSearchResult> {
-  console.time("[local-search/worker] search")
   const target = await ensureIndex()
   const { text, mode, spaceId, excludeThreads } = params
   const query = text.trim().toLowerCase()
-  if(!query) return { ids: [] }
+  if (!query) return { ids: [] }
 
   const excludeSet = new Set(excludeThreads)
   const onlyThread = mode === "select_thread"
@@ -187,7 +180,7 @@ async function handleSearch(params: WorkerSearchParams): Promise<WorkerSearchRes
   const docMap = new Map<string, SearchIndexDoc>()
   const contributionMap = new Map<string, Record<SearchFieldName, number>>()
 
-  for(let i = 0; i < SEARCH_FIELDS.length; i++) {
+  for (let i = 0; i < SEARCH_FIELDS.length; i++) {
     const { field, weight } = SEARCH_FIELDS[i]
     const results = await target.search(query, {
       pluck: field,
@@ -196,15 +189,15 @@ async function handleSearch(params: WorkerSearchParams): Promise<WorkerSearchRes
       limit: FIELD_LIMIT,
     }) as FlexsearchEnrichedResult[]
 
-    for(let j = 0; j < results.length; j++) {
+    for (let j = 0; j < results.length; j++) {
       const item = results[j]
       const id = String(item.id)
       const doc = item.doc
-      if(!doc) continue
-      if(doc.spaceId !== spaceId) continue
-      if(doc.oState !== "OK") continue
-      if(onlyThread && doc.infoType !== "THREAD") continue
-      if(excludeSet.has(id)) continue
+      if (!doc) continue
+      if (doc.spaceId !== spaceId) continue
+      if (doc.oState !== "OK") continue
+      if (onlyThread && doc.infoType !== "THREAD") continue
+      if (excludeSet.has(id)) continue
 
       const rankScore = (FIELD_LIMIT - j) + weight
       const oldScore = scoreMap.get(id) ?? 0
@@ -213,7 +206,7 @@ async function handleSearch(params: WorkerSearchParams): Promise<WorkerSearchRes
       docMap.set(id, doc)
 
       let contributions = contributionMap.get(id)
-      if(!contributions) {
+      if (!contributions) {
         contributions = {
           title: 0,
           body: 0,
@@ -228,7 +221,7 @@ async function handleSearch(params: WorkerSearchParams): Promise<WorkerSearchRes
   const reranked = rerankSmallSample(ranked, docMap, keywords, stampMap)
 
   reranked.sort((a, b) => {
-    if(a[1] !== b[1]) return b[1] - a[1]
+    if (a[1] !== b[1]) return b[1] - a[1]
     const stampA = stampMap.get(a[0]) ?? 0
     const stampB = stampMap.get(b[0]) ?? 0
     return stampB - stampA
@@ -249,20 +242,13 @@ async function handleSearch(params: WorkerSearchParams): Promise<WorkerSearchRes
       bodyPreview: doc?.body?.substring(0, 60) ?? "",
     }
   })
-  console.timeEnd("[local-search/worker] search")
-  console.log("[local-search/worker] search result", {
-    text: query,
-    mode,
-    hits: result.ids.length,
-    ranked: rankedDebug,
-  })
   return result
 }
 
 async function handleClear() {
   console.log("[local-search/worker] clear")
   const target = await ensureIndex()
-  await target.clear()
+  target.clear()
   await target.commit()
 }
 
@@ -296,31 +282,31 @@ onmessage = async (evt: MessageEvent<SearchWorkerRequest<SearchWorkerAction>>) =
   const req = evt.data
 
   try {
-    if(req.action === "init") {
+    if (req.action === "init") {
       await ensureIndex()
       postOk(req, { ready: true })
       return
     }
 
-    if(req.action === "search") {
+    if (req.action === "search") {
       const data = await handleSearch(req.payload as WorkerSearchParams)
       postOk(req, data)
       return
     }
 
-    if(req.action === "sync") {
+    if (req.action === "sync") {
       await handleSync(req.payload as SearchSyncPayload)
       postOk(req, { done: true })
       return
     }
 
-    if(req.action === "clear") {
+    if (req.action === "clear") {
       await handleClear()
       postOk(req, { cleared: true })
       return
     }
   }
-  catch(err) {
+  catch (err) {
     console.warn("search worker error")
     console.log(err)
     postErr(req, err)
@@ -337,15 +323,15 @@ function rerankSmallSample(
   keywords: string[],
   stampMap: Map<string, number>,
 ) {
-  if(keywords.length < 1) return ranked
+  if (keywords.length < 1) return ranked
 
   const rescored: Array<[string, number]> = []
-  for(let i = 0; i < ranked.length; i++) {
+  for (let i = 0; i < ranked.length; i++) {
     const [id, baseScore] = ranked[i]
     const doc = docMap.get(id)
-    if(!doc) continue
+    if (!doc) continue
     const strictScore = getStrictSampleScore(doc, keywords)
-    if(strictScore <= 0) continue
+    if (strictScore <= 0) continue
     stampMap.set(id, doc.editedStamp)
     rescored.push([id, baseScore + strictScore])
   }
@@ -359,13 +345,13 @@ function getStrictSampleScore(doc: SearchIndexDoc, keywords: string[]) {
   const firstLine = body.split("\n")[0] ?? ""
   let score = 0
 
-  for(let i = 0; i < keywords.length; i++) {
+  for (let i = 0; i < keywords.length; i++) {
     const keyword = keywords[i]
     const reg = createStrictRegex(keyword)
     const titleMatched = reg.test(title)
     const bodyMatched = reg.test(body)
 
-    if(!titleMatched && !bodyMatched) {
+    if (!titleMatched && !bodyMatched) {
       return 0
     }
 
@@ -394,15 +380,15 @@ function getFieldScore(
   keyword: string,
   weight: { hit: number, prefix: number, early: number },
 ) {
-  if(!text) return 0
+  if (!text) return 0
 
   const lowerText = text.toLowerCase()
   const lowerKeyword = keyword.toLowerCase()
   const index = lowerText.indexOf(lowerKeyword)
-  if(index < 0) return 0
+  if (index < 0) return 0
 
   let score = weight.hit
-  if(index === 0 || isWordPrefixMatch(lowerText, lowerKeyword, index)) {
+  if (index === 0 || isWordPrefixMatch(lowerText, lowerKeyword, index)) {
     score += weight.prefix
   }
 
@@ -412,19 +398,19 @@ function getFieldScore(
 }
 
 function isWordPrefixMatch(text: string, keyword: string, index: number) {
-  if(index < 0) return false
-  if(index === 0) return true
-  if(!valTool.isAllEnglishChar(keyword)) return false
+  if (index < 0) return false
+  if (index === 0) return true
+  if (!valTool.isAllEnglishChar(keyword)) return false
   const prev = text[index - 1]
   return /[^a-z0-9]/i.test(prev)
 }
 
 function createStrictRegex(keyword: string) {
   const source = escapeRegex(keyword)
-  if(keyword.length >= 4) {
+  if (keyword.length >= 4) {
     return new RegExp(source, "i")
   }
-  if(valTool.isAllEnglishChar(keyword)) {
+  if (valTool.isAllEnglishChar(keyword)) {
     return new RegExp(`\\b${source}`, "i")
   }
   return new RegExp(source, "i")
