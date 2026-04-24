@@ -96,7 +96,7 @@ export const txt2TxtAiWorkers: LiuAi.AiWorker[] = [
   },
   {
     computingProvider: "aliyun-bailian",
-    model: "qwen-plus-2025-12-01",
+    model: "qwen3.6-plus-2026-04-02",
     character: "tongyi-qwen",
     stream: true,
   },
@@ -108,7 +108,7 @@ export const txt2TxtAiWorkers: LiuAi.AiWorker[] = [
   },
   {
     computingProvider: "aliyun-bailian",
-    model: "qwen3.5-plus-2026-02-15",
+    model: "qwen3.5-plus-2026-04-20",
     character: "tongyi-qwen",
     stream: true,
   },
@@ -140,26 +140,20 @@ export const img2TxtWorkers: LiuAi.AiWorker[] = [
     character: "yuewen",
   },
   {
-    computingProvider: "minimax",
-    model: "MiniMax-Text-01",
-    character: "hailuo",
-  },
-
-  {
     computingProvider: "aliyun-bailian",
-    model: "qwen3.5-397b-a17b",
+    model: "qwen3.6-flash",
     character: "tongyi-qwen",
     stream: true,
   },
   {
     computingProvider: "aliyun-bailian",
-    model: "qwen3-vl-plus-2025-12-19",
+    model: "qwen3.6-flash-2026-04-16",
     character: "tongyi-qwen",
     stream: true,
   },
   {
     computingProvider: "aliyun-bailian",
-    model: "qwen3-vl-flash-2026-01-22",
+    model: "qwen3.6-35b-a3b",
     character: "tongyi-qwen",
     stream: true,
   },
@@ -171,7 +165,7 @@ export const img2TxtWorkers: LiuAi.AiWorker[] = [
   },
   {
     computingProvider: "aliyun-bailian",
-    model: "qwen3.5-plus-2026-02-15",
+    model: "qwen3.5-plus-2026-04-20",
     character: "tongyi-qwen",
     stream: true,
   }
@@ -2821,7 +2815,7 @@ export class Palette {
     const body: Record<string, any> = {
       model: opt.model,
       prompt,
-      image_size: sizeType === "square" ? "1024x1024" : "768x1024",
+      image_size: sizeType === "square" ? "1328x1328" : "1140x1472",
       num_inference_steps: 20,
     }
 
@@ -2843,6 +2837,8 @@ export class Palette {
       )
 
       if (res3.code === "0000" && res3.data) {
+        console.log("palette runBySiliconflow got result: ")
+        console.log(res3.data)
         const parseResult = this._parseFromSiliconflow(res3.data, opt.model, prompt)
         return parseResult
       }

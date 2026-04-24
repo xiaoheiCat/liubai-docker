@@ -19,51 +19,51 @@ export function useTcTopbar(
     const _td = td.value
 
     // 1. judged by aiModel
-    if(_td.aiModel) {
+    if (_td.aiModel) {
       const modelName = showModelName(_td.aiModel)
-      if(modelName === "DeepSeek R1") return "ds_r.png"
-      if(modelName === "DeepSeek V3") return "deepseek.svg"
-      if(modelName === "QwQ 32B") return "tongyi-qwen.svg"
-      if(modelName === "GLM Z1") return "zhipu.svg"
+      if (modelName === "DeepSeek R1") return "ds_r.png"
+      if (modelName === "DeepSeek V3") return "deepseek.svg"
+      if (modelName === "QwQ 32B") return "tongyi-qwen.svg"
+      if (modelName === "GLM Z1") return "zhipu.svg"
     }
 
     // 2. judged by aiCharacter
     const a = _td.aiCharacter
-    if(!a) return
-    if(a === "baixiaoying") return "baichuan.svg"
-    if(a === "bailing") return "bailing.png"
-    if(a === "deepseek") return "deepseek.svg"
-    if(a === "ds-reasoner") return "ds_r.png"
-    if(a === "hailuo") return "hailuo.svg"
-    if(a === "hunyuan") return "hunyuan.svg"
-    if(a === "kimi") return "kimi.png"
-    if(a === "tongyi-qwen") return "tongyi-qwen.svg"
-    if(a === "wanzhi") return "01-ai.png"
-    if(a === "yuewen") return "yuewen.svg"
-    if(a === "zhipu") return "zhipu.svg"
+    if (!a) return
+    if (a === "baixiaoying") return "baichuan.svg"
+    if (a === "bailing") return "bailing.png"
+    if (a === "deepseek") return "deepseek.svg"
+    if (a === "ds-reasoner") return "ds_r.png"
+    if (a === "hailuo") return "hailuo.svg"
+    if (a === "hunyuan") return "hunyuan.svg"
+    if (a === "kimi") return "kimi.png"
+    if (a === "tongyi-qwen") return "tongyi-qwen.svg"
+    if (a === "wanzhi") return "01-ai.png"
+    if (a === "yuewen") return "yuewen.svg"
+    if (a === "zhipu") return "zhipu.svg"
   })
 
   const ideIconName = computed(() => {
     const _td = td.value
     const ideType = _td.ideType
-    if(!ideType) return
+    if (!ideType) return
 
     const prefix = "logos-"
 
-    if(ideType === "cnb.cool") return `${prefix}cnb-cool`
-    if(ideType === "cursor") {
-      if(theme.value === "light") return `${prefix}cursor`
+    if (ideType === "cnb.cool") return `${prefix}cnb-cool`
+    if (ideType === "cursor") {
+      if (theme.value === "light") return `${prefix}cursor`
       return `${prefix}cursor_dark`
     }
-    if(ideType === "github.dev") return `${prefix}github`
-    if(ideType === "gitpod.io") return `${prefix}gitpod`
-    if(ideType === "project-idx") return `${prefix}project-idx`
-    if(ideType === "stackblitz.com") return `${prefix}stackblitz`
-    if(ideType === "tencent-cloud-studio") return `${prefix}tencent-cloud-studio`
-    if(ideType === "trae") return `${prefix}trae`
-    if(ideType === "vscode-insiders") return `${prefix}vscode-insiders`
-    if(ideType === "vscodium") return `${prefix}vscodium`
-    if(ideType === "windsurf") return `${prefix}windsurf`
+    if (ideType === "github.dev") return `${prefix}github`
+    if (ideType === "gitpod.io") return `${prefix}gitpod`
+    if (ideType === "project-idx") return `${prefix}project-idx`
+    if (ideType === "stackblitz.com") return `${prefix}stackblitz`
+    if (ideType === "tencent-cloud-studio") return `${prefix}tencent-cloud-studio`
+    if (ideType === "trae") return `${prefix}trae`
+    if (ideType === "vscode-insiders") return `${prefix}vscode-insiders`
+    if (ideType === "vscodium") return `${prefix}vscodium`
+    if (ideType === "windsurf") return `${prefix}windsurf`
 
     // 使用 vscode 兜底
     return `${prefix}vscode`
@@ -71,20 +71,20 @@ export function useTcTopbar(
 
   const showTopbar = computed(() => {
     const t = td.value
-    if(t.pinStamp) return true
-    if(t.stateId && t.stateShow) return true
-    if(!t.aiReadable || t.aiReadable === "N") return true
-    if(t.storageState === `LOCAL` || t.storageState === `ONLY_LOCAL`) return true
-    if(aiCharacterUrl.value) return true
-    if(ideIconName.value) return true
+    if (t.pinStamp) return true
+    if (t.stateId && t.stateShow) return true
+    if (!t.aiReadable || t.aiReadable === "N") return true
+    if (t.storageState === `LOCAL` || t.storageState === `ONLY_LOCAL`) return true
+    if (aiCharacterUrl.value) return true
+    if (ideIconName.value) return true
     return false
   })
 
   const cloudOffPlacement = computed<TooltipPlacement>(() => {
     const _td = td.value
-    if(_td.stateShow) return `bottom`
-    if(_td.aiCharacter) return `bottom`
-    if(_td.ideType) return `bottom`
+    if (_td.stateShow) return `bottom`
+    if (_td.aiCharacter) return `bottom`
+    if (_td.ideType) return `bottom`
     return `bottom-end`
   })
 
@@ -97,35 +97,35 @@ export function useTcTopbar(
     let company = ""
 
     // 1. judged by character
-    if(a) {
+    if (a) {
       name = t(`ai_character.${a}`)
       company = t(`ai_provider.${a}`)
     }
 
     // 2.1 company is judged by computingProvider
     const computingProvider = _td.computingProvider
-    if(computingProvider) {
+    if (computingProvider) {
       const company2 = t(`computing_provider.${computingProvider}`)
-      if(company2) company = company2
+      if (company2) company = company2
     }
 
     // 2.2 name is judged by aiModel
-    if(_td.aiModel) {
+    if (_td.aiModel) {
       const modelName = showModelName(_td.aiModel)
-      if(modelName) name = modelName
+      if (modelName) name = modelName
     }
 
 
-    if(!name || !company) return
+    if (!name || !company) return
     const isTheSame = name === company
     let content = ""
-    if(isTheSame) {
+    if (isTheSame) {
       content = t("thread_related.created_by_ai2", { name })
     }
     else {
       content = t("thread_related.created_by_ai", { name, company })
     }
-    
+
     cui.showModal({
       title: "🪄",
       content,
@@ -148,7 +148,7 @@ export function useTcTopbar(
   const onTapIDEType = () => {
     const _td = td.value
     const ideType = _td.ideType
-    if(!ideType) return
+    if (!ideType) return
     const dateTime = _td.createdStr
     const ide = showIdeFullName(ideType)
     cui.showModal({

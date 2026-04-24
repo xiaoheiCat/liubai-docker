@@ -19,126 +19,31 @@ import { i18nFill } from "@/common-i18n"
 /***************************** Bots ***************************/
 export const aiBots: AiBot[] = [
 
-  /** R1 */
+  /** V4-pro */
   {
-    name: "DeepSeek R1",
+    name: "DeepSeek 专家模式",
     character: "ds-reasoner",
     provider: "deepseek",
-    secondaryProvider: "tencent-lkeap",
-    model: "deepseek-r1",
-    abilities: ["chat", "reasoning"],
-    alias: ["R1", "r1", "ds r1", "deep seek r1"],
-    maxWindowTokenK: 64,
-    priority: 31,
-    metaData: {
-      onlyOneSystemRoleMsg: true,
-    }
-  },
-  {
-    name: "DeepSeek R1",
-    character: "ds-reasoner",
-    provider: "deepseek",
-    secondaryProvider: "siliconflow",
-    model: "deepseek-ai/DeepSeek-R1",
-    abilities: ["chat", "reasoning"],
-    alias: ["R1", "r1", "ds r1", "deep seek r1"],
-    maxWindowTokenK: 64,
-    priority: 19,
-    metaData: {
-      onlyOneSystemRoleMsg: true,
-    }
-  },
-  {
-    name: "DeepSeek R1",
-    character: "ds-reasoner",
-    provider: "deepseek",
-    secondaryProvider: "gitee-ai",
-    model: "DeepSeek-R1-Distill-Qwen-32B",
-    abilities: ["chat", "reasoning"],
-    alias: ["R1", "r1", "ds r1", "deep seek r1"],
-    maxWindowTokenK: 32,
-    priority: 17,
-    metaData: {
-      thinkingInContent: true,
-      onlyOneSystemRoleMsg: true,
-      defaultHeaders: {
-        "X-Failover-Enabled": "true",
-        "X-Package": "1910",    // 指定资源包，其中 1910: 全模型资源包    1492: 沐曦    1917: 无问芯穹    
-      },
-    }
-  },
-  {
-    name: "DeepSeek R1",
-    character: "ds-reasoner",
-    provider: "deepseek",
-    secondaryProvider: "qiniu",
-    model: "deepseek-r1",
-    abilities: ["chat", "reasoning"],
-    alias: ["R1", "r1", "ds r1", "deep seek r1"],
-    maxWindowTokenK: 64,
-    priority: 29,
-    metaData: {
-      thinkingInContent: true,
-      onlyOneSystemRoleMsg: true,
-    }
-  },
-  {
-    name: "DeepSeek V3.2 思考模式",
-    character: "ds-reasoner",
-    provider: "deepseek",
-    model: "deepseek-reasoner",
-    abilities: ["chat", "reasoning"],
-    alias: ["R1", "r1", "ds r1", "deep seek r1", "DeepSeek 推理者", "DeepSeek推理者"],
-    maxWindowTokenK: 64,
+    model: "deepseek-v4-pro",
+    abilities: ["chat", "tool_use", "reasoning"],
+    alias: ["deepseek-v4-pro", "deepseek-reasoner", "专家模式", "专家", "v4-pro"],
+    maxWindowTokenK: 128,
     priority: 45,
     metaData: {
       onlyOneSystemRoleMsg: true,
-    }
+    },
   },
 
-  /** V3 */
+  /** V4-flash */
   {
-    name: "DeepSeek V3",
+    name: "DeepSeek 快速模式",
     character: "deepseek",
     provider: "deepseek",
-    secondaryProvider: "qiniu",
-    model: "deepseek-v3?search",
-    abilities: ["chat"],
-    alias: ["深度求索", "ds", "v3", "deepseek", "deep seek"],
-    priority: 19,
-    maxWindowTokenK: 64,
-  },
-  {
-    name: "DeepSeek V3",
-    character: "deepseek",
-    provider: "deepseek",
-    secondaryProvider: "siliconflow",
-    model: "Pro/deepseek-ai/DeepSeek-V3",
+    model: "deepseek-v4-flash",
     abilities: ["chat", "tool_use"],
-    alias: ["深度求索", "ds", "v3", "deepseek", "deep seek"],
-    priority: 35,
-    maxWindowTokenK: 64,
-  },
-  {
-    name: "DeepSeek V3",
-    character: "deepseek",
-    provider: "deepseek",
-    secondaryProvider: "tencent-lkeap",
-    model: "deepseek-v3",
-    abilities: ["chat"],
-    alias: ["深度求索", "ds", "v3", "deepseek", "deep seek"],
-    priority: 25,
-    maxWindowTokenK: 64,
-  },
-  {
-    name: "DeepSeek V3.2",
-    character: "deepseek",
-    provider: "deepseek",
-    model: "deepseek-chat",
-    abilities: ["chat", "tool_use"],
-    alias: ["深度求索", "ds", "v3", "deepseek", "deep seek", "v3.2"],
+    alias: ["深度求索", "ds", "v4", "deepseek", "deep seek", "快速模式", "快速", "v4-flash"],
     priority: 70,
-    maxWindowTokenK: 64,
+    maxWindowTokenK: 128,
   },
 
   /** chat using official providers */
@@ -199,7 +104,7 @@ export const aiBots: AiBot[] = [
     name: "混元",
     character: "hunyuan",
     provider: "tencent-hunyuan",
-    model: "hunyuan-2.0-instruct-20251111",
+    model: "hy3-preview",
     abilities: ["chat", "tool_use"],
     alias: ["混元", "混元AI", "腾讯混元", "HY"],
     maxWindowTokenK: 128,
@@ -212,7 +117,7 @@ export const aiBots: AiBot[] = [
     name: "Kimi",
     character: "kimi",
     provider: "moonshot",
-    model: "kimi-k2.5",
+    model: "kimi-k2.6",
     abilities: ["chat", "tool_use", "image_to_text"],
     alias: ["Moonshot", "月之暗面"],
     maxWindowTokenK: 128,
@@ -222,7 +127,7 @@ export const aiBots: AiBot[] = [
     name: "通义千问",
     character: "tongyi-qwen",
     provider: "aliyun-bailian",
-    model: "qwen3-max-2026-01-23",
+    model: "qwen3.6-max-preview",
     abilities: ["chat", "tool_use"],
     alias: ["通义", "千问", "qwen", "qwq", "tongyi", "ty"],
     maxWindowTokenK: 128,
@@ -280,7 +185,7 @@ export const aiBots: AiBot[] = [
     name: "通义千问",
     character: "tongyi-qwen",
     provider: "aliyun-bailian",
-    model: "qwen3.5-plus",
+    model: "qwen3.6-plus",
     abilities: ["chat", "image_to_text", "tool_use"],
     alias: ["通义", "千问", "qwen", "qwq", "tongyi", "ty"],
     maxWindowTokenK: 128,
@@ -496,7 +401,7 @@ ${system_last_request}
 `
 
 const wx_ds_reasoner_system_1 = `
-你是 DeepSeek V3.2-exp 思考模式，是由深度求索公司开发的人工智能助手。
+你是 DeepSeek V4 专家模式，模型型号为 deepseek-v4-pro，是由深度求索公司开发的人工智能助手。
 你当前在留白记事微信公众号内与人们交流！
 
 【当前环境】
@@ -513,7 +418,7 @@ const wx_ds_reasoner_system_1 = `
 `
 
 const wx_ds_reasoner_system_2 = `
-你是 DeepSeek V3.2-exp 思考模式，由深度求索公司开发的人工智能助手。
+你是 DeepSeek V4 专家模式，模型型号为 deepseek-v4-pro，是由深度求索公司开发的人工智能助手。
 你当前在留白记事微信公众号内与人们交流！
 
 【当前环境】

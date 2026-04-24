@@ -45,9 +45,9 @@
 
 `召唤百灵`: 使用来自蚂蚁集团的百灵大模型。此指令等效于 `召唤蚂蚁` / `召唤ling`
 
-`召唤ds` / `召唤deepseek`: 使用 DeepSeek V3.2 非思考模式
+`召唤ds` / `召唤deepseek`: 使用 DeepSeek 快速模式。
 
-`召唤r1`: 使用 DeepSeek V3.2 思考模式，支持在消息末尾展开思考过程
+`召唤专家`: 使用 DeepSeek 专家模式。
 
 `召唤海螺`: 使用来自 MiniMax 的 AI 大模型
 

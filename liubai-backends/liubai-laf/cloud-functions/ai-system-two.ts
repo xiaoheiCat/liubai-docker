@@ -3,14 +3,14 @@
  * author: yenche123
  */
 
-import { 
-  getNowStamp, 
-  isWithinMillis, 
+import {
+  getNowStamp,
+  isWithinMillis,
   MINUTE,
   getBasicStampWhileAdding,
   HOUR,
 } from "@/common-time"
-import type { 
+import type {
   AiCharacter,
   AiEntry,
   AiImageSizeType,
@@ -21,8 +21,8 @@ import type {
   OaiPrompt,
   OaiToolCall,
   Partial_Id,
-  Table_AiChat, 
-  Table_AiRoom, 
+  Table_AiChat,
+  Table_AiRoom,
   Table_User,
   DataPass,
   LiuErrReturn,
@@ -38,21 +38,21 @@ import {
   aiImageSizeTypes,
 } from "@/common-types"
 import cloud from "@lafjs/cloud"
-import { 
+import {
   AiToolUtil,
   checker,
-  checkIfUserSubscribed, 
-  LiuDateUtil, 
+  checkIfUserSubscribed,
+  LiuDateUtil,
   valTool,
 } from "@/common-util"
 import xml2js from "xml2js"
-import { 
-  AiShared, 
-  BaseLLM, 
-  LogHelper, 
-  Palette, 
-  TellUser, 
-  ToolShared, 
+import {
+  AiShared,
+  BaseLLM,
+  LogHelper,
+  Palette,
+  TellUser,
+  ToolShared,
   Translator,
 } from "@/ai-shared"
 import { aiLang, i18nFill, useI18n } from "@/common-i18n"
@@ -548,7 +548,7 @@ interface UserCtx {
 export async function invoke_by_clock() {
   const controller = new Controller()
   const { num } = await controller.batchRun()
-  if(num > 0) {
+  if (num > 0) {
     console.warn("estimated num: ", num)
   }
   return { num }
@@ -568,34 +568,34 @@ class Controller {
 
     let num = 0
     let runTimes = 0
-    while(num < maxUser && runTimes < this._maxRunTimes) {
+    while (num < maxUser && runTimes < this._maxRunTimes) {
       runTimes++
 
       // 1. get rooms
       const res1 = await this.getRooms(minNeedSystem2Stamp)
-      if(res1.newNeedSystem2Stamp) {
+      if (res1.newNeedSystem2Stamp) {
         minNeedSystem2Stamp = res1.newNeedSystem2Stamp
       }
-      if(res1.userIds.length < 1) break
+      if (res1.userIds.length < 1) break
 
       // 2.1 get users
       const users = await this.getUsers(res1.userIds)
-      if(users.length < 1) continue
+      if (users.length < 1) continue
 
       // 2.2 get personal members
       const members = await this.getMembers(users)
 
       // 3. ctxs filled by users and rooms
       const res3 = this.initUserCtxs(res1.rooms, users, members)
-      if(res3.length < 1) continue
+      if (res3.length < 1) continue
 
       // 4. get chats for each ctx
-      for(let i=0; i<res3.length; i++) {
+      for (let i = 0; i < res3.length; i++) {
 
         // 4.1 get chats
         const ctx = res3[i]
         const chats = await this.getChats(ctx.room._id)
-        if(chats.length < 10) continue
+        if (chats.length < 10) continue
         ctx.chats = chats
 
         // 4.2 start to run for the user
@@ -608,7 +608,7 @@ class Controller {
 
 
       // n. check out if we need to break the loop
-      if(!res1.newNeedSystem2Stamp) {
+      if (!res1.newNeedSystem2Stamp) {
         break
       }
     }
@@ -632,7 +632,7 @@ class Controller {
     const rooms = res1.data
     const userIds = rooms.map(v => v.owner)
     const rLength = rooms.length
-    if(rLength < 1) return { rooms, userIds }
+    if (rLength < 1) return { rooms, userIds }
     const lastRoom = rooms[rLength - 1]
     const newNeedSystem2Stamp = lastRoom.needSystem2Stamp
     return { rooms, userIds, newNeedSystem2Stamp }
@@ -652,7 +652,7 @@ class Controller {
     const uCol = db.collection("User")
     const res1 = await uCol.where(w1).get<Table_User>()
     const users = res1.data
-    if(users.length < 1) return []
+    if (users.length < 1) return []
 
     // 2. set more fields, like:
     // "Are they subscribed?" 
@@ -660,23 +660,23 @@ class Controller {
     // "Were they chatting in the last 47 hours?"
     // "How many conversations do they have?"
     const newUsers: Table_User[] = []
-    for(let i=0; i<users.length; i++) {
+    for (let i = 0; i < users.length; i++) {
       const v = users[i]
 
       const lastUserChatStamp = v.quota?.lastWxGzhChatStamp ?? 1
       const within47 = isWithinMillis(lastUserChatStamp, HR_47)
-      if(!within47) continue
+      if (!within47) continue
 
       const subscribe = v.thirdData?.wx_gzh?.subscribe
-      if(subscribe === 0) continue
+      if (subscribe === 0) continue
 
       const isPremium = checkIfUserSubscribed(v)
-      if(isPremium) {
+      if (isPremium) {
         newUsers.push(v)
         continue
       }
       const count = v.quota?.aiConversationCount ?? 0
-      if(count >= ai_cfg.minConversationsToTriggerSystemTwo) {
+      if (count >= ai_cfg.minConversationsToTriggerSystemTwo) {
         newUsers.push(v)
         continue
       }
@@ -690,7 +690,7 @@ class Controller {
   ) {
     // 1. get user ids
     const userIds = users.map(v => v._id)
-    if(userIds.length < 1) return []
+    if (userIds.length < 1) return []
 
     // 2. construct where
     const w2 = {
@@ -714,7 +714,7 @@ class Controller {
 
     // if the first item is direction of 4 from System2, return []
     const firstItem = list[0]
-    if(firstItem && firstItem.directionOfSystem2 === "4") return []
+    if (firstItem && firstItem.directionOfSystem2 === "4") return []
 
     return list
   }
@@ -725,12 +725,12 @@ class Controller {
     members: Table_Member[],
   ) {
     const list: UserCtx[] = []
-    for(let i=0; i<rooms.length; i++) {
+    for (let i = 0; i < rooms.length; i++) {
       const room = rooms[i]
       const user = users.find(v => v._id === room.owner)
-      if(!user) continue
+      if (!user) continue
       const member = members.find(v => v.user === user._id)
-      if(!member) continue
+      if (!member) continue
       list.push({ user, room, member, chats: [] })
     }
     return list
@@ -756,14 +756,14 @@ class SystemTwo {
     this.mapToSomeHourLater(1)
 
     // 2. run system two in loop
-    const maxTimes = 3
+    const maxTimes = 5
     let runTimes = 0
-    while(runTimes < maxTimes) {
+    while (runTimes < maxTimes) {
       runTimes++
       const chatCompletion = await this.inputToLLM()
-      if(!chatCompletion) break
+      if (!chatCompletion) break
       const res2 = await this.handleOutput(chatCompletion)
-      if(!res2) break
+      if (!res2) break
     }
 
     // 3. handle _runLogs
@@ -773,7 +773,7 @@ class SystemTwo {
   private async handleRunLogs() {
     // 1. get logs
     const allLogs = this._runLogs
-    if(allLogs.length < 1) return
+    if (allLogs.length < 1) return
     allLogs.sort((a, b) => a.logStamp - b.logStamp)
 
     // 2. extract logs into privacy & working
@@ -791,7 +791,7 @@ class SystemTwo {
     let msg = ""
 
     // 4. privacy logs
-    if(privacyLogs.length > 0) {
+    if (privacyLogs.length > 0) {
       msg += (t("privacy_title") + "\n")
       privacyLogs.forEach(v => {
         msg += (v.textToUser + "\n")
@@ -800,7 +800,7 @@ class SystemTwo {
     }
 
     // 5. working logs
-    if(workingLogs.length > 0) {
+    if (workingLogs.length > 0) {
       msg += (t("working_log_title") + "\n")
       workingLogs.forEach(v => {
         msg += (v.textToUser + "\n")
@@ -809,7 +809,7 @@ class SystemTwo {
     }
 
     // 6. send
-    if(msg) {
+    if (msg) {
       msg = msg.trim()
       console.log("see msg in handleRunLogs: ", msg)
       await valTool.waitMilli(1500)
@@ -827,28 +827,28 @@ class SystemTwo {
     // 2. get token we have
     let tokenWeHave = AiShared.calculateTextToken(system_prompt)
     tokenWeHave += AiShared.calculateTextToken(user_prompt)
-    for(let i=0; i<reasonerAndUs.length; i++) {
+    for (let i = 0; i < reasonerAndUs.length; i++) {
       const v = reasonerAndUs[i]
       tokenWeHave += AiShared.calculatePromptToken(v)
     }
 
     // 3. add logs
     let system2Logs: string[] = []
-    for(let i=0; i<chats.length; i++) {
+    for (let i = 0; i < chats.length; i++) {
       const v = chats[i]
       const chat2log = new ChatToLog(this._ctx)
       const res3_1 = chat2log.run(v)
-      if(!res3_1) continue
+      if (!res3_1) continue
       system2Logs.push(...res3_1)
       res3_1.forEach(v2 => {
         tokenWeHave += AiShared.calculateTextToken(v2)
       })
-      if(tokenWeHave > maxInputToken) continue
+      if (tokenWeHave > maxInputToken) continue
     }
 
     // 4. generate log string
     let logs = ""
-    for(let i=0; i<system2Logs.length; i++) {
+    for (let i = 0; i < system2Logs.length; i++) {
       const v = system2Logs[i]
       logs = v + "\n" + logs
     }
@@ -887,11 +887,15 @@ class SystemTwo {
     const apiData = System2Util.getApiData()
     const { model, baseUrl, apiKey } = apiData
     const llm = new BaseLLM(apiKey, baseUrl)
-    const res8 = await llm.chat({ 
-      messages, 
-      model, 
-      temperature: 0.6,
+    const res8 = await llm.chat({
+      messages,
+      model,
       max_tokens: MAX_OUTPUT_TOKENS,
+
+      //@ts-ignore thinking for DeepSeek
+      thinking: { "type": "enabled" },
+      reasoning_effort: "high",
+
       stream: true,
     })
 
@@ -912,7 +916,7 @@ class SystemTwo {
 
     // 2. handle error
     // 2.1 there is only reasoning_content
-    if(!content1 && reasoning_content1) {
+    if (!content1 && reasoning_content1) {
       console.warn("there is only reasoning_content: ", reasoning_content1)
       const msg2_1 = `### Only reasoning_content\n\n${reasoning_content1}`
       this._toReporter(msg2_1)
@@ -921,7 +925,7 @@ class SystemTwo {
 
     // 2.2 see finish reason
     const finishReason = AiShared.getFinishReason(chatCompletion)
-    if(!finishReason || finishReason === "length") {
+    if (!finishReason || finishReason === "length") {
       console.warn("finish reason is unexpected: ", finishReason)
       const msg2_2 = `### Finish Reason\n\n${finishReason}`
       this._toReporter(msg2_2)
@@ -929,7 +933,7 @@ class SystemTwo {
     }
 
     // 2.3 no content
-    if(!content1) {
+    if (!content1) {
       console.warn("no content", chatCompletion)
       const ccMsg = valTool.objToStr(chatCompletion)
       const msg2_3 = `### No Content\n\n${ccMsg}`
@@ -944,34 +948,34 @@ class SystemTwo {
       const { xml } = await parser.parseStringPromise(content1)
       res3 = xml
     }
-    catch(err) {
+    catch (err) {
       console.warn("xml2js.Parser parse error: ", err)
     }
 
     // 3.2 start to handle parsing error
-    if(!res3) {
+    if (!res3) {
       const msg3_2 = `### Parse Error\n\n${content1}`
 
       // 3.2.1 if content1 has <direction> but parser failed
-      if(content1.includes("<direction>")) {
+      if (content1.includes("<direction>")) {
         this._toReporter(msg3_2)
         return true
       }
 
       // 3.2.2 if content1 has <content> but parser failed
-      if(content1.includes("<content>")) {
+      if (content1.includes("<content>")) {
         this._toReporter(msg3_2)
         return true
       }
 
       // 3.2.3 if content1 has <tool_calls> but parser failed
-      if(content1.includes("<tool_calls>")) {
+      if (content1.includes("<tool_calls>")) {
         this._toReporter(msg3_2)
         return true
       }
 
       // 3.2.4 if contents has too less characters
-      if(content1.length < 10) {
+      if (content1.length < 10) {
         this._toReporter(msg3_2)
         return true
       }
@@ -982,13 +986,13 @@ class SystemTwo {
         const { xml: xml2 } = await parser.parseStringPromise(newContent1)
         res3 = xml2
       }
-      catch(err) {
+      catch (err) {
         console.warn("parsing failed again: ", err)
       }
     }
 
     // 3.3 parsing error again
-    if(!res3) {
+    if (!res3) {
       const msg3_3 = `### Parse Error Again\n\n${content1}`
       this._toReporter(msg3_3)
       return false
@@ -1000,26 +1004,26 @@ class SystemTwo {
 
     // 4. decide which path to go
     let res4 = false
-    const { 
-      direction, 
+    const {
+      direction,
       content: content4,
       tool_calls,
     } = res3
-    if(direction === "1" && content4) {
+    if (direction === "1" && content4) {
       // get to reply
       this.toReply(content4, reasoning_content1)
     }
-    else if(direction === "2" && tool_calls) {
+    else if (direction === "2" && tool_calls) {
       // const msg4_2 = `### Tool calls\n\n${tool_calls}`
       // this._toReporter(msg4_2)
-      res4 = await this.toUseTools(tool_calls)
+      res4 = await this.toUseTools(tool_calls, reasoning_content1)
     }
-    else if(direction === "3" && reasoning_content1) {
+    else if (direction === "3" && reasoning_content1) {
       const msg4_3 = `### Think Later\n\n${reasoning_content1}`
       this._toReporter(msg4_3)
       this.toThinkLater(reasoning_content1, content4)
     }
-    else if(direction === "4") {
+    else if (direction === "4") {
       this.toFeelAllGood()
     }
     else {
@@ -1033,30 +1037,30 @@ class SystemTwo {
   private _calibrateOutput(
     result?: LiuAi.Sys2Output
   ) {
-    if(!result) return
+    if (!result) return
     const { direction, content } = result
 
     const _isContentRepliedText = () => {
-      if(!content) return false
+      if (!content) return false
       const content2 = content.trim()
-      if(content2.startsWith("<")) return false
-      if(content2.endsWith(">")) return false
-      if(content2.length < 3) return false
+      if (content2.startsWith("<")) return false
+      if (content2.endsWith(">")) return false
+      if (content2.length < 3) return false
       return true
     }
 
     // 1. no direction
-    if(!direction) {
+    if (!direction) {
       const res1 = _isContentRepliedText()
-      if(res1) result.direction = "1"
+      if (res1) result.direction = "1"
       return
     }
 
     // 2. direction is not legal
     const LEGAL_DIRECTIONS = ["1", "2", "3", "4"]
-    if(!LEGAL_DIRECTIONS.includes(direction)) {
+    if (!LEGAL_DIRECTIONS.includes(direction)) {
       const res1 = _isContentRepliedText()
-      if(res1) result.direction = "1"
+      if (res1) result.direction = "1"
       return
     }
   }
@@ -1076,7 +1080,7 @@ class SystemTwo {
 
     // 2. get request id
     const requestId = this._lastChatCompletion?.id
-    if(requestId) {
+    if (requestId) {
       markdown += `**Request id:** ${requestId}`
     }
 
@@ -1097,11 +1101,11 @@ class SystemTwo {
     text: any,
     reasoning_content?: string,
   ) {
-    if(!text) return
-    if(text?._ && typeof text._ === "string") {
+    if (!text) return
+    if (text?._ && typeof text._ === "string") {
       text = text._
     }
-    if(!valTool.isStringWithVal(text)) {
+    if (!valTool.isStringWithVal(text)) {
       console.warn("text is not string with value: ", text)
       return
     }
@@ -1121,17 +1125,20 @@ class SystemTwo {
     this.mapToSomeHourLater(23)
   }
 
-  private async toUseTools(tool_calls_str: string) {
+  private async toUseTools(
+    tool_calls_str: string,
+    reasoning_content?: string,
+  ) {
     // 1. parse tool calls
     let tool_calls: Record<string, any>[] = []
     try {
       tool_calls = JSON.parse(tool_calls_str)
     }
-    catch(err) {
+    catch (err) {
       console.warn("JSON.parse tool_calls error: ", err)
       return false
     }
-    if(!tool_calls || !Array.isArray(tool_calls)) {
+    if (!tool_calls || !Array.isArray(tool_calls)) {
       console.warn("fail to parse tool_calls: ", tool_calls_str)
       return false
     }
@@ -1139,10 +1146,10 @@ class SystemTwo {
     // 2. let's call tools
     let hasAnyContinue = false
     const maxToolCalls = Math.min(tool_calls.length, 3)
-    for(let i=0; i<maxToolCalls; i++) {
+    for (let i = 0; i < maxToolCalls; i++) {
       const v = tool_calls[i]
-      let res2 = await this.useATool(v as OaiToolCall)
-      if(res2) hasAnyContinue = true
+      let res2 = await this.useATool(v as OaiToolCall, reasoning_content)
+      if (res2) hasAnyContinue = true
     }
 
     return hasAnyContinue
@@ -1150,16 +1157,17 @@ class SystemTwo {
 
   private async useATool(
     tool_call: OaiToolCall,
+    reasoning_content?: string,
   ) {
     // 1. check out param
     const funcData = tool_call["function"]
-    if(tool_call.type !== "function" || !funcData) return true
+    if (tool_call.type !== "function" || !funcData) return true
 
     // 2. get required params
     const funcName = funcData.name as LiuAi.ToolName
     const funcArgs = funcData.arguments as any
     let funcJson: any = funcArgs
-    if(typeof funcArgs === "string") {
+    if (typeof funcArgs === "string") {
       funcJson = valTool.strToObj(funcArgs)
     }
 
@@ -1167,70 +1175,81 @@ class SystemTwo {
     console.log(funcJson)
 
     const toolHandler2 = new ToolHandler2(
-      this._ctx, 
-      [tool_call] as OaiToolCall[], 
+      this._ctx,
+      [tool_call] as OaiToolCall[],
       this._lastChatCompletion,
     )
 
     // 3. decide which path to go
-    if(funcName === "add_note") {
+    if (funcName === "add_note") {
       const addNoteRes1 = await toolHandler2.add_note(funcJson)
       const addNoteRes2 = this.afterAddingCard(addNoteRes1, tool_call)
       return addNoteRes2
     }
-    if(funcName === "add_todo") {
+    if (funcName === "add_todo") {
       const addTodoRes1 = await toolHandler2.add_todo(funcJson)
       const addTodoRes2 = this.afterAddingCard(addTodoRes1, tool_call)
       return addTodoRes2
     }
-    if(funcName === "add_calendar") {
+    if (funcName === "add_calendar") {
       const addCalendarRes1 = await toolHandler2.add_calendar(funcJson)
       const addCalendarRes2 = this.afterAddingCard(addCalendarRes1, tool_call)
       return addCalendarRes2
     }
-    
-    if(funcName === "web_search") {
+
+    if (funcName === "web_search") {
       const searchRes1 = await toolHandler2.web_search(funcJson)
-      const searchRes2 = this.afterSearching(searchRes1, tool_call)
+      const searchRes2 = this.afterSearching(searchRes1, tool_call, reasoning_content)
       return searchRes2
     }
-    
-    if(funcName === "parse_link") {
+
+    if (funcName === "parse_link") {
       const parsingRes1 = await toolHandler2.parse_link(funcJson)
-      const parsingRes2 = this.afterParsingLink(parsingRes1, tool_call)
+      const parsingRes2 = this.afterParsingLink(parsingRes1, tool_call, reasoning_content)
       return parsingRes2
     }
-    
-    if(funcName === "draw_picture") {
+
+    if (funcName === "draw_picture") {
       const drawRes1 = await toolHandler2.draw_picture(funcJson)
       const drawRes2 = this.afterDrawingPicture(drawRes1, tool_call)
       return drawRes2
     }
 
-    if(funcName === "get_schedule") {
+    if (funcName === "get_schedule") {
       const getSchRes1 = await toolHandler2.get_schedule(funcJson)
-      const getSchRes2 = this.afterGettingSchedules(getSchRes1, funcJson, tool_call)
+      const getSchRes2 = this.afterGettingSchedules(
+        getSchRes1,
+        funcJson,
+        tool_call,
+        reasoning_content,
+      )
       return getSchRes2
     }
-    
-    if(funcName === "get_cards") {
+
+    if (funcName === "get_cards") {
       const getCardsRes1 = await toolHandler2.get_cards(funcJson)
-      const getCardsRes2 = this.afterGettingCards(getCardsRes1, funcJson, tool_call)
+      const getCardsRes2 = this.afterGettingCards(
+        getCardsRes1,
+        funcJson,
+        tool_call,
+        reasoning_content,
+      )
       return getCardsRes2
     }
 
-    if(funcName?.startsWith("maps_")) {
+    if (funcName?.startsWith("maps_")) {
       const mapRes1 = await toolHandler2.maps_whatever(funcName, funcJson)
-      const mapRes2 = this.afterMapsWhatever(mapRes1, tool_call)
+      const mapRes2 = this.afterMapsWhatever(mapRes1, tool_call, reasoning_content)
       return mapRes2
     }
-    
+
     return true
   }
 
   private _addPromptsForToolUse(
     tool_result: string,
     tool_call: OaiToolCall,
+    reasoning_content?: string,
   ) {
     // 1. generate message from LLM
     const tool_call_msg = valTool.objToStr(tool_call)
@@ -1243,6 +1262,11 @@ class SystemTwo {
     const assistantMessage: OaiPrompt = {
       role: "assistant",
       content: content1,
+    }
+    if (reasoning_content) {
+      // DeepSeek thinking mode requires previous assistant reasoning to be
+      // carried back in later requests after a tool-use turn.
+      ; (assistantMessage as any).reasoning_content = reasoning_content
     }
     this._reasonerAndUs.push(assistantMessage)
 
@@ -1258,7 +1282,7 @@ class SystemTwo {
       content: newUserContent,
     }
     this._reasonerAndUs.push(userPrompt)
-    
+
     console.warn("tool result prompt: ", newUserContent)
 
     return true
@@ -1267,9 +1291,10 @@ class SystemTwo {
   private _addErrPromptsForToolUse(
     err: LiuErrReturn,
     tool_call: OaiToolCall,
+    reasoning_content?: string,
   ) {
     const msg = valTool.objToStr(err)
-    return this._addPromptsForToolUse(msg, tool_call)
+    return this._addPromptsForToolUse(msg, tool_call, reasoning_content)
   }
 
   private _getCurrentTimeStr() {
@@ -1286,10 +1311,11 @@ class SystemTwo {
     dataPass: DataPass<LiuAi.ReadCardsResult>,
     funcJson: Record<string, any>,
     tool_call: OaiToolCall,
+    reasoning_content?: string,
   ) {
     // 1. if error
-    if(!dataPass.pass) {
-      return this._addErrPromptsForToolUse(dataPass.err, tool_call)
+    if (!dataPass.pass) {
+      return this._addErrPromptsForToolUse(dataPass.err, tool_call, reasoning_content)
     }
     const readingRes = dataPass.data
 
@@ -1304,17 +1330,18 @@ class SystemTwo {
     this._runLogs.push(log)
 
     // 3. add prompts
-    return this._addPromptsForToolUse(readingRes.textToBot, tool_call)
+    return this._addPromptsForToolUse(readingRes.textToBot, tool_call, reasoning_content)
   }
 
   private afterGettingSchedules(
     dataPass: DataPass<LiuAi.ReadCardsResult>,
     funcJson: Record<string, any>,
     tool_call: OaiToolCall,
+    reasoning_content?: string,
   ) {
     // 1. if error
-    if(!dataPass.pass) {
-      return this._addErrPromptsForToolUse(dataPass.err, tool_call)
+    if (!dataPass.pass) {
+      return this._addErrPromptsForToolUse(dataPass.err, tool_call, reasoning_content)
     }
     const readingRes = dataPass.data
 
@@ -1330,7 +1357,7 @@ class SystemTwo {
     this._runLogs.push(log)
 
     // 3. add prompts
-    return this._addPromptsForToolUse(readingRes.textToBot, tool_call)
+    return this._addPromptsForToolUse(readingRes.textToBot, tool_call, reasoning_content)
   }
 
   /** return `true` to represent `continue`,
@@ -1340,7 +1367,7 @@ class SystemTwo {
     res: CommonPass,
     tool_call: OaiToolCall,
   ) {
-    if(!res.pass) {
+    if (!res.pass) {
       return this._addErrPromptsForToolUse(res.err, tool_call)
     }
 
@@ -1355,39 +1382,42 @@ class SystemTwo {
   private afterSearching(
     dataPass: DataPass<LiuAi.SearchResult>,
     tool_call: OaiToolCall,
+    reasoning_content?: string,
   ) {
-    if(!dataPass.pass) {
-      return this._addErrPromptsForToolUse(dataPass.err, tool_call)
+    if (!dataPass.pass) {
+      return this._addErrPromptsForToolUse(dataPass.err, tool_call, reasoning_content)
     }
     const searchRes = dataPass.data
     const searchMd = searchRes.markdown
-    return this._addPromptsForToolUse(searchMd, tool_call)
+    return this._addPromptsForToolUse(searchMd, tool_call, reasoning_content)
   }
 
   private afterParsingLink(
     dataPass: DataPass<LiuAi.ParseLinkResult>,
     tool_call: OaiToolCall,
+    reasoning_content?: string,
   ) {
-    if(!dataPass.pass) {
-      return this._addErrPromptsForToolUse(dataPass.err, tool_call)
+    if (!dataPass.pass) {
+      return this._addErrPromptsForToolUse(dataPass.err, tool_call, reasoning_content)
     }
     const parseRes = dataPass.data
     const parseMd = parseRes.markdown
-    return this._addPromptsForToolUse(parseMd, tool_call)
+    return this._addPromptsForToolUse(parseMd, tool_call, reasoning_content)
   }
 
   private afterMapsWhatever(
     dataPass: DataPass<LiuAi.MapResult>,
     tool_call: OaiToolCall,
+    reasoning_content?: string,
   ) {
     // 1. handle error
-    if(!dataPass.pass) {
-      return this._addErrPromptsForToolUse(dataPass.err, tool_call)
+    if (!dataPass.pass) {
+      return this._addErrPromptsForToolUse(dataPass.err, tool_call, reasoning_content)
     }
     const mapRes = dataPass.data
 
     // 2. add running log
-    if(mapRes.textToUser) {
+    if (mapRes.textToUser) {
       const log: LiuAi.RunLog = {
         toolName: "maps_whatever",
         character: SYS2_CHARACTER,
@@ -1399,7 +1429,7 @@ class SystemTwo {
 
     // 3. add prompts
     const mapMd = mapRes.textToBot
-    return this._addPromptsForToolUse(mapMd, tool_call)
+    return this._addPromptsForToolUse(mapMd, tool_call, reasoning_content)
   }
 
 
@@ -1411,7 +1441,7 @@ class SystemTwo {
     tool_call: OaiToolCall,
   ) {
     // 0. if error
-    if(!dataPass.pass) {
+    if (!dataPass.pass) {
       return this._addErrPromptsForToolUse(dataPass.err, tool_call)
     }
     const drawRes = dataPass.data
@@ -1447,8 +1477,8 @@ class SystemTwo {
   ) {
     this._addSystem2Chat("assistant", "3", { reasoning_content })
     const hours = Number(hrs)
-    if(isNaN(hours)) return
-    if(hours >= 2 && hours <= 24) {
+    if (isNaN(hours)) return
+    if (hours >= 2 && hours <= 24) {
       this.mapToSomeHourLater(hours)
     }
   }
@@ -1510,19 +1540,19 @@ class SystemTwo {
     // 2. check out activeStamp
     const user = this._ctx.user
     const activeStamp = user.activeStamp
-    if(!activeStamp) {
+    if (!activeStamp) {
       return
     }
     const maxStamp = activeStamp + (47 * HOUR)
-    if(needSystem2Stamp > maxStamp) {
+    if (needSystem2Stamp > maxStamp) {
       needSystem2Stamp = maxStamp
     }
-    if(needSystem2Stamp < now1) {
+    if (needSystem2Stamp < now1) {
       needSystem2Stamp = 0
     }
 
     // 3. update
-    const rCol = db.collection("AiRoom") 
+    const rCol = db.collection("AiRoom")
     const u1: Partial<Table_AiRoom> = {
       updatedStamp: now1,
       needSystem2Stamp,
@@ -1541,7 +1571,7 @@ class SystemTwo {
     }
     await rCol.doc(roomId).update(u1)
   }
-  
+
 }
 
 class ToolHandler2 {
@@ -1601,7 +1631,7 @@ class ToolHandler2 {
   async add_note(funcJson: Record<string, any>): Promise<CommonPass> {
     // 1. check out param
     const res1 = AiToolUtil.turnJsonToWaitingData("add_note", funcJson)
-    if(!res1.pass) {
+    if (!res1.pass) {
       return res1
     }
 
@@ -1610,7 +1640,7 @@ class ToolHandler2 {
       funcName: "add_note",
       funcJson,
     })
-    if(!chatId) {
+    if (!chatId) {
       return this._getErrForAddingMsg()
     }
 
@@ -1625,7 +1655,7 @@ class ToolHandler2 {
   async add_todo(funcJson: Record<string, any>): Promise<CommonPass> {
     // 1. check out param
     const res1 = AiToolUtil.turnJsonToWaitingData("add_todo", funcJson)
-    if(!res1.pass) {
+    if (!res1.pass) {
       console.warn("fail to parse funcJson in add_todo: ")
       console.log(funcJson)
       return res1
@@ -1636,7 +1666,7 @@ class ToolHandler2 {
       funcName: "add_note",
       funcJson,
     })
-    if(!chatId) {
+    if (!chatId) {
       return this._getErrForAddingMsg()
     }
 
@@ -1651,7 +1681,7 @@ class ToolHandler2 {
   async add_calendar(funcJson: Record<string, any>): Promise<CommonPass> {
     // 1. check out param
     const res1 = AiToolUtil.turnJsonToWaitingData("add_calendar", funcJson)
-    if(!res1.pass) {
+    if (!res1.pass) {
       return res1
     }
 
@@ -1660,7 +1690,7 @@ class ToolHandler2 {
       funcName: "add_calendar",
       funcJson,
     })
-    if(!chatId) {
+    if (!chatId) {
       return this._getErrForAddingMsg()
     }
 
@@ -1678,7 +1708,7 @@ class ToolHandler2 {
     // 1. search by ToolShared
     const toolShared = this._toolShared
     const searchPass = await toolShared.web_search(funcJson)
-    if(!searchPass.pass) return searchPass
+    if (!searchPass.pass) return searchPass
     const searchRes = searchPass.data
 
     // 2. add to chat
@@ -1695,19 +1725,19 @@ class ToolHandler2 {
 
 
   private async _getDrawResult(
-    prompt: string, 
+    prompt: string,
     sizeType: AiImageSizeType,
   ) {
     // 1. get param
     let res: LiuAi.PaletteResult | undefined
-    
+
     // 2. translate if needed
     let imagePrompt = prompt
     const num2 = valTool.getChineseCharNum(prompt)
-    if(num2 > 6) {
+    if (num2 > 6) {
       const translator = new Translator()
       const res2 = await translator.run(prompt)
-      if(!res2) {
+      if (!res2) {
         console.warn("fail to tranlate!!!")
       }
       else {
@@ -1728,14 +1758,14 @@ class ToolHandler2 {
 
     // 1. check out param
     const prompt = funcJson.prompt
-    if(!prompt || typeof prompt !== "string") {
+    if (!prompt || typeof prompt !== "string") {
       console.warn("draw_picture prompt is not string")
       console.log(funcJson)
       errRes.err.errMsg = "draw_picture prompt is not string"
       return errRes
     }
     let sizeType = funcJson.sizeType as AiImageSizeType
-    if(sizeType !== "portrait" && sizeType !== "square") {
+    if (sizeType !== "portrait" && sizeType !== "square") {
       sizeType = "square"
     }
 
@@ -1746,11 +1776,11 @@ class ToolHandler2 {
       text: prompt,
     }
     const chatId = await this._addMsgToChat(data2)
-    if(!chatId) return this._getErrForAddingMsg()
+    if (!chatId) return this._getErrForAddingMsg()
 
     // 3. draw
     const res3 = await this._getDrawResult(prompt, sizeType)
-    if(!res3) {
+    if (!res3) {
       errRes.err.errMsg = "fail to draw picture"
       return errRes
     }
@@ -1761,7 +1791,7 @@ class ToolHandler2 {
       drawPictureData: res3.originalResult,
       drawPictureModel: res3.model,
     }
-    if(prompt !== res3.prompt) {
+    if (prompt !== res3.prompt) {
       data4.text = res3.prompt
     }
     AiShared.updateAiChat(chatId, data4)
@@ -1782,7 +1812,7 @@ class ToolHandler2 {
     // 1. get schedule from ai-shared.ts
     const toolShared = this._toolShared
     const res1 = await toolShared.get_schedule(funcJson)
-    if(!res1.pass) return res1
+    if (!res1.pass) return res1
     const { textToBot, textToUser } = res1.data
 
     // 2. add chat
@@ -1792,7 +1822,7 @@ class ToolHandler2 {
       text: textToBot,
     }
     const chatId = await this._addMsgToChat(data2)
-    if(!chatId) return this._getErrForAddingMsg()
+    if (!chatId) return this._getErrForAddingMsg()
 
     return {
       pass: true,
@@ -1810,7 +1840,7 @@ class ToolHandler2 {
     // 1. get cards using ToolShared
     const toolShared = this._toolShared
     const res1 = await toolShared.get_cards(funcJson)
-    if(!res1.pass) return res1
+    if (!res1.pass) return res1
     const { textToBot, textToUser } = res1.data
 
     // 2. add msg
@@ -1820,7 +1850,7 @@ class ToolHandler2 {
       text: textToBot,
     }
     const chatId = await this._addMsgToChat(data2)
-    if(!chatId) return this._getErrForAddingMsg()
+    if (!chatId) return this._getErrForAddingMsg()
 
     return {
       pass: true,
@@ -1838,12 +1868,12 @@ class ToolHandler2 {
     // 1. get to parse
     const toolShared = this._toolShared
     const res1 = await toolShared.parse_link(funcJson)
-    if(!res1.pass) return res1
+    if (!res1.pass) return res1
     const parsingRes = res1.data
 
     // 2. clip
     let { markdown } = parsingRes
-    if(markdown.length > 6666) {
+    if (markdown.length > 6666) {
       markdown = markdown.substring(0, 6666) + "......"
     }
 
@@ -1854,7 +1884,7 @@ class ToolHandler2 {
       text: markdown,
     }
     const chatId = await this._addMsgToChat(data3)
-    if(!chatId) return this._getErrForAddingMsg()
+    if (!chatId) return this._getErrForAddingMsg()
 
     return res1
   }
@@ -1868,30 +1898,30 @@ class ToolHandler2 {
 
     // 2. get result
     let res: DataPass<LiuAi.MapResult> | undefined
-    if(funcName === "maps_regeo") {
+    if (funcName === "maps_regeo") {
       res = await toolShared.maps_regeo(funcJson)
     }
-    else if(funcName === "maps_geo") {
+    else if (funcName === "maps_geo") {
       res = await toolShared.maps_geo(funcJson)
     }
-    else if(funcName === "maps_text_search") {
+    else if (funcName === "maps_text_search") {
       res = await toolShared.maps_text_search(funcJson)
     }
-    else if(funcName === "maps_around_search") {
+    else if (funcName === "maps_around_search") {
       res = await toolShared.maps_around_search(funcJson)
     }
-    else if(funcName === "maps_direction") {
+    else if (funcName === "maps_direction") {
       res = await toolShared.maps_direction(funcJson)
     }
 
     // 3. handle error
-    if(!res) {
+    if (!res) {
       return {
         pass: false,
         err: { code: "E4000", errMsg: "funcName is invalid" }
       }
     }
-    if(!res.pass) return res
+    if (!res.pass) return res
     const data3 = res.data
 
     // 4. add chat
@@ -1902,7 +1932,7 @@ class ToolHandler2 {
       mapSearchData: data3.originalResult,
     }
     const chatId = await this._addMsgToChat(data4)
-    if(!chatId) return this._getErrForAddingMsg()
+    if (!chatId) return this._getErrForAddingMsg()
     return res
   }
 
@@ -1932,38 +1962,38 @@ class ChatToLog {
     let contentStr: string | undefined
 
     // 3. specifically handle
-    if(chat.infoType === "tool_use") {
+    if (chat.infoType === "tool_use") {
       const logs3_1 = this._turnForToolUse(chat)
       return logs3_1
     }
-    if(chat.fromSystem2) {
+    if (chat.fromSystem2) {
       const logs3_2 = this._turnForSystem2(chat)
       return logs3_2
     }
-    if(chat.infoType === "assistant") {
+    if (chat.infoType === "assistant") {
       const logs3_3 = this._turnForBot(chat)
       return logs3_3
     }
-    if(chat.infoType === "user") {
+    if (chat.infoType === "user") {
       const logs3_4 = this._turnForHuman(chat)
       return logs3_4
     }
 
-    if(chat.infoType === "background" && chat.text) {
+    if (chat.infoType === "background" && chat.text) {
       roleStr = "system"
       contentStr = `【背景信息】\n${chat.text}`
     }
-    else if(chat.infoType === "clear") {
+    else if (chat.infoType === "clear") {
       roleStr = "system"
       contentStr = `【清空上文】`
     }
-    else if(chat.infoType === "summary" && chat.text) {
+    else if (chat.infoType === "summary" && chat.text) {
       roleStr = "system"
       contentStr = `【前方对话摘要】\n${chat.text}`
     }
 
     // 3. handle content
-    if(!roleStr || !contentStr) return
+    if (!roleStr || !contentStr) return
     const timeStr = this._getTimeStr(chat.sortStamp)
     const logStr = this.generateLog(roleStr, {
       content: contentStr,
@@ -1991,13 +2021,13 @@ class ChatToLog {
 
     // 1. get content
     let contentStr = this._getBasicContent(chat)
-    if(!contentStr) return
+    if (!contentStr) return
 
     // 2. construct middle part
     let obj: Record<string, string> = {
       content: contentStr,
     }
-    if(member.name) {
+    if (member.name) {
       obj.name = member.name
     }
 
@@ -2012,13 +2042,13 @@ class ChatToLog {
   ) {
     // 1. get content
     let contentStr = this._getBasicContent(chat)
-    if(!contentStr) return
+    if (!contentStr) return
 
     // 2. construct middle part
     let obj: Record<string, string> = {
       content: contentStr,
     }
-    if(chat.model) {
+    if (chat.model) {
       obj.name = chat.model
     }
 
@@ -2036,23 +2066,23 @@ class ChatToLog {
     let directionStr = directionOfSystem2
     let contentStr: string | undefined
 
-    if(directionOfSystem2 === "1") {
-     contentStr = this._getBasicContent(v)
+    if (directionOfSystem2 === "1") {
+      contentStr = this._getBasicContent(v)
     }
-    else if(directionOfSystem2 === "3") {
-      if(reasoning_content) {
+    else if (directionOfSystem2 === "3") {
+      if (reasoning_content) {
         contentStr = `思考过程: ${reasoning_content}`
       }
       else {
         contentStr = `再想想`
       }
     }
-    else if(directionOfSystem2 === "4") {
+    else if (directionOfSystem2 === "4") {
       contentStr = all_good_str
     }
 
-    if(!directionStr || !contentStr) return
-    
+    if (!directionStr || !contentStr) return
+
     const timeStr = this._getTimeStr(v.sortStamp)
     const logStr = this.generateLog("you", {
       direction: directionStr,
@@ -2069,7 +2099,7 @@ class ChatToLog {
     let str = "<log>\n"
     str += `  <role>${role}</role>\n`
     const keys = Object.keys(obj)
-    for(let i=0; i<keys.length; i++) {
+    for (let i = 0; i < keys.length; i++) {
       const k = keys[i]
       str += `  <${k}>${obj[k]}</${k}>\n`
     }
@@ -2084,15 +2114,15 @@ class ChatToLog {
     // 1. get params
     const user = this._user
     const { tool_calls } = v
-    if(!tool_calls) return
+    if (!tool_calls) return
     const tool_call_id = tool_calls[0]?.id
-    if(!tool_call_id) return
+    if (!tool_call_id) return
     const { t } = useI18n(aiLang, { user })
 
     // 2. get tool msg
     const toolMsg = AiShared.getToolMessage(tool_call_id, t, v)
     let toolContent = "[Fail to use the tool]"
-    if(toolMsg && typeof toolMsg.content === "string") {
+    if (toolMsg && typeof toolMsg.content === "string") {
       toolContent = toolMsg.content
     }
     const toolTime = this._getTimeStr(v.sortStamp + 1000)
@@ -2103,10 +2133,10 @@ class ChatToLog {
 
     // 3. get assistant msg
     const tool_calls_msg = valTool.objToStr(tool_calls)
-    if(!tool_calls_msg) return
+    if (!tool_calls_msg) return
     const assistantTime = this._getTimeStr(v.sortStamp)
     let assistantLog = ""
-    if(v.fromSystem2) {
+    if (v.fromSystem2) {
       assistantLog = this.generateLog("you", {
         direction: "2",
         tool_calls: tool_calls_msg,
@@ -2126,21 +2156,21 @@ class ChatToLog {
     v: Table_AiChat,
   ) {
     const {
-      text, 
+      text,
       imageUrl,
       msgType,
     } = v
 
     let str = ""
-    if(imageUrl) {
+    if (imageUrl) {
       str = `【图片消息】\n链接: ${imageUrl}`
-      if(text) {
+      if (text) {
         str += `\n识图结果: ${text}`
       }
       return str
     }
 
-    if(msgType === "voice" && text) {
+    if (msgType === "voice" && text) {
       str = `【语音消息】\n识别结果: ${text}`
       return str
     }
@@ -2171,5 +2201,4 @@ class System2Util {
   }
 
 }
-
 

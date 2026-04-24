@@ -1,6 +1,6 @@
 // Function Name: common-i18n
 
-import { 
+import {
   supportedLocales,
   type SupportedLocale,
   type Table_User,
@@ -399,7 +399,7 @@ export const aiLang: LangAtom = {
     "fail_to_parse_link": "链接解析失败",
 
     // system 2
-    "system2_r1": "系统二（R1）",
+    "system2_r1": "系统二",
 
     // maps
     "see_map": "{bot}看了一眼地图",
@@ -523,7 +523,7 @@ export const aiLang: LangAtom = {
     "fail_to_parse_link": "連結解析失敗",
 
     // system 2
-    "system2_r1": "系統二 (R1) ",
+    "system2_r1": "系統二",
 
     // maps
     "see_map": "{bot}看了一眼地圖",
@@ -647,7 +647,7 @@ export const aiLang: LangAtom = {
     "fail_to_parse_link": "Fail to parse link",
 
     // system 2
-    "system2_r1": "System 2 (R1)",
+    "system2_r1": "System 2",
 
     // maps
     "see_map": "{bot} looked at the map",
@@ -970,11 +970,11 @@ export const wxTextRepliesItems: WxTextReplyItem[] = [
 /** 获取兜底语言 */
 let fallbackLocale: SupportedLocale | undefined
 export function getFallbackLocale(): SupportedLocale {
-  if(fallbackLocale) return fallbackLocale
+  if (fallbackLocale) return fallbackLocale
   const f = process.env.LIU_FALLBACK_LOCALE
-  if(!f) return "en"
+  if (!f) return "en"
   const existed = supportedLocales.includes(f as SupportedLocale)
-  if(!existed) return "en"
+  if (!existed) return "en"
   fallbackLocale = f as SupportedLocale
   return fallbackLocale
 }
@@ -982,15 +982,15 @@ export function getFallbackLocale(): SupportedLocale {
 /** 归一化语言 */
 function normalizeLanguage(val: string): SupportedLocale {
   val = val.toLowerCase()
-  if(!val) return getFallbackLocale()
+  if (!val) return getFallbackLocale()
 
   val = val.replace(/_/g, "-")
 
-  if(val === "zh-hant") return "zh-Hant"
-  if(val === "zh-tw") return "zh-Hant"
-  if(val === "zh-hk") return "zh-Hant"
-  if(val.startsWith("zh")) return "zh-Hans"
-  if(val.length > 1) return "en"
+  if (val === "zh-hant") return "zh-Hant"
+  if (val === "zh-tw") return "zh-Hant"
+  if (val === "zh-hk") return "zh-Hant"
+  if (val.startsWith("zh")) return "zh-Hans"
+  if (val.length > 1) return "en"
 
   return getFallbackLocale()
 }
@@ -1000,21 +1000,21 @@ export function getCurrentLocale(
   opt?: GetLangValOpt
 ): SupportedLocale {
   let locale = opt?.locale
-  if(locale) return locale
+  if (locale) return locale
 
   // 从 lang 判断
   const lang = opt?.lang
-  if(lang && lang !== "system") {
+  if (lang && lang !== "system") {
     locale = normalizeLanguage(lang)
     return locale
   }
-  
+
   // 从 user 中判断
   const user = opt?.user
-  if(user) {
+  if (user) {
     const { language, systemLanguage } = user
-    if(language !== "system") return language
-    if(systemLanguage) {
+    if (language !== "system") return language
+    if (systemLanguage) {
       locale = normalizeLanguage(systemLanguage)
     }
     else {
@@ -1025,7 +1025,7 @@ export function getCurrentLocale(
 
   // 从 body 中判断
   const liuLang = opt?.body?.x_liu_language
-  if(liuLang && typeof liuLang === "string") {
+  if (liuLang && typeof liuLang === "string") {
     locale = normalizeLanguage(liuLang)
     return locale
   }
@@ -1042,15 +1042,15 @@ export function i18nFill(
   opt2.LIU_DOMAIN = _env.LIU_DOMAIN ?? ""
   opt2.LIU_DOCS_DOMAIN = _env.LIU_DOCS_DOMAIN ?? ""
   opt2.LIU_CUSTOMER_SERVICE = _env.LIU_CUSTOMER_SERVICE ?? ""
-  
+
   const keys = Object.keys(opt2)
-  for(let i=0; i<keys.length; i++) {
+  for (let i = 0; i < keys.length; i++) {
     const v = keys[i]
     const theVal = opt2[v]
     const dynamicPattern = `{${v}}`
     const escapedPattern = dynamicPattern.replace(/[{}]/g, '\\$&')
     const regexPattern = new RegExp(escapedPattern, 'g')
-    res = res.replace(regexPattern, theVal.toString()) 
+    res = res.replace(regexPattern, theVal.toString())
   }
   return res
 }
@@ -1064,17 +1064,17 @@ export function useI18n(
   const _getVal = (key: string) => {
     const locale = getCurrentLocale(opt1)
     let val = langAtom[locale]?.[key]
-    if(val) return val
+    if (val) return val
     const fLocale = getFallbackLocale()
-    if(fLocale !== locale) {
+    if (fLocale !== locale) {
       val = langAtom[fLocale]?.[key]
-      if(val) return val
+      if (val) return val
     }
   }
 
   const t: T_I18N = (key, opt2) => {
     let res = _getVal(key)
-    if(!res) return ""
+    if (!res) return ""
     res = i18nFill(res, opt2 ?? {})
     return res
   }
@@ -1088,6 +1088,6 @@ export function getAppName(
 ) {
   const { t } = useI18n(commonLang, opt1)
   const res = t('appName')
-  if(res) return res
+  if (res) return res
   return "xxx"
 }

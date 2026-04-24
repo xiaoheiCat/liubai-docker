@@ -1,6 +1,6 @@
 // Function Name: ai-entrance
 
-import type { 
+import type {
   AiBot,
   AiCharacter,
   AiEntry,
@@ -13,9 +13,9 @@ import type {
   OaiMessage,
   OaiCreateParam,
   OaiChatCompletion,
-  Partial_Id, 
-  Table_AiChat, 
-  Table_AiRoom, 
+  Partial_Id,
+  Table_AiChat,
+  Table_AiRoom,
   Table_User,
   Table_Order,
   Table_Subscription,
@@ -27,8 +27,8 @@ import type {
   Ns_SiliconFlow,
   DataPass,
 } from "@/common-types"
-import { 
-  checkIfUserSubscribed, 
+import {
+  checkIfUserSubscribed,
   getDocAddId,
   valTool,
   createAvailableOrderId,
@@ -38,18 +38,18 @@ import {
   SubscriptionManager,
   CommonShared,
 } from "@/common-util"
-import { 
-  getBasicStampWhileAdding, 
-  getNowStamp, 
-  HOUR, 
+import {
+  getBasicStampWhileAdding,
+  getNowStamp,
+  HOUR,
   DAY,
   isWithinMillis,
   MINUTE,
   SECOND,
 } from "@/common-time"
-import { 
-  aiBots, 
-  aiI18nChannel, 
+import {
+  aiBots,
+  aiI18nChannel,
   aiI18nShared,
   aiTools,
 } from "@/ai-prompt"
@@ -58,10 +58,10 @@ import { useI18n, aiLang } from "@/common-i18n"
 import { downloadFile, responseToFormData } from "@/file-utils"
 import { createRandom } from "@/common-ids"
 import axios from "axios"
-import { 
-  AiShared, 
-  TellUser, 
-  ToolShared, 
+import {
+  AiShared,
+  TellUser,
+  ToolShared,
   Palette,
   BaseLLM,
   LogHelper,
@@ -147,46 +147,46 @@ export async function get_into_ai(
 ) {
   // 0. pre check
   const res0 = preCheck()
-  if(!res0) return
+  if (!res0) return
 
   // 1. check out text or image_url
   const { msg_type, image_url, text, audio_url, location } = entry
-  if(msg_type === "text" && !text) return
-  if(msg_type === "image" && !image_url) return
-  if(msg_type === "voice" && !audio_url) return
-  if(msg_type === "location" && !location) return
+  if (msg_type === "text" && !text) return
+  if (msg_type === "image" && !image_url) return
+  if (msg_type === "voice" && !audio_url) return
+  if (msg_type === "location" && !location) return
 
   // 1.1 check out text
-  if(msg_type === "text" && text) {
+  if (msg_type === "text" && text) {
     const res1_1 = preCheckText(text, entry)
-    if(!res1_1) return
+    if (!res1_1) return
   }
 
   // 2. check out directive
   const theDirective = AiDirective.check(entry)
   // interrupt non-continue command
-  if(theDirective && theDirective.theCommand !== "continue") {
+  if (theDirective && theDirective.theCommand !== "continue") {
     return
   }
 
   // 3. get my ai room
   const room = await AiHelper.getMyAiRoom(entry)
-  if(!room) return
+  if (!room) return
   const roomId = room._id
 
   // 4. check out quota
   const isQuotaEnough = await UserHelper.checkQuota(entry, room)
-  if(!isQuotaEnough) return
+  if (!isQuotaEnough) return
 
   // 4.1 check out if no assistants
   const res4_1 = await AiHelper.checkIfNobodyHere(entry, room)
-  if(res4_1) return
+  if (res4_1) return
 
   // 4.2 check out if it's "continue" command
-  if(theDirective?.theCommand === "continue") {
+  if (theDirective?.theCommand === "continue") {
     const controller4_2 = new ContinueController(
-      entry, 
-      room, 
+      entry,
+      room,
       theDirective?.theBot?.character
     )
     controller4_2.run()
@@ -194,11 +194,11 @@ export async function get_into_ai(
   }
 
   // 4.3 transcibe voice msg
-  if(msg_type === "voice" && !text) {
+  if (msg_type === "voice" && !text) {
     const transcriber = new Transcriber(audio_url ?? "")
     const res4_3 = await transcriber.run()
     const text4_3 = res4_3?.text
-    if(!text4_3) {
+    if (!text4_3) {
       console.warn("fail to transcribe voice msg, so return")
       return
     }
@@ -207,17 +207,17 @@ export async function get_into_ai(
   }
 
   // 4.4 turn image into text if needed
-  if(msg_type === "image" && !text) {
+  if (msg_type === "image" && !text) {
     const img2Txt = new Image2Text(image_url as string)
     const res4_4 = await img2Txt.run()
-    if(res4_4) {
+    if (res4_4) {
       entry.text = res4_4.text
     }
   }
 
   // 5. add the current message into db
   const chatId = await AiHelper.addUserMsg(entry, roomId)
-  if(!chatId) return
+  if (!chatId) return
 
   // 6. get latest chat records
   const res6 = await AiHelper.getLatestChat(roomId)
@@ -234,13 +234,13 @@ function preCheck() {
   const summaryBaseUrl = _env.LIU_SUMMARY_BASE_URL
   const summaryApiKey = _env.LIU_SUMMARY_API_KEY
   const summaryModel = _env.LIU_SUMMARY_MODEL
-  if(!summaryBaseUrl || !summaryApiKey || !summaryModel) {
+  if (!summaryBaseUrl || !summaryApiKey || !summaryModel) {
     console.warn("summary is not available")
     return false
   }
 
   const domain = _env.LIU_DOMAIN
-  if(!domain) {
+  if (!domain) {
     console.warn("domain is not set")
     return false
   }
@@ -249,7 +249,7 @@ function preCheck() {
 }
 
 function preCheckText(text: string, entry: AiEntry) {
-  if(text.length > MAX_WORDS) {
+  if (text.length > MAX_WORDS) {
     const { t } = useI18n(aiLang, { user: entry.user })
     const msg = t("too_many_words")
     TellUser.text(entry, msg)
@@ -268,57 +268,57 @@ function mapBots(
 
   const user = aiParam.entry.user
 
-  if(c === "baixiaoying") {
+  if (c === "baixiaoying") {
     const botBaichuan = new BotBaichuan(user)
     const proBaichuan = botBaichuan.run(aiParam)
     promises.push(proBaichuan)
   }
-  else if(c === "bailing") {
+  else if (c === "bailing") {
     const botBailing = new BotBailing(user)
     const proBailing = botBailing.run(aiParam)
     promises.push(proBailing)
   }
-  else if(c === "deepseek") {
+  else if (c === "deepseek") {
     const bot1 = new BotDeepSeek(user)
     const pro1 = bot1.run(aiParam)
     promises.push(pro1)
   }
-  else if(c === "ds-reasoner") {
+  else if (c === "ds-reasoner") {
     const botDsR = new BotDsReasoner(user)
     const proDsR = botDsR.run(aiParam)
     promises.push(proDsR)
   }
-  else if(c === "hailuo") {
+  else if (c === "hailuo") {
     const botMinimax = new BotMiniMax(user)
     const proMinimax = botMinimax.run(aiParam)
     promises.push(proMinimax)
   }
-  else if(c === "hunyuan") {
+  else if (c === "hunyuan") {
     const botHunyuan = new BotTencentHunyuan(user)
     const proHunyuan = botHunyuan.run(aiParam)
     promises.push(proHunyuan)
   }
-  else if(c === "kimi") {
+  else if (c === "kimi") {
     const bot2 = new BotMoonshot(user)
     const pro2 = bot2.run(aiParam)
     promises.push(pro2)
   }
-  else if(c === "tongyi-qwen") {
+  else if (c === "tongyi-qwen") {
     const botTyqw = new BotTongyiQwen(user)
     const pro3 = botTyqw.run(aiParam)
     promises.push(pro3)
   }
-  else if(c === "wanzhi") {
+  else if (c === "wanzhi") {
     const bot3 = new BotYi(user)
     const pro3 = bot3.run(aiParam)
     promises.push(pro3)
   }
-  else if(c === "yuewen") {
+  else if (c === "yuewen") {
     const bot4 = new BotStepfun(user)
     const pro4 = bot4.run(aiParam)
     promises.push(pro4)
   }
-  else if(c === "zhipu") {
+  else if (c === "zhipu") {
     const bot5 = new BotZhipu(user)
     const pro5 = bot5.run(aiParam)
     promises.push(pro5)
@@ -338,44 +338,44 @@ class AiDirective {
 
     // 1. get text
     const text = entry.text
-    if(!text) return
+    if (!text) return
 
     // 2. is it a kick directive?
     const text2 = text.trim().replace(/\+/g, " ")
     const botKicked = this.isKickBot(text2)
-    if(botKicked) {
+    if (botKicked) {
       this.toKickBot(entry, botKicked)
       return { theCommand: "kick", theBot: botKicked }
     }
 
     // 3.1 is it an adding directive?
     const botAdded = this.isAddBot(text2)
-    if(botAdded) {
+    if (botAdded) {
       this.toAddBot(entry, botAdded)
       return { theCommand: "add", theBot: botAdded }
     }
 
     // 3.2 is it a bot not available?
     const botNotAvailable = this.isBotNotAvailable(text2)
-    if(botNotAvailable) {
+    if (botNotAvailable) {
       this.toShowItIsNotAvailable(entry, botNotAvailable)
       return { theCommand: "bot_not_available" }
     }
 
     // 4. is it clear directive?
     const res4 = this.isClear(text2)
-    if(res4) {
+    if (res4) {
       this.toClear(entry)
       return { theCommand: "clear_history" }
     }
 
     // 5. is it continue directive?
     const res5 = this.isContinue(text2)
-    if(res5) return res5
+    if (res5) return res5
 
     // 6. is it viewing status directive?
     const res6 = this.isViewingStatus(text2)
-    if(res6) {
+    if (res6) {
       this.toViewStatus(entry)
       return { theCommand: "group_status" }
     }
@@ -387,16 +387,16 @@ class AiDirective {
     text: string,
   ) {
     const prefixMatched = prefix.find(v => text.startsWith(v))
-    if(!prefixMatched) return
+    if (!prefixMatched) return
 
     const txt1 = text.substring(prefixMatched.length).trim()
     const txt2 = txt1.toLowerCase()
     const botMatched = this._bots.find(v => {
       const name = v.name.toLowerCase()
       const alias = v.alias.map(v => v.toLowerCase())
-      if(name === txt2) return true
-      if(v.character === txt2) return true
-      if(alias.includes(txt2)) return true
+      if (name === txt2) return true
+      if (v.character === txt2) return true
+      if (alias.includes(txt2)) return true
       return false
     })
 
@@ -413,16 +413,16 @@ class AiDirective {
 
     // 1. direct match
     const res1 = list.includes(str)
-    if(res1) return true
-    if(!fuzzy) return false
+    if (res1) return true
+    if (!fuzzy) return false
 
     // 2. fuzzy match
     let res2 = false
     list.forEach(v => {
       const res2_1 = str.startsWith(v)
-      if(!res2_1) return
+      if (!res2_1) return
       const diff = Math.abs(v.length - str.length)
-      if(diff > 2) return
+      if (diff > 2) return
       res2 = true
     })
 
@@ -442,9 +442,9 @@ class AiDirective {
   private static isContinue(text: string): AiDirectiveCheckRes | undefined {
     const prefix = ["继续", "繼續", "Continue"]
     const res1 = this._areTheyMatched(prefix, text)
-    if(res1) return { theCommand: "continue" }
+    if (res1) return { theCommand: "continue" }
     const botMatched = this._getCommandedBot(prefix, text)
-    if(botMatched) {
+    if (botMatched) {
       return { theCommand: "continue", theBot: botMatched }
     }
   }
@@ -452,20 +452,20 @@ class AiDirective {
   private static async toViewStatus(entry: AiEntry) {
     // 1. get the user's ai room
     const room = await AiHelper.getMyAiRoom(entry)
-    if(!room) return
+    if (!room) return
     const user = entry.user
     const { t } = useI18n(aiLang, { user })
     let msg = t("status_1") + "\n"
 
     // 2. get assistants
     const { characters } = room
-    if(characters.length < 1) {
+    if (characters.length < 1) {
       msg += (t("no_member") + "\n")
     }
     else {
       characters.forEach(v => {
         const name = AiShared.getCharacterName(v)
-        if(name) msg += (name + "\n")
+        if (name) msg += (name + "\n")
       })
     }
     msg += "\n"
@@ -491,22 +491,22 @@ class AiDirective {
 
     let hasCluster = false
     // 3.1 add cluster quota if aiClusterCount > 0
-    if(usedTimes_2 > 0) {
+    if (usedTimes_2 > 0) {
       hasCluster = true
       msg += `${msg3_2}\n`
     }
 
     // 3.2 add ad quota if aiConversationCount >= MAX_TIMES_FREE && !isSubscribed
-    if(usedTimes_1 >= MAX_TIMES_FREE && !isSubscribed) {
+    if (usedTimes_1 >= MAX_TIMES_FREE && !isSubscribed) {
       msg += `${msg3_3}\n`
     }
-    else if(!hasCluster) {
+    else if (!hasCluster) {
       hasCluster = true
       msg += `${msg3_2}\n`
     }
 
     // 4. add subscription link
-    if(isSubscribed) {
+    if (isSubscribed) {
       const msg4 = t("renew_premium")
       msg += `\n\n${msg4}`
     }
@@ -518,7 +518,7 @@ class AiDirective {
   private static isViewingStatus(text: string) {
     const prefix1 = ["AI", "额度", "額度"]
     const res1 = this._areTheyMatched(prefix1, text)
-    if(res1) return res1
+    if (res1) return res1
 
     const prefix2 = [
       "群聊状态", "查看群聊状态", "群聊有谁", "群聊还有谁", "群里还有谁",
@@ -535,13 +535,13 @@ class AiDirective {
 
     // 1. get the user's ai room
     const room = await AiHelper.getMyAiRoom(entry)
-    if(!room) return
+    if (!room) return
     const roomId = room._id
 
     // 2. find the bot in the room
     const characterKicked = bot.character
     const theBot = room.characters.find(v => v === characterKicked)
-    if(!theBot) {
+    if (!theBot) {
       const msg2 = t("already_left", { botName: bot.name })
       TellUser.text(entry, msg2)
       return
@@ -563,17 +563,17 @@ class AiDirective {
     addedList = addedList.filter(v => !Boolean(charactersTakingARest.includes(v)))
     addedList = addedList.filter(v => !ai_cfg.retired_ai.includes(v))
     const reservedNum = newCharacters.length < 1 ? 4 : 3
-    if(addedList.length > reservedNum) {
+    if (addedList.length > reservedNum) {
       addedList.splice(reservedNum, addedList.length - reservedNum)
     }
 
     // 5. send a message to user
     const msg5 = t("bot_left", { botName: bot.name })
     const gzhType = CommonShared.getGzhType()
-    if(gzhType === "service_account" && addedList.length > 0) {
+    if (gzhType === "service_account" && addedList.length > 0) {
       // 5.1 send menu
       const menuList: LiuAi.MenuItem[] = []
-      const prefixMsg = msg5  + "\n\n" + t("operation_title")
+      const prefixMsg = msg5 + "\n\n" + t("operation_title")
       addedList.forEach(v => menuList.push({ operation: "add", character: v }))
       TellUser.menu(entry, prefixMsg, menuList, "")
     }
@@ -593,15 +593,15 @@ class AiDirective {
 
     // 1. get the user's ai room
     const room = await AiHelper.getMyAiRoom(entry, bot)
-    if(!room) return
+    if (!room) return
     const { characters } = room
 
     // 2. find the bot in the room
     const theBot = characters.find(v => v === bot.character)
-    if(theBot) {
+    if (theBot) {
       const roomCreatedStamp = room.insertedStamp
       const diff2 = getNowStamp() - roomCreatedStamp
-      if(diff2 < 2000) {
+      if (diff2 < 2000) {
         // this room just added
         this._sayHello(entry, bot)
       }
@@ -614,18 +614,18 @@ class AiDirective {
     }
 
     // 3. check out if the room has reached the max bots
-    if(characters.length >= MAX_CHARACTERS) {
+    if (characters.length >= MAX_CHARACTERS) {
       // get ai coming to retire
       let idx3 = -1
-      for(let i=0; i<characters.length; i++) {
+      for (let i = 0; i < characters.length; i++) {
         const v = characters[i]
         const isRetired = ai_cfg.retired_ai.includes(v)
-        if(isRetired) {
+        if (isRetired) {
           idx3 = i
           break
         }
       }
-      if(idx3 >= 0) {
+      if (idx3 >= 0) {
         characters.splice(idx3, 1)
       }
       else {
@@ -665,7 +665,7 @@ class AiDirective {
   private static isKickBot(text: string) {
     const prefix = ["踢掉", "踢掉", "Kick", "Remove", "T调"]
     const botMatched = this._getCommandedBot(prefix, text)
-    return botMatched 
+    return botMatched
   }
 
   private static addPrefixs = [
@@ -678,7 +678,7 @@ class AiDirective {
 
   private static isBotNotAvailable(text: string) {
     const prefixMatched = this.addPrefixs.find(v => text.startsWith(v))
-    if(!prefixMatched) return
+    if (!prefixMatched) return
 
     const txt1 = text.substring(prefixMatched.length).trim()
     const txt2 = txt1.toLowerCase()
@@ -693,15 +693,15 @@ class AiDirective {
   private static isAddBot(text: string) {
     // 1. use prefix
     const botMatched = this._getCommandedBot(this.addPrefixs, text)
-    if(botMatched) return botMatched
-    
+    if (botMatched) return botMatched
+
     // 2. text match completed
     const lowerText = text.toLowerCase()
     const botMatched2 = this._bots.find(v => {
       const name = v.name.toLowerCase()
-      if(name === lowerText) return true
+      if (name === lowerText) return true
       const alias = v.alias.map(v => v.toLowerCase())
-      if(alias.includes(lowerText)) return true
+      if (alias.includes(lowerText)) return true
       return false
     })
 
@@ -712,25 +712,25 @@ class AiDirective {
     const strs = [
       // 清空
       "清空",
-      "清空上文", 
+      "清空上文",
       "清空上下文",
-      "清空历史", 
+      "清空历史",
       "清空歷史",
       "清空历史纪录",
       "清空歷史紀錄",
 
       // 清除
-      "清除上文", 
+      "清除上文",
       "清除上下文",
-      "清除历史", 
+      "清除历史",
       "清除歷史",
       "清除历史纪录",
       "清除歷史紀錄",
 
       // 消除
-      "消除上文", 
+      "消除上文",
       "消除上下文",
-      "消除历史", 
+      "消除历史",
       "消除歷史",
       "消除历史纪录",
       "消除歷史紀錄",
@@ -747,7 +747,7 @@ class AiDirective {
   private static async toClear(entry: AiEntry) {
     // 1. get the user's ai room
     const room = await AiHelper.getMyAiRoom(entry)
-    if(!room) return false
+    if (!room) return false
 
     // 2. add a clear record into db
     const b2 = getBasicStampWhileAdding()
@@ -783,7 +783,7 @@ class BaseBot {
   private _fromUser: Table_User | undefined
 
   constructor(
-    c: AiCharacter, 
+    c: AiCharacter,
     user?: Table_User,
   ) {
     this._character = c
@@ -799,7 +799,7 @@ class BaseBot {
   ) {
     const character = bot.character
     const apiData = AiShared.getApiEndpointFromBot(bot)
-    if(!apiData) {
+    if (!apiData) {
       console.warn(`no api data for ${character}`)
       console.log(bot)
       return
@@ -813,7 +813,7 @@ class BaseBot {
 
     this._chatTimes++
     const llm = new BaseLLM(
-      apiData.apiKey, 
+      apiData.apiKey,
       apiData.baseURL,
       apiData.defaultHeaders,
     )
@@ -821,14 +821,14 @@ class BaseBot {
     const res = await llm.chat(params, { user: this._fromUser, ...opt })
     const t2 = getNowStamp()
     const cost = t2 - t1
-    
+
     console.log(`${theService} cost: ${cost}ms`)
-    if(!res) {
+    if (!res) {
       console.warn(`${theService} got an error`)
     }
 
     const firstChoice = res?.choices?.[0]
-    if(!firstChoice) {
+    if (!firstChoice) {
       // console.warn(`${theService} no choice! see chatCompletion: `)
       // console.log(res)
       return
@@ -845,13 +845,13 @@ class BaseBot {
 
     // 2. filter bots for image_to_text
     const needImageToText = AiHelper.needImageToTextAbility(chats)
-    if(needImageToText) {
+    if (needImageToText) {
       bots = bots.filter(v => v.abilities.includes("image_to_text"))
-      if(bots.length < 1) {
+      if (bots.length < 1) {
 
         // 3. try to compress chats for images
         const newChats = AiHelper.compressChatsForImages(chats)
-        if(!newChats) {
+        if (!newChats) {
           const { t } = useI18n(aiLang, { user: param.entry.user })
           const msg3 = t("cannot_read_images")
           TellUser.text(param.entry, msg3, { fromCharacter: _this._character })
@@ -862,7 +862,7 @@ class BaseBot {
         chats = newChats
       }
     }
-    
+
     return { bot: bots[0], chats }
   }
 
@@ -872,30 +872,30 @@ class BaseBot {
     user: Table_User,
   ) {
     const cLength = chats.length
-    if(cLength < 2) return chats
+    if (cLength < 2) return chats
 
     // 1. get windowTokens
     const isSubscribed = checkIfUserSubscribed(user)
     const _MAX_TOKEN = isSubscribed ? 32000 : 16000
     const { maxWindowTokenK } = bot
     let windowTokens = 1000 * maxWindowTokenK
-    if(windowTokens > _MAX_TOKEN) {
+    if (windowTokens > _MAX_TOKEN) {
       windowTokens = _MAX_TOKEN
     }
 
     // 2. calculate reachedTokens
     let reservedToken = Math.floor(windowTokens * 0.1)
-    if(reservedToken < MIN_RESERVED_TOKENS) {
+    if (reservedToken < MIN_RESERVED_TOKENS) {
       reservedToken = MIN_RESERVED_TOKENS
     }
     const reachedTokens = windowTokens - reservedToken
 
     // 3. to clip
     let token = 0
-    for(let i=0; i<cLength; i++) {
+    for (let i = 0; i < cLength; i++) {
       const v = chats[i]
       token += AiShared.calculateChatToken(v)
-      if(token > reachedTokens) {
+      if (token > reachedTokens) {
         chats = chats.slice(0, i)
         break
       }
@@ -907,7 +907,7 @@ class BaseBot {
   protected preRun(param: LiuAi.RunParam): PreRunResult | undefined {
     // 1. get bot
     const botAndChats = this._getBotAndChats(param)
-    if(!botAndChats) return
+    if (!botAndChats) return
     let { bot, chats } = botAndChats
 
     // 2. clip chats
@@ -916,8 +916,8 @@ class BaseBot {
     chats = this._clipChats(bot, chats, user)
 
     // 3. get prompts and add system prompt
-    const chatIntoPrompter = new ChatIntoPrompter(user, { 
-      abilities: bot.abilities, 
+    const chatIntoPrompter = new ChatIntoPrompter(user, {
+      abilities: bot.abilities,
       metaData: bot.metaData,
       character: bot.character,
       isContinueCommand: param.isContinueCommand,
@@ -928,7 +928,7 @@ class BaseBot {
     const system_1 = this.getFirstSystemPrompt(entry, bot)
 
     const system_1_token = AiShared.calculateTextToken(system_1)
-    if(system_1) {
+    if (system_1) {
       prompts.push({ role: "system", content: system_1 })
     }
 
@@ -946,7 +946,7 @@ class BaseBot {
     const res7: PreRunResult = { prompts, totalToken, bot, chats }
 
     // 8. tools
-    if(bot.abilities.includes("tool_use")) {
+    if (bot.abilities.includes("tool_use")) {
       const tools = valTool.copyObject(aiTools)
       res7.tools = tools
     }
@@ -970,17 +970,17 @@ class BaseBot {
     const botName = AiShared.getCharacterName(character)
     const { t } = useI18n(aiLang, { user: aiParam.entry.user })
     const toolHandler = new ToolHandler(
-      aiParam, 
+      aiParam,
       bot,
       tool_calls,
       chatCompletion,
     )
 
-    for(let i=0; i<tool_calls.length; i++) {
+    for (let i = 0; i < tool_calls.length; i++) {
       const v = tool_calls[i]
       const funcData = v["function"]
 
-      if(v.type !== "function" || !funcData) continue
+      if (v.type !== "function" || !funcData) continue
       const tool_call_id = v.id
 
       const funcName = funcData.name
@@ -989,30 +989,30 @@ class BaseBot {
       console.log("funcName: ", funcName)
       console.log(funcJson)
 
-      if(funcName === "add_note") {
+      if (funcName === "add_note") {
         await toolHandler.add_note(funcJson)
       }
-      else if(funcName === "add_todo") {
+      else if (funcName === "add_todo") {
         await toolHandler.add_todo(funcJson)
       }
-      else if(funcName === "add_calendar") {
+      else if (funcName === "add_calendar") {
         await toolHandler.add_calendar(funcJson)
       }
-      else if(funcName === "web_search") {
+      else if (funcName === "web_search") {
         const searchPass = await toolHandler.web_search(funcJson)
-        if(searchPass.pass) {
+        if (searchPass.pass) {
           await this._continueAfterWebSearch(
-            postParam, 
-            tool_calls, 
-            searchPass.data, 
+            postParam,
+            tool_calls,
+            searchPass.data,
             tool_call_id,
           )
           break
         }
       }
-      else if(funcName === "parse_link") {
+      else if (funcName === "parse_link") {
         const parsingLinkRes = await toolHandler.parse_link(funcJson)
-        if(!parsingLinkRes) continue
+        if (!parsingLinkRes) continue
         await this._continueAfterParsingLink(
           postParam,
           tool_calls,
@@ -1020,9 +1020,9 @@ class BaseBot {
           tool_call_id,
         )
       }
-      else if(funcName === "maps_regeo") {
+      else if (funcName === "maps_regeo") {
         const mapsRes = await toolHandler.maps_regeo(funcJson)
-        if(!mapsRes) continue
+        if (!mapsRes) continue
         await this._continueAfterMaps(
           postParam,
           tool_calls,
@@ -1031,9 +1031,9 @@ class BaseBot {
         )
         this._addAiLogsForMap(mapsRes)
       }
-      else if(funcName === "maps_geo") {
+      else if (funcName === "maps_geo") {
         const mapsRes = await toolHandler.maps_geo(funcJson)
-        if(!mapsRes) continue
+        if (!mapsRes) continue
         await this._continueAfterMaps(
           postParam,
           tool_calls,
@@ -1042,9 +1042,9 @@ class BaseBot {
         )
         this._addAiLogsForMap(mapsRes)
       }
-      else if(funcName === "maps_text_search") {
+      else if (funcName === "maps_text_search") {
         const mapsRes = await toolHandler.maps_text_search(funcJson)
-        if(!mapsRes) continue
+        if (!mapsRes) continue
         await this._continueAfterMaps(
           postParam,
           tool_calls,
@@ -1053,9 +1053,9 @@ class BaseBot {
         )
         this._addAiLogsForMap(mapsRes)
       }
-      else if(funcName === "maps_around_search") {
+      else if (funcName === "maps_around_search") {
         const mapsRes = await toolHandler.maps_around_search(funcJson)
-        if(!mapsRes) continue
+        if (!mapsRes) continue
         await this._continueAfterMaps(
           postParam,
           tool_calls,
@@ -1064,9 +1064,9 @@ class BaseBot {
         )
         this._addAiLogsForMap(mapsRes)
       }
-      else if(funcName === "maps_direction") {
+      else if (funcName === "maps_direction") {
         const mapsRes = await toolHandler.maps_direction(funcJson)
-        if(!mapsRes) continue
+        if (!mapsRes) continue
         await this._continueAfterMaps(
           postParam,
           tool_calls,
@@ -1075,11 +1075,11 @@ class BaseBot {
         )
         this._addAiLogsForMap(mapsRes)
       }
-      else if(funcName === "draw_picture") {
+      else if (funcName === "draw_picture") {
         const drawRes = await toolHandler.draw_picture(funcJson)
-        if(!drawRes) continue
-        const drawTextToUser = t("bot_draw", { 
-          botName: botName ?? "", 
+        if (!drawRes) continue
+        const drawTextToUser = t("bot_draw", {
+          botName: botName ?? "",
           model: drawRes.model,
         })
         const drawLog: LiuAi.RunLog = {
@@ -1091,9 +1091,9 @@ class BaseBot {
         }
         this._aiLogs.push(drawLog)
       }
-      else if(funcName === "get_schedule") {
+      else if (funcName === "get_schedule") {
         const scheduleRes = await toolHandler.get_schedule(funcJson)
-        if(!scheduleRes) continue
+        if (!scheduleRes) continue
 
         await this._continueAfterReadingCards(
           postParam,
@@ -1102,7 +1102,7 @@ class BaseBot {
           tool_call_id,
         )
 
-        if(scheduleRes.textToUser) {
+        if (scheduleRes.textToUser) {
           const scheduleLog: LiuAi.RunLog = {
             toolName: "get_schedule",
             hoursFromNow: funcJson.hoursFromNow,
@@ -1113,11 +1113,11 @@ class BaseBot {
           }
           this._aiLogs.push(scheduleLog)
         }
-        
+
       }
-      else if(funcName === "get_cards") {
+      else if (funcName === "get_cards") {
         const cardsRes = await toolHandler.get_cards(funcJson)
-        if(!cardsRes) continue
+        if (!cardsRes) continue
 
         await this._continueAfterReadingCards(
           postParam,
@@ -1126,7 +1126,7 @@ class BaseBot {
           tool_call_id,
         )
 
-        if(cardsRes.textToUser) {
+        if (cardsRes.textToUser) {
           const cardLog: LiuAi.RunLog = {
             toolName: "get_cards",
             cardType: funcJson.cardType,
@@ -1144,7 +1144,7 @@ class BaseBot {
     mapsRes: LiuAi.MapResult,
   ) {
     const textToUser = mapsRes.textToUser
-    if(!textToUser) return
+    if (!textToUser) return
     const mapLog: LiuAi.RunLog = {
       toolName: "maps_whatever",
       character: this._character,
@@ -1161,21 +1161,21 @@ class BaseBot {
     // 1. pre handle prompt and restTokens
     const { chatParam, chatCompletion, bot } = postParam
     const usage = chatCompletion?.usage
-    if(!usage) return
+    if (!usage) return
     const usedTokens = usage.total_tokens
     const { messages } = chatParam
     let prompts = [...messages]
     const maxWindowTokens = bot.maxWindowTokenK * 1000
     let restTokens = maxWindowTokens - usedTokens
     const mLength = messages.length
-    if(mLength < 2) return
+    if (mLength < 2) return
 
     // 2. constrain prompts and restTokens
-    if(restTokens < 1) {
+    if (restTokens < 1) {
       prompts = PromptsChecker.getLastUserPrompts(prompts)
       restTokens = maxWindowTokens - AiShared.calculatePromptsToken(prompts)
     }
-    else if(mLength > 5) {
+    else if (mLength > 5) {
       const systemPrompt = messages[0]
       const tempPrompts = messages.slice(mLength - 4)
       prompts = [systemPrompt, ...tempPrompts]
@@ -1187,12 +1187,12 @@ class BaseBot {
     restTokens -= token3
     const isReasoning = AiShared.isReasoningBot(bot)
     const thresholdTop = isReasoning ? MIN_REASONING_TOKENS : MAX_WX_TOKEN
-    if(restTokens > thresholdTop) {
+    if (restTokens > thresholdTop) {
       restTokens = thresholdTop
     }
     const thresholdBottom = isReasoning ? MIN_REASONING_TOKENS : MIN_REST_TOKEN
-    if(restTokens < thresholdBottom) {
-      if(prompts.length > 3) {
+    if (restTokens < thresholdBottom) {
+      if (prompts.length > 3) {
         restTokens = thresholdBottom
         prompts.splice(0, prompts.length - 3)
       }
@@ -1213,7 +1213,7 @@ class BaseBot {
   ) {
     // 1. handle max tokens
     const data1 = this._getRestTokensAndPrompts(postParam, textToBot)
-    if(!data1) return
+    if (!data1) return
     let { restTokens, prompts } = data1
 
     // 2. get other params
@@ -1225,7 +1225,7 @@ class BaseBot {
     const { t } = useI18n(aiLang, { user })
 
     // 3. add prompts with tool_calls and its result
-    if(canUseTool) {
+    if (canUseTool) {
       prompts.push({ role: "assistant", tool_calls, name: assistantName })
       textToBot += (`\n\n` + t("do_not_use_tool"))
       prompts.push({
@@ -1242,7 +1242,7 @@ class BaseBot {
         t,
         assistantName,
       )
-      if(newPrompts.length < 1) return
+      if (newPrompts.length < 1) return
       prompts.push(...newPrompts)
     }
 
@@ -1253,7 +1253,7 @@ class BaseBot {
       max_tokens: restTokens,
     }
     const res4 = await this.chat(newChatParam, bot)
-    if(!res4) {
+    if (!res4) {
       console.warn("no result in _continueAfterToolUse ......")
       return
     }
@@ -1267,7 +1267,7 @@ class BaseBot {
     }
     const chatTimes = this._chatTimes
     console.log("chatTimes: ", chatTimes)
-    if(chatTimes <= this.MAX_CHAT_TIMES) {
+    if (chatTimes <= this.MAX_CHAT_TIMES) {
       const res5 = await this.postRun(postParam5)
       console.warn("postRun result of _continueAfterToolUse: ", res5)
       return
@@ -1275,7 +1275,7 @@ class BaseBot {
 
     // 6. can i reply
     const res6 = await AiHelper.canReply(aiParam, bot)
-    if(!res6) return
+    if (!res6) return
 
     // 7. handle text from response
     await this._handleAssistantText(res4, aiParam, bot)
@@ -1353,10 +1353,10 @@ class BaseBot {
       reasoning_content: txt_b,
     } = AiShared.getContentFromLLM(chatCompletion, bot)
 
-    if(!txt_a && !txt_b) return
+    if (!txt_a && !txt_b) return
     let textToUser = txt_a
     let showCoT = Boolean(txt_a && txt_b)
-    if(!textToUser) {
+    if (!textToUser) {
       const { t } = useI18n(aiLang, { user })
       textToUser = t("thinking", { text: txt_b ?? "" })
     }
@@ -1366,7 +1366,7 @@ class BaseBot {
 
     // 1.3 handle special message, like location info
     const textToUser2 = TransformContent.convertTextBeforeReplying(textToUser, user)
-    if(!textToUser2) {
+    if (!textToUser2) {
       console.warn("fail to convert text before replying")
       console.log(textToUser)
       return
@@ -1374,7 +1374,7 @@ class BaseBot {
     textToUser = textToUser2
 
     // 2. reply to user without CoT
-    if(!showCoT) {
+    if (!showCoT) {
       await this._replyToUser({
         chatCompletion,
         entry,
@@ -1384,7 +1384,7 @@ class BaseBot {
         room: aiParam.room,
       })
     }
-    
+
     // 3. add assistant chat
     const apiEndpoint = AiShared.getApiEndpointFromBot(bot)
     const param3: LiuAi.HelperAssistantMsgParam = {
@@ -1401,7 +1401,7 @@ class BaseBot {
     const assistantChatId = await AiHelper.addAssistantMsg(param3)
 
     // 4. reply to user with CoT
-    if(showCoT) {
+    if (showCoT) {
       await this._replyToUser({
         chatCompletion,
         entry,
@@ -1422,17 +1422,17 @@ class BaseBot {
   ) {
     const MAX_REPLIED_WORDS = 600
     const MAX_CHARS = MAX_REPLIED_WORDS * 2
-    if(text.length < MAX_REPLIED_WORDS) return text
+    if (text.length < MAX_REPLIED_WORDS) return text
     const list = text.split("\n")
     let newText = ""
     let charNum = 0
 
-    for(let i=0; i<list.length; i++) {
+    for (let i = 0; i < list.length; i++) {
       const row = list[i]
       newText += `${row}\n`
       const theNum = valTool.getTextCharNum(row)
       charNum += theNum
-      if(charNum > MAX_CHARS) {
+      if (charNum > MAX_CHARS) {
         console.warn("clip the content because it exceeds the limit")
         console.log(list[i + 1])
         AiShared.setFinishReasonToLength(chatCompletion)
@@ -1462,7 +1462,7 @@ class BaseBot {
     let text = textToUser
 
     // 2. handle CoT
-    if(assistantChatId && showCoT) {
+    if (assistantChatId && showCoT) {
       const user = entry.user
       const { t } = useI18n(aiLang, { user })
       const domain = getLiuDoman()
@@ -1472,10 +1472,10 @@ class BaseBot {
     }
 
     // 3. handle length
-    if(finishReason === "length" && gzhType === "service_account") {
+    if (finishReason === "length" && gzhType === "service_account") {
       TellUser.menu(
-        entry, 
-        text, 
+        entry,
+        text,
         [{ operation: "continue", character }],
         "",
         character,
@@ -1485,7 +1485,7 @@ class BaseBot {
 
     // 4. handle audio
     const isAudioCharacter = ai_cfg.speaking_characters.includes(character)
-    if(isAudioCharacter && text.length <= MAX_WORDS_TTS) {
+    if (isAudioCharacter && text.length <= MAX_WORDS_TTS) {
       await this._replyWithAudio(param)
       return
     }
@@ -1506,9 +1506,9 @@ class BaseBot {
     const tts = new TextToSpeech({ room })
 
     // 2.1 yuewen
-    if(character === "yuewen") {
+    if (character === "yuewen") {
       const res2_1 = await tts.runByStepfun(text)
-      if(!res2_1) {
+      if (!res2_1) {
         TellUser.text(entry, text, { fromBot: bot })
         return
       }
@@ -1518,10 +1518,10 @@ class BaseBot {
     }
 
     // 2.2 minimax
-    if(character === "hailuo") {
+    if (character === "hailuo") {
       const res2_2 = await tts.runByMiniMax(text)
       const hex2_2 = res2_2?.data?.audio
-      if(!hex2_2) {
+      if (!hex2_2) {
         TellUser.text(entry, text, { fromBot: bot })
         return
       }
@@ -1531,9 +1531,9 @@ class BaseBot {
     }
 
     // 2.3 tongyi-qwen
-    if(character === "tongyi-qwen") {
+    if (character === "tongyi-qwen") {
       const res2_3 = await tts.runByTongyi(text)
-      if(!res2_3) {
+      if (!res2_3) {
         TellUser.text(entry, text, { fromBot: bot })
         return
       }
@@ -1547,10 +1547,10 @@ class BaseBot {
   /** remove the last line if we receive `finish_reason` with value `length` */
   private _handleLength(message: OaiMessage) {
     let content = message.content
-    if(!content) return
+    if (!content) return
     content = content.trimEnd()
     const tmpList = content.split("\n")
-    if(tmpList.length < 5) return
+    if (tmpList.length < 5) return
     tmpList.pop()
     message.content = tmpList.join("\n")
   }
@@ -1560,15 +1560,15 @@ class BaseBot {
   ): Promise<LiuAi.RunSuccess | undefined> {
     // 1. get params
     const { bot, chatCompletion, aiParam } = postParam
-    if(!chatCompletion) return
+    if (!chatCompletion) return
     const c = bot.character
 
     let firstChoice = chatCompletion?.choices?.[0]
-    if(!firstChoice) {
+    if (!firstChoice) {
       return
     }
     let { finish_reason, message } = firstChoice
-    if(!message) {
+    if (!message) {
       console.warn(`${c} no message! see firstChoice: `)
       console.log(firstChoice)
     }
@@ -1577,7 +1577,7 @@ class BaseBot {
     // 1.1 try to transform text into tool
     //   and remove <assistant></assistant> tag
     const res1 = TransformText.handleFromAssistantChoice(firstChoice)
-    if(res1) {
+    if (res1) {
       finish_reason = firstChoice.finish_reason
       message = firstChoice.message
       tool_calls = message.tool_calls
@@ -1586,10 +1586,10 @@ class BaseBot {
     // console.log(`${c} finish reason: ${finish_reason}`)
     // console.log(`usage: `)
     // console.log(chatCompletion.usage)
-    
+
     // 2. can i reply
     const res2 = await AiHelper.canReply(aiParam, bot)
-    if(!res2) {
+    if (!res2) {
       return {
         character: c,
         replyStatus: "has_new_msg",
@@ -1601,30 +1601,30 @@ class BaseBot {
     // console.log(chatCompletion.choices[0].message)
 
     // 3. tool calls
-    if(finish_reason === "tool_calls" && tool_calls) {
+    if (finish_reason === "tool_calls" && tool_calls) {
       await this._handleToolUse(postParam, tool_calls)
     }
-    
+
     // 4. finish reason is "length"
-    if(finish_reason === "length") {
+    if (finish_reason === "length") {
       this._handleLength(message)
     }
 
     // 5. finish reason is "content_filter"
-    if(finish_reason === "content_filter") {
+    if (finish_reason === "content_filter") {
       console.warn(`${c} content filter!`)
     }
 
     // 6. otherwise, handle text
     let assistantChatId: string | undefined
-    if(finish_reason !== "tool_calls") {
+    if (finish_reason !== "tool_calls") {
       assistantChatId = await this._handleAssistantText(chatCompletion, aiParam, bot)
     }
-    
-    return { 
+
+    return {
       character: c,
       replyStatus: "yes",
-      chatCompletion, 
+      chatCompletion,
       assistantChatId,
       logs: [...this._aiLogs],
       hasVoiceReplied: this._hasVoiceReplied,
@@ -1636,8 +1636,8 @@ class BaseBot {
     bot: AiBot,
   ) {
     const user = entry.user
-    const { 
-      date: current_date, 
+    const {
+      date: current_date,
       time: current_time,
     } = LiuDateUtil.getDateAndTime(getNowStamp(), user.timezone)
     const current_provider = AiHelper.getProviderName(bot) ?? "Unknown"
@@ -1645,16 +1645,16 @@ class BaseBot {
 
     // for deepseek reasoner from the official
     let key = "system_1"
-    if(this._character === "ds-reasoner") {
+    if (this._character === "ds-reasoner") {
       const canUseTool = bot.abilities.includes("tool_use")
-      if(canUseTool) {
+      if (canUseTool) {
         key = "system_2"
       }
     }
 
-    const system_1 = p(key, { 
-      current_date, 
-      current_time, 
+    const system_1 = p(key, {
+      current_date,
+      current_time,
       current_provider,
     })
     return system_1
@@ -1669,7 +1669,7 @@ class BaseBot {
 
     // 1. switch model
     const secondBot = this._bots[1]
-    if(!secondBot) {
+    if (!secondBot) {
       return
     }
     chatParam.model = secondBot.model
@@ -1678,7 +1678,7 @@ class BaseBot {
 
     // 2. change system prompt
     const firstMsg = chatParam.messages?.[0]
-    if(firstMsg.role === "system") {
+    if (firstMsg.role === "system") {
       const newSystemContent = this.getFirstSystemPrompt(entry, secondBot)
       firstMsg.content = newSystemContent
     }
@@ -1697,7 +1697,7 @@ class BotBaichuan extends BaseBot {
   async run(aiParam: LiuAi.RunParam): Promise<LiuAi.RunSuccess | undefined> {
     // 1. pre run
     const res1 = this.preRun(aiParam)
-    if(!res1) return
+    if (!res1) return
     const { prompts, totalToken, bot, chats, tools } = res1
 
     // 2. get other params
@@ -1716,7 +1716,7 @@ class BotBaichuan extends BaseBot {
       tools,
     }
     const chatCompletion = await this.chat(chatParam, bot)
-    
+
     // 6. post run
     const postParam: PostRunParam = {
       aiParam,
@@ -1737,7 +1737,7 @@ class BotBailing extends BaseBot {
   async run(aiParam: LiuAi.RunParam): Promise<LiuAi.RunSuccess | undefined> {
     // 1. pre run
     const res1 = this.preRun(aiParam)
-    if(!res1) return
+    if (!res1) return
     const { prompts, totalToken, bot, chats, tools } = res1
 
     // 2. get other params
@@ -1756,7 +1756,7 @@ class BotBailing extends BaseBot {
       tools,
     }
     const chatCompletion = await this.chat(chatParam, bot)
-    
+
     // 6. post run
     const postParam: PostRunParam = {
       aiParam,
@@ -1778,7 +1778,7 @@ class BotDeepSeek extends BaseBot {
   async run(aiParam: LiuAi.RunParam): Promise<LiuAi.RunSuccess | undefined> {
     // 1. pre run
     const res1 = this.preRun(aiParam)
-    if(!res1) return
+    if (!res1) return
     const { prompts, totalToken, chats, tools } = res1
 
     // 2. get other params
@@ -1786,7 +1786,7 @@ class BotDeepSeek extends BaseBot {
     let model = bot.model
 
     // 3. handle other things
-    if(aiParam.isContinueCommand) {
+    if (aiParam.isContinueCommand) {
       prompts.push({ role: "user", content: "Continue / 继续" })
     }
 
@@ -1800,17 +1800,19 @@ class BotDeepSeek extends BaseBot {
       model,
       tools,
     }
+    //@ts-expect-error thinking
+    chatParam.thinking = { type: "disabled" }
     let chatCompletion = await this.chat(chatParam, bot, { timeoutSec: 50 })
 
     // 5.2 try again if needed
-    if(!chatCompletion) {
+    if (!chatCompletion) {
       const res5_2 = await this.tryAgain(aiParam, chatParam)
-      if(res5_2) {
+      if (res5_2) {
         chatCompletion = res5_2.newChatCompletion
         bot = res5_2.newBot
       }
     }
-    
+
     // 6. post run
     const postParam: PostRunParam = {
       aiParam,
@@ -1833,7 +1835,7 @@ class BotDsReasoner extends BaseBot {
   async run(aiParam: LiuAi.RunParam): Promise<LiuAi.RunSuccess | undefined> {
     // 1. pre run
     const res1 = this.preRun(aiParam)
-    if(!res1) return
+    if (!res1) return
     const { prompts, totalToken, chats, tools } = res1
 
     // 2. get other params
@@ -1841,7 +1843,7 @@ class BotDsReasoner extends BaseBot {
     let model = bot.model
 
     // 3. handle other things
-    if(aiParam.isContinueCommand) {
+    if (aiParam.isContinueCommand) {
       prompts.push({ role: "user", content: "Continue / 继续" })
     }
 
@@ -1854,21 +1856,22 @@ class BotDsReasoner extends BaseBot {
       max_tokens: maxToken,
       model,
       tools,
-      temperature: 0.6,  // reference: https://github.com/deepseek-ai/DeepSeek-R1/pull/399/files
     }
+    //@ts-expect-error thinking
+    chatParam.thinking = { type: "disabled" }
     let chatCompletion = await this.chat(chatParam, bot)
 
     // 5.2 try again if needed
-    if(!chatCompletion) {
+    if (!chatCompletion) {
       console.warn("try again !!!")
       const res5_2 = await this.tryAgain(aiParam, chatParam)
       console.warn("try again res5_2:", res5_2)
-      if(res5_2) {
+      if (res5_2) {
         chatCompletion = res5_2.newChatCompletion
         bot = res5_2.newBot
       }
     }
-    
+
     // 6. post run
     const postParam: PostRunParam = {
       aiParam,
@@ -1891,7 +1894,7 @@ class BotMiniMax extends BaseBot {
   async run(aiParam: LiuAi.RunParam): Promise<LiuAi.RunSuccess | undefined> {
     // 1. pre run
     const res1 = this.preRun(aiParam)
-    if(!res1) return
+    if (!res1) return
     const { prompts, totalToken, bot, chats, tools } = res1
 
     // 2. get other params
@@ -1899,12 +1902,12 @@ class BotMiniMax extends BaseBot {
 
     // 3. handle other things
     // turn parameters into `string` in tools
-    if(tools) {
+    if (tools) {
       tools.forEach(v => {
         v.function.parameters = valTool.objToStr(v.function.parameters) as any
       })
     }
-    if(aiParam.isContinueCommand) {
+    if (aiParam.isContinueCommand) {
       prompts.push({ role: "user", content: "Continue / 继续" })
     }
 
@@ -1922,7 +1925,7 @@ class BotMiniMax extends BaseBot {
 
     // 6. handle audio result
     this.handleAudio(chatParam, chatCompletion)
-    
+
     // 7. post run
     const postParam: PostRunParam = {
       aiParam,
@@ -1943,16 +1946,16 @@ class BotMiniMax extends BaseBot {
   ) {
     // 1. check out if there is message
     const choice = chatCompletion?.choices[0]
-    if(!choice || choice.message) {
+    if (!choice || choice.message) {
       return
     }
     const choice2 = choice as any
     const messages = choice2?.messages as OaiPrompt[] | undefined
-    if(!messages) return
+    if (!messages) return
 
     // 2. get assistant message
     const assistantMsg = messages.find(v => v.role === "assistant")
-    if(assistantMsg) {
+    if (assistantMsg) {
       console.warn("update assistant message: ")
       console.log(assistantMsg)
       delete assistantMsg.name
@@ -1962,18 +1965,18 @@ class BotMiniMax extends BaseBot {
     // 3. get last user message whose type if input_audio
     const prompts = chatParam.messages
     const pLength = prompts.length
-    if(pLength < 1) return
+    if (pLength < 1) return
     const lastPrompt = prompts[pLength - 1]
-    if(!lastPrompt) return
-    if(lastPrompt.role !== "user") return
+    if (!lastPrompt) return
+    if (lastPrompt.role !== "user") return
     const lastContent = lastPrompt.content
-    if(!Array.isArray(lastContent)) return
+    if (!Array.isArray(lastContent)) return
 
     const lastPart = lastContent[0]
-    if(lastPart.type !== "input_audio") return
+    if (lastPart.type !== "input_audio") return
 
     const userMsg = messages.find(v => v.role === "user")
-    if(userMsg) {
+    if (userMsg) {
       console.warn("update last prompt: ")
       console.log(userMsg)
       delete userMsg.name
@@ -1994,14 +1997,14 @@ class BotMoonshot extends BaseBot {
   async run(aiParam: LiuAi.RunParam): Promise<LiuAi.RunSuccess | undefined> {
     // 1. pre run
     const res1 = this.preRun(aiParam)
-    if(!res1) return
+    if (!res1) return
     const { prompts, totalToken, bot, chats, tools } = res1
 
     // 2. get other params
     const model = bot.model
 
     // 3. handle other things
-    if(aiParam.isContinueCommand) {
+    if (aiParam.isContinueCommand) {
       prompts.push({ role: "user", content: "Continue / 继续" })
     }
     await ImageHelper.checkPromptsForBase64(prompts)
@@ -2016,8 +2019,10 @@ class BotMoonshot extends BaseBot {
       model,
       tools,
     }
+    //@ts-expect-error thinking for Kimi K2.6
+    chatParam.thinking = { type: "disabled" }
     const chatCompletion = await this.chat(chatParam, bot)
-    
+
     // 6. post run
     const postParam: PostRunParam = {
       aiParam,
@@ -2040,7 +2045,7 @@ class BotStepfun extends BaseBot {
   async run(aiParam: LiuAi.RunParam): Promise<LiuAi.RunSuccess | undefined> {
     // 1. pre run
     const res1 = this.preRun(aiParam)
-    if(!res1) return
+    if (!res1) return
     const { prompts, totalToken, bot, chats, tools } = res1
 
     // 2. get other params
@@ -2059,7 +2064,7 @@ class BotStepfun extends BaseBot {
       tools,
     }
     const chatCompletion = await this.chat(chatParam, bot)
-    
+
     // 6. post run
     const postParam: PostRunParam = {
       aiParam,
@@ -2081,7 +2086,7 @@ class BotTencentHunyuan extends BaseBot {
   async run(aiParam: LiuAi.RunParam): Promise<LiuAi.RunSuccess | undefined> {
     // 1. pre run
     const res1 = this.preRun(aiParam)
-    if(!res1) return
+    if (!res1) return
     const { prompts, totalToken, bot, chats, tools } = res1
 
     // 2. get other params
@@ -2089,7 +2094,7 @@ class BotTencentHunyuan extends BaseBot {
 
     // 3. handle other things
     // 3.1 interleave user assistant
-    if(aiParam.isContinueCommand) {
+    if (aiParam.isContinueCommand) {
       prompts.push({ role: "user", content: "Continue / 继续" })
     }
     PromptsChecker.interleaveUserAssistant(prompts)
@@ -2106,7 +2111,7 @@ class BotTencentHunyuan extends BaseBot {
       tools,
     }
     const chatCompletion = await this.chat(chatParam, bot)
-    
+
     // 6. post run
     const postParam: PostRunParam = {
       aiParam,
@@ -2129,14 +2134,14 @@ class BotTongyiQwen extends BaseBot {
   ): Promise<LiuAi.RunSuccess | undefined> {
     // 1. pre run
     const res1 = this.preRun(aiParam)
-    if(!res1) return
+    if (!res1) return
     const { prompts, totalToken, bot, chats, tools } = res1
 
     // 2. get other params
     const model = bot.model
 
     // 3. handle other things
-    if(bot.abilities.includes("image_to_text")) {
+    if (bot.abilities.includes("image_to_text")) {
       PromptsChecker.interleaveUserAssistant(prompts)
     }
 
@@ -2151,7 +2156,7 @@ class BotTongyiQwen extends BaseBot {
       tools,
     }
     const chatCompletion = await this.chat(chatParam, bot)
-    
+
     // 6. post run
     const postParam: PostRunParam = {
       aiParam,
@@ -2173,14 +2178,14 @@ class BotYi extends BaseBot {
   async run(aiParam: LiuAi.RunParam): Promise<LiuAi.RunSuccess | undefined> {
     // 1. pre run
     const res1 = this.preRun(aiParam)
-    if(!res1) return
+    if (!res1) return
     const { prompts, totalToken, bot, chats, tools } = res1
 
     // 2. get other params
     const model = bot.model
 
     // 3. handle other things
-    if(aiParam.isContinueCommand) {
+    if (aiParam.isContinueCommand) {
       prompts.push({ role: "user", content: "Continue / 继续" })
     }
 
@@ -2195,7 +2200,7 @@ class BotYi extends BaseBot {
       tools,
     }
     const chatCompletion = await this.chat(chatParam, bot)
-    
+
     // 6. post run
     const postParam: PostRunParam = {
       aiParam,
@@ -2218,7 +2223,7 @@ class BotZhipu extends BaseBot {
   async run(aiParam: LiuAi.RunParam): Promise<LiuAi.RunSuccess | undefined> {
     // 1. pre run
     const res1 = this.preRun(aiParam)
-    if(!res1) return
+    if (!res1) return
     const { prompts, totalToken, bot, chats, tools } = res1
 
     // 2. get other params
@@ -2226,10 +2231,10 @@ class BotZhipu extends BaseBot {
 
     // 3. handle other things
     // 3.1 remove web_search and parse_link, and add its own web_search
-    if(tools && bot.metaData?.zhipuWebSearch) {
+    if (tools && bot.metaData?.zhipuWebSearch) {
       AiHelper.removeOneTool("web_search", tools)
       AiHelper.removeOneTool("parse_link", tools)
-      
+
       // see https://bigmodel.cn/dev/howuse/websearch
       const webSearchTool = {
         type: "web_search",
@@ -2252,7 +2257,7 @@ class BotZhipu extends BaseBot {
       tools,
     }
     const chatCompletion = await this.chat(chatParam, bot)
-    
+
     // 6. post run
     const postParam: PostRunParam = {
       aiParam,
@@ -2273,14 +2278,14 @@ class AiController {
   // decide whether to send "typing"
   private _handleSendTyping(aiParam: LiuAi.RunParam) {
     const { chats, entry } = aiParam
-    if(chats.length < 3) {
+    if (chats.length < 3) {
       TellUser.typing(entry)
       return
     }
     const secondChat = chats[1]
-    if(secondChat.infoType === "user") {
+    if (secondChat.infoType === "user") {
       const hasTyping = isWithinMillis(secondChat.insertedStamp, SEC_15)
-      if(hasTyping) return
+      if (hasTyping) return
     }
     TellUser.typing(entry)
   }
@@ -2289,11 +2294,11 @@ class AiController {
   private _hasReasoningBot(
     newCharacters: AiCharacter[],
   ) {
-    for(let i=0; i<newCharacters.length; i++) {
+    for (let i = 0; i < newCharacters.length; i++) {
       const v1 = newCharacters[i]
       const bots = AiHelper.getBotsForCharacter(v1)
       const reasoningBot = bots.find(v2 => AiShared.isReasoningBot(v2))
-      if(reasoningBot) return true
+      if (reasoningBot) return true
     }
     return false
   }
@@ -2304,12 +2309,12 @@ class AiController {
   ) {
     const { entry } = aiParam
     const { msg_type } = entry
-    if(aiParam.isContinueCommand || msg_type === "voice") return 0
-    if(msg_type === "image") return 0
+    if (aiParam.isContinueCommand || msg_type === "voice") return 0
+    if (msg_type === "image") return 0
 
     // 1. check out reasoning models exist
     const hasReasoningModel = this._hasReasoningBot(newCharacters)
-    if(hasReasoningModel) return 0
+    if (hasReasoningModel) return 0
 
     // 2. randomly wait for a while
     const r = Math.floor((Math.random() * 3)) + 1
@@ -2322,18 +2327,18 @@ class AiController {
     // 1. check bots in the room
     let characters = room.characters
     const newCharacters = characters.filter(c => AiHelper.isCharacterAvailable(c))
-    if(newCharacters.length < 1) {
+    if (newCharacters.length < 1) {
       console.warn("no available characters in the room")
       return false
     }
 
     // 1.2 decide how long to wait
     const seconds = this._waitForSeconds(aiParam, newCharacters)
-    if(seconds > 0) {
+    if (seconds > 0) {
       // console.log(`start to wait ${seconds} seconds`)
       await valTool.waitMilli(seconds * SECOND)
       const res1_2 = await AiHelper.canReply(aiParam)
-      if(!res1_2) {
+      if (!res1_2) {
         console.warn("don't reply!")
         return
       }
@@ -2341,14 +2346,14 @@ class AiController {
 
     // 2. compress chats
     const needCompress = AiCompressor.doINeedCompress(aiParam.chats)
-    if(needCompress) {
+    if (needCompress) {
       // console.log("get to compress..............")
       const newChats = await AiCompressor.run(aiParam)
-      if(newChats) {
+      if (newChats) {
         aiParam.chats = newChats
       }
       const res2 = await AiHelper.canReply(aiParam)
-      if(!res2) {
+      if (!res2) {
         // console.warn("we don't need to reply because ")
         // console.log("there is a new message after compressing")
         return
@@ -2357,16 +2362,16 @@ class AiController {
 
     // 3. get promises
     const promises: Promise<LiuAi.RunSuccess | undefined>[] = []
-    for(let i=0; i<newCharacters.length; i++) {
+    for (let i = 0; i < newCharacters.length; i++) {
       const c = newCharacters[i]
       const _chats = valTool.copyObject(aiParam.chats)
-      const newParam: LiuAi.RunParam = { 
+      const newParam: LiuAi.RunParam = {
         ...aiParam,
         chats: _chats,
       }
       mapBots(c, newParam, promises)
     }
-    if(promises.length < 1) return
+    if (promises.length < 1) return
 
     // 3.1 send "typing" state
     this._handleSendTyping(aiParam)
@@ -2377,41 +2382,41 @@ class AiController {
     let hasEverUsedTool = false
     let hasEverUsedVoice = false
     const aiLogs: LiuAi.RunLog[] = []
-    for(let i=0; i<res4.length; i++) {
+    for (let i = 0; i < res4.length; i++) {
       const v = res4[i]
-      if(v && v.replyStatus === "yes") {
+      if (v && v.replyStatus === "yes") {
         hasEverSucceeded = true
-        if(v.toolName) hasEverUsedTool = true
-        if(v.hasVoiceReplied) hasEverUsedVoice = true
-        if(v.logs) {
+        if (v.toolName) hasEverUsedTool = true
+        if (v.hasVoiceReplied) hasEverUsedVoice = true
+        if (v.logs) {
           // console.log("see logs in ai controller:::")
           // LogHelper.printLastItems(v.logs)
           aiLogs.push(...v.logs)
         }
       }
     }
-    if(!hasEverSucceeded) return
+    if (!hasEverSucceeded) return
 
     // 5. add quota
     const num5 = AiHelper.addQuotaForUser(entry, room)
 
     // 5.1 if num5 === 10 && !isSubscribed, send tip
     const available = UserHelper.checkQuota(entry, room)
-    if(!available) return
+    if (!available) return
 
     // 5.2 popup tip for ai voice
-    if(hasEverUsedVoice) {
-      if(!room.voicePreference) {
+    if (hasEverUsedVoice) {
+      if (!room.voicePreference) {
         this.popupTipForAiVoice(aiParam)
         return
       }
     }
 
     // 5.3 send fallback message
-    if(aiLogs.length > 0) {
-      this.sendFallbackMenu(aiParam, res4, aiLogs) 
+    if (aiLogs.length > 0) {
+      this.sendFallbackMenu(aiParam, res4, aiLogs)
     }
-    else if((num5 % 3) === 2 && !hasEverUsedTool) {
+    else if ((num5 % 3) === 2 && !hasEverUsedTool) {
       this.sendFallbackMenu(aiParam, res4, aiLogs)
     }
   }
@@ -2464,7 +2469,7 @@ class AiController {
     })
 
     // 2.2 privacy tips
-    if(privacyLogs.length > 0) {
+    if (privacyLogs.length > 0) {
       privacyLogs.sort((a, b) => a.logStamp - b.logStamp)
       prefixMessage += (t("privacy_title") + "\n")
       privacyLogs.forEach(v => {
@@ -2474,7 +2479,7 @@ class AiController {
     }
 
     // 2.3 working logs
-    if(workingLogs.length > 0) {
+    if (workingLogs.length > 0) {
       workingLogs.sort((a, b) => a.logStamp - b.logStamp)
       prefixMessage += (t("working_log_title") + "\n")
       workingLogs.forEach(v => {
@@ -2488,7 +2493,7 @@ class AiController {
     kickList.forEach(v => menuList.push({ operation: "kick", character: v }))
     addedList.forEach(v => menuList.push({ operation: "add", character: v }))
     menuList.push({ operation: "clear_history" })
-    if(menuList.length > 0) {
+    if (menuList.length > 0) {
       prefixMessage += t("operation_title")
       suffixMessage = "\n"
     }
@@ -2522,7 +2527,7 @@ class ContinueController {
   private _characterSelected?: AiCharacter
 
   constructor(
-    entry: AiEntry, 
+    entry: AiEntry,
     room: Table_AiRoom,
     characterSelected?: AiCharacter
   ) {
@@ -2539,21 +2544,21 @@ class ContinueController {
 
     // 1. get latest 16 chats
     const chats = await AiHelper.getLatestChat(roomId, 16)
-    if(chats.length < 2) return
+    if (chats.length < 2) return
 
     // 1.1 generate a chat list where the first one is the user message, and the rest is messages before that
     let chatsBeforeUser: Table_AiChat[] = []
     let userAndTheRest: Table_AiChat[] = []
-    for(let i=0; i<chats.length; i++) {
+    for (let i = 0; i < chats.length; i++) {
       const v = chats[i]
-      if(v.infoType === "user") {
+      if (v.infoType === "user") {
         chatsBeforeUser = chats.slice(0, i)
         userAndTheRest = chats.slice(i)
         break
       }
     }
-    if(chatsBeforeUser.length < 1) return
-    if(userAndTheRest.length < 1) return
+    if (chatsBeforeUser.length < 1) return
+    if (userAndTheRest.length < 1) return
 
     // 2. find characters and their chats to continue
     const stoppedCharacters: AiCharacter[] = []
@@ -2561,9 +2566,9 @@ class ContinueController {
 
     const _addChat = (item: Table_AiChat) => {
       const { character } = item
-      if(!character) return
+      if (!character) return
       const v2 = list.find(v3 => v3.character === character)
-      if(v2) {
+      if (v2) {
         v2.chats.push(item)
       }
       else {
@@ -2571,43 +2576,43 @@ class ContinueController {
       }
     }
 
-    for(let i=0; i<chatsBeforeUser.length; i++) {
+    for (let i = 0; i < chatsBeforeUser.length; i++) {
       const v = chatsBeforeUser[i]
       const { infoType, character, finish_reason } = v
 
       // 2.1 next if infoType is not assistant or character is undefined
-      if(infoType !== "assistant" || !character) continue
+      if (infoType !== "assistant" || !character) continue
 
       // 2.2 check out if it's the selected character
-      if(characterSelected) {
-        if(character !== characterSelected) continue
+      if (characterSelected) {
+        if (character !== characterSelected) continue
       }
 
       // 2.2.1 ds-reasoner
-      if(character === "ds-reasoner") {
+      if (character === "ds-reasoner") {
         _addChat(v)
         continue
       }
 
       // 2.3 next if character is stopped
       const isStopped = stoppedCharacters.includes(character)
-      if(isStopped) continue
+      if (isStopped) continue
 
       // 2.4 add character into stoppedCharacters if finish_reason is stop
-      if(finish_reason === "stop") {
+      if (finish_reason === "stop") {
         stoppedCharacters.push(character)
         continue
       }
 
       // 2.5 next if finish_reason is not "length"
-      if(finish_reason !== "length") continue
-      
+      if (finish_reason !== "length") continue
+
       // 2.6 add the chat
       _addChat(v)
     }
 
     // 3. return if list is empty
-    if(list.length < 1) {
+    if (list.length < 1) {
       const { t } = useI18n(aiLang, { user: entry.user })
       const msg3 = t("no_more_to_continue")
       TellUser.text(entry, msg3)
@@ -2620,7 +2625,7 @@ class ContinueController {
 
     // 4. get promises
     const promises: Promise<LiuAi.RunSuccess | undefined>[] = []
-    for(let i=0; i<list.length; i++) {
+    for (let i = 0; i < list.length; i++) {
       const v = list[i]
       const c = v.character
       const newParam: LiuAi.RunParam = {
@@ -2631,7 +2636,7 @@ class ContinueController {
       }
       mapBots(c, newParam, promises)
     }
-    if(promises.length < 1) return
+    if (promises.length < 1) return
 
     // 3.1 send "typing" state
     TellUser.typing(entry)
@@ -2639,13 +2644,13 @@ class ContinueController {
     // 4. wait for all promises
     const res4 = await Promise.all(promises)
     let hasEverSucceeded = false
-    for(let i=0; i<res4.length; i++) {
+    for (let i = 0; i < res4.length; i++) {
       const v = res4[i]
-      if(v && v.replyStatus === "yes") {
+      if (v && v.replyStatus === "yes") {
         hasEverSucceeded = true
       }
     }
-    if(!hasEverSucceeded) return
+    if (!hasEverSucceeded) return
 
     // 5. add quota for user
     AiHelper.addQuotaForUser(entry, room)
@@ -2660,16 +2665,16 @@ class AiCompressor {
 
   static doINeedCompress(chats: Table_AiChat[]) {
     const len = chats.length
-    if(len < 3) return false
-    
+    if (len < 3) return false
+
     let token = 0
-    for(let i=0; i<len; i++) {
+    for (let i = 0; i < len; i++) {
       const v = chats[i]
       token += AiShared.calculateChatToken(v)
-      if(v.infoType === "summary") break
+      if (v.infoType === "summary") break
     }
 
-    if(token > TOKEN_NEED_COMPRESS) return true
+    if (token > TOKEN_NEED_COMPRESS) return true
     return false
   }
 
@@ -2695,18 +2700,18 @@ class AiCompressor {
 
     // 3. add prefix msg
     const prefix_msg = p("prefix_msg")
-    if(_env.LIU_SUMMARY_PREFIX === "01") {
-      const msg3_1 = { 
-        role: "assistant", 
-        content: prefix_msg, 
+    if (_env.LIU_SUMMARY_PREFIX === "01") {
+      const msg3_1 = {
+        role: "assistant",
+        content: prefix_msg,
         prefix: true,
       } as OaiPrompt
       prompts.push(msg3_1)
     }
-    else if(_env.LIU_SUMMARY_PARTIAL === "01") {
-      const msg3_2 = { 
-        role: "assistant", 
-        content: prefix_msg, 
+    else if (_env.LIU_SUMMARY_PARTIAL === "01") {
+      const msg3_2 = {
+        role: "assistant",
+        content: prefix_msg,
         partial: true,
       } as OaiPrompt
       prompts.push(msg3_2)
@@ -2724,7 +2729,7 @@ class AiCompressor {
     const t2 = getNowStamp()
     const cost = t2 - t1
     console.log("summary cost: ", cost)
-    if(!res4) {
+    if (!res4) {
       console.warn("summary llm got an error")
       return
     }
@@ -2734,7 +2739,7 @@ class AiCompressor {
     // 5. get data from the response
     const usage = res4.usage
     const text = res4.choices[0].message.content
-    if(!text) {
+    if (!text) {
       console.warn("no text in the summary response")
       return
     }
@@ -2743,17 +2748,17 @@ class AiCompressor {
     let totalToken = 0
     let idx6 = 0
     const newChats: Table_AiChat[] = []
-    for(let i=0; i<chats.length; i++) {
+    for (let i = 0; i < chats.length; i++) {
       const v = chats[i]
       const token = AiShared.calculateChatToken(v)
       totalToken += token
       newChats.push(v)
       idx6 = i
-      if(totalToken > 900) {
+      if (totalToken > 900) {
         break
       }
     }
-    if(usage?.completion_tokens) {
+    if (usage?.completion_tokens) {
       totalToken += usage.completion_tokens
     }
     const clipChat = chats[idx6]
@@ -2774,7 +2779,7 @@ class AiCompressor {
       baseUrl: _env.LIU_SUMMARY_BASE_URL,
     }
     const chatId7 = await AiShared.addChat(data7)
-    if(!chatId7) return
+    if (!chatId7) return
     newChats.push({ _id: chatId7, ...data7 })
 
     // 8. return the new chats
@@ -2795,7 +2800,7 @@ class ToolHandler {
   private _chatCompletion?: OaiChatCompletion
 
   constructor(
-    aiParam: LiuAi.RunParam, 
+    aiParam: LiuAi.RunParam,
     bot: AiBot,
     tool_calls: OaiToolCall[],
     chatCompletion?: OaiChatCompletion,
@@ -2827,18 +2832,18 @@ class ToolHandler {
     const assistantChatId = await AiHelper.addAssistantMsg(arg)
     return assistantChatId
   }
-  
+
   async add_note(funcJson: Record<string, any>) {
     // 1. check out param
     const res1 = AiToolUtil.turnJsonToWaitingData("add_note", funcJson)
-    if(!res1.pass) return
+    if (!res1.pass) return
 
     // 2. add msg
     const assistantChatId = await this._addMsgToChat({
       funcName: "add_note",
       funcJson,
     })
-    if(!assistantChatId) return
+    if (!assistantChatId) return
 
     // 3. reply
     const toolShared = this._toolShared
@@ -2849,14 +2854,14 @@ class ToolHandler {
   async add_todo(funcJson: Record<string, any>) {
     // 1. check out param
     const res1 = AiToolUtil.turnJsonToWaitingData("add_todo", funcJson)
-    if(!res1.pass) return
+    if (!res1.pass) return
 
     // 2. add chat
     const assistantChatId = await this._addMsgToChat({
       funcName: "add_todo",
       funcJson,
     })
-    if(!assistantChatId) return
+    if (!assistantChatId) return
 
     // 3. reply
     const toolShared = this._toolShared
@@ -2867,14 +2872,14 @@ class ToolHandler {
   async add_calendar(funcJson: Record<string, any>) {
     // 1. check out param
     const res1 = AiToolUtil.turnJsonToWaitingData("add_calendar", funcJson)
-    if(!res1.pass) return
+    if (!res1.pass) return
 
     // 2. add chat
     const assistantChatId = await this._addMsgToChat({
       funcName: "add_calendar",
       funcJson,
     })
-    if(!assistantChatId) return
+    if (!assistantChatId) return
 
     // 3. reply
     const toolShared = this._toolShared
@@ -2888,7 +2893,7 @@ class ToolHandler {
     // 1. search by ToolShared
     const toolShared = this._toolShared
     const searchPass = await toolShared.web_search(funcJson)
-    if(!searchPass.pass) return searchPass
+    if (!searchPass.pass) return searchPass
     const searchRes = searchPass.data
 
     // 2. add msg
@@ -2904,23 +2909,23 @@ class ToolHandler {
   }
 
   private async _getDrawResult(
-    prompt: string, 
+    prompt: string,
     sizeType: AiImageSizeType,
   ) {
     // 1. get param
     let res: LiuAi.PaletteResult | undefined
     const bot = this._bot
     const c = bot.character
-    
+
     // 2. translate if needed
     let imagePrompt = prompt
     const num2 = valTool.getChineseCharNum(prompt)
     console.warn("chinese char num: ", num2)
-    if(num2 > 6) {
+    if (num2 > 6) {
       const user = this._aiParam.entry.user
       const translator = new Translator(bot, user)
       const res2 = await translator.run(prompt)
-      if(!res2) {
+      if (!res2) {
         console.warn("fail to translate")
       }
       else {
@@ -2929,15 +2934,15 @@ class ToolHandler {
     }
 
     // 3. run by zhipu if character is zhipu
-    if(c === "zhipu") {
+    if (c === "zhipu") {
       res = await Palette.runByZhipu(imagePrompt, sizeType)
-      if(res) return res
+      if (res) return res
     }
 
     // 4. run by stepfun if character is stepfun
-    if(c === "yuewen") {
+    if (c === "yuewen") {
       res = await Palette.runByStepfun(imagePrompt, sizeType)
-      if(res) return res
+      if (res) return res
     }
 
     // n. run 
@@ -2950,13 +2955,13 @@ class ToolHandler {
   ): Promise<LiuAi.PaletteResult | undefined> {
     // 1. check out param
     const prompt = funcJson.prompt
-    if(!prompt || typeof prompt !== "string") {
+    if (!prompt || typeof prompt !== "string") {
       console.warn("draw_picture prompt is not string")
       console.log(funcJson)
       return
     }
     let sizeType = funcJson.sizeType as AiImageSizeType
-    if(sizeType !== "portrait" && sizeType !== "square") {
+    if (sizeType !== "portrait" && sizeType !== "square") {
       sizeType = "square"
     }
 
@@ -2967,11 +2972,11 @@ class ToolHandler {
       text: prompt,
     }
     const assistantChatId = await this._addMsgToChat(data2)
-    if(!assistantChatId) return
+    if (!assistantChatId) return
 
     // 3. draw
     let res3 = await this._getDrawResult(prompt, sizeType)
-    if(!res3) return
+    if (!res3) return
 
     // 4. update assistant msg
     const data4: Partial<Table_AiChat> = {
@@ -2979,7 +2984,7 @@ class ToolHandler {
       drawPictureData: res3.originalResult,
       drawPictureModel: res3.model,
     }
-    if(prompt !== res3.prompt) {
+    if (prompt !== res3.prompt) {
       data4.text = res3.prompt
     }
 
@@ -2997,7 +3002,7 @@ class ToolHandler {
   ): Promise<LiuAi.ReadCardsResult | undefined> {
     // 1. get schedule from ai-shared.ts
     const res1 = await this._toolShared.get_schedule(funcJson)
-    if(!res1.pass) return
+    if (!res1.pass) return
     const { textToUser, textToBot, hasData } = res1.data
 
     // 2. add msg into chats
@@ -3007,7 +3012,7 @@ class ToolHandler {
       text: hasData ? textToUser : textToBot,
     }
     const assistantChatId = await this._addMsgToChat(data8)
-    if(!assistantChatId) return
+    if (!assistantChatId) return
 
     return {
       textToUser,
@@ -3022,7 +3027,7 @@ class ToolHandler {
     // 1. get cards using ToolShared
     const toolShared = this._toolShared
     const res1 = await toolShared.get_cards(funcJson)
-    if(!res1.pass) return
+    if (!res1.pass) return
     const { textToUser, textToBot, hasData } = res1.data
 
     // 2. add msg
@@ -3032,7 +3037,7 @@ class ToolHandler {
       text: hasData ? textToUser : textToBot,
     }
     const assistantChatId = await this._addMsgToChat(data8)
-    if(!assistantChatId) return
+    if (!assistantChatId) return
 
     return {
       textToUser,
@@ -3047,12 +3052,12 @@ class ToolHandler {
     // 1. get to parse
     const toolShared = this._toolShared
     const res1 = await toolShared.parse_link(funcJson)
-    if(!res1.pass) return
+    if (!res1.pass) return
     const parsingRes = res1.data
 
     // 2. clip
     let { markdown } = parsingRes
-    if(markdown.length > 6666) {
+    if (markdown.length > 6666) {
       markdown = markdown.substring(0, 6666) + "......"
     }
 
@@ -3063,8 +3068,8 @@ class ToolHandler {
       text: markdown,
     }
     const assistantChatId = await this._addMsgToChat(data8)
-    if(!assistantChatId) return
-    
+    if (!assistantChatId) return
+
     return parsingRes
   }
 
@@ -3074,7 +3079,7 @@ class ToolHandler {
     funcName: string,
     res1: DataPass<LiuAi.MapResult>
   ) {
-    if(!res1.pass) return
+    if (!res1.pass) return
 
     const mapSearchData = res1.data.originalResult
     const mapProvider = res1.data.provider
@@ -3085,7 +3090,7 @@ class ToolHandler {
       mapSearchData,
     }
     const assistantChatId = await this._addMsgToChat(data2)
-    if(!assistantChatId) return
+    if (!assistantChatId) return
     return res1.data
   }
 
@@ -3139,11 +3144,11 @@ class PromptsChecker {
   // try to interleave the user/assistant messages in the message sequence for
   // deepseek-reasoner
   static run(
-    prompts: OaiPrompt[], 
+    prompts: OaiPrompt[],
     bot?: AiBot
   ) {
     this._removeTool(prompts)
-    if(bot && AiShared.isReasoningBot(bot)) {
+    if (bot && AiShared.isReasoningBot(bot)) {
       this.interleaveUserAssistant(prompts)
       this._constraintPromptsNum(prompts)
       this._ensureFirstPromptIsUser(prompts)
@@ -3161,35 +3166,35 @@ class PromptsChecker {
    */
   static interleaveUserAssistant(prompts: OaiPrompt[]) {
     let hasUserAppeared = false
-    for(let i=0; i<prompts.length-1; i++) {
+    for (let i = 0; i < prompts.length - 1; i++) {
       const currentOne = prompts[i]
       const currentRole = currentOne.role
 
-      if(!hasUserAppeared) {
-        if(currentRole === "user") {
+      if (!hasUserAppeared) {
+        if (currentRole === "user") {
           hasUserAppeared = true
         }
-        else if(currentRole !== "system") {
+        else if (currentRole !== "system") {
           prompts.splice(i, 1)
           i--
           continue
         }
       }
 
-      const nextOne = prompts[i+1]
+      const nextOne = prompts[i + 1]
       const nextRole = nextOne.role
 
       const twoUserPrompts = Boolean(currentRole === "user" && nextRole === "user")
       const twoAssistantPrompts = Boolean(currentRole === "assistant" && nextRole === "assistant")
-      
-      if(twoUserPrompts || twoAssistantPrompts) {
+
+      if (twoUserPrompts || twoAssistantPrompts) {
         const mergedContent = this._mergeTwoPrompts(currentOne, nextOne)
-        if(mergedContent) {
+        if (mergedContent) {
           currentOne.content = mergedContent
-          if(currentRole === "assistant") {
+          if (currentRole === "assistant") {
             delete currentOne.name
           }
-          prompts.splice(i+1, 1)
+          prompts.splice(i + 1, 1)
         }
         else {
           prompts.splice(i, 1)
@@ -3205,24 +3210,24 @@ class PromptsChecker {
 
     const cType = typeof currentContent
     const nType = typeof nextContent
-    if(cType === "string" && nType === "string") {
+    if (cType === "string" && nType === "string") {
       return `${currentContent}\n\n${nextContent}`
     }
 
     const isArr1 = Array.isArray(currentContent)
     const isArr2 = Array.isArray(nextContent)
-    if(isArr1 && isArr2) {
+    if (isArr1 && isArr2) {
       return [...currentContent, ...nextContent] as OaiContentPart[]
     }
 
-    if(isArr1 && typeof nType === "string") {
+    if (isArr1 && typeof nType === "string") {
       return [
         ...currentContent,
         { type: "text", text: nextContent }
       ] as OaiContentPart[]
     }
 
-    if(typeof cType === "string" && isArr2) {
+    if (typeof cType === "string" && isArr2) {
       return [
         { type: "text", text: currentContent },
         ...nextContent
@@ -3232,17 +3237,17 @@ class PromptsChecker {
   }
 
   private static _removeTool(prompts: OaiPrompt[]) {
-    if(prompts.length < 3) return
+    if (prompts.length < 3) return
     const firstPrompt = prompts[0]
     const secondPrompt = prompts[1]
-    if(firstPrompt.role === "system") {
-      if(secondPrompt.role === "tool" && secondPrompt.tool_call_id) {
+    if (firstPrompt.role === "system") {
+      if (secondPrompt.role === "tool" && secondPrompt.tool_call_id) {
         prompts.splice(1, 1)
       }
       return
     }
 
-    if(firstPrompt.role === "tool" && firstPrompt.tool_call_id) {
+    if (firstPrompt.role === "tool" && firstPrompt.tool_call_id) {
       prompts.splice(0, 1)
     }
   }
@@ -3252,24 +3257,24 @@ class PromptsChecker {
     prompts: OaiPrompt[],
     maxNum = 8,    // including system prompt
   ) {
-    if(prompts.length <= maxNum) return
+    if (prompts.length <= maxNum) return
 
-    for(let i=0; i<prompts.length-1; i++) {
-      if(prompts.length <= maxNum) break
+    for (let i = 0; i < prompts.length - 1; i++) {
+      if (prompts.length <= maxNum) break
       const currentOne = prompts[i]
       const role = currentOne.role
-      if(role === "system") continue
+      if (role === "system") continue
       prompts.splice(i, 1)
       i--
     }
   }
 
   private static _ensureFirstPromptIsUser(prompts: OaiPrompt[]) {
-    for(let i=0; i<prompts.length; i++) {
+    for (let i = 0; i < prompts.length; i++) {
       const v = prompts[i]
       const role = v.role
-      if(role === "system" && i === 0) continue
-      if(role === "user") return
+      if (role === "system" && i === 0) continue
+      if (role === "user") return
       prompts.splice(i, 1)
       i--
     }
@@ -3282,27 +3287,27 @@ class PromptsChecker {
    * 3. 或者什么都不接（也就是放在最后一个元素） 
    */
   static processForHunyuan(prompts: OaiPrompt[]) {
-    for(let i=0; i<prompts.length-1; i++) {
+    for (let i = 0; i < prompts.length - 1; i++) {
       const currentOne = prompts[i]
       const role = currentOne.role
-      if(role !== "tool") continue
-      const nextOne = prompts[i+1]
+      if (role !== "tool") continue
+      const nextOne = prompts[i + 1]
       const nextRole = nextOne.role
-      if(nextRole === "assistant" || nextRole === "tool") continue
+      if (nextRole === "assistant" || nextRole === "tool") continue
       const newAssistant: OaiPrompt = {
         role: "assistant",
         content: ai_cfg.i_got_it,
       }
-      prompts.splice(i+1, 0, newAssistant)
+      prompts.splice(i + 1, 0, newAssistant)
     }
   }
 
   /** 返回最后一个 message 为 user 的 prompt 以及再之后的 prompt */
   static getLastUserPrompts(prompts: OaiPrompt[]) {
-    for(let i=prompts.length-1; i>=0; i--) {
+    for (let i = prompts.length - 1; i >= 0; i--) {
       const currentOne = prompts[i]
       const role = currentOne.role
-      if(role === "user") {
+      if (role === "user") {
         return prompts.slice(i)
       }
     }
@@ -3323,17 +3328,17 @@ class AiHelper {
     const rCol = db.collection("AiRoom")
     const res1 = await rCol.where({ owner: userId }).getOne<Table_AiRoom>()
     const room = res1.data
-    if(room) return room
-  
+    if (room) return room
+
     // 2.1 get available characters
     const b2 = getBasicStampWhileAdding()
     const characters = AiShared.fillCharacters()
 
     // 2.2 try to add bot user wants
-    if(botUserWannaAdd) {
+    if (botUserWannaAdd) {
       const c2_2 = botUserWannaAdd.character
       const canAdd = this.isCharacterAvailable(botUserWannaAdd.character)
-      if(canAdd && !characters.includes(c2_2)) {
+      if (canAdd && !characters.includes(c2_2)) {
         characters.splice(0, 1, c2_2)
       }
     }
@@ -3346,7 +3351,7 @@ class AiHelper {
     }
     const res2 = await rCol.add(room2)
     const roomId = getDocAddId(res2)
-    if(!roomId) {
+    if (!roomId) {
       console.warn("cannot get roomId while creating ai room error")
       console.log(res2)
       console.log("entry: ")
@@ -3354,7 +3359,7 @@ class AiHelper {
       return
     }
     LogHelper.add(characters, entry.user)
-  
+
     // 3. return room
     const newRoom: Table_AiRoom = { _id: roomId, ...room2 }
     return newRoom
@@ -3365,9 +3370,9 @@ class AiHelper {
     roomId: string,
   ) {
     const userId = entry.user._id
-    const { 
+    const {
       msg_type,
-      text, 
+      text,
       location,
       image_url,
       audio_url,
@@ -3392,7 +3397,7 @@ class AiHelper {
       userId,
       location,
     }
-    if(wx_gzh_openid) {
+    if (wx_gzh_openid) {
       data1.channel = "wx_gzh"
     }
 
@@ -3447,22 +3452,22 @@ class AiHelper {
     const chats: Table_AiChat[] = []
     let imageNum = 0
 
-    for(let i=0; i<results.length; i++) {
+    for (let i = 0; i < results.length; i++) {
       const v = results[i]
-      if(v.infoType === "clear") {
+      if (v.infoType === "clear") {
         break
       }
 
       // turn image to [image]
-      if(v.msgType === "image") {
+      if (v.msgType === "image") {
         imageNum++
 
-        if(imageNum > 3 || i > INDEX_TO_PRESERVE_IMAGES) {
+        if (imageNum > 3 || i > INDEX_TO_PRESERVE_IMAGES) {
           v.msgType = "text"
           v.text = AiHelper.imageRecognitionText(v.text)
           delete v.imageUrl
         }
-        else if(!isWithinMillis(v.insertedStamp, DAY)) {
+        else if (!isWithinMillis(v.insertedStamp, DAY)) {
           v.msgType = "text"
           v.text = AiHelper.imageRecognitionText(v.text)
           delete v.imageUrl
@@ -3480,7 +3485,7 @@ class AiHelper {
     aiParam: LiuAi.RunParam,
     bot?: AiBot,
   ) {
-    if(bot && AiShared.isReasoningBot(bot)) {
+    if (bot && AiShared.isReasoningBot(bot)) {
       return true
     }
 
@@ -3492,25 +3497,25 @@ class AiHelper {
     const chats = res1.data
 
     let res = false
-    for(let i=0; i<chats.length; i++) {
+    for (let i = 0; i < chats.length; i++) {
       const v = chats[i]
       const { infoType } = v
 
-      if(isContinueCommand) {
-        if(!bot) break
-        if(bot.character === v.character) {
-          if(v.finish_reason === "stop") break
+      if (isContinueCommand) {
+        if (!bot) break
+        if (bot.character === v.character) {
+          if (v.finish_reason === "stop") break
           res = true
           break
         }
         continue
       }
 
-      if(infoType === "user") {
+      if (infoType === "user") {
         res = v._id === chatId
         break
       }
-      if(infoType === "clear") {
+      if (infoType === "clear") {
         break
       }
     }
@@ -3520,62 +3525,62 @@ class AiHelper {
   static isCharacterAvailable(c: AiCharacter) {
     const _env = process.env
 
-    if(c === "baixiaoying") {
-      if(_env.LIU_BAICHUAN_API_KEY && _env.LIU_BAICHUAN_BASE_URL) {
+    if (c === "baixiaoying") {
+      if (_env.LIU_BAICHUAN_API_KEY && _env.LIU_BAICHUAN_BASE_URL) {
         return true
       }
       return false
     }
-    if(c === "deepseek") {
-      if(_env.LIU_DEEPSEEK_API_KEY && _env.LIU_DEEPSEEK_BASE_URL) {
+    if (c === "deepseek") {
+      if (_env.LIU_DEEPSEEK_API_KEY && _env.LIU_DEEPSEEK_BASE_URL) {
         return true
       }
       return false
     }
-    if(c === "ds-reasoner") {
-      if(_env.LIU_DEEPSEEK_API_KEY && _env.LIU_DEEPSEEK_BASE_URL) {
+    if (c === "ds-reasoner") {
+      if (_env.LIU_DEEPSEEK_API_KEY && _env.LIU_DEEPSEEK_BASE_URL) {
         return true
       }
       return false
     }
-    if(c === "hailuo") {
-      if(_env.LIU_MINIMAX_API_KEY && _env.LIU_MINIMAX_BASE_URL) {
+    if (c === "hailuo") {
+      if (_env.LIU_MINIMAX_API_KEY && _env.LIU_MINIMAX_BASE_URL) {
         return true
       }
       return false
     }
-    if(c === "hunyuan") {
-      if(_env.LIU_TENCENT_HUNYUAN_API_KEY && _env.LIU_TENCENT_HUNYUAN_BASE_URL) {
+    if (c === "hunyuan") {
+      if (_env.LIU_TENCENT_HUNYUAN_API_KEY && _env.LIU_TENCENT_HUNYUAN_BASE_URL) {
         return true
       }
       return false
     }
-    if(c === "kimi") {
-      if(_env.LIU_MOONSHOT_API_KEY && _env.LIU_MOONSHOT_BASE_URL) {
+    if (c === "kimi") {
+      if (_env.LIU_MOONSHOT_API_KEY && _env.LIU_MOONSHOT_BASE_URL) {
         return true
       }
       return false
     }
-    if(c === "tongyi-qwen") {
-      if(_env.LIU_ALIYUN_BAILIAN_API_KEY && _env.LIU_ALIYUN_BAILIAN_BASE_URL) {
+    if (c === "tongyi-qwen") {
+      if (_env.LIU_ALIYUN_BAILIAN_API_KEY && _env.LIU_ALIYUN_BAILIAN_BASE_URL) {
         return true
       }
       return false
     }
-    if(c === "wanzhi") {
-      if(_env.LIU_YI_API_KEY && _env.LIU_YI_BASE_URL) {
+    if (c === "wanzhi") {
+      if (_env.LIU_YI_API_KEY && _env.LIU_YI_BASE_URL) {
         return true
       }
       return false
     }
-    if(c === "yuewen") {
-      if(_env.LIU_STEPFUN_API_KEY && _env.LIU_STEPFUN_BASE_URL) {
+    if (c === "yuewen") {
+      if (_env.LIU_STEPFUN_API_KEY && _env.LIU_STEPFUN_BASE_URL) {
         return true
       }
       return false
     }
-    if(c === "zhipu") {
-      if(_env.LIU_ZHIPU_API_KEY && _env.LIU_ZHIPU_BASE_URL) {
+    if (c === "zhipu") {
+      if (_env.LIU_ZHIPU_API_KEY && _env.LIU_ZHIPU_BASE_URL) {
         return true
       }
       return false
@@ -3593,10 +3598,10 @@ class AiHelper {
     assistantName?: string,
   ): OaiPrompt[] {
     const theTool = tool_calls.find(v => v.id === tool_call_id)
-    if(!theTool) return []
+    if (!theTool) return []
 
     const theFunc = theTool["function"]
-    if(!theFunc) return []
+    if (!theFunc) return []
     const funcName = theFunc.name
     const funcArgs = theFunc.arguments || "{}"
     const msg = t("bot_call_tools", { funcName, funcArgs })
@@ -3625,21 +3630,21 @@ class AiHelper {
     // 1. set maxTokens to double firstChat token
     const firstToken = AiShared.calculateChatToken(firstChat)
     let maxTokens = firstToken * 2
-    if(maxTokens < 280) maxTokens = 280
+    if (maxTokens < 280) maxTokens = 280
 
     // 2. adapt to wechat max characters limit
-    if(maxTokens > MAX_WX_TOKEN) maxTokens = MAX_WX_TOKEN
+    if (maxTokens > MAX_WX_TOKEN) maxTokens = MAX_WX_TOKEN
 
     // 3. for reasoning model with thinkingInContent
     const isReasoning = AiShared.isReasoningBot(bot)
-    if(isReasoning) {
-      if(maxTokens < MIN_REASONING_TOKENS) {
+    if (isReasoning) {
+      if (maxTokens < MIN_REASONING_TOKENS) {
         maxTokens = MIN_REASONING_TOKENS
       }
     }
 
     // 4. set maxTokens to restToken if exceed
-    if(maxTokens > restToken) maxTokens = restToken
+    if (maxTokens > restToken) maxTokens = restToken
 
     // console.log("maxTokens: ", maxTokens)
 
@@ -3656,16 +3661,16 @@ class AiHelper {
     const quota = user.quota ?? { aiConversationCount: 0 }
     const count1 = quota.aiConversationCount + 1
     quota.aiConversationCount = count1
-    if(entry.wx_gzh_openid) {
+    if (entry.wx_gzh_openid) {
       quota.lastWxGzhChatStamp = getNowStamp()
     }
 
     // 2. minus conversationCountFromAd if exceed MAX_TIMES_FREE
-    if(count1 > MAX_TIMES_FREE) {
+    if (count1 > MAX_TIMES_FREE) {
       const isSubscribed = checkIfUserSubscribed(user)
-      if(!isSubscribed) {
+      if (!isSubscribed) {
         const count2 = quota.conversationCountFromAd ?? 0
-        if(count2 > 0) {
+        if (count2 > 0) {
           quota.conversationCountFromAd = count2 - 1
         }
       }
@@ -3683,7 +3688,7 @@ class AiHelper {
 
     // 4. update room for needSystem2Stamp
     const minRecordNum = ai_cfg.minCoversationsToRecordForSystemTwo
-    if(quota.aiConversationCount >= minRecordNum) {
+    if (quota.aiConversationCount >= minRecordNum) {
       this._updateNeedSystem2Stamp(room)
     }
 
@@ -3691,7 +3696,7 @@ class AiHelper {
     user.quota = quota
     user.activeStamp = now2
     user.updatedStamp = now2
-    
+
     return quota.aiConversationCount
   }
 
@@ -3702,11 +3707,11 @@ class AiHelper {
     const now = getNowStamp()
     const lastStamp = room.needSystem2Stamp ?? 0
     const twoHoursLater = now + 2 * HOUR
-    if(lastStamp > now && lastStamp < twoHoursLater) {
+    if (lastStamp > now && lastStamp < twoHoursLater) {
       return
     }
     const roomId = room._id
-    
+
     // 2. define map hours
     const _update = (hr: number) => {
       // 2.1 get new stamp
@@ -3722,11 +3727,11 @@ class AiHelper {
       rCol.doc(roomId).update(u2)
     }
 
-    if(!lastStamp) {
+    if (!lastStamp) {
       _update(23)
     }
     else {
-     _update(1) 
+      _update(1)
     }
   }
 
@@ -3735,7 +3740,7 @@ class AiHelper {
     results: LiuAi.RunResults,
   ) {
     const cLength = characters.length
-    if(cLength < 2) return []
+    if (cLength < 2) return []
 
     const kickList: AiCharacter[] = []
     const successList: AiCharacter[] = []
@@ -3743,8 +3748,8 @@ class AiHelper {
     // 1. add failed characters to kickList first
     characters.forEach(v => {
       const r = results.find(v2 => v2?.character === v)
-      if(!r) kickList.push(v)
-      else if(r.replyStatus === "has_new_msg") kickList.push(v)
+      if (!r) kickList.push(v)
+      else if (r.replyStatus === "has_new_msg") kickList.push(v)
       else successList.push(v)
     })
 
@@ -3759,31 +3764,31 @@ class AiHelper {
     results: LiuAi.RunResults,
   ) {
     const cLength = characters.length
-    if(cLength >= MAX_CHARACTERS) return []
-    
+    if (cLength >= MAX_CHARACTERS) return []
+
     // 1. get available characters
     const availableCharacters = AiShared.getAvailableCharacters()
-    for(let i=0; i<availableCharacters.length; i++) {
+    for (let i = 0; i < availableCharacters.length; i++) {
       const v = availableCharacters[i]
-      if(characters.includes(v)) {
+      if (characters.includes(v)) {
         availableCharacters.splice(i, 1)
         i--
       }
-      else if(charactersTakingARest.includes(v)) {
+      else if (charactersTakingARest.includes(v)) {
         availableCharacters.splice(i, 1)
         i--
       }
     }
-    if(availableCharacters.length <= 2) {
+    if (availableCharacters.length <= 2) {
       return availableCharacters
     }
 
     // 2. select characters
     const selectNum = cLength >= (MAX_CHARACTERS - 1) ? 2 : 3
     const addedList: AiCharacter[] = []
-    for(let i=0; i<selectNum; i++) {
+    for (let i = 0; i < selectNum; i++) {
       const aLength = availableCharacters.length
-      if(aLength <= 1) {
+      if (aLength <= 1) {
         addedList.push(...availableCharacters)
         break
       }
@@ -3798,7 +3803,7 @@ class AiHelper {
 
   // only return chats when compression (turn images into text) succeeds
   static compressChatsForImages(chats: Table_AiChat[]) {
-    if(chats.length < 1) return []
+    if (chats.length < 1) return []
 
     // 1. check if we can compress
     let canCompress = true
@@ -3807,45 +3812,45 @@ class AiHelper {
     const cLength = chats.length
     const maxIndex1 = Math.min(cLength, 2)
     const maxIndex2 = Math.min(cLength, 5)
-    for(let i=0; i<maxIndex2; i++) {
+    for (let i = 0; i < maxIndex2; i++) {
       const v = chats[i]
       const { msgType, imageUrl, infoType, text } = v
 
       // 1.2 if index is less than 2 and there is any image among the first 2 items
       // and the text is empty
       // then we can't compress
-      if(i < maxIndex1 && !text) {
-        if(msgType === "image" || imageUrl) {
+      if (i < maxIndex1 && !text) {
+        if (msgType === "image" || imageUrl) {
           canCompress = false
           break
         }
       }
 
-      if(infoType === "assistant" && firstAssistantIdx < 0) {
+      if (infoType === "assistant" && firstAssistantIdx < 0) {
         firstAssistantIdx = i
       }
-      else if(infoType === "tool_use" && firstAssistantIdx < 0) {
+      else if (infoType === "tool_use" && firstAssistantIdx < 0) {
         firstAssistantIdx = i
       }
 
-      if((msgType === "image" || imageUrl) && !text && firstPhotoIdx < 0) {
+      if ((msgType === "image" || imageUrl) && !text && firstPhotoIdx < 0) {
         firstPhotoIdx = i
       }
     }
-    if(!canCompress) return
+    if (!canCompress) return
 
     // 2. if there is any photo in the first 5 messages
-    if(firstPhotoIdx >= 0) {
+    if (firstPhotoIdx >= 0) {
       // 2.1 we cannot compress if there is no assistant message
-      if(firstAssistantIdx < 0) return
+      if (firstAssistantIdx < 0) return
       // 2.2 we cannot compress if the assistant message is after the first photo
-      if(firstAssistantIdx > firstPhotoIdx) return
+      if (firstAssistantIdx > firstPhotoIdx) return
     }
 
     // 3. turn all images into text
     const newChats = chats.map(v => {
       const { msgType, imageUrl, text } = v
-      if(msgType === "image" || imageUrl) {
+      if (msgType === "image" || imageUrl) {
         v.msgType = "text"
         v.text = AiHelper.imageRecognitionText(text)
         delete v.imageUrl
@@ -3860,13 +3865,13 @@ class AiHelper {
   ) {
     const imgPrefix = "【识图结果】"
     let text = originalText || ""
-    if(text) {
-      if(text === "[image]") return text
-      if(text.startsWith(imgPrefix)) return text
+    if (text) {
+      if (text === "[image]") return text
+      if (text.startsWith(imgPrefix)) return text
       text = `${imgPrefix}：\n${text}`
     }
 
-    if(!text) {
+    if (!text) {
       text = "[image]"
     }
     return text
@@ -3876,9 +3881,9 @@ class AiHelper {
     chats: Table_AiChat[],
   ) {
     let need = false
-    for(let i=0; i<chats.length; i++) {
+    for (let i = 0; i < chats.length; i++) {
       const chat = chats[i]
-      if(chat.msgType === "image") {
+      if (chat.msgType === "image") {
         need = true
         break
       }
@@ -3887,9 +3892,9 @@ class AiHelper {
   }
 
   static removeOneTool(funcName: string, tools: OaiTool[]) {
-    for(let i=0; i<tools.length; i++) {
+    for (let i = 0; i < tools.length; i++) {
       const v = tools[i]
-      if(v.type === "function" && v.function?.name === funcName) {
+      if (v.type === "function" && v.function?.name === funcName) {
         tools.splice(i, 1)
         break
       }
@@ -3907,28 +3912,28 @@ class AiHelper {
     const everExistedCharacters: AiCharacter[] = []
     chats.forEach(v => {
       const c = v.character
-      if(everExistedCharacters.length > 2) return
-      if(c && !everExistedCharacters.includes(c)) {
+      if (everExistedCharacters.length > 2) return
+      if (c && !everExistedCharacters.includes(c)) {
         everExistedCharacters.push(c)
       }
     })
 
     // 2. get availableCharacters
     const availableCharacters = AiShared.getAvailableCharacters()
-    for(let i=0; i<availableCharacters.length; i++) {
+    for (let i = 0; i < availableCharacters.length; i++) {
       const v = availableCharacters[i]
-      if(everExistedCharacters.includes(v)) {
+      if (everExistedCharacters.includes(v)) {
         availableCharacters.splice(i, 1)
         i--
       }
     }
-    if(availableCharacters.length < 1) {
+    if (availableCharacters.length < 1) {
       return []
     }
 
     // 3. randomly sort
     const addedList: AiCharacter[] = []
-    while(addedList.length < 5 && availableCharacters.length > 0) {
+    while (addedList.length < 5 && availableCharacters.length > 0) {
       const r = Math.floor(Math.random() * availableCharacters.length)
       const c = availableCharacters[r]
       addedList.push(c)
@@ -3939,18 +3944,18 @@ class AiHelper {
   }
 
   static async checkIfNobodyHere(
-    entry: AiEntry, 
+    entry: AiEntry,
     room: Table_AiRoom,
   ) {
     // 1. return false if there is at least one character
     const len = room.characters.length
-    if(len >= 1) return false
+    if (len >= 1) return false
 
     // 2. get history for ever existed characters
     const addedList = await this.getNonUsedCharacters(room._id)
     const len2 = addedList.length
-    if(len2 < 1) return false
-    if(len2 > 3) {
+    if (len2 < 1) return false
+    if (len2 > 3) {
       addedList.splice(3, len2 - 3)
     }
 
@@ -3965,23 +3970,23 @@ class AiHelper {
 
   static getProviderName(bot: AiBot) {
     const { secondaryProvider, provider } = bot
-    if(secondaryProvider === "siliconflow") return "北京硅基流动"
-    if(secondaryProvider === "gitee-ai") return "Gitee AI"
-    if(secondaryProvider === "qiniu") return "七牛云"
-    if(secondaryProvider === "tencent-lkeap") return "腾讯云"
-    if(secondaryProvider === "suanleme") return "算了么"
-    if(provider === "aliyun-bailian") return "阿里云"
-    if(provider === "baichuan") return "北京百川智能"
-    if(provider === "antgroup") return "蚂蚁金服"
-    if(provider === "deepseek") return "杭州深度求索"
-    if(provider === "minimax") return "上海稀宇科技"
-    if(provider === "moonshot") return "北京月之暗面"
-    if(provider === "stepfun") return "上海阶跃星辰"
-    if(provider === "tencent-hunyuan") return "腾讯"
-    if(provider === "zero-one") return "北京零一万物"
-    if(provider === "zhipu") return "北京智谱华章"
+    if (secondaryProvider === "siliconflow") return "北京硅基流动"
+    if (secondaryProvider === "gitee-ai") return "Gitee AI"
+    if (secondaryProvider === "qiniu") return "七牛云"
+    if (secondaryProvider === "tencent-lkeap") return "腾讯云"
+    if (secondaryProvider === "suanleme") return "算了么"
+    if (provider === "aliyun-bailian") return "阿里云"
+    if (provider === "baichuan") return "北京百川智能"
+    if (provider === "antgroup") return "蚂蚁金服"
+    if (provider === "deepseek") return "杭州深度求索"
+    if (provider === "minimax") return "上海稀宇科技"
+    if (provider === "moonshot") return "北京月之暗面"
+    if (provider === "stepfun") return "上海阶跃星辰"
+    if (provider === "tencent-hunyuan") return "腾讯"
+    if (provider === "zero-one") return "北京零一万物"
+    if (provider === "zhipu") return "北京智谱华章"
   }
-  
+
 }
 
 class ChatIntoPrompter {
@@ -4009,37 +4014,37 @@ class ChatIntoPrompter {
     const messages: OaiPrompt[] = []
     const opt = _this._opt
     const cLength = chats.length
-    
-    for(let i=0; i<cLength; i++) {
+
+    for (let i = 0; i < cLength; i++) {
       const v = chats[i]
 
-      if(v.infoType === "user") {
+      if (v.infoType === "user") {
         const userPrompt = _this.turnForUser(v, i)
-        if(userPrompt) messages.push(userPrompt)
+        if (userPrompt) messages.push(userPrompt)
       }
-      else if(v.infoType === "assistant") {
+      else if (v.infoType === "assistant") {
         const assistantPrompt = _this.turnForAssistant(v, i)
-        if(assistantPrompt) messages.push(assistantPrompt)
+        if (assistantPrompt) messages.push(assistantPrompt)
       }
-      else if(v.infoType === "summary") {
-        if(!v.text) continue
+      else if (v.infoType === "summary") {
+        if (!v.text) continue
         const summary = `【前方对话摘要】\n${v.text}`
         messages.push({
           role: opt?.metaData?.onlyOneSystemRoleMsg ? "user" : "system",
           content: summary,
         })
       }
-      else if(v.infoType === "background") {
-        if(!v.text) continue
+      else if (v.infoType === "background") {
+        if (!v.text) continue
         const background = `【背景信息】\n${v.text}`
         messages.push({
           role: opt?.metaData?.onlyOneSystemRoleMsg ? "user" : "system",
           content: background,
         })
       }
-      else if(v.infoType === "tool_use") {
+      else if (v.infoType === "tool_use") {
         const toolMsgs = _this.turnForToolUse(v)
-        if(toolMsgs) messages.push(...toolMsgs)
+        if (toolMsgs) messages.push(...toolMsgs)
       }
     }
 
@@ -4048,9 +4053,9 @@ class ChatIntoPrompter {
 
   private turnForToolUse(v: Table_AiChat) {
     const { tool_calls } = v
-    if(!tool_calls) return
+    if (!tool_calls) return
     const tool_call_id = tool_calls[0]?.id
-    if(!tool_call_id) return
+    if (!tool_call_id) return
     const user = this._user
     const { t } = useI18n(aiLang, { user })
     const canUseTool = this._canUseTool
@@ -4060,14 +4065,14 @@ class ChatIntoPrompter {
     const toolMsg = AiShared.getToolMessage(tool_call_id, t, v)
 
     // 2. if we can use tool
-    if(canUseTool && toolMsg) {
+    if (canUseTool && toolMsg) {
       const msg2 = AiShared.getAssistantMsgWithTool(tool_calls, v)
       return [toolMsg, msg2]
     }
 
     // 3. otherwise, turn the tool_call_result prompt into a user prompt
     let tmpPrompts: OaiPrompt[] = []
-    if(toolMsg) {
+    if (toolMsg) {
       const tmpToolMsg = valTool.objToStr(toolMsg)
       const tmpUserContent = t("result_of_tool", { msg: tmpToolMsg })
       const tmpUserPrompt: OaiPrompt = {
@@ -4078,7 +4083,7 @@ class ChatIntoPrompter {
     }
 
     const msg3 = this._turnToolCallIntoNormalAssistantMsg(t, v)
-    if(msg3) tmpPrompts.push(msg3)
+    if (msg3) tmpPrompts.push(msg3)
     return tmpPrompts
   }
 
@@ -4089,11 +4094,11 @@ class ChatIntoPrompter {
   ) {
     // 1. get params
     const { funcName, funcJson, character } = v
-    if(!funcName) return
-    
+    if (!funcName) return
+
     // 2. change prompt if funcName is draw_picture
     // just because text field storages the translated prompt
-    if(funcName === "draw_picture" && v.text && funcJson) {
+    if (funcName === "draw_picture" && v.text && funcJson) {
       funcJson.prompt = v.text
     }
 
@@ -4113,9 +4118,9 @@ class ChatIntoPrompter {
     v: Table_AiChat,
     index: number,
   ): OaiPrompt | undefined {
-    const { 
-      text, 
-      reasoning_content, 
+    const {
+      text,
+      reasoning_content,
       character,
       finish_reason,
     } = v
@@ -4123,24 +4128,24 @@ class ChatIntoPrompter {
     const assistantName = AiShared.getCharacterName(character)
 
     let content = ""
-    if(isContinue && index < 3 && reasoning_content && finish_reason === "length") {
+    if (isContinue && index < 3 && reasoning_content && finish_reason === "length") {
       const hasThink = reasoning_content.startsWith("<think>")
-      if(hasThink) content = reasoning_content
+      if (hasThink) content = reasoning_content
       else content = `<think>${reasoning_content}</think>`
-      if(text) {
+      if (text) {
         content += `\n${text}`
       }
     }
-    else if(valTool.isStringWithVal(text)) {
+    else if (valTool.isStringWithVal(text)) {
       content = text
     }
-    else if(reasoning_content) {
+    else if (reasoning_content) {
       const hasThink = reasoning_content.startsWith("<think>")
-      if(hasThink) content = reasoning_content
+      if (hasThink) content = reasoning_content
       else content = `<think>${reasoning_content}`
     }
-    
-    if(!content) return
+
+    if (!content) return
 
     return {
       role: "assistant",
@@ -4154,7 +4159,7 @@ class ChatIntoPrompter {
     index: number,
   ): OaiPrompt | undefined {
     const {
-      text, 
+      text,
       imageUrl,
       audioBase64,
       msgType,
@@ -4164,19 +4169,19 @@ class ChatIntoPrompter {
     const canReadPhoto = this._canReadPhoto
     const c = this._opt?.character
 
-    if(msgType === "image") {
-      if(imageUrl && canReadPhoto) {
+    if (msgType === "image") {
+      if (imageUrl && canReadPhoto) {
         return {
           role: "user",
           content: [
-            { 
-              type: "image_url", 
+            {
+              type: "image_url",
               image_url: { url: imageUrl },
             }
           ]
         }
       }
-      if(text) {
+      if (text) {
         return {
           role: "user",
           content: AiHelper.imageRecognitionText(text),
@@ -4184,7 +4189,7 @@ class ChatIntoPrompter {
       }
     }
 
-    if(msgType === "voice" && audioBase64 && canInputAudio) {
+    if (msgType === "voice" && audioBase64 && canInputAudio) {
       const audioPrompt: OaiPrompt = {
         role: "user",
         content: [
@@ -4197,13 +4202,13 @@ class ChatIntoPrompter {
           }
         ]
       }
-      if(!c) return audioPrompt
-      if(c === "hailuo" && index === 0) {
+      if (!c) return audioPrompt
+      if (c === "hailuo" && index === 0) {
         return audioPrompt
       }
     }
 
-    if(msgType === "location" && location) {
+    if (msgType === "location" && location) {
       let locaStr = "【位置消息】\n"
       locaStr += valTool.objToStr(location)
       return {
@@ -4212,7 +4217,7 @@ class ChatIntoPrompter {
       }
     }
 
-    if(valTool.isStringWithVal(text)) {
+    if (valTool.isStringWithVal(text)) {
       return {
         role: "user",
         content: text,
@@ -4232,7 +4237,7 @@ class UserHelper {
   ) {
     const user = entry.user
     const quota = user.quota
-    if(!quota) return true
+    if (!quota) return true
 
     const count = quota.aiConversationCount
     const count2 = quota.conversationCountFromAd ?? 0
@@ -4241,12 +4246,12 @@ class UserHelper {
     const MAX_TIMES = isSubscribed ? MAX_TIMES_MEMBERSHIP : MAX_TIMES_FREE
 
     let available = count < MAX_TIMES
-    if(!available) {
+    if (!available) {
       available = count2 > 0
     }
 
-    if(!available) {
-      if(isSubscribed) {
+    if (!available) {
+      if (isSubscribed) {
         this.sendQuotaWarning2(entry)
       }
       else {
@@ -4263,7 +4268,7 @@ class UserHelper {
     // 1. get some required data
     const _env = process.env
     const appid = _env.LIU_WX_MINI_APPID
-    if(!appid) {
+    if (!appid) {
       console.warn("fail to get appid")
       return false
     }
@@ -4274,12 +4279,12 @@ class UserHelper {
 
     // 2. get payment link
     const paymentLink = await this._getPaymentLink(entry)
-    if(!paymentLink) return false
+    if (!paymentLink) return false
 
     // 3. send
     const { user } = entry
     const { t } = useI18n(aiLang, { user })
-    let msg = t(msgKey, { 
+    let msg = t(msgKey, {
       membershipTimes: MAX_TIMES_MEMBERSHIP,
       link1: paymentLink,
       appid,
@@ -4292,12 +4297,12 @@ class UserHelper {
   static async sendQuotaWarning2(entry: AiEntry) {
     // 1. get payment link
     const paymentLink = await this._getPaymentLink(entry)
-    if(!paymentLink) return
-    
+    if (!paymentLink) return
+
     // 2. send
     const { user } = entry
     const { t } = useI18n(aiLang, { user })
-    let msg = t("quota_warning_2", { 
+    let msg = t("quota_warning_2", {
       membershipTimes: MAX_TIMES_MEMBERSHIP,
       link: paymentLink,
     })
@@ -4311,7 +4316,7 @@ class UserHelper {
 
     // 2. get my order
     const order = await this._createOrderForQuota(entry)
-    if(!order) return
+    if (!order) return
 
     // 3. get payment link
     const orderId = order.order_id
@@ -4324,7 +4329,7 @@ class UserHelper {
     const { user, wx_gzh_openid } = entry
     const userId = user._id
     const stamp1 = getNowStamp() + MIN_3
-    
+
     // 2. get existed order
     const oCol = db.collection("Order")
     const w2: Record<string, any> = {
@@ -4334,14 +4339,14 @@ class UserHelper {
       orderType: "subscription",
       expireStamp: _.gte(stamp1),
     }
-    if(wx_gzh_openid) {
+    if (wx_gzh_openid) {
       w2.channel = "wx_gzh"
     }
     const res2 = await oCol.where(w2).getOne<Table_Order>()
     let theOrder = res2.data ?? undefined
 
     // 3. calculate expireStamp
-    if(!theOrder) {
+    if (!theOrder) {
       theOrder = await this._createOrder(entry)
     }
 
@@ -4354,16 +4359,16 @@ class UserHelper {
     const q1 = sCol.where({ isOn: "Y", payment_circle: "monthly" })
     const res1 = await q1.getOne<Table_Subscription>()
     const subPlan = res1.data
-    if(!subPlan) return
+    if (!subPlan) return
 
     // 2. check out amount_CNY
-    if(typeof subPlan.amount_CNY !== "number") {
+    if (typeof subPlan.amount_CNY !== "number") {
       return
     }
 
     // 3. create order_id
     const order_id = await createAvailableOrderId()
-    if(!order_id) return
+    if (!order_id) return
 
     // 4. construct an order
     const { user, wx_gzh_openid } = entry
@@ -4383,7 +4388,7 @@ class UserHelper {
       plan_id: subPlan._id,
       expireStamp: getNowStamp() + HOUR_12,
     }
-    if(wx_gzh_openid) {
+    if (wx_gzh_openid) {
       data4.channel = "wx_gzh"
     }
 
@@ -4391,7 +4396,7 @@ class UserHelper {
     const oCol = db.collection("Order")
     const res5 = await oCol.add(data4)
     const id5 = getDocAddId(res5)
-    if(!id5) return
+    if (!id5) return
 
     const newOrder: Table_Order = {
       _id: id5,
@@ -4408,36 +4413,36 @@ class TransformText {
     const finish_reason = choice.finish_reason
 
     // 1.1 only reserve one tool
-    if(finish_reason === "tool_calls") {
+    if (finish_reason === "tool_calls") {
       const toolNum = choice.message.tool_calls?.length ?? 0
-      if(toolNum > 1) {
+      if (toolNum > 1) {
         choice.message.tool_calls?.splice(1, toolNum - 1)
         return true
       }
     }
 
     // 1.2 get text
-    if(finish_reason !== "stop") return
+    if (finish_reason !== "stop") return
     const { message } = choice
     let text = message.content
-    if(!text) return
+    if (!text) return
     const originalText = text.trim()
 
     // 2. for shape 1
     const res2 = this._turnIntoTool_1(choice, originalText)
-    if(res2) return true
+    if (res2) return true
 
     // 3. for shape 2
     const res3 = this._turnIntoTool_2(choice, originalText)
-    if(res3) return true
+    if (res3) return true
 
     // 4. for shape 3
     const res4 = this._turnIntoTool_3(choice, originalText)
-    if(res4) return true
+    if (res4) return true
 
     // 5. for shape 4
     const res5 = this._turnIntoTool_4(choice, originalText)
-    if(res5) return true
+    if (res5) return true
 
     // 6. remove <assistant></assistant>
     const res6 = this._removeAssistantTag(choice, originalText)
@@ -4452,24 +4457,24 @@ class TransformText {
     let hasChanged = false
     const str1 = "<assistant>"
     const str2 = "</assistant>"
-    if(text.startsWith(str1)) {
+    if (text.startsWith(str1)) {
       hasChanged = true
       text = text.substring(str1.length)
       text = text.trimStart()
     }
-    if(text.endsWith(str2)) {
+    if (text.endsWith(str2)) {
       hasChanged = true
       text = text.substring(0, text.length - str2.length)
       text = text.trimEnd()
     }
-    if(hasChanged) {
+    if (hasChanged) {
       choice.message.content = text
     }
     return hasChanged
-  } 
+  }
 
   private static _fillChoiceWithToolCall(
-    choice: OaiChoice, 
+    choice: OaiChoice,
     toolName: string,
     toolArgs: string,
   ) {
@@ -4502,13 +4507,13 @@ class TransformText {
     text: string,
   ) {
     // 1. check out the start and the end str
-    if(!text.startsWith("{")) return
-    if(!text.endsWith("}")) return
+    if (!text.startsWith("{")) return
+    if (!text.endsWith("}")) return
 
     // 2. check out prompt and sizeType
     const argObj = valTool.strToObj(text)
-    if(!valTool.isStringWithVal(argObj.prompt)) return
-    if(!valTool.isStringWithVal(argObj.sizeType)) return
+    if (!valTool.isStringWithVal(argObj.prompt)) return
+    if (!valTool.isStringWithVal(argObj.sizeType)) return
 
     const toolCall = this._fillChoiceWithToolCall(choice, "draw_picture", text)
     console.warn("success to turnIntoTool_4: ")
@@ -4534,35 +4539,35 @@ class TransformText {
     let index1 = -1
     let thePrefix1 = ""
     const prefix1s = ["function ", "function: "]
-    for(let i=0; i<prefix1s.length; i++) {
+    for (let i = 0; i < prefix1s.length; i++) {
       const v = prefix1s[i]
       index1 = text.indexOf(v)
-      if(index1 >= 0) {
+      if (index1 >= 0) {
         thePrefix1 = v
         break
       }
     }
-    if(!thePrefix1) return
+    if (!thePrefix1) return
 
     // 2. get toolName
     text = text.substring(index1 + thePrefix1.length).trimStart()
     const tmpList2 = text.split("\n")
-    if(!tmpList2 || tmpList2.length < 2) return
+    if (!tmpList2 || tmpList2.length < 2) return
     const toolName = tmpList2[0].trim()
-    if(!toolName) return
+    if (!toolName) return
     const hasTheTool = aiTools.find(v => v.function?.name === toolName)
-    if(!hasTheTool) return
+    if (!hasTheTool) return
 
     // 3. check if the rest of the text starts with ```json
     tmpList2.shift()
     text = tmpList2.join("\n").trim()
     const prefix3s = ["```json", "```JSON"]
     const thePrefix3 = prefix3s.find(v => text.startsWith(v))
-    if(!thePrefix3) return
+    if (!thePrefix3) return
 
     // 4. check if the rest of the text ends with ```
     text = text.substring(thePrefix3.length).trimStart()
-    if(!text.endsWith("```")) return
+    if (!text.endsWith("```")) return
     text = text.substring(0, text.length - 3).trimEnd()
 
     // 5. handle toolArgs
@@ -4570,7 +4575,7 @@ class TransformText {
     try {
       toolArgs = JSON.stringify(text)
     }
-    catch(err) {
+    catch (err) {
       console.warn("_turnIntoTool_3 err when stringify: ")
       console.log(err)
       return
@@ -4600,59 +4605,59 @@ class TransformText {
     // 1. start and end with
     const startMatched = text.startsWith("{")
     const endMatched = text.endsWith("}")
-    if(!startMatched || !endMatched) return
+    if (!startMatched || !endMatched) return
 
     // 2. get toolName and tmpArgs
     let toolName = ""
     let tmpArgs: unknown
     try {
       const obj = JSON.parse(text)
-      if(!obj) return
+      if (!obj) return
       toolName = obj.name
-      if(obj["parameters"]) {
+      if (obj["parameters"]) {
         tmpArgs = obj["parameters"]
       }
-      if(obj["arguments"]) {
+      if (obj["arguments"]) {
         tmpArgs = obj["arguments"]
       }
     }
-    catch(err) {
+    catch (err) {
       console.warn("_turnIntoTool_2 err: ")
       console.log(err)
       return
     }
-    if(!toolName || !tmpArgs) return
+    if (!toolName || !tmpArgs) return
 
     // 3. check if toolName exists
     const hasTheTool = aiTools.find(v => v.function?.name === toolName)
-    if(!hasTheTool) return
+    if (!hasTheTool) return
 
     // 4. handle toolArgs
     let toolArgs = ""
-    if(typeof tmpArgs === "string") {
+    if (typeof tmpArgs === "string") {
       let tmp4 = tmpArgs.trim()
       try {
         JSON.parse(tmp4)
       }
-      catch(err) {
+      catch (err) {
         console.warn("JSON.parse(tmp4) error: ")
         console.log(err)
         return
       }
       toolArgs = tmp4
     }
-    else if(typeof tmpArgs === "object") {
+    else if (typeof tmpArgs === "object") {
       try {
         toolArgs = JSON.stringify(tmpArgs)
       }
-      catch(err) {
+      catch (err) {
         console.warn("JSON.stringify(tmpArgs) error: ")
         console.log(err)
       }
     }
-    if(!toolArgs) return
+    if (!toolArgs) return
 
-    
+
     const toolCall = this._fillChoiceWithToolCall(choice, toolName, toolArgs)
     return true
   }
@@ -4673,43 +4678,43 @@ class TransformText {
     let index1 = -1
     let thePrefix1 = ""
     const prefix1s = ["调用工具:", "調用工具:", "Call a tool:"]
-    for(let i=0; i<prefix1s.length; i++) {
+    for (let i = 0; i < prefix1s.length; i++) {
       const v = prefix1s[i]
       index1 = text.indexOf(v)
-      if(index1 >= 0) {
+      if (index1 >= 0) {
         thePrefix1 = v
         break
       }
     }
-    if(!thePrefix1) return
+    if (!thePrefix1) return
 
     // 2. get toolName
     text = text.substring(index1 + thePrefix1.length).trimStart()
     const tmpList2 = text.split("\n")
-    if(!tmpList2 || tmpList2.length < 2) return
+    if (!tmpList2 || tmpList2.length < 2) return
     const toolName = tmpList2[0].trim()
-    if(!toolName) return
+    if (!toolName) return
     const hasTheTool = aiTools.find(v => v.function?.name === toolName)
-    if(!hasTheTool) return
+    if (!hasTheTool) return
 
     // 3. check if the rest of the text starts with "参数"
     tmpList2.shift()
     text = tmpList2.join("\n").trim()
     const prefix3s = ["参数:", "參數:", "Arguments:"]
     const thePrefix3 = prefix3s.find(v => text.startsWith(v))
-    if(!thePrefix3) return
+    if (!thePrefix3) return
 
     // 4. get args
     text = text.substring(thePrefix3.length).trimStart()
     let toolArgs = text.split("\n")[0]
-    if(!toolArgs) return
+    if (!toolArgs) return
     toolArgs = toolArgs.trim()
     try {
       const args = JSON.parse(toolArgs)
       console.warn("see args in _turnIntoTool: ")
       console.log(args)
     }
-    catch(err) {
+    catch (err) {
       console.warn("TransformText _turnIntoTool err: ")
       console.log(err)
       return
@@ -4740,7 +4745,7 @@ export class Transcriber {
     const _env = process.env
     const baseUrl = _env.LIU_SILICONFLOW_BASE_URL
     const apiKey = _env.LIU_SILICONFLOW_API_KEY
-    if(!baseUrl || !apiKey) {
+    if (!baseUrl || !apiKey) {
       console.warn("there is no baseUrl or apiKey in Transcriber")
       return
     }
@@ -4748,17 +4753,17 @@ export class Transcriber {
     // 2. download file
     const res2 = await downloadFile(this._audioUrl)
     const { code, data, errMsg } = res2
-    if(code !== "0000" || !data) {
+    if (code !== "0000" || !data) {
       console.warn("download file err:::")
       console.log(code)
       console.log(errMsg)
       return
     }
-    
+
     // 3. get formdata
     const response = data.res
     const filename = `` + getNowStamp() + `.mp3`
-    const { form, b64 } = await responseToFormData(response, { 
+    const { form, b64 } = await responseToFormData(response, {
       formKey: "file",
       filename,
     })
@@ -4777,7 +4782,7 @@ export class Transcriber {
       console.log(res4.data)
       data4 = res4.data
     }
-    catch(err) {
+    catch (err) {
       console.warn("Transcriber error: ")
       console.log(err)
     }
@@ -4803,7 +4808,7 @@ class Image2Text {
     const apiKey = _env.LIU_IMG2TXT_API_KEY
     const baseUrl = _env.LIU_IMG2TXT_BASE_URL
     const model = _env.LIU_IMG2TXT_MODEL
-    if(!apiKey || !baseUrl || !model) {
+    if (!apiKey || !baseUrl || !model) {
       console.warn("apiKey, baseUrl, and model are required in Image2Text")
       return
     }
@@ -4818,7 +4823,8 @@ class Image2Text {
             type: "image_url",
             image_url: { url }
           },
-          { type: "text", 
+          {
+            type: "text",
             text: "解释一下图中的现象",
           },
         ]
@@ -4828,14 +4834,14 @@ class Image2Text {
     // 3. fetch
     const llm = new BaseLLM(apiKey, baseUrl)
     const res = await llm.chat({ messages, model })
-    if(!res) {
+    if (!res) {
       console.warn("image to text failed!")
       return
     }
 
     // 4. handle result 
     const res4 = AiShared.getContentFromLLM(res)
-    if(!res4.content) return
+    if (!res4.content) return
     return { text: res4.content }
   }
 
@@ -4849,20 +4855,20 @@ class ImageHelper {
     prompts: OaiPrompt[],
   ) {
     const _this = this
-    for(let i=0; i<prompts.length; i++) {
+    for (let i = 0; i < prompts.length; i++) {
       const v = prompts[i]
       const c1 = v.content
-      if(!c1) continue
-      if(typeof c1 === "string") continue
-      for(let j=0; j<c1.length; j++) {
+      if (!c1) continue
+      if (typeof c1 === "string") continue
+      for (let j = 0; j < c1.length; j++) {
         const c2 = c1[j]
-        if(c2.type !== "image_url") continue
+        if (c2.type !== "image_url") continue
         const url = c2.image_url.url
-        if(url.startsWith("data:image")) continue
-        if(!url.startsWith("http")) continue
+        if (url.startsWith("data:image")) continue
+        if (!url.startsWith("http")) continue
         console.log("get to convert image url to base64......")
         const b64 = await _this.getBase64(url)
-        if(!b64) continue
+        if (!b64) continue
         c2.image_url.url = b64
       }
     }
@@ -4871,7 +4877,7 @@ class ImageHelper {
   static async getBase64(url: string) {
     const res1 = await downloadFile(url)
     const { code, data, errMsg } = res1
-    if(code !== "0000" || !data) {
+    if (code !== "0000" || !data) {
       console.warn("download file err in getBase64")
       console.log(code)
       console.log(errMsg)
@@ -4880,7 +4886,7 @@ class ImageHelper {
 
     const response = data.res
     const filename = `` + getNowStamp() + `.mp3`
-    const { b64, contentType } = await responseToFormData(response, { 
+    const { b64, contentType } = await responseToFormData(response, {
       formKey: "file",
       filename,
     })
@@ -4893,4 +4899,3 @@ class ImageHelper {
   }
 
 }
-

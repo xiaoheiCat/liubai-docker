@@ -18,18 +18,25 @@ export function showModelName(
 ) {
   const m = model.toLowerCase()
 
+  if (m.includes("deepseek-v4-flash")) {
+    return "deepseek-v4-flash"
+  }
+  if (m.includes("deepseek-v4-pro")) {
+    return "deepseek-v4-pro"
+  }
+
   // R1
-  if(m.includes("deepseek-r1")) return "DeepSeek R1"
-  if(m.includes("deepseek-reasoner")) return "DeepSeek R1"
-  
+  if (m.includes("deepseek-r1")) return "DeepSeek R1"
+  if (m.includes("deepseek-reasoner")) return "DeepSeek R1"
+
   // V3
-  if(m.includes("deepseek-v3")) return "DeepSeek V3"
-  if(m.includes("deepseek-chat")) return "DeepSeek V3"
+  if (m.includes("deepseek-v3")) return "DeepSeek V3"
+  if (m.includes("deepseek-chat")) return "DeepSeek V3"
 
   // QwQ 32B
-  if(m.includes("qwq-32b")) return "QwQ 32B"
+  if (m.includes("qwq-32b")) return "QwQ 32B"
 
   // GLM Z1
-  if(m.includes("glm-z1-")) return "GLM Z1"
+  if (m.includes("glm-z1-")) return "GLM Z1"
 
 }
