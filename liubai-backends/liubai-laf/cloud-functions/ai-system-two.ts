@@ -839,11 +839,13 @@ class SystemTwo {
       const chat2log = new ChatToLog(this._ctx)
       const res3_1 = chat2log.run(v)
       if (!res3_1) continue
-      system2Logs.push(...res3_1)
+      let addedToken = 0
       res3_1.forEach(v2 => {
-        tokenWeHave += AiShared.calculateTextToken(v2)
+        addedToken += AiShared.calculateTextToken(v2)
       })
-      if (tokenWeHave > maxInputToken) continue
+      if (tokenWeHave + addedToken > maxInputToken) break
+      system2Logs.push(...res3_1)
+      tokenWeHave += addedToken
     }
 
     // 4. generate log string
