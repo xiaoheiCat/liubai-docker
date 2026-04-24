@@ -27,10 +27,10 @@
 目前支持的 AI 有:
 
 - 百灵 (来自 [蚂蚁金服](https://alipaytbox.yuque.com/sxs0ba/ling))
-- DeepSeek (来自 [深度求索](https://api-docs.deepseek.com/zh-cn/))
+- DeepSeek (来自 [深度求索](https://api-docs.deepseek.com/zh-cn/))，已适配至 V4
 - 海螺 (来自 [MiniMax](https://minimaxi.com/))，已适配至 MiniMax-M2.7
 - 混元 (来自[腾讯](https://hunyuan.tencent.com/))
-- Kimi（来自[月之暗面](https://www.moonshot.cn/)），已适配至 kimi-2.5
+- Kimi（来自[月之暗面](https://www.moonshot.cn/)），已适配至 kimi-2.6
 - 通义千问（来自[阿里巴巴](https://tongyi.aliyun.com/welcome)）
 - 跃问（来自[阶跃星辰](https://www.stepfun.com/)）
 - 智谱（来自[智谱华章](https://bigmodel.cn/)）
