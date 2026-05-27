@@ -60,9 +60,6 @@ async function _upload(
       const res = await fetch(uploadUrl, {
         method: "PUT",
         body: f,
-        headers: {
-          "Content-Type": f.type || "application/octet-stream",
-        },
       })
       if(!res.ok) {
         console.warn("minio PUT failed")

@@ -61,6 +61,34 @@ function createS3Client(endpoint: string) {
   })
 }
 
+async function objectExists(key: string): Promise<boolean> {
+  const cfg = getMinioConfig()
+  const endpoints = [cfg.endpoint, cfg.publicEndpoint]
+    .map(v => v.replace(/\/$/, ""))
+    .filter((v, i, a) => v && a.indexOf(v) === i)
+
+  for(let attempt = 0; attempt < 5; attempt++) {
+    for(const endpoint of endpoints) {
+      try {
+        const client = createS3Client(endpoint)
+        await client.send(new HeadObjectCommand({
+          Bucket: cfg.bucket,
+          Key: key,
+        }))
+        return true
+      }
+      catch {
+        // try next endpoint / retry
+      }
+    }
+    if(attempt < 4) {
+      await Bun.sleep(300)
+    }
+  }
+
+  return false
+}
+
 function buildMinioUploadPrefix(
   user: Table_User,
   purpose?: FileSetAPI.Param["purpose"],
@@ -116,7 +144,6 @@ async function minioPresign(
   const command = new PutObjectCommand({
     Bucket: cfg.bucket,
     Key: key,
-    ContentType: contentType || "application/octet-stream",
   })
   const uploadUrl = await getSignedUrl(client, command, { expiresIn: 3600 })
 
@@ -150,17 +177,10 @@ async function minioConfirm(
   }
 
   const cfg = getMinioConfig()
-  const client = createS3Client(cfg.endpoint)
-
-  try {
-    await client.send(new HeadObjectCommand({
-      Bucket: cfg.bucket,
-      Key: key,
-    }))
-  }
-  catch(err) {
+  const exists = await objectExists(key)
+  if(!exists) {
     console.warn("minio confirm: object not found")
-    console.log(err)
+    console.log({ bucket: cfg.bucket, key, endpoint: cfg.endpoint, publicEndpoint: cfg.publicEndpoint })
     return { code: "E4004", errMsg: "object not found" }
   }
 
