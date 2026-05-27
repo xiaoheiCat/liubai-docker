@@ -4,10 +4,15 @@ import { runWithInterceptor, runInit } from "./router.ts"
 import { startCronScheduler, getRuntimeBind } from "./cron.ts"
 import { closeMongoClient } from "./laf-shim/mongo-client.ts"
 import { corsPreflightResponse, withCors } from "./cors.ts"
+import { applyDockerStorageDefaults, getStorageHealthInfo } from "./storage/config.ts"
+import { handleFileSetRequest } from "./storage/file-set-route.ts"
 
 const RESERVED = new Set(["health", "favicon.ico"])
 
 async function bootstrap(): Promise<void> {
+  applyDockerStorageDefaults()
+  console.log("[runtime] storage:", getStorageHealthInfo())
+
   console.log("[runtime] connecting to MongoDB...")
   await initCloudShim()
   console.log("[runtime] MongoDB ready")
@@ -43,7 +48,14 @@ async function bootstrap(): Promise<void> {
       const url = new URL(req.url)
 
       if (url.pathname === "/health") {
-        return withCors(Response.json({ ok: true, service: "liubai-runtime" }), req)
+        return withCors(
+          Response.json({
+            ok: true,
+            service: "liubai-runtime",
+            storage: getStorageHealthInfo(),
+          }),
+          req,
+        )
       }
 
       const funcName = url.pathname.replace(/^\//, "").split("/")[0]
@@ -56,7 +68,16 @@ async function bootstrap(): Promise<void> {
 
       try {
         const { ctx, getResult } = await createFunctionContext(req, funcName)
-        const result = await runWithInterceptor(funcName, ctx)
+
+        let result: unknown
+        if(funcName === "file-set") {
+          const minioResult = await handleFileSetRequest(ctx)
+          result = minioResult ?? await runWithInterceptor(funcName, ctx)
+        }
+        else {
+          result = await runWithInterceptor(funcName, ctx)
+        }
+
         const handlerResult = getResult()
         return withCors(buildHttpResponse(result, handlerResult), req)
       } catch (err) {
