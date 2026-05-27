@@ -23,6 +23,16 @@
 
 [→ 开始部署](DEPLOY.md)
 
+## MCP 🔧
+
+自部署完成后，将以下内容发送给任意支持 MCP 协议的 LLM 客户端完成 Liubai MCP 的安装:
+
+```text
+请参考此 Agent Skill，查看该 Skill 中的教程，帮助我完成 Liubai MCP 的安装:
+https://github.com/xiaoheiCat/liubai-docker/raw/refs/heads/main/liubai-frontends/liubai-mcp/installation/SKILL.md
+如果 github.com 在部分国家/地区访问过慢，可以尝试将 github.com/... 替换为 gh-proxy.com/github.com/... 来尝试提速。
+```
+
 ## 已实现 🥂
 
 ✅ 原子化附着: 文本、图片、多级标签、状态、文件

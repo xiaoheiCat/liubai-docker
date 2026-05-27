@@ -14,6 +14,7 @@ description: >-
 1. `LIUBAI_API_DOMAIN`: 已部署并可访问的 **Liubai 后端**（需优先询问用户后端地址）
 2. `LIU_DOMAIN`: 已部署 **Liubai Web**（用于 OAuth 授权页 `/authorize`；需优先询问用户前端地址）
 3. **Node.js ≥ 22** 或 **Bun**
+4. 已经完成执行 `git clone https://github.com/xiaoheiCat/liubai-docker` 到临时目录，且将 `/path/to/liubai-docker/liubai-frontends/liubai-mcp` 拷贝到了当前的工作目录。
 
 ## 第一步：OAuth 登录获取凭证
 
