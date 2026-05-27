@@ -25,22 +25,51 @@ function parseApiDomain(args: string[]): string | undefined {
   return process.env.LIUBAI_API_DOMAIN?.trim()
 }
 
-async function openBrowser(url: string): Promise<void> {
-  const platform = process.platform
-  if (platform === "darwin") {
-    await execFileAsync("open", [url])
-    return
+/** Returns true if a browser was launched; false if unavailable or failed. */
+async function tryOpenBrowser(url: string): Promise<boolean> {
+  try {
+    const platform = process.platform
+    if (platform === "darwin") {
+      await execFileAsync("open", [url])
+      return true
+    }
+    if (platform === "win32") {
+      await execFileAsync("cmd", ["/c", "start", "", url])
+      return true
+    }
+    await execFileAsync("xdg-open", [url])
+    return true
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.warn(`无法自动打开浏览器（${msg}），已跳过。`)
+    return false
   }
-  if (platform === "win32") {
-    await execFileAsync("cmd", ["/c", "start", "", url])
-    return
-  }
-  await execFileAsync("xdg-open", [url])
+}
+
+function printRemoteAuthGuide(authUrl: string, redirectUri: string) {
+  console.log("")
+  console.log("=== 无本地浏览器 / 远程授权 ===")
+  console.log("")
+  console.log("当前环境可能无法打开浏览器。请在另一台有浏览器的设备上打开以下授权链接：")
+  console.log("")
+  console.log(authUrl)
+  console.log("")
+  console.log("授权完成后，浏览器会跳转到本机回调地址并显示「无法打开此网页」，这是正常现象。")
+  console.log("请复制地址栏中的完整链接（形如）：")
+  console.log(`${redirectUri}?code=...&state=...`)
+  console.log("")
+  console.log("回到运行 login 的本机，执行：")
+  console.log('  curl "<完整链接>"')
+  console.log("")
+  console.log("若由 AI 协助安装：把完整链接发给 AI，让 AI 在本机终端执行上述 curl。")
+  console.log("login 进程须保持运行，直到 curl 成功或终端显示 Login successful。")
+  console.log("")
 }
 
 function startCallbackServer(expectedState: string) {
   const server = http.createServer()
   let port = 0
+  let settled = false
 
   const codePromise = new Promise<string>((resolve, reject) => {
     server.on("request", (req, res) => {
@@ -57,11 +86,20 @@ function startCallbackServer(expectedState: string) {
         const gotState = url.searchParams.get("state")
         if (!gotCode || gotState !== expectedState) {
           res.writeHead(400, { "Content-Type": "text/plain; charset=utf-8" })
-          res.end("Invalid OAuth callback")
-          reject(new Error("OAuth callback invalid or state mismatch"))
-          server.close()
+          res.end(
+            "OAuth callback invalid (missing code or state mismatch). " +
+              "Check the URL and retry curl on the machine running login.",
+          )
+          console.warn("收到无效回调，仍在等待正确的 callback URL……")
           return
         }
+
+        if (settled) {
+          res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" })
+          res.end("Already authorized.")
+          return
+        }
+        settled = true
 
         res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" })
         res.end(
@@ -69,7 +107,10 @@ function startCallbackServer(expectedState: string) {
         )
         server.close(() => resolve(gotCode))
       } catch (err) {
-        reject(err instanceof Error ? err : new Error(String(err)))
+        if (!settled) {
+          settled = true
+          reject(err instanceof Error ? err : new Error(String(err)))
+        }
         server.close()
       }
     })
@@ -87,6 +128,7 @@ function startCallbackServer(expectedState: string) {
   return {
     ready,
     getPort: () => port,
+    getRedirectUri: () => `http://127.0.0.1:${port}/callback`,
     waitForCode: () => codePromise,
   }
 }
@@ -118,21 +160,29 @@ export async function runLogin(apiDomainInput?: string): Promise<void> {
 
   const callback = startCallbackServer(state)
   await callback.ready
-  const redirectUri = `http://127.0.0.1:${callback.getPort()}/callback`
+  const redirectUri = callback.getRedirectUri()
 
   const authReq = await loginAuthRequest(apiDomain, redirectUri, state)
   const authUrl = new URL("/authorize", authReq.baseUrl)
   authUrl.searchParams.set("credential", authReq.credential)
   authUrl.searchParams.set("state", state)
+  const authUrlStr = authUrl.toString()
 
   console.log("")
-  console.log("Opening browser for authorization...")
-  console.log(`If the browser does not open, visit:\n${authUrl.toString()}`)
+  console.log("授权链接：")
+  console.log(authUrlStr)
+  console.log("")
+  console.log(`本机回调地址：${redirectUri}`)
   console.log("")
 
-  await openBrowser(authUrl.toString())
+  const opened = await tryOpenBrowser(authUrlStr)
+  if (opened) {
+    console.log("已在本地尝试打开浏览器，请在页面中完成登录并授权。")
+  } else {
+    printRemoteAuthGuide(authUrlStr, redirectUri)
+  }
 
-  console.log("Waiting for authorization in browser...")
+  console.log("等待授权完成（可在本机用 curl 访问 callback URL）……")
   const code = await callback.waitForCode()
 
   console.log("Submitting authorization code...")

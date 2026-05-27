@@ -28,13 +28,39 @@ bun install && bun run build
 LIUBAI_API_DOMAIN=http://localhost:9000/ LIU_DOMAIN=http://localhost:8080 bun run login
 ```
 
-流程：
+**重要：** `bun run login` 会阻塞等待授权完成。在远程/无 GUI 环境安装时，须保持该进程运行，直到 curl 回调成功或终端出现 `Login successful.`。
+
+### 标准流程（本机有浏览器）
 
 1. CLI 向后端 `user-login` 发起 `init` → `auth_request`
-2. 自动打开浏览器到 `{LIU_DOMAIN}/authorize?credential=...&state=...`
+2. 自动打开浏览器到 `{LIU_DOMAIN}/authorize?credential=...&state=...`（打不开也不会退出，见下文）
 3. 在 Web 端登录（若尚未登录）并点击 **授权**
 4. 浏览器跳回本机 `http://127.0.0.1:<port>/callback`，CLI 完成 `auth_submit`
 5. 凭证写入 **`~/.config/liubai-mcp/credentials.json`**（权限 `600`）
+
+### 无本地浏览器 / 远程授权（AI 须告知用户）
+
+当 login 运行在无桌面环境、SSH 服务器、或容器内时，通常**无法**在本机打开浏览器。此时 CLI 会打印 **授权链接** 与 **本机回调地址**，并继续等待，不会退出。
+
+**AI 安装时应向用户说明：**
+
+1. 当前机器没有可用浏览器，需要在**另一台有浏览器的设备**（手机、笔记本等）打开 CLI 打印的授权链接。
+2. 在授权页登录 Liubai 并点击 **授权**。
+3. 授权后浏览器会跳转到 `http://127.0.0.1:<port>/callback?code=...&state=...`，页面往往显示 **「无法打开此网页」** —— 这是正常的（回调应打到运行 `login` 的那台机器，而不是你用来浏览的设备）。
+4. 请用户**复制地址栏中的完整链接**，发回给 AI。
+5. **AI 必须在运行 login 的同一台机器上**执行：
+
+```bash
+curl "<用户粘贴的完整 callback 链接>"
+```
+
+6. curl 成功后，login 终端应继续并完成 `auth_submit`，最后显示 `Login successful.`；凭证写入 `~/.config/liubai-mcp/credentials.json`。
+
+**注意：**
+
+- callback 链接里的 `127.0.0.1:<port>` 必须对应 CLI 打印的 **本机回调地址**（端口一致）；若用户复制时端口不对，请对照 login 输出修正后再 curl。
+- 若 curl 返回 400，说明 `code`/`state` 无效或已过期，需重新执行 `bun run login` 获取新链接。
+- 在整个过程中 **不要关闭** 正在等待的 login 进程。
 
 之后启动 MCP 时，**无需**在环境变量里填 `LIUBAI_TOKEN` / `LIUBAI_SERIAL`（会自动读取该文件）。环境变量若已设置，则**覆盖**文件中的同名字段。
 
@@ -118,7 +144,7 @@ npm install && npm run build
 | 现象 | 处理 |
 |------|------|
 | `E4000` / `checkEntry error` | 确认后端已更新到含 MCP 支持的版本并重启 runtime；MCP 请求须带合法 `x_liu_*` 字段（`x_liu_theme` 只能是 `light` 或 `dark`） |
-| 登录时浏览器打开失败 | 手动访问 CLI 打印的 authorize URL |
+| 登录时浏览器打开失败 | 正常：CLI 不会退出。在另一台设备打开打印的授权链接；授权后复制 callback 完整 URL，在运行 login 的本机执行 `curl "<url>"`（见上文「无本地浏览器 / 远程授权」） |
 | authorize 页报错 / 空白 | 检查 `LIU_DOMAIN` 是否指向 Web 前端，且与 API 域可协同登录 |
 | `E4003` / token 失败 | 重新执行 `bun run login` |
 | `Missing credentials` | 先登录，或设置 `LIUBAI_TOKEN` + `LIUBAI_SERIAL` |
