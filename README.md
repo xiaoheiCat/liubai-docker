@@ -13,6 +13,12 @@
 
 <br>
 
+## 主体提示 📢
+
+此项目为 [yenche123/liubai](https://github.com/yenche123/liubai) 的 Fork，为原项目添加了本地 Docker 部署功能。
+
+本项目不代表原开发者观点。
+
 ## 自部署 🚀
 
 [→ 开始部署](DEPLOY.md)
