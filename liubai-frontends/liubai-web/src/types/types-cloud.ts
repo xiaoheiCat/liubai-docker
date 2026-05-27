@@ -141,7 +141,7 @@ export interface Wxpay_Jsapi_Params {
 
 /*************************** 云存储 **********************/
 // 云存储服务
-export type CloudStorageService = "qiniu" | "tecent_cos" | "aliyun_oss"
+export type CloudStorageService = "qiniu" | "minio" | "tecent_cos" | "aliyun_oss"
 
 
 

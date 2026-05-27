@@ -11,6 +11,7 @@ import type { LiuImageStore } from "~/types"
 import APIs from "~/requests/APIs"
 import liuReq from "~/requests/liu-req"
 import { uploadViaQiniu } from "~/utils/cloud/upload-tasks/tools/upload-via-qiniu"
+import { uploadViaMinio } from "~/utils/cloud/upload-tasks/tools/upload-via-minio"
 import ider from "~/utils/basic/ider";
 import transferUtil from "~/utils/transfer-util";
 import { useWorkspaceStore } from "~/hooks/stores/useWorkspaceStore";
@@ -127,7 +128,10 @@ async function uploadFile(
   showCropperLoading("common.uploading")
 
   // 4. upload file
-  await uploadViaQiniu(
+  const uploadFn = tokenRes.data.cloudService === "minio"
+    ? uploadViaMinio
+    : uploadViaQiniu
+  await uploadFn(
     tokenRes.data, 
     [imgStore],
     (fileId, res) => {

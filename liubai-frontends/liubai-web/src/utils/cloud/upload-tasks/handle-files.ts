@@ -10,6 +10,7 @@ import APIs from "~/requests/APIs"
 import type { FileSetAPI } from "~/requests/req-types"
 import type { LiuUploadTask } from "~/types/types-atom"
 import { uploadViaQiniu } from "./tools/upload-via-qiniu"
+import { uploadViaMinio } from "./tools/upload-via-minio"
 import liuReq from "~/requests/liu-req"
 import type { 
   UploadFileAtom, 
@@ -277,6 +278,9 @@ async function handleAnAtom(
   let uploadRes: UploadFileRes | undefined
   if(cs === "qiniu") {
     uploadRes = await uploadViaQiniu(rut, files, _whenAFileCompleted)
+  }
+  else if(cs === "minio") {
+    uploadRes = await uploadViaMinio(rut, files, _whenAFileCompleted)
   }
   else if(cs === "aliyun_oss") {
 

@@ -16,6 +16,13 @@ import type {
 } from "@/common-types"
 import { createFileRandom } from "@/common-ids"
 import { qiniuCallBackBody } from "@/file-utils"
+import {
+  getUploadTokenViaMinio,
+  isMinioConfigured,
+  minioConfirm,
+  minioPresign,
+  preCheckForMinio,
+} from "@/file-minio"
 
 const MB = 1024 * 1024
 const MB_10 = 10 * MB
@@ -29,8 +36,40 @@ export async function main(ctx: FunctionContext) {
   if(oT === "get-upload-token") {
     res = await getUploadToken(ctx, body)
   }
+  else if(oT === "minio-presign") {
+    res = await handleMinioPresign(ctx, body)
+  }
+  else if(oT === "minio-confirm") {
+    res = await handleMinioConfirm(ctx, body)
+  }
   
   return res
+}
+
+async function handleMinioPresign(
+  ctx: FunctionContext,
+  body: Record<string, any>,
+) {
+  const err1 = preCheckForMinio()
+  if(err1) return err1
+
+  const vRes = await verifyToken(ctx, body)
+  if(!vRes.pass) return vRes.rqReturn
+
+  return minioPresign(vRes.userData, body as FileSetAPI.Param_MinioPresign)
+}
+
+async function handleMinioConfirm(
+  ctx: FunctionContext,
+  body: Record<string, any>,
+) {
+  const err1 = preCheckForMinio()
+  if(err1) return err1
+
+  const vRes = await verifyToken(ctx, body)
+  if(!vRes.pass) return vRes.rqReturn
+
+  return minioConfirm(vRes.userData, body as FileSetAPI.Param_MinioConfirm)
 }
 
 
@@ -57,6 +96,9 @@ async function getUploadToken(
   }
   else if(res2 === "aliyun_oss") {
 
+  }
+  else if(res2 === "minio") {
+    res = getUploadTokenViaMinio(user, newBody)
   }
   else if(res2 === "tecent_cos") {
 
@@ -133,6 +175,10 @@ function getUploadTokenViaQiniu(
 }
 
 function preCheckForUploadToken(): LiuRqReturn | undefined {
+  if(isMinioConfigured()) {
+    return preCheckForMinio()
+  }
+
   const _env = process.env
   const qiniu_access_key = _env.LIU_QINIU_ACCESS_KEY
   const qiniu_secret_key = _env.LIU_QINIU_SECRET_KEY
@@ -171,5 +217,8 @@ function preCheckForUploadToken(): LiuRqReturn | undefined {
 }
 
 function getTheRightService(): CloudStorageService {
+  if(isMinioConfigured()) {
+    return "minio"
+  }
   return "qiniu"
 }

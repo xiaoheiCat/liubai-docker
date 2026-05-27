@@ -931,7 +931,7 @@ export const Sch_X_Liu = vbot.object({
 
 export const Sch_IP = vbot.string([vbot.ip()])
 
-export type CloudStorageService = "qiniu" | "tecent_cos" | "aliyun_oss"
+export type CloudStorageService = "qiniu" | "minio" | "tecent_cos" | "aliyun_oss"
 
 // user's wechat data
 export interface UserWeChatGzh {
@@ -2289,10 +2289,32 @@ export namespace FileSetAPI {
     purpose?: "avatar" | "coupon-upload" | "coupon-tmp"
   }
 
+  export interface Param_MinioPresign {
+    operateType: "minio-presign"
+    key: string
+    contentType?: string
+    fsize?: number
+  }
+
+  export interface Param_MinioConfirm {
+    operateType: "minio-confirm"
+    key: string
+    fsize: number
+  }
+
   export interface Res_UploadToken {
     cloudService: CloudStorageService
     uploadToken: string
     prefix: string
+  }
+
+  export interface Res_MinioPresign {
+    uploadUrl: string
+    key: string
+  }
+
+  export interface Res_MinioConfirm {
+    cloud_url: string
   }
 }
 

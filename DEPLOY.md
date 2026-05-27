@@ -13,6 +13,8 @@
 | Compose 服务 | 说明 |
 |--------------|------|
 | `db` | 独立 MongoDB 容器，**不**捆绑在 runtime 内 |
+| `minio` | 对象存储（S3 兼容），默认用于图片/文件上传 |
+| `minio-init` | 一次性初始化 bucket、公开读与 CORS |
 | `runtime` | `liubai-runtime`（Bun），运行原 `liubai-laf` 云函数 |
 | `ffmpeg` | AMR 转 MP3 服务 |
 | `web` | 可选，profile `with-web`，Nginx 托管静态前端 |
@@ -45,7 +47,8 @@ cp .env.example .env
 
    - `LIU_DOMAIN` — 前端站点 URL
    - `LIU_TRIGGER_TOKEN` — 定时任务内部 token（请改为随机字符串）
-   - 各第三方服务密钥（OAuth、Stripe、七牛等，见 [`liubai-laf/.env.template`](liubai-backends/liubai-laf/.env.template)）
+   - 各第三方服务密钥（OAuth、Stripe 等，见 [`liubai-laf/.env.template`](liubai-backends/liubai-laf/.env.template)）
+   - **对象存储**：Compose 默认捆绑 MinIO，一般只需设置 `LIU_MINIO_PUBLIC_URL` 为浏览器可访问的 MinIO 地址（如 `http://localhost:19000` 或反代后的 `https://storage.example.com`）。若改用七牛，请清空 `.env` 中全部 `LIU_MINIO_*` 并填写 `LIU_QINIU_*`。
    - `GHCR_MIRROR` — 若无法直连 `ghcr.io`，可改为自定义镜像仓库前缀（默认 `ghcr.io`）；也可单独设置 `LIUBAI_*_IMAGE` 覆盖完整镜像地址
 
 4. `LIU_FFMPEG_BASEURL` 在 Compose 内已默认为 `http://ffmpeg:3000`，一般无需修改。
@@ -134,6 +137,26 @@ docker compose -f docker-compose.yml -f docker-compose.local.yml --profile with-
 ```
 
 默认将前端映射到宿主机 `8080` 端口。构建时通过 `.env` 中的 `VITE_API_DOMAIN` 注入 API 地址。
+
+## 对象存储（MinIO）
+
+Compose 默认启动 MinIO，runtime 在检测到 `LIU_MINIO_*` 环境变量时会**优先使用 MinIO**，无需配置七牛。
+
+| 变量 | 说明 |
+|------|------|
+| `LIU_MINIO_ENDPOINT` | runtime 容器内访问 MinIO 的地址，默认 `http://minio:9000` |
+| `LIU_MINIO_PUBLIC_URL` | **浏览器**上传/读取文件的地址，必须与用户访问前端时的网络可达；本地默认 `http://localhost:19000` |
+| `LIU_MINIO_ACCESS_KEY` / `LIU_MINIO_SECRET_KEY` | MinIO 凭证，默认 `minioadmin` |
+| `LIU_MINIO_BUCKET` | bucket 名称，默认 `liubai` |
+| `MINIO_API_PORT` / `MINIO_CONSOLE_PORT` | 宿主机映射端口，默认 `19000` / `19001` |
+
+生产环境建议：
+
+1. 修改 MinIO 默认密码。
+2. 通过 Nginx/Caddy 为 `LIU_MINIO_PUBLIC_URL` 配置 HTTPS 反代（MinIO API 端口 9000）。
+3. 若前端部署在 Cloudflare Pages，需重新构建前端以包含 MinIO 上传逻辑（`upload-via-minio`）。
+
+MinIO 控制台：`http://localhost:19001`（默认账号密码见上表）。
 
 ## 运维备忘
 

@@ -239,10 +239,32 @@ export namespace FileSetAPI {
     purpose?: "avatar"
   }
 
+  export interface Param_MinioPresign {
+    operateType: "minio-presign"
+    key: string
+    contentType?: string
+    fsize?: number
+  }
+
+  export interface Param_MinioConfirm {
+    operateType: "minio-confirm"
+    key: string
+    fsize: number
+  }
+
   export interface Res_UploadToken {
     cloudService: CloudStorageService
     uploadToken: string
     prefix: string
+  }
+
+  export interface Res_MinioPresign {
+    uploadUrl: string
+    key: string
+  }
+
+  export interface Res_MinioConfirm {
+    cloud_url: string
   }
 }
 
