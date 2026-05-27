@@ -1,4 +1,5 @@
 import type { LiubaiMcpConfig } from "./config.js"
+import { buildXLiuBody } from "./x-liu-body.js"
 
 export type McpOperateType =
   | "mcp-health"
@@ -26,19 +27,12 @@ export class LiubaiClient {
     operateType: McpOperateType,
     params: Record<string, unknown> = {},
   ): Promise<T> {
-    const body = {
+    const body = buildXLiuBody({
       operateType,
-      x_liu_language: "zh-CN",
-      x_liu_theme: "system",
-      x_liu_version: "0.31",
-      x_liu_stamp: Date.now(),
-      x_liu_timezone: String(-new Date().getTimezoneOffset() / 60),
-      x_liu_client: "mcp",
-      x_liu_device: "liubai-mcp",
       x_liu_token: this.config.token,
       x_liu_serial: this.config.serial,
       ...params,
-    }
+    })
 
     let res: Response
     try {

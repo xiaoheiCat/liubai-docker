@@ -117,6 +117,7 @@ npm install && npm run build
 
 | 现象 | 处理 |
 |------|------|
+| `E4000` / `checkEntry error` | 确认后端已更新到含 MCP 支持的版本并重启 runtime；MCP 请求须带合法 `x_liu_*` 字段（`x_liu_theme` 只能是 `light` 或 `dark`） |
 | 登录时浏览器打开失败 | 手动访问 CLI 打印的 authorize URL |
 | authorize 页报错 / 空白 | 检查 `LIU_DOMAIN` 是否指向 Web 前端，且与 API 域可协同登录 |
 | `E4003` / token 失败 | 重新执行 `bun run login` |

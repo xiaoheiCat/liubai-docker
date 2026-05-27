@@ -11,7 +11,23 @@ export function getTimezone(): string {
 export async function calibrateTime(apiDomain: string): Promise<void> {
   const url = `${normalizeApiDomain(apiDomain)}hello-world`
   const t1 = Date.now()
-  const res = await fetch(url, { method: "POST", signal: AbortSignal.timeout(10_000) })
+  const hr = new Date().getHours()
+  const theme = hr >= 6 && hr <= 17 ? "light" : "dark"
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      x_liu_language: "zh-CN",
+      x_liu_theme: theme,
+      x_liu_version: "0.31",
+      x_liu_stamp: getTime(),
+      x_liu_timezone: getTimezone(),
+      x_liu_client: "mcp",
+      x_liu_device: "liubai-mcp",
+      x_liu_ide_type: "mcp",
+    }),
+    signal: AbortSignal.timeout(10_000),
+  })
   const t2 = Date.now()
   const json = (await res.json()) as { code?: string; data?: { stamp?: number } }
   if (json.code !== "0000" || !json.data?.stamp) return

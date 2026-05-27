@@ -1,4 +1,4 @@
-import { getTime, getTimezone } from "./time.js"
+import { buildXLiuBody } from "./x-liu-body.js"
 
 interface LiuRqReturn<T = Record<string, unknown>> {
   code: string
@@ -10,20 +10,6 @@ function normalizeApiDomain(domain: string): string {
   return domain.endsWith("/") ? domain : `${domain}/`
 }
 
-function buildBody(body: Record<string, unknown>): string {
-  return JSON.stringify({
-    x_liu_language: "zh-CN",
-    x_liu_theme: "system",
-    x_liu_version: "0.31",
-    x_liu_stamp: getTime(),
-    x_liu_timezone: getTimezone(),
-    x_liu_client: "mcp",
-    x_liu_device: "liubai-mcp",
-    x_liu_ide_type: "mcp",
-    ...body,
-  })
-}
-
 async function post<T>(
   apiDomain: string,
   operateType: string,
@@ -33,7 +19,7 @@ async function post<T>(
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: buildBody({ operateType, ...body }),
+    body: JSON.stringify(buildXLiuBody({ operateType, ...body })),
     signal: AbortSignal.timeout(30_000),
   })
   const json = (await res.json()) as LiuRqReturn<T>
