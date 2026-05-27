@@ -16,7 +16,7 @@ services:
 
   runtime:
     image: ${LIUBAI_RUNTIME_IMAGE:-${GHCR_MIRROR:-ghcr.io}/xiaoheicat/liubai-runtime:latest}
-    pull_policy: missing
+    pull_policy: always
     container_name: liubai-runtime
     restart: unless-stopped
     depends_on:
@@ -55,6 +55,7 @@ services:
       LIU_QINIU_CALLBACK_URL: ${LIU_QINIU_CALLBACK_URL:-}
       LIU_QINIU_CDN_DOMAIN: ${LIU_QINIU_CDN_DOMAIN:-}
       LIU_QINIU_CUSTOM_KEY: ${LIU_QINIU_CUSTOM_KEY:-}
+      LIU_STORAGE: ${LIU_STORAGE:-minio}
       LIU_MINIO_ENDPOINT: ${LIU_MINIO_ENDPOINT:-http://minio:9000}
       LIU_MINIO_PUBLIC_URL: ${LIU_MINIO_PUBLIC_URL:-http://localhost:19000}
       LIU_MINIO_ACCESS_KEY: ${LIU_MINIO_ACCESS_KEY:-minioadmin}

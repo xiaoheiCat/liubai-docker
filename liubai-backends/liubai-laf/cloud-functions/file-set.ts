@@ -180,6 +180,13 @@ function preCheckForUploadToken(): LiuRqReturn | undefined {
   }
 
   const _env = process.env
+  if(_env.LIU_STORAGE?.trim().toLowerCase() === "minio") {
+    return {
+      code: "E5001",
+      errMsg: "LIU_STORAGE=minio but MinIO env vars are missing; set LIU_MINIO_ENDPOINT, LIU_MINIO_ACCESS_KEY, LIU_MINIO_SECRET_KEY, LIU_MINIO_BUCKET, and LIU_MINIO_PUBLIC_URL",
+    }
+  }
+
   const qiniu_access_key = _env.LIU_QINIU_ACCESS_KEY
   const qiniu_secret_key = _env.LIU_QINIU_SECRET_KEY
   const qiniu_bucket = _env.LIU_QINIU_BUCKET

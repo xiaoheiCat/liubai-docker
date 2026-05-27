@@ -1,0 +1,17 @@
+# 生产环境 override 示例：与 docker-compose.yml 合并使用
+#
+#   docker compose -f docker-compose.yml -f docker-compose.proxy.example.yml up -d
+#
+# 复制为 docker-compose.proxy.yml 后按需修改域名。
+
+services:
+  runtime:
+    environment:
+      LIU_STORAGE: minio
+      # 浏览器访问 MinIO 的公网 HTTPS 地址（presigned URL 会指向这里）
+      LIU_MINIO_PUBLIC_URL: ${LIU_MINIO_PUBLIC_URL:-https://storage.example.com}
+      LIU_MINIO_CORS_ORIGIN: ${LIU_MINIO_CORS_ORIGIN:-https://liubai.example.com}
+
+  minio:
+    environment:
+      MINIO_API_CORS_ALLOW_ORIGIN: ${LIU_MINIO_CORS_ORIGIN:-https://liubai.example.com}

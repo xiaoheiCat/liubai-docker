@@ -27,12 +27,24 @@ const db = cloud.database()
 
 export function isMinioConfigured(): boolean {
   const e = process.env
-  return Boolean(
+  const storage = e.LIU_STORAGE?.trim().toLowerCase()
+
+  if(storage === "qiniu") {
+    return false
+  }
+
+  const hasMinioVars = Boolean(
     e.LIU_MINIO_ENDPOINT &&
     e.LIU_MINIO_ACCESS_KEY &&
     e.LIU_MINIO_SECRET_KEY &&
     e.LIU_MINIO_BUCKET,
   )
+
+  if(storage === "minio") {
+    return hasMinioVars
+  }
+
+  return hasMinioVars
 }
 
 export function preCheckForMinio(): LiuRqReturn | undefined {
