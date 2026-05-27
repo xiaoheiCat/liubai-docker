@@ -23,7 +23,7 @@ import {
   type DataPass,
   SyncOperateAPI,
 } from '@/common-types'
-import { getBasicStampWhileAdding, getNowStamp } from './common-time'
+import { getBasicStampWhileAdding, getNowStamp } from '@/common-time'
 import { createThreadId } from '@/common-ids'
 import { AiShared } from '@/ai-shared'
 import { afterPostingThread } from '@/sync-after'

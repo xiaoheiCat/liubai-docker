@@ -1,7 +1,7 @@
 // Function Name: service-poly
 
 import cloud from '@lafjs/cloud'
-import { LiuRqReturn, ServicePolyAPI, Table_Config } from './common-types'
+import { LiuRqReturn, ServicePolyAPI, Table_Config } from '@/common-types'
 import { createCommonNonce } from '@/common-ids'
 import { getNowStamp } from '@/common-time'
 import * as crypto from "crypto";
