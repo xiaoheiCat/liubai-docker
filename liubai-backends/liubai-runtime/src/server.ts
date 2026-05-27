@@ -5,7 +5,6 @@ import { startCronScheduler, getRuntimeBind } from "./cron.ts"
 import { closeMongoClient } from "./laf-shim/mongo-client.ts"
 import { corsPreflightResponse, withCors } from "./cors.ts"
 import { applyDockerStorageDefaults, getStorageHealthInfo } from "./storage/config.ts"
-import { handleFileSetRequest } from "./storage/file-set-route.ts"
 
 const RESERVED = new Set(["health", "favicon.ico"])
 

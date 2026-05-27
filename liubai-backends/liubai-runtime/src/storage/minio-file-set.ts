@@ -24,7 +24,9 @@ const MB = 1024 * 1024
 const MB_10 = 10 * MB
 const MB_100 = 100 * MB
 
-const db = cloud.database()
+function db() {
+  return cloud.database()
+}
 
 function preCheckForMinio(): LiuRqReturn | undefined {
   if(!isMinioConfigured()) {
@@ -179,7 +181,7 @@ async function recordMinioQuota(
   let theSize = Math.round(fsizeBytes / 1024)
   if(theSize < 1) theSize = 1
 
-  const col_user = db.collection("User")
+  const col_user = db().collection("User")
   const res1 = await col_user.doc(userId).get<Table_User>()
   const theUser = res1.data
   if(!theUser) {
