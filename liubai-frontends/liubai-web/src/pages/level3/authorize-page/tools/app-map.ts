@@ -14,5 +14,6 @@ export const appMap: Record<LiuAppType, string> = {
   "tencent-cloud-studio": "Cloud Studio",
   "cnb.cool": "CNB",
   "project-idx": "Project IDX",
-  "trae": "Trae"
+  "trae": "Trae",
+  "mcp": "Liubai MCP",
 }

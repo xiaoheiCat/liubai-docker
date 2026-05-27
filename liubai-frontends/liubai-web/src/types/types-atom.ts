@@ -274,6 +274,7 @@ export const liuIDETypes = [
   "tencent-cloud-studio",
   "cnb.cool",
   "trae",
+  "mcp",
 ] as const
 export type LiuIDEType = typeof liuIDETypes[number]
 

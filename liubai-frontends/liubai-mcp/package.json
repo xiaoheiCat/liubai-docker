@@ -1,0 +1,34 @@
+{
+  "name": "liubai-mcp",
+  "private": true,
+  "version": "0.31.0",
+  "description": "MCP server for Liubai — todos, calendar, and notes",
+  "author": {
+    "name": "yenche123",
+    "email": "tsuiyenche@outlook.com"
+  },
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "bin": {
+    "liubai-mcp": "./dist/index.js",
+    "liubai-mcp-login": "./dist/login.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "bun run src/index.ts",
+    "login": "node dist/login.js",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.0",
+    "typescript": "^5.9.3"
+  }
+}

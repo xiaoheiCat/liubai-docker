@@ -228,6 +228,7 @@ export const supportedClients = [
   "web",
   "ide-extension",
   "weixin-miniprogram",
+  "mcp",
 ] as const
 export type SupportedClient = typeof supportedClients[number]
 export const Sch_SupportedClient = vbot.picklist(supportedClients)
@@ -237,6 +238,7 @@ export const clientMaximum: Record<SupportedClient, number> = {
   "web": 9,
   "ide-extension": 5,
   "weixin-miniprogram": 3,
+  "mcp": 3,
 }
 
 export const liuIDETypes = [
@@ -254,6 +256,7 @@ export const liuIDETypes = [
   "tencent-cloud-studio",
   "cnb.cool",
   "trae",
+  "mcp",
 ] as const
 export type LiuIDEType = typeof liuIDETypes[number]
 export const Sch_LiuIDEType = vbot.picklist(liuIDETypes)
@@ -2847,6 +2850,65 @@ export namespace SyncOperateAPI {
   export type Result = Res_AgreeAichat | Res_GetAichat | Res_GetAiDetail
 }
 
+/****************** liubai-mcp api ***************/
+export namespace LiubaiMcpAPI {
+  export type OperateType =
+    | "mcp-health"
+    | "mcp-add-note"
+    | "mcp-add-todo"
+    | "mcp-add-calendar"
+    | "mcp-get-pending"
+    | "mcp-get-schedule"
+    | "mcp-get-cards"
+
+  export const Sch_Param = vbot.object({
+    operateType: vbot.picklist([
+      "mcp-health",
+      "mcp-add-note",
+      "mcp-add-todo",
+      "mcp-add-calendar",
+      "mcp-get-pending",
+      "mcp-get-schedule",
+      "mcp-get-cards",
+    ]),
+  })
+
+  export interface Res_Health {
+    operateType: "mcp-health"
+    ok: true
+    userId: string
+  }
+
+  export interface Res_PendingContent {
+    operateType: "mcp-add-note" | "mcp-add-todo" | "mcp-add-calendar"
+    status: "pending"
+    contentType: SyncOperateAPI.ContentType
+    chatId: string
+    agreeLink: string
+    editLink: string
+    funcJson: Record<string, any>
+  }
+
+  export interface Res_GetPending {
+    operateType: "mcp-get-pending"
+    status: "pending" | "created"
+    contentType: SyncOperateAPI.ContentType
+    chatId: string
+    agreeLink: string
+    editLink: string
+    contentId?: string
+    funcJson?: Record<string, any>
+  }
+
+  export interface Res_Read {
+    operateType: "mcp-get-schedule" | "mcp-get-cards"
+    text: string
+    hasData: boolean
+  }
+
+  export type Result = Res_Health | Res_PendingContent | Res_GetPending | Res_Read
+}
+
 /****************** service-poly api ***************/
 export namespace ServicePolyAPI {
 
@@ -2870,7 +2932,7 @@ export namespace UserLoginAPI {
     operateType: "auth_request"
     redirect_uri: string
     state: string
-    x_liu_client: "ide-extension"
+    x_liu_client: "ide-extension" | "mcp"
     x_liu_ide_type: LiuIDEType
   }
 
@@ -2878,7 +2940,7 @@ export namespace UserLoginAPI {
     operateType: vbot.literal("auth_request"),
     redirect_uri: Sch_Id,
     state: Sch_Id,
-    x_liu_client: vbot.literal("ide-extension"),
+    x_liu_client: vbot.picklist(["ide-extension", "mcp"]),
     x_liu_ide_type: Sch_LiuIDEType,
   })
 
@@ -2893,7 +2955,7 @@ export namespace UserLoginAPI {
     credential: string
     code: string
     enc_client_key: string
-    x_liu_client: "ide-extension"
+    x_liu_client: "ide-extension" | "mcp"
     x_liu_ide_type: LiuIDEType
   }
 
@@ -2902,7 +2964,7 @@ export namespace UserLoginAPI {
     credential: Sch_Id,
     code: Sch_Id,
     enc_client_key: Sch_Id,
-    x_liu_client: vbot.literal("ide-extension"),
+    x_liu_client: vbot.picklist(["ide-extension", "mcp"]),
     x_liu_ide_type: Sch_LiuIDEType,
   })
 
