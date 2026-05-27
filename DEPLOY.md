@@ -105,7 +105,17 @@ curl -X POST http://localhost:9000/__init__ \
 
 ### A. Cloudflare Pages / 自有 CDN
 
-在 [`liubai-frontends/liubai-web`](liubai-frontends/liubai-web) 构建并部署，设置 `VITE_API_DOMAIN` 指向 runtime 公网地址（需以 `/` 结尾），例如 `https://api.example.com/`。
+在 Cloudflare Pages 中建议配置：
+
+| 项 | 值 |
+|----|-----|
+| 根目录（Root directory） | `liubai-frontends/liubai-web` |
+| 构建命令 | `npm run build` |
+| 输出目录 | `dist` |
+
+环境变量至少设置 `VITE_API_DOMAIN`，指向 runtime 公网地址（需以 `/` 结尾），例如 `https://api.example.com/`。
+
+若从仓库根目录构建（会 `npm install` 整个 monorepo），需保证 `liubai-web` 的 Vite 插件版本与 `vite@8` 兼容。
 
 ### B. 与 Compose 一起启动
 
