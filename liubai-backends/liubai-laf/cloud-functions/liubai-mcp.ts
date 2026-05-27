@@ -10,7 +10,7 @@ import {
 } from "@/common-util"
 import * as vbot from "valibot"
 import {
-  type LiubaiMcpAPI,
+  LiubaiMcpAPI,
   type LiuRqReturn,
   type Partial_Id,
   type Table_AiChat,
