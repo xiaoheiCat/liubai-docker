@@ -13,7 +13,7 @@
     "types": ["node"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["../liubai-laf/cloud-functions/*"],
+      "@/*": ["./cloud-functions/*", "../liubai-laf/cloud-functions/*"],
       "@lafjs/cloud": ["./src/laf-shim/index.ts"]
     }
   },

@@ -11,6 +11,8 @@ COPY liubai-backends/liubai-runtime/defaults/secret-config.ts /app/liubai-backen
 COPY liubai-backends/liubai-runtime/src ./src
 COPY liubai-backends/liubai-runtime/tsconfig.json liubai-backends/liubai-runtime/bunfig.toml ./
 
+RUN ln -sf ../liubai-laf/cloud-functions ./cloud-functions
+
 EXPOSE 9000
 
-CMD ["bun", "src/server.ts"]
+CMD ["bun", "--preload", "./src/register-paths.ts", "src/server.ts"]

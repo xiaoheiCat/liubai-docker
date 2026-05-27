@@ -1,3 +1,4 @@
+import "./register-paths.ts"
 import type { FunctionContext } from "./types/function-context.ts"
 
 type CloudFunctionModule = {

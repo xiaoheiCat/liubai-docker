@@ -18,7 +18,18 @@ Bun.plugin({
     }))
 
     build.onLoad({ filter: /.*/, namespace: "liubai-cloud" }, async (args) => {
-      const filePath = path.join(cloudFunctionsDir, args.path.slice(2))
+      const subpath = args.path.slice(2)
+      const candidates = [
+        path.join(cloudFunctionsDir, subpath),
+        path.join(cloudFunctionsDir, `${subpath}.ts`),
+      ]
+      let filePath = candidates[0]
+      for (const candidate of candidates) {
+        if (await Bun.file(candidate).exists()) {
+          filePath = candidate
+          break
+        }
+      }
       return {
         contents: await Bun.file(filePath).text(),
         loader: "ts",
