@@ -1,0 +1,113 @@
+# Liubai Docker 部署指南
+
+本文档说明如何使用 Docker Compose 自托管 Liubai 后端（及可选前端）。
+
+## 前置条件
+
+- Docker 与 Docker Compose v2
+- [Bun](https://bun.sh/)（仅部署 `liubai-push-proxy` 到 Cloudflare 时需要）
+- 已解析的域名与 HTTPS 反向代理（生产环境推荐，Compose 本身只暴露 HTTP 端口）
+
+## 架构概览
+
+| Compose 服务 | 说明 |
+|--------------|------|
+| `db` | 独立 MongoDB 容器，**不**捆绑在 runtime 内 |
+| `runtime` | `liubai-runtime`（Bun），运行原 `liubai-laf` 云函数 |
+| `ffmpeg` | AMR 转 MP3 服务 |
+| `web` | 可选，profile `with-web`，Nginx 托管静态前端 |
+
+## Step 1 — 部署 liubai-push-proxy（Cloudflare，推荐）
+
+Web Push 需能访问 FCM。在部分网络环境下需通过 Cloudflare Worker 代理：
+
+```bash
+cd liubai-backends/liubai-push-proxy
+bun install
+bun deploy
+```
+
+部署完成后，将 Worker 域名（不含 `https://`）写入环境变量 `LIU_WEB_PUSH_PROXY_HOST`。
+
+## Step 2 — 配置后端
+
+1. 复制环境变量模板：
+
+```bash
+cp .env.example .env
+```
+
+2. 在 [`liubai-laf/cloud-functions/`](liubai-backends/liubai-laf/cloud-functions/) 下创建 `secret-config.ts`（参考 [`liubai-laf/README.md`](liubai-backends/liubai-laf/README.md) 中的模板）。Docker 构建时会使用 [`liubai-runtime/defaults/secret-config.ts`](liubai-backends/liubai-runtime/defaults/secret-config.ts) 作为空占位；生产环境请填写微信支付/支付宝等密钥。
+
+3. 编辑 `.env`，至少设置：
+
+   - `LIU_DOMAIN` — 前端站点 URL
+   - `LIU_TRIGGER_TOKEN` — 定时任务内部 token（请改为随机字符串）
+   - 各第三方服务密钥（OAuth、Stripe、七牛等，见 [`liubai-laf/.env.template`](liubai-backends/liubai-laf/.env.template)）
+
+4. `LIU_FFMPEG_BASEURL` 在 Compose 内已默认为 `http://ffmpeg:3000`，一般无需修改。
+
+## Step 3 — 启动后端
+
+仅启动 MongoDB + runtime + ffmpeg：
+
+```bash
+docker compose up -d
+```
+
+查看日志：
+
+```bash
+docker compose logs -f runtime
+```
+
+验证 API（runtime 默认映射宿主机 `9000` 端口）：
+
+```bash
+curl -X POST http://localhost:9000/hello-world \
+  -H "Content-Type: application/json" \
+  -d '{"x_liu_language":"zh-CN","x_liu_theme":"light","x_liu_version":"0.31.0","x_liu_stamp":1,"x_liu_timezone":"8.0","x_liu_client":"web"}'
+```
+
+首次启动时 `runtime` 会自动执行 `__init__`（初始化 Config 集合与 RSA/AES 密钥）。也可在设置 `LIU_DEBUG_KEY` 后手动触发：
+
+```bash
+curl -X POST http://localhost:9000/__init__ \
+  -H "x-liu-debug-key: YOUR_DEBUG_KEY"
+```
+
+## Step 4 — 前端（二选一，可选）
+
+### A. Cloudflare Pages / 自有 CDN
+
+在 [`liubai-frontends/liubai-web`](liubai-frontends/liubai-web) 构建并部署，设置 `VITE_API_DOMAIN` 指向 runtime 公网地址（需以 `/` 结尾），例如 `https://api.example.com/`。
+
+### B. 与 Compose 一起启动
+
+```bash
+docker compose --profile with-web up -d
+```
+
+默认将前端映射到宿主机 `8080` 端口。构建时通过 `.env` 中的 `VITE_API_DOMAIN` 注入 API 地址。
+
+## 运维备忘
+
+- **Webhook**：微信/Stripe/七牛等回调 URL 需指向 runtime 公网地址下的对应路径，如 `https://api.example.com/webhook-stripe`。
+- **Cron**：`clock-per-min` / `clock-half-hr` / `clock-one-hr` 由 runtime 容器内调度；需保持 runtime 常驻。可用 `LIU_DISABLE_CRON=01` 关闭。
+- **MongoDB 备份**：数据卷 `mongo_data`，请定期备份。
+- **切换外部 MongoDB**：修改 `MONGODB_URI` 并移除或停用 Compose 中的 `db` 服务即可。
+
+## 本地开发 runtime（不用 Docker）
+
+```bash
+# 需本地或远程 MongoDB
+export MONGODB_URI=mongodb://127.0.0.1:27017/liubai
+cd liubai-backends/liubai-runtime
+bun install
+bun run dev
+```
+
+## 相关文档
+
+- 上游同步与维护目标：[`AGENTS.md`](./AGENTS.md)
+- push-proxy 开发说明：[`liubai-backends/liubai-push-proxy/README.md`](liubai-backends/liubai-push-proxy/README.md)

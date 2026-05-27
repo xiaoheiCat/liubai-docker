@@ -1,0 +1,3 @@
+[run]
+# Resolve @/* and @lafjs/cloud from tsconfig paths when loading cloud-functions.
+tsconfig = "./tsconfig.json"

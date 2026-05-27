@@ -26,6 +26,6 @@ bun deploy
 
 ## 配置
 
-部署后，请在 Laf 后台的环境变量中配置：
+部署后，请在 liubai-runtime 环境变量（或 `.env`）中配置：
 
 - `LIU_WEB_PUSH_PROXY_HOST`: 设置为该 Worker 的自定义域名或 `workers.dev` 域名（不含 `https://`）。

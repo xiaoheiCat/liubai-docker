@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "lib": ["ESNext"],
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["../liubai-laf/cloud-functions/*"],
+      "@lafjs/cloud": ["./src/laf-shim/index.ts"]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "../liubai-laf/cloud-functions/**/*.ts",
+    "../liubai-laf/types/**/*.d.ts"
+  ],
+  "exclude": ["node_modules"]
+}
