@@ -187,11 +187,23 @@ LIU_MINIO_PUBLIC_URL=https://你的-storage-域名
 
 3. **`docker-compose.proxy.yml` 覆盖了 runtime 环境** — 需保留 `LIU_STORAGE` 与 `LIU_MINIO_*`，可参考 [`docker-compose.proxy.example.yml`](docker-compose.proxy.example.yml)。
 
-验证 runtime 环境：
+验证 runtime 是否已启用 MinIO：
 
 ```bash
-docker exec liubai-runtime printenv | grep LIU_MINIO
-docker exec liubai-runtime test -f /app/liubai-backends/liubai-runtime/cloud-functions/file-minio.ts && echo minio-ok
+curl -s http://localhost:9000/health | jq .storage
+```
+
+应看到 `"backend": "minio"` 且 `"minio_configured": true`。若仍是 `qiniu` 或 `other`，必须**重建 runtime**：
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build runtime
+docker compose -f docker-compose.yml -f docker-compose.proxy.yml up -d --force-recreate runtime
+```
+
+旧命令（检查 cloud-functions 内文件）仅适用于未升级镜像；**自 vNext 起 MinIO 逻辑在 runtime `src/storage/`**，以 `/health` 为准。
+
+```bash
+docker exec liubai-runtime printenv | grep -E 'LIU_DOCKER|LIU_STORAGE|LIU_MINIO'
 ```
 
 ## 运维备忘

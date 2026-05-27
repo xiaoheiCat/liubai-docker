@@ -70,6 +70,7 @@ async function bootstrap(): Promise<void> {
 
         let result: unknown
         if(funcName === "file-set") {
+          const { handleFileSetRequest } = await import("./storage/file-set-route.ts")
           const minioResult = await handleFileSetRequest(ctx)
           result = minioResult ?? await runWithInterceptor(funcName, ctx)
         }
