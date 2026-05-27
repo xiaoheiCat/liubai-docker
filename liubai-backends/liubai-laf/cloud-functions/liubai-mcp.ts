@@ -197,6 +197,7 @@ async function handle_get_schedule(
   body: Record<string, any>,
 ): Promise<LiuRqReturn<LiubaiMcpAPI.Res_Read>> {
   const funcJson = extractToolParams(body, metaKeys)
+  // ToolShared filters aiReadable: "Y" (Web privacy「AI 可读」)
   const toolShared = new ToolShared(user, { fromSystem2: true })
   const res1 = await toolShared.get_schedule(funcJson)
   if (!res1.pass) return res1.err
@@ -216,6 +217,7 @@ async function handle_get_cards(
   body: Record<string, any>,
 ): Promise<LiuRqReturn<LiubaiMcpAPI.Res_Read>> {
   const funcJson = extractToolParams(body, metaKeys)
+  // ToolShared filters aiReadable: "Y" (Web privacy「AI 可读」)
   const toolShared = new ToolShared(user, { fromSystem2: true })
   const res1 = await toolShared.get_cards(funcJson)
   if (!res1.pass) return res1.err

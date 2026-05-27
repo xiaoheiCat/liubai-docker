@@ -1908,6 +1908,27 @@ export interface ToolSharedOpt {
   fromSystem2?: boolean
 }
 
+/** Matches Web privacy setting「AI 可读」= checked. */
+export function isContentAiReadable(
+  content: Pick<Table_Content, "aiReadable">,
+): boolean {
+  return content.aiReadable === "Y"
+}
+
+/** Base Content query for AI read tools (WeChat bot, MCP, system2). */
+export function buildBaseContentQueryForAiTools(
+  userId: string,
+): Record<string, unknown> {
+  return {
+    user: userId,
+    spaceType: "ME",
+    infoType: "THREAD",
+    oState: "OK",
+    storageState: "CLOUD",
+    aiReadable: "Y",
+  }
+}
+
 export class ToolShared {
 
   private _user: Table_User
@@ -1981,12 +2002,7 @@ export class ToolShared {
     const botName = this._botName
     const user = this._user
     const q2: Record<string, any> = {
-      user: user._id,
-      spaceType: "ME",
-      infoType: "THREAD",
-      oState: "OK",
-      storageState: "CLOUD",
-      aiReadable: "Y",
+      ...buildBaseContentQueryForAiTools(user._id),
       calendarStamp: _.gte(now),
     }
     let sortWay: SortWay = "asc"
@@ -2031,7 +2047,7 @@ export class ToolShared {
     const col5 = db.collection("Content")
     const q5 = col5.where(q2).orderBy("calendarStamp", sortWay)
     const res5 = await q5.limit(10).get<Table_Content>()
-    const list5 = res5.data
+    const list5 = res5.data.filter(isContentAiReadable)
 
     // 6. package
     let msg6 = ""
@@ -2175,14 +2191,7 @@ export class ToolShared {
     const botName = this._botName
     const user = this._user
     const userId = user._id
-    const q2: Record<string, any> = {
-      user: userId,
-      spaceType: "ME",
-      infoType: "THREAD",
-      oState: "OK",
-      storageState: "CLOUD",
-      aiReadable: "Y",
-    }
+    const q2: Record<string, any> = buildBaseContentQueryForAiTools(userId)
 
     // 2.1 define replied text
     let textToBot = ""
@@ -2196,7 +2205,7 @@ export class ToolShared {
       q2.stateId = cardType
       const q3_0 = cCol.where(q2).orderBy("stateStamp", "desc").limit(10)
       const res3_0 = await q3_0.get<Table_Content>()
-      contents = res3_0.data
+      contents = res3_0.data.filter(isContentAiReadable)
       if (cardType === "TODO") {
         textToBot = t("todo_cards")
         textToUser = t("bot_read_todo", { bot: botName })
@@ -2210,14 +2219,14 @@ export class ToolShared {
       q2.calendarStamp = _.gt(getNowStamp() - DAY)
       const q3_1 = cCol.where(q2).orderBy("createdStamp", "desc").limit(10)
       const res3_1 = await q3_1.get<Table_Content>()
-      contents = res3_1.data
+      contents = res3_1.data.filter(isContentAiReadable)
       textToBot = t("event_cards")
       textToUser = t("bot_read_event", { bot: botName })
     }
     else {
       const q3_2 = cCol.where(q2).orderBy("createdStamp", "desc").limit(10)
       const res3_2 = await q3_2.get<Table_Content>()
-      contents = res3_2.data
+      contents = res3_2.data.filter(isContentAiReadable)
       textToBot = t("note_cards")
       textToUser = t("bot_read_note", { bot: botName })
     }

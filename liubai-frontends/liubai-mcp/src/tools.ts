@@ -57,12 +57,12 @@ function textResult(data: Record<string, unknown>): string {
 }
 
 const PENDING_TOOL_HINT =
-  "Return the tool result to the user verbatim (WeChat-style approval message with agree/edit links)."
+  "将工具返回结果原文发给用户（含同意/编辑链接的微信式待确认话术）。"
 
 export const tools: McpToolDef[] = [
   {
     name: "liubai_health",
-    description: "Check connectivity to your Liubai account.",
+    description: "检查 Liubai 账号连接是否正常。",
     inputSchema: { type: "object", properties: {} },
     handler: async (client) => {
       const data = await client.call("mcp-health")
@@ -72,11 +72,11 @@ export const tools: McpToolDef[] = [
   {
     name: "liubai_add_todo",
     description:
-      `Submit a todo for user approval on the Web. ${PENDING_TOOL_HINT}`,
+      `提交待办，待用户在 Web 端确认后才会写入。${PENDING_TOOL_HINT}`,
     inputSchema: {
       type: "object",
       properties: {
-        title: { type: "string", description: "Todo title" },
+        title: { type: "string", description: "待办标题" },
       },
       required: ["title"],
     },
@@ -89,28 +89,28 @@ export const tools: McpToolDef[] = [
   {
     name: "liubai_add_calendar",
     description:
-      `Submit a calendar/reminder for user approval on the Web. ${PENDING_TOOL_HINT}`,
+      `提交日程/提醒，待用户在 Web 端确认后才会写入。${PENDING_TOOL_HINT}`,
     inputSchema: {
       type: "object",
       properties: {
-        title: { type: "string", description: "Optional title" },
-        description: { type: "string", description: "Event content (required)" },
-        date: { type: "string", description: "Date YYYY-MM-DD (mutually exclusive with specificDate)" },
+        title: { type: "string", description: "标题（可选）" },
+        description: { type: "string", description: "日程内容（必填）" },
+        date: { type: "string", description: "日期 YYYY-MM-DD（与 specificDate 互斥）" },
         specificDate: {
           type: "string",
           enum: [...addCalendarSpecificDates],
-          description: "Relative date such as today or tomorrow",
+          description: "相对日期，如 today、tomorrow",
         },
-        time: { type: "string", description: "Time hh:mm" },
+        time: { type: "string", description: "时间 hh:mm" },
         earlyMinute: {
           type: "string",
           enum: [...addCalendarEarlyMinutes],
-          description: "Reminder offset in minutes before the event",
+          description: "提前提醒分钟数",
         },
         laterHour: {
           type: "string",
           enum: [...addCalendarLaterHours],
-          description: "Hours from now (mutually exclusive with date/time/earlyMinute)",
+          description: "距今小时数（与 date/time/earlyMinute 互斥）",
         },
       },
       required: ["description"],
@@ -123,12 +123,12 @@ export const tools: McpToolDef[] = [
   {
     name: "liubai_add_note",
     description:
-      `Submit a note for user approval on the Web. ${PENDING_TOOL_HINT}`,
+      `提交笔记，待用户在 Web 端确认后才会写入。${PENDING_TOOL_HINT}`,
     inputSchema: {
       type: "object",
       properties: {
-        title: { type: "string", description: "Note title" },
-        description: { type: "string", description: "Note body (required)" },
+        title: { type: "string", description: "笔记标题" },
+        description: { type: "string", description: "笔记正文（必填）" },
       },
       required: ["description"],
     },
@@ -140,11 +140,11 @@ export const tools: McpToolDef[] = [
   {
     name: "liubai_get_pending",
     description:
-      "Check whether a previously submitted item (by chatId) has been approved and created in Liubai.",
+      "根据 chatId 查询先前提交的条目是否已在 Liubai 中创建。",
     inputSchema: {
       type: "object",
       properties: {
-        chatId: { type: "string", description: "chatId returned by add_* tools" },
+        chatId: { type: "string", description: "add_* 工具返回的 chatId" },
       },
       required: ["chatId"],
     },
@@ -157,19 +157,19 @@ export const tools: McpToolDef[] = [
   {
     name: "liubai_get_schedule",
     description:
-      "Get upcoming or past calendar entries from Liubai. Omit both params to fetch the next 10 events.",
+      "查询 Liubai 日程（仅返回隐私设置中已开启「AI 可读」的卡片）。不传参数时返回接下来 10 条日程。",
     inputSchema: {
       type: "object",
       properties: {
         hoursFromNow: {
           type: "string",
           enum: [...getScheduleHoursFromNow],
-          description: "Window in hours; negative values look into the past",
+          description: "时间窗口（小时）；负值表示查询过去",
         },
         specificDate: {
           type: "string",
           enum: [...getScheduleSpecificDates],
-          description: "Filter by a specific day",
+          description: "按指定日期筛选",
         },
       },
     },
@@ -180,14 +180,15 @@ export const tools: McpToolDef[] = [
   },
   {
     name: "liubai_get_cards",
-    description: "Get todos, finished items, recent cards, or recent timed events from Liubai.",
+    description:
+      "查询待办、已完成、最近卡片或近期定时事件（仅返回隐私设置中已开启「AI 可读」的卡片）。",
     inputSchema: {
       type: "object",
       properties: {
         cardType: {
           type: "string",
           enum: [...getCardTypes],
-          description: "TODO | FINISHED | ADD_RECENTLY | EVENT",
+          description: "TODO（待办）| FINISHED（已完成）| ADD_RECENTLY（最近）| EVENT（定时事件）",
         },
       },
       required: ["cardType"],

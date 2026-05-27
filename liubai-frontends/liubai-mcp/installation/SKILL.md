@@ -95,10 +95,17 @@ npm install && npm run build
 | `liubai_add_calendar` | 提交日程/提醒（待 Web 同意） |
 | `liubai_add_note` | 提交笔记（待 Web 同意） |
 | `liubai_get_pending` | 查询待确认条目是否已创建 |
-| `liubai_get_schedule` | 查询日程 |
-| `liubai_get_cards` | 查询待办/已完成/最近卡片 |
+| `liubai_get_schedule` | 查询日程（仅「AI 可读」卡片） |
+| `liubai_get_cards` | 查询待办/已完成/最近卡片（仅「AI 可读」卡片） |
 
 创建类工具返回与微信/服务号 AI 相同结构的待确认话术（含同意/编辑链接）。**LLM 应将工具返回值原文发给用户**，用户点击同意后才会写入 Liubai。
+
+### 隐私：「AI 可读」
+
+卡片编辑器里的隐私设置 **「AI 可读」** 与 MCP 读取类工具（`liubai_get_schedule`、`liubai_get_cards`）一致：
+
+- **已勾选**：MCP / 微信 AI 可通过上述工具查到该卡片
+- **未勾选**（`aiReadable = N`）：不会出现在 MCP 查询结果中，AI 无法读取该条目内容
 
 | 变量 | 说明 | 默认 |
 |------|------|------|
