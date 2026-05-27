@@ -30,21 +30,4 @@ mc mb "${ALIAS}/${BUCKET}" --ignore-existing
 echo "minio-init: setting public read policy..."
 mc anonymous set download "${ALIAS}/${BUCKET}"
 
-echo "minio-init: applying CORS..."
-# mc cors set syntax: mc cors set ALIAS/BUCKET CORSFILE  (CORSFILE must be XML)
-mc cors set "${ALIAS}/${BUCKET}" - <<'EOF'
-<CORSConfiguration>
-  <CORSRule>
-    <AllowedOrigin>*</AllowedOrigin>
-    <AllowedMethod>GET</AllowedMethod>
-    <AllowedMethod>PUT</AllowedMethod>
-    <AllowedMethod>POST</AllowedMethod>
-    <AllowedMethod>HEAD</AllowedMethod>
-    <AllowedHeader>*</AllowedHeader>
-    <ExposeHeader>ETag</ExposeHeader>
-    <MaxAgeSeconds>3600</MaxAgeSeconds>
-  </CORSRule>
-</CORSConfiguration>
-EOF
-
-echo "minio-init: done"
+echo "minio-init: done (global CORS is configured via MINIO_API_CORS_ALLOW_ORIGIN on the minio service)"

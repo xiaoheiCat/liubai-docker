@@ -71,6 +71,8 @@ services:
     environment:
       MINIO_ROOT_USER: ${LIU_MINIO_ACCESS_KEY:-minioadmin}
       MINIO_ROOT_PASSWORD: ${LIU_MINIO_SECRET_KEY:-minioadmin}
+      # Community Edition: bucket-level `mc cors set` is unavailable; use global CORS instead.
+      MINIO_API_CORS_ALLOW_ORIGIN: ${LIU_MINIO_CORS_ORIGIN:-*}
     volumes:
       - minio_data:/data
     ports:
