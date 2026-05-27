@@ -15,7 +15,7 @@ services:
       start_period: 20s
 
   runtime:
-    image: ${LIUBAI_RUNTIME_IMAGE:-ghcr.io/xiaoheicat/liubai-runtime:latest}
+    image: ${LIUBAI_RUNTIME_IMAGE:-${GHCR_MIRROR:-ghcr.io}/xiaoheicat/liubai-runtime:latest}
     pull_policy: missing
     container_name: liubai-runtime
     restart: unless-stopped
@@ -56,7 +56,7 @@ services:
       LIU_DISABLE_CRON: ${LIU_DISABLE_CRON:-}
 
   ffmpeg:
-    image: ${LIUBAI_FFMPEG_IMAGE:-ghcr.io/xiaoheicat/liubai-ffmpeg:latest}
+    image: ${LIUBAI_FFMPEG_IMAGE:-${GHCR_MIRROR:-ghcr.io}/xiaoheicat/liubai-ffmpeg:latest}
     pull_policy: missing
     container_name: liubai-ffmpeg
     restart: unless-stopped
@@ -66,7 +66,7 @@ services:
   web:
     profiles:
       - with-web
-    image: ${LIUBAI_WEB_IMAGE:-ghcr.io/xiaoheicat/liubai-web:latest}
+    image: ${LIUBAI_WEB_IMAGE:-${GHCR_MIRROR:-ghcr.io}/xiaoheicat/liubai-web:latest}
     pull_policy: missing
     container_name: liubai-web
     restart: unless-stopped

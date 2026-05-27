@@ -46,6 +46,7 @@ cp .env.example .env
    - `LIU_DOMAIN` — 前端站点 URL
    - `LIU_TRIGGER_TOKEN` — 定时任务内部 token（请改为随机字符串）
    - 各第三方服务密钥（OAuth、Stripe、七牛等，见 [`liubai-laf/.env.template`](liubai-backends/liubai-laf/.env.template)）
+   - `GHCR_MIRROR` — 若无法直连 `ghcr.io`，可改为自定义镜像仓库前缀（默认 `ghcr.io`）；也可单独设置 `LIUBAI_*_IMAGE` 覆盖完整镜像地址
 
 4. `LIU_FFMPEG_BASEURL` 在 Compose 内已默认为 `http://ffmpeg:3000`，一般无需修改。
 
