@@ -13,7 +13,7 @@
     "lib": ["ESNext", "DOM", "WebWorker"],
     "skipLibCheck": true,
     "types": [
-      "user-agent-data-types",
+      "./node_modules/user-agent-data-types",
       "google.accounts",
       "vite-plugin-pwa/client"
     ],
