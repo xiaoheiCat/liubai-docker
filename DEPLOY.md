@@ -115,8 +115,6 @@ curl -X POST http://localhost:9000/__init__ \
 
 环境变量至少设置 `VITE_API_DOMAIN`，指向 runtime 公网地址（需以 `/` 结尾），例如 `https://api.example.com/`。
 
-若从仓库根目录构建（会 `npm install` 整个 monorepo），需保证 `liubai-web` 的 Vite 插件版本与 `vite@8` 兼容。
-
 ### B. 与 Compose 一起启动
 
 ```bash
