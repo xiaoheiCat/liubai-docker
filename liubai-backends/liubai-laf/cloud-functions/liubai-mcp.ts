@@ -18,55 +18,73 @@ import {
   type Table_User,
 } from "@/common-types"
 import { getBasicStampWhileAdding } from "@/common-time"
-import { AiShared, ToolShared } from "@/ai-shared"
 
-const db = cloud.database()
+type AiSharedModule = typeof import("@/ai-shared")
+
+let aiSharedModule: AiSharedModule | undefined
+
+async function loadAiShared(): Promise<AiSharedModule> {
+  if (!aiSharedModule) {
+    aiSharedModule = await import("@/ai-shared")
+  }
+  return aiSharedModule
+}
 
 export async function main(ctx: FunctionContext) {
   const body = ctx.request?.body ?? {}
 
-  const backendAESKey = getAESKey()
-  if (!backendAESKey) {
-    return { code: "E5001", errMsg: "no backend AES key" }
-  }
+  try {
+    const res1 = vbot.safeParse(LiubaiMcpAPI.Sch_Param, body)
+    if (!res1.success) {
+      return {
+        code: "E4000",
+        errMsg: checker.getErrMsgFromIssues(res1.issues),
+      }
+    }
 
-  const res1 = vbot.safeParse(LiubaiMcpAPI.Sch_Param, body)
-  if (!res1.success) {
+    const oT = body.operateType as LiubaiMcpAPI.OperateType
+
+    const vRes = await verifyToken(ctx, body as Record<string, string>)
+    if (!vRes.pass) return vRes.rqReturn
+    const user = vRes.userData
+
+    if (oT === "mcp-health") {
+      return handle_health(user)
+    }
+
+    const backendAESKey = getAESKey()
+    if (!backendAESKey) {
+      return { code: "E5001", errMsg: "no backend AES key" }
+    }
+
+    if (oT === "mcp-add-note") {
+      return mcp_create_pending(user, "add_note", body)
+    }
+    if (oT === "mcp-add-todo") {
+      return mcp_create_pending(user, "add_todo", body)
+    }
+    if (oT === "mcp-add-calendar") {
+      return mcp_create_pending(user, "add_calendar", body)
+    }
+    if (oT === "mcp-get-pending") {
+      return handle_get_pending(user, body)
+    }
+    if (oT === "mcp-get-schedule") {
+      return handle_get_schedule(user, body)
+    }
+    if (oT === "mcp-get-cards") {
+      return handle_get_cards(user, body)
+    }
+
+    return { code: "E4000" }
+  }
+  catch (err) {
+    console.error("[liubai-mcp] unhandled error:", err)
     return {
-      code: "E4000",
-      errMsg: checker.getErrMsgFromIssues(res1.issues),
+      code: "E5001",
+      errMsg: err instanceof Error ? err.message : "liubai-mcp internal error",
     }
   }
-
-  const vRes = await verifyToken(ctx, body)
-  if (!vRes.pass) return vRes.rqReturn
-  const user = vRes.userData
-
-  const oT = body.operateType as LiubaiMcpAPI.OperateType
-
-  if (oT === "mcp-health") {
-    return handle_health(user)
-  }
-  if (oT === "mcp-add-note") {
-    return mcp_create_pending(user, "add_note", body)
-  }
-  if (oT === "mcp-add-todo") {
-    return mcp_create_pending(user, "add_todo", body)
-  }
-  if (oT === "mcp-add-calendar") {
-    return mcp_create_pending(user, "add_calendar", body)
-  }
-  if (oT === "mcp-get-pending") {
-    return handle_get_pending(user, body)
-  }
-  if (oT === "mcp-get-schedule") {
-    return handle_get_schedule(user, body)
-  }
-  if (oT === "mcp-get-cards") {
-    return handle_get_cards(user, body)
-  }
-
-  return { code: "E4000" }
 }
 
 function handle_health(user: Table_User): LiuRqReturn<LiubaiMcpAPI.Res_Health> {
@@ -101,6 +119,7 @@ async function mcp_create_pending(
   funcName: "add_note" | "add_todo" | "add_calendar",
   body: Record<string, any>,
 ): Promise<LiuRqReturn<LiubaiMcpAPI.Res_PendingContent>> {
+  const { AiShared, ToolShared } = await loadAiShared()
   const funcJson = extractToolParams(body, metaKeys)
 
   const res1 = AiToolUtil.turnJsonToWaitingData(funcName, funcJson, user)
@@ -145,6 +164,7 @@ async function handle_get_pending(
   user: Table_User,
   body: Record<string, any>,
 ): Promise<LiuRqReturn<LiubaiMcpAPI.Res_GetPending>> {
+  const { ToolShared } = await loadAiShared()
   const chatId = body.chatId
   if (typeof chatId !== "string" || !chatId) {
     return { code: "E4000", errMsg: "chatId is required" }
@@ -196,8 +216,8 @@ async function handle_get_schedule(
   user: Table_User,
   body: Record<string, any>,
 ): Promise<LiuRqReturn<LiubaiMcpAPI.Res_Read>> {
+  const { ToolShared } = await loadAiShared()
   const funcJson = extractToolParams(body, metaKeys)
-  // ToolShared filters aiReadable: "Y" (Web privacy「AI 可读」)
   const toolShared = new ToolShared(user, { fromSystem2: true })
   const res1 = await toolShared.get_schedule(funcJson)
   if (!res1.pass) return res1.err
@@ -216,8 +236,8 @@ async function handle_get_cards(
   user: Table_User,
   body: Record<string, any>,
 ): Promise<LiuRqReturn<LiubaiMcpAPI.Res_Read>> {
+  const { ToolShared } = await loadAiShared()
   const funcJson = extractToolParams(body, metaKeys)
-  // ToolShared filters aiReadable: "Y" (Web privacy「AI 可读」)
   const toolShared = new ToolShared(user, { fromSystem2: true })
   const res1 = await toolShared.get_cards(funcJson)
   if (!res1.pass) return res1.err
@@ -233,6 +253,8 @@ async function handle_get_cards(
 }
 
 async function getOrCreateAiRoom(userId: string): Promise<Table_AiRoom | undefined> {
+  const { AiShared } = await loadAiShared()
+  const db = cloud.database()
   const rCol = db.collection("AiRoom")
   const res1 = await rCol.where({ owner: userId }).getOne<Table_AiRoom>()
   if (res1.data) return res1.data
@@ -254,6 +276,7 @@ async function getAiChatForUser(
   user: Table_User,
   chatId: string,
 ) {
+  const db = cloud.database()
   const aiChatCol = db.collection("AiChat")
   const res1 = await aiChatCol.doc(chatId).get<Table_AiChat>()
   const theChat = res1.data

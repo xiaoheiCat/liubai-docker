@@ -82,8 +82,9 @@ async function bootstrap(): Promise<void> {
         return withCors(buildHttpResponse(result, handlerResult), req)
       } catch (err) {
         console.error(`[runtime] error handling /${funcName}:`, err)
+        const errMsg = err instanceof Error ? err.message : "Internal server error"
         return withCors(
-          Response.json({ code: "E5002", errMsg: "Internal server error" }, { status: 500 }),
+          Response.json({ code: "E5002", errMsg }, { status: 500 }),
           req,
         )
       }

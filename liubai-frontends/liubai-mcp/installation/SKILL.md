@@ -143,6 +143,7 @@ npm install && npm run build
 
 | 现象 | 处理 |
 |------|------|
+| `E5002` / Internal server error | 多为 runtime 未包含最新 `liubai-mcp` 云函数或运行时异常；请用 `docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build runtime` 本地重建 runtime，并查看 runtime 日志；新版 API 会在 `errMsg` 中返回具体原因 |
 | `E4000` / `checkEntry error` | 确认后端已更新到含 MCP 支持的版本并重启 runtime；MCP 请求须带合法 `x_liu_*` 字段（`x_liu_theme` 只能是 `light` 或 `dark`） |
 | 登录时浏览器打开失败 | 正常：CLI 不会退出。在另一台设备打开打印的授权链接；授权后复制 callback 完整 URL，在运行 login 的本机执行 `curl "<url>"`（见上文「无本地浏览器 / 远程授权」） |
 | authorize 页报错 / 空白 | 检查 `LIU_DOMAIN` 是否指向 Web 前端，且与 API 域可协同登录 |

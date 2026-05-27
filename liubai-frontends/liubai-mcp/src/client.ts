@@ -55,7 +55,8 @@ export class LiubaiClient {
     }
 
     if (json.code !== "0000" || !json.data) {
-      throw new Error(json.errMsg ?? `Liubai API error: ${json.code}`)
+      const detail = json.errMsg ? `: ${json.errMsg}` : ""
+      throw new Error(`Liubai API error ${json.code}${detail}`)
     }
 
     return json.data

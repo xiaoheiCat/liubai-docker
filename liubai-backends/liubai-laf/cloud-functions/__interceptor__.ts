@@ -116,7 +116,8 @@ async function toNext(
   catch(err: any) {
     console.error(`next 异常`)
     console.log(err)
-    return { code: `E5002` }
+    const errMsg = typeof err?.message === "string" ? err.message : undefined
+    return { code: `E5002`, errMsg }
   }
 
   if(nextRes?.code === "E4009") {
