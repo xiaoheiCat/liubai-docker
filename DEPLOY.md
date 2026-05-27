@@ -110,10 +110,15 @@ curl -X POST http://localhost:9000/__init__ \
 | 项 | 值 |
 |----|-----|
 | 根目录（Root directory） | `liubai-frontends/liubai-web` |
-| 构建命令 | `npm run build` |
+| 构建命令 | `bun install && bun run build` |
 | 输出目录 | `dist` |
 
-环境变量至少设置 `VITE_API_DOMAIN`，指向 runtime 公网地址（需以 `/` 结尾），例如 `https://api.example.com/`。
+环境变量：
+
+| 变量 | 值 |
+|------|-----|
+| `SKIP_DEPENDENCY_INSTALL` | `1`（跳过 Pages 默认 `npm install`，由构建命令中的 `bun install` 负责安装） |
+| `VITE_API_DOMAIN` | runtime 公网地址，需以 `/` 结尾，例如 `https://api.example.com/` |
 
 ### B. 与 Compose 一起启动
 
