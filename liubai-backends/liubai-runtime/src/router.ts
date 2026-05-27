@@ -13,7 +13,7 @@ export async function loadCloudFunction(funcName: string): Promise<CloudFunction
   }
 
   try {
-    const mod = (await import(`@/${funcName}.ts`)) as CloudFunctionModule
+    const mod = (await import(`@/${funcName}.ts?liubai-runtime=1`)) as CloudFunctionModule
     if (typeof mod.main !== "function") {
       return null
     }

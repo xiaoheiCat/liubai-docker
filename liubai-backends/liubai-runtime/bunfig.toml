@@ -1,4 +1,2 @@
 [run]
-# Resolve @/* and @lafjs/cloud from tsconfig paths when loading cloud-functions.
-tsconfig = "./tsconfig.json"
-preload = ["./src/register-paths.ts"]
+# Cloud-function @/* imports are resolved by src/register-paths.ts (imported from router.ts).

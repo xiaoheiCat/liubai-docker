@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun --watch src/server.ts",
-    "start": "bun src/server.ts",
+    "start": "bun --preload ./src/register-paths.ts src/server.ts",
     "typecheck": "tsc --noEmit -p tsconfig.src.json"
   },
   "author": {
@@ -14,6 +14,9 @@
     "email": "tsuiyenche@outlook.com"
   },
   "license": "AGPL-3.0-or-later",
+  "imports": {
+    "@lafjs/cloud": "./src/laf-shim/index.ts"
+  },
   "dependencies": {
     "@lark-base-open/node-sdk": "^1.0.1",
     "@wecom/crypto": "^1.0.1",
@@ -29,6 +32,7 @@
     "openai": "^4.104.0",
     "qiniu": "^7.15.1",
     "resend": "^4.8.0",
+    "socks": "^2.8.9",
     "stripe": "^17.7.0",
     "tencentcloud-sdk-nodejs-ses": "^4.1.182",
     "tencentcloud-sdk-nodejs-sms": "^4.1.171",
