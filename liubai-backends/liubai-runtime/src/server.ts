@@ -3,6 +3,7 @@ import { createFunctionContext, buildHttpResponse } from "./context.ts"
 import { runWithInterceptor, runInit } from "./router.ts"
 import { startCronScheduler, getRuntimeBind } from "./cron.ts"
 import { closeMongoClient } from "./laf-shim/mongo-client.ts"
+import { corsPreflightResponse, withCors } from "./cors.ts"
 
 const RESERVED = new Set(["health", "favicon.ico"])
 
@@ -34,25 +35,36 @@ async function bootstrap(): Promise<void> {
     hostname,
     port,
     async fetch(req) {
+      const preflight = corsPreflightResponse(req)
+      if (preflight) {
+        return preflight
+      }
+
       const url = new URL(req.url)
 
       if (url.pathname === "/health") {
-        return Response.json({ ok: true, service: "liubai-runtime" })
+        return withCors(Response.json({ ok: true, service: "liubai-runtime" }), req)
       }
 
       const funcName = url.pathname.replace(/^\//, "").split("/")[0]
       if (!funcName || RESERVED.has(funcName)) {
-        return Response.json({ code: "E4040", errMsg: "Not found" }, { status: 404 })
+        return withCors(
+          Response.json({ code: "E4040", errMsg: "Not found" }, { status: 404 }),
+          req,
+        )
       }
 
       try {
         const { ctx, getResult } = await createFunctionContext(req, funcName)
         const result = await runWithInterceptor(funcName, ctx)
         const handlerResult = getResult()
-        return buildHttpResponse(result, handlerResult)
+        return withCors(buildHttpResponse(result, handlerResult), req)
       } catch (err) {
         console.error(`[runtime] error handling /${funcName}:`, err)
-        return Response.json({ code: "E5002", errMsg: "Internal server error" }, { status: 500 })
+        return withCors(
+          Response.json({ code: "E5002", errMsg: "Internal server error" }, { status: 500 }),
+          req,
+        )
       }
     },
   })
