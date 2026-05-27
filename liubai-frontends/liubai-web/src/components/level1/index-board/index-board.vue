@@ -9,8 +9,6 @@ const {
   onTapCloseA2hsTip,
   onConfirmNewVersion,
   onCancelNewVersion,
-  onTapViewSubscription,
-  onTapCancelSubscription,
   onTapWebPush,
   onCancelWebPush,
 } = useIndexBoard()
@@ -38,17 +36,6 @@ const { t } = useI18n()
     :expand="ibData.newVersion"
     @confirm="onConfirmNewVersion"
     @cancel="onCancelNewVersion"
-  ></GeneralTip>
-
-  
-  <!-- Subscription -->
-  <GeneralTip
-    :title="t('payment.subscription_prompt_1')"
-    :desc="t('payment.subscription_prompt_2')"
-    :confirmText="t('payment.let_me_see')"
-    :expand="ibData.subscribePrompt"
-    @confirm="onTapViewSubscription"
-    @cancel="onTapCancelSubscription"
   ></GeneralTip>
 
   <!-- Web Push -->

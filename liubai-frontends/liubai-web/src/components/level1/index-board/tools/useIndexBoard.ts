@@ -15,8 +15,6 @@ import { toUpdateSW } from "~/hooks/pwa/useServiceWorker";
 import { useIdle } from "~/hooks/useVueUse";
 import { useShowAddToHomeScreen } from "~/hooks/pwa/useA2HS";
 import type { SimpleFunc } from "~/utils/basic/type-tool";
-import { useActiveSyncNum } from "~/hooks/useCommon";
-import { useWorkspaceStore } from "~/hooks/stores/useWorkspaceStore";
 import valTool from "~/utils/basic/val-tool";
 import { getNotificationPermission, requestNotification } from "~/hooks/pwa/useWebPush";
 import { useSwRegStore } from "~/hooks/stores/useSwRegStore";
@@ -36,7 +34,6 @@ export function useIndexBoard() {
   const ibData = reactive<IbData>({
     a2hs: false,
     newVersion: false,
-    subscribePrompt: false,
     webPush: false,
   })
   const ctx: IbCtx = {
@@ -46,33 +43,11 @@ export function useIndexBoard() {
   }
   listenToNewVersion(ctx)
   const { toA2HS } = listenToA2HS(ibData)
-  handleSubscribePrompt(ibData)
   handleWebPush(ibData)
 
   const onTapInstall = () => {
     ctx.hasEverTapInstall = true
     toA2HS?.()
-  }
-
-  const onTapViewSubscription = () => {
-    ibData.subscribePrompt = false
-    rr.router.push({ name: "subscription" })
-  }
-
-  const onTapCancelSubscription = async () => {
-    ibData.subscribePrompt = false
-    const { launchNum = 0 } = localCache.getOnceData()
-    if (launchNum % 10 !== 4) return
-    const res1 = await cui.showModal({
-      title: "🍞",
-      content_key: "payment.subscription_prompt_3",
-      confirm_key: "payment.let_me_see_2",
-      cancel_key: "payment.still_close",
-      isTitleEqualToEmoji: true,
-    })
-    if (res1.confirm) {
-      rr.router.push({ name: "subscription" })
-    }
   }
 
   return {
@@ -81,8 +56,6 @@ export function useIndexBoard() {
     onTapCloseA2hsTip: () => toCloseA2HS(ctx, toA2HS),
     onConfirmNewVersion: () => toConfirmNewVersion(ctx),
     onCancelNewVersion: () => toCancelNewVersion(ctx),
-    onTapViewSubscription,
-    onTapCancelSubscription,
     onTapWebPush: () => toTapWebPush(ibData),
     onCancelWebPush: () => toCancelWebPush(ibData),
   }
@@ -351,38 +324,3 @@ function listenToA2HS(
   return { toA2HS }
 }
 
-function handleSubscribePrompt(
-  ibData: IbData,
-) {
-
-  const _check = () => {
-    const res1 = canIShow(ibData)
-    if (!res1) return
-
-    const { launchNum = 0 } = localCache.getOnceData()
-    if ((launchNum % 5) !== 4) return
-
-    const wStore = useWorkspaceStore()
-    if (wStore.isPremium) return
-
-    ibData.subscribePrompt = true
-  }
-
-  const {
-    activeSyncNum,
-    stop: stop1,
-  } = useActiveSyncNum()
-
-  const _wait = () => {
-    setTimeout(() => {
-      _check()
-    }, time.SECOND * 3)
-  }
-
-  const stop2 = watch(activeSyncNum, (newV) => {
-    if (newV < 1) return
-    _wait()
-    stop1()
-    stop2()
-  })
-}
