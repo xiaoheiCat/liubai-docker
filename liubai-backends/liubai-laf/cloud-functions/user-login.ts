@@ -126,6 +126,15 @@ const db = cloud.database()
 const _ = db.command
 
 
+function isRegistrationDisabled() {
+  return process.env.LIU_CLOUD_LOGIN === "03"
+}
+
+function rejectRegistration(): LiuErrReturn {
+  return { code: "B0004", errMsg: "registration is disabled" }
+}
+
+
 /************************ 函数们 *************************/
 
 export async function main(ctx: FunctionContext) {
@@ -226,8 +235,15 @@ async function handle_phone(
     return { code: "U0010", errMsg: "too much sms sent" }
   }
 
-  // 5. create sms code
   const phoneNumber = `${regionCode}_${localNumber}`
+
+  // 4.5 login-only: reject unknown phone numbers before sending sms
+  if(isRegistrationDisabled()) {
+    const userRes = await findUserByPhone(phoneNumber)
+    if(userRes.type === 3) return rejectRegistration()
+  }
+
+  // 5. create sms code
   const smsCode = createSmsCode()
   const expireStamp = getNowStamp() + 5 * MINUTE
   const b6 = getBasicStampWhileAdding()
@@ -1055,6 +1071,12 @@ async function handle_email(
   if(res0) return res0
 
   console.log(`user wants to log in using ${email}`)
+
+  // 2.5 login-only: reject unknown emails before sending verification code
+  if(isRegistrationDisabled()) {
+    const userRes = await findUserByEmail(email)
+    if(userRes.type === 3) return rejectRegistration()
+  }
 
   // 3. 检查 email 是否发送过于频繁
   const res1 = await checkIfEmailSentTooMuch(email)
@@ -2214,6 +2236,10 @@ async function sign_up(
   client_key?: string,
   thirdData?: UserThirdData,
 ): Promise<LiuRqReturn<Res_UserLoginNormal>> {
+  if(isRegistrationDisabled()) {
+    return rejectRegistration()
+  }
+
   // 1. init user
   const res1 = await init_user(body, param2, thirdData)
   const { code, data: userInfos } = res1
@@ -2723,6 +2749,11 @@ function handle_init() {
   // if wechat gzh exists
   if(wxGzhAppid && wxGzhAppSecret && wxGzhLogin === "01") {
     data.wxGzhAppid = wxGzhAppid
+  }
+
+  const cloudLogin = _env.LIU_CLOUD_LOGIN
+  if(cloudLogin) {
+    data.cloudLogin = cloudLogin
   }
 
   return { code: `0000`, data }

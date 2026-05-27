@@ -61,6 +61,7 @@ const {
         :is-sending-email="lpData.isSendingEmail"
         :is-logging-by-phone="lpData.isLoggingByPhone"
         :sms-sending-num="lpData.smsSendingNum"
+        :login-only="lpData.cloudLogin === '03'"
       ></LpMain>
     </div>
 

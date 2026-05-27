@@ -80,6 +80,8 @@ export namespace UserLoginAPI {
     googleOAuthClientId?: string
     wxGzhAppid?: string
     state?: string
+    /** 01: 开放登录与注册; 02: 关闭登录; 03: 仅登录不注册 */
+    cloudLogin?: string
   }
 
   export interface Res_WxGzhForMini {

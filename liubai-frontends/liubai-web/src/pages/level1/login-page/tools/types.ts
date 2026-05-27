@@ -29,6 +29,7 @@ export interface LpData {
   state?: string
   initCode?: string           // 调用 login 接口 init 时，返回的 code
   initStamp?: number          // 调用 login 接口 init 后的时间戳
+  cloudLogin?: string         // 01 / 02 / 03，见 UserLoginAPI.Res_Init
 
   // 多用户选择 相关
   multi_credential?: string

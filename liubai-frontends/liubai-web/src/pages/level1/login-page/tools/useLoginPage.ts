@@ -380,6 +380,9 @@ async function toRequestSMSCode(
   if (code === "U0011") {
     showFollowToGetPermission()
   }
+  else if (code === "B0004") {
+    await showEmojiTip("login.registration_closed", "🔒")
+  }
   else if (code !== "0000") {
     showErrMsg("login", res)
   }
@@ -432,6 +435,10 @@ async function toSubmitEmailAddress(
 
   if (code === "U0006") {
     showFollowToGetPermission()
+    return
+  }
+  if (code === "B0004") {
+    await showEmojiTip("login.registration_closed", "🔒")
     return
   }
   if (code === "E4003" && errMsg === "last_event: bounced") {
@@ -694,6 +701,7 @@ function toGetLoginInitData(
     lpData.googleOAuthClientId = data.googleOAuthClientId
     lpData.wxGzhAppid = data.wxGzhAppid
     lpData.state = data.state
+    lpData.cloudLogin = data.cloudLogin
     lpData.initStamp = time.getTime()
 
     // google one-tap 登录后端流程已跑通

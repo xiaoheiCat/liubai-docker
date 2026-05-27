@@ -27,6 +27,7 @@ export interface LpmProps {
   isSendingEmail: boolean
   isLoggingByPhone: boolean
   smsSendingNum: number
+  loginOnly?: boolean
 }
 
 export const lpmProps = {
@@ -41,7 +42,11 @@ export const lpmProps = {
   smsSendingNum: {
     type: Number,
     default: 0,
-  }
+  },
+  loginOnly: {
+    type: Boolean,
+    default: false,
+  },
 }
 
 export interface LpmEmit {
