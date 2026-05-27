@@ -15,9 +15,8 @@ services:
       start_period: 20s
 
   runtime:
-    build:
-      context: .
-      dockerfile: liubai-backends/liubai-runtime/Dockerfile
+    image: ${LIUBAI_RUNTIME_IMAGE:-ghcr.io/xiaoheicat/liubai-runtime:latest}
+    pull_policy: missing
     container_name: liubai-runtime
     restart: unless-stopped
     depends_on:
@@ -57,9 +56,8 @@ services:
       LIU_DISABLE_CRON: ${LIU_DISABLE_CRON:-}
 
   ffmpeg:
-    build:
-      context: .
-      dockerfile: liubai-backends/liubai-ffmpeg/Dockerfile
+    image: ${LIUBAI_FFMPEG_IMAGE:-ghcr.io/xiaoheicat/liubai-ffmpeg:latest}
+    pull_policy: missing
     container_name: liubai-ffmpeg
     restart: unless-stopped
     expose:
@@ -68,11 +66,8 @@ services:
   web:
     profiles:
       - with-web
-    build:
-      context: .
-      dockerfile: docker/liubai-web/Dockerfile
-      args:
-        VITE_API_DOMAIN: ${VITE_API_DOMAIN:-http://localhost:9000/}
+    image: ${LIUBAI_WEB_IMAGE:-ghcr.io/xiaoheicat/liubai-web:latest}
+    pull_policy: missing
     container_name: liubai-web
     restart: unless-stopped
     depends_on:

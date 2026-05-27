@@ -17,6 +17,8 @@
 | `ffmpeg` | AMR 转 MP3 服务 |
 | `web` | 可选，profile `with-web`，Nginx 托管静态前端 |
 
+默认使用 [GHCR 预构建镜像](https://github.com/xiaoheiCat/liubai-docker/pkgs/container/liubai-runtime)（`latest`）。拉取失败或需改源码时，改用 [`docker-compose.local.yml`](docker-compose.local.yml) 在本地构建。
+
 ## Step 1 — 部署 liubai-push-proxy（Cloudflare，推荐）
 
 Web Push 需能访问 FCM。在部分网络环境下需通过 Cloudflare Worker 代理：
@@ -49,11 +51,33 @@ cp .env.example .env
 
 ## Step 3 — 启动后端
 
-仅启动 MongoDB + runtime + ffmpeg：
+仅启动 MongoDB + runtime + ffmpeg（**默认拉取 GHCR 镜像**）：
 
 ```bash
+docker compose pull
 docker compose up -d
 ```
+
+若包为 private，先登录 GHCR：
+
+```bash
+echo "$GITHUB_TOKEN" | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
+```
+
+**拉取失败或需要本地构建时**，合并 local override 并构建：
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
+```
+
+也可在 `.env` 中固定启用本地构建：
+
+```bash
+COMPOSE_FILE=docker-compose.yml:docker-compose.local.yml
+docker compose up -d --build
+```
+
+本地构建 `runtime` 时，仍需按 Step 2 准备 `secret-config.ts`（构建上下文会打入镜像）。
 
 查看日志：
 
@@ -85,7 +109,14 @@ curl -X POST http://localhost:9000/__init__ \
 ### B. 与 Compose 一起启动
 
 ```bash
+docker compose pull
 docker compose --profile with-web up -d
+```
+
+本地构建前端时：
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.local.yml --profile with-web up -d --build
 ```
 
 默认将前端映射到宿主机 `8080` 端口。构建时通过 `.env` 中的 `VITE_API_DOMAIN` 注入 API 地址。

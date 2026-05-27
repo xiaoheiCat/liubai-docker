@@ -1,0 +1,25 @@
+# 本地构建 override：与 docker-compose.yml 合并使用
+#
+# 一次性启动：
+#   docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
+#
+# 或在 .env 中设置：
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.local.yml
+
+services:
+  runtime:
+    build:
+      context: .
+      dockerfile: liubai-backends/liubai-runtime/Dockerfile
+
+  ffmpeg:
+    build:
+      context: .
+      dockerfile: liubai-backends/liubai-ffmpeg/Dockerfile
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/liubai-web/Dockerfile
+      args:
+        VITE_API_DOMAIN: ${VITE_API_DOMAIN:-http://localhost:9000/}
