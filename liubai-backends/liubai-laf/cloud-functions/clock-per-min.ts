@@ -320,6 +320,14 @@ async function get_task_atoms(
 
 
 async function handle_remind() {
+
+  // check out if the tmplId is enabled
+  const _env = process.env
+  const tmplId = _env.LIU_WX_GZ_TMPL_ID_1
+  if (!tmplId) {
+    return false
+  }
+
   let startDate = addSeconds(new Date(), -59)
   startDate = date_fn_set(startDate, { seconds: 55, milliseconds: 0 })
   let endDate = addSeconds(startDate, 59)
@@ -337,32 +345,14 @@ async function handle_remind() {
     return true
   }
 
-  const access_token = await resolveWxGzhAccessToken(atoms2)
+  const access_token = await checkAndGetWxGzhAccessToken()
+  if (!access_token) {
+    console.warn("access_token is not found")
+    return false
+  }
 
   await batch_send(access_token, atoms2)
 
-  return true
-}
-
-async function resolveWxGzhAccessToken(
-  atoms: RemindAtom_2[],
-) {
-  const needsWx = atoms.some(v => v.wx_gzh_openid)
-  if (!needsWx) return ""
-
-  const tmplId = process.env.LIU_WX_GZ_TMPL_ID_1
-  if (!tmplId) {
-    console.warn("LIU_WX_GZ_TMPL_ID_1 is not set; skipping wechat reminders")
-    return ""
-  }
-
-  const access_token = await checkAndGetWxGzhAccessToken()
-  if (!access_token) {
-    console.warn("access_token is not found; skipping wechat reminders")
-    return ""
-  }
-
-  return access_token
 }
 
 async function batch_send(
@@ -487,7 +477,7 @@ async function send_remind_message(
     }
   }
 
-  if (wx_gzh_openid && access_token && tmplId) {
+  if (wx_gzh_openid) {
     const obj = valTool.copyObject(wx_reminder_tmpl)
     obj.template_id = tmplId
     obj.touser = wx_gzh_openid
