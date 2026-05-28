@@ -6,7 +6,7 @@ export namespace LiuAi {
   | "minimax" | "moonshot" | "stepfun" | "zero-one" | "zhipu" | "antgroup"
 
   export type AiSecondaryProvider = "siliconflow" | "gitee-ai" | "qiniu" | "tencent-lkeap"
-  | "suanleme" | "opencode-go"
+  | "suanleme"
 
   export type ComputingProvider = AiProvider | AiSecondaryProvider
   

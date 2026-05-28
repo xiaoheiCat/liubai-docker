@@ -701,7 +701,7 @@ export type AiProvider = "aliyun-bailian" | "baichuan" | "deepseek" | "tencent-h
   | "minimax" | "moonshot" | "stepfun" | "zero-one" | "zhipu" | "jina" | "antgroup"
 
 export type AiSecondaryProvider = "siliconflow" | "gitee-ai" | "qiniu" | "tencent-lkeap"
-  | "suanleme" | "opencode-go"
+  | "suanleme"
 
 // tencent-lkeap: 腾讯云，知识引擎原子能力（LLM Knowledge Engine Atomic Power）
 // suanleme: https://api.suanli.cn/

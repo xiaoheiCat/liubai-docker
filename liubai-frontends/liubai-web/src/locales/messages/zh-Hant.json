@@ -728,8 +728,7 @@
     "gitee-ai": "模力方舟",
     "qiniu": "七牛雲",
     "tencent-lkeap": "騰訊雲知識能力引擎",
-    "suanleme": "算了麼",
-    "opencode-go": "OpenCode Go"
+    "suanleme": "算了麼"
   },
   "bind": {
     "phone_title": "行動電話綁定",
