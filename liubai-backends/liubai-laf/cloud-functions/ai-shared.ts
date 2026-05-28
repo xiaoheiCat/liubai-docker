@@ -129,7 +129,24 @@ export const txt2TxtAiWorkers: LiuAi.AiWorker[] = [
     model: "glm-4.7",
     character: "zhipu",
     stream: true,
-  }
+  },
+  {
+    computingProvider: "opencode-go",
+    model: "deepseek-v4-flash",
+    character: "deepseek",
+    stream: true,
+  },
+  {
+    computingProvider: "opencode-go",
+    model: "qwen3.5-plus",
+    character: "tongyi-qwen",
+    stream: true,
+  },
+  {
+    computingProvider: "opencode-go",
+    model: "mimo-v2.5",
+    stream: true,
+  },
 ]
 
 
@@ -168,7 +185,19 @@ export const img2TxtWorkers: LiuAi.AiWorker[] = [
     model: "qwen3.5-plus-2026-04-20",
     character: "tongyi-qwen",
     stream: true,
-  }
+  },
+  {
+    computingProvider: "opencode-go",
+    model: "kimi-k2.6",
+    character: "kimi",
+    stream: true,
+  },
+  {
+    computingProvider: "opencode-go",
+    model: "qwen3.6-plus",
+    character: "tongyi-qwen",
+    stream: true,
+  },
 ]
 
 
@@ -518,6 +547,10 @@ export class AiShared {
       apiKey = _env.LIU_SUANLEME_API_KEY
       baseURL = _env.LIU_SUANLEME_BASE_URL
     }
+    else if (p === "opencode-go") {
+      apiKey = _env.LIU_OPENCODE_GO_API_KEY
+      baseURL = _env.LIU_OPENCODE_GO_BASE_URL
+    }
     else if (p === "aliyun-bailian") {
       apiKey = _env.LIU_ALIYUN_BAILIAN_API_KEY
       baseURL = _env.LIU_ALIYUN_BAILIAN_BASE_URL
@@ -613,17 +646,79 @@ export class AiShared {
 
   static getAvailableBots() {
     const bots: AiBot[] = []
-    const tmpBots = [...aiBots].sort((a, b) => b.priority - a.priority)
-    for (let i = 0; i < tmpBots.length; i++) {
-      const bot = tmpBots[i]
-      const existedBot = bots.find(v => v.character === bot.character)
-      if (existedBot) continue
-      const apiData = AiShared.getApiEndpointFromBot(bot)
-      if (apiData) {
-        bots.push(bot)
+    const seen = new Set<string>()
+    for (let i = 0; i < aiBots.length; i++) {
+      const character = aiBots[i].character
+      if (seen.has(character)) continue
+      seen.add(character)
+      const charBots = aiBots.filter(v => v.character === character)
+      const { phase1, phase2 } = AiShared.buildBotCallChain(charBots)
+      const pick = phase1[0] ?? phase2[0]
+      if (pick) {
+        bots.push(pick)
       }
     }
     return bots
+  }
+
+  static isOpencodeGoConfigured() {
+    const _env = process.env
+    return Boolean(_env.LIU_OPENCODE_GO_API_KEY && _env.LIU_OPENCODE_GO_BASE_URL)
+  }
+
+  static shouldReverseModelVersionCall() {
+    return process.env.LIU_REVERSE_MODEL_VERSION_CALL === "01"
+  }
+
+  static sortBotsForCallOrder(bots: AiBot[]) {
+    const reverse = AiShared.shouldReverseModelVersionCall()
+    return [...bots].sort((a, b) => {
+      if (reverse) return b.priority - a.priority
+      return a.priority - b.priority
+    })
+  }
+
+  static getApiEndpointForPhase(
+    bot: AiBot,
+    phase: 1 | 2,
+  ): LiuAi.ApiEndpoint | undefined {
+    const defaultHeaders = bot.metaData?.defaultHeaders
+    let apiEndpoint: LiuAi.ApiEndpoint | undefined
+
+    if (phase === 1) {
+      if (bot.secondaryProvider !== "opencode-go") return
+      if (!AiShared.isOpencodeGoConfigured()) return
+      apiEndpoint = AiShared.getEndpointFromProvider("opencode-go")
+    }
+    else {
+      apiEndpoint = AiShared.getEndpointFromProvider(bot.provider)
+    }
+
+    if (apiEndpoint) {
+      apiEndpoint.defaultHeaders = defaultHeaders
+    }
+    return apiEndpoint
+  }
+
+  static buildBotCallChain(bots: AiBot[]) {
+    const sorted = AiShared.sortBotsForCallOrder(bots)
+    const phase1 = sorted.filter(bot => {
+      if (bot.secondaryProvider !== "opencode-go") return false
+      return Boolean(AiShared.getApiEndpointForPhase(bot, 1))
+    })
+    const phase2 = sorted.filter(bot => {
+      return Boolean(AiShared.getApiEndpointForPhase(bot, 2))
+    })
+    return { phase1, phase2 }
+  }
+
+  static flattenBotCallChain(
+    chain: { phase1: AiBot[], phase2: AiBot[] },
+  ) {
+    const entries: { bot: AiBot, phase: 1 | 2 }[] = []
+    chain.phase1.forEach(bot => entries.push({ bot, phase: 1 }))
+    chain.phase2.forEach(bot => entries.push({ bot, phase: 2 }))
+    return entries
   }
 
 
@@ -1078,6 +1173,7 @@ export class AiShared {
     if (url.includes("api.lkeap.cloud.tencent.com")) return "tencent-lkeap"
     if (url.includes("api.suanli.cn")) return "suanleme"
     if (url.includes("ling.tbox.cn")) return "antgroup"
+    if (url.includes("opencode.ai")) return "opencode-go"
 
   }
 

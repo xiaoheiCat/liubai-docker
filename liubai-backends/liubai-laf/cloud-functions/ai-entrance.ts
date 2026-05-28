@@ -776,6 +776,9 @@ class AiDirective {
 class BaseBot {
   protected _character: AiCharacter
   protected _bots: AiBot[]
+  protected _callChain: { bot: AiBot, phase: 1 | 2 }[] = []
+  protected _chainIndex = 0
+  protected _currentPhase: 1 | 2 = 2
   protected _aiLogs: LiuAi.RunLog[] = []
   protected _chatTimes = 0
   protected MAX_CHAT_TIMES = 3
@@ -787,9 +790,17 @@ class BaseBot {
     user?: Table_User,
   ) {
     this._character = c
-    const bots = aiBots.filter(v => v.character === c)
-    this._bots = bots.sort((a, b) => b.priority - a.priority)
+    this._bots = aiBots.filter(v => v.character === c)
     this._fromUser = user
+  }
+
+  private _buildCallChain(filteredBots: AiBot[]) {
+    const chain = AiShared.buildBotCallChain(filteredBots)
+    this._callChain = AiShared.flattenBotCallChain(chain)
+    this._chainIndex = 0
+    if (this._callChain.length > 0) {
+      this._currentPhase = this._callChain[0].phase
+    }
   }
 
   protected async chat(
@@ -798,7 +809,7 @@ class BaseBot {
     opt?: LiuAi.BaseLLMChatOpt,
   ) {
     const character = bot.character
-    const apiData = AiShared.getApiEndpointFromBot(bot)
+    const apiData = AiShared.getApiEndpointForPhase(bot, this._currentPhase)
     if (!apiData) {
       console.warn(`no api data for ${character}`)
       console.log(bot)
@@ -863,7 +874,11 @@ class BaseBot {
       }
     }
 
-    return { bot: bots[0], chats }
+    _this._buildCallChain(bots)
+    const first = _this._callChain[0]
+    if (!first) return
+
+    return { bot: first.bot, chats }
   }
 
   private _clipChats(
@@ -1640,7 +1655,7 @@ class BaseBot {
       date: current_date,
       time: current_time,
     } = LiuDateUtil.getDateAndTime(getNowStamp(), user.timezone)
-    const current_provider = AiHelper.getProviderName(bot) ?? "Unknown"
+    const current_provider = AiHelper.getProviderName(bot, this._currentPhase) ?? "Unknown"
     const { p } = aiI18nChannel({ entry, bot })
 
     // for deepseek reasoner from the official
@@ -1663,28 +1678,29 @@ class BaseBot {
   protected async tryAgain(
     param: LiuAi.RunParam,
     chatParam: OaiCreateParam,
+    opt?: LiuAi.BaseLLMChatOpt,
   ) {
-    // 0. get params
     const entry = param.entry
 
-    // 1. switch model
-    const secondBot = this._bots[1]
-    if (!secondBot) {
-      return
-    }
-    chatParam.model = secondBot.model
-    const p = secondBot.secondaryProvider ?? secondBot.provider
-    console.warn(`try again using ${secondBot.model} on ${p}`)
+    while (this._chainIndex + 1 < this._callChain.length) {
+      this._chainIndex++
+      const next = this._callChain[this._chainIndex]
+      this._currentPhase = next.phase
+      chatParam.model = next.bot.model
+      const p = next.phase === 1 ? "opencode-go" : next.bot.provider
+      console.warn(`try again using ${next.bot.model} on ${p}`)
 
-    // 2. change system prompt
-    const firstMsg = chatParam.messages?.[0]
-    if (firstMsg.role === "system") {
-      const newSystemContent = this.getFirstSystemPrompt(entry, secondBot)
-      firstMsg.content = newSystemContent
-    }
+      const firstMsg = chatParam.messages?.[0]
+      if (firstMsg?.role === "system") {
+        const newSystemContent = this.getFirstSystemPrompt(entry, next.bot)
+        firstMsg.content = newSystemContent
+      }
 
-    const chatCompletion = await this.chat(chatParam, secondBot)
-    return { newChatCompletion: chatCompletion, newBot: secondBot }
+      const chatCompletion = await this.chat(chatParam, next.bot, opt)
+      if (chatCompletion) {
+        return { newChatCompletion: chatCompletion, newBot: next.bot }
+      }
+    }
   }
 
 }
@@ -3968,8 +3984,9 @@ class AiHelper {
     return true
   }
 
-  static getProviderName(bot: AiBot) {
+  static getProviderName(bot: AiBot, phase?: 1 | 2) {
     const { secondaryProvider, provider } = bot
+    if (phase === 1 && secondaryProvider === "opencode-go") return "OpenCode Go"
     if (secondaryProvider === "siliconflow") return "北京硅基流动"
     if (secondaryProvider === "gitee-ai") return "Gitee AI"
     if (secondaryProvider === "qiniu") return "七牛云"

@@ -728,7 +728,8 @@
     "gitee-ai": "Gitee AI",
     "qiniu": "Qiniu",
     "tencent-lkeap": "Tencent LKEAP",
-    "suanleme": "Suanleme"
+    "suanleme": "Suanleme",
+    "opencode-go": "OpenCode Go"
   },
   "bind": {
     "phone_title": "Phone Number Binding",

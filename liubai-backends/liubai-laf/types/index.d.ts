@@ -188,6 +188,13 @@ declare global {
       LIU_SUANLEME_BASE_URL?: string
       LIU_SUANLEME_API_KEY?: string
 
+      /** OpenCode Go aggregator */
+      LIU_OPENCODE_GO_BASE_URL?: string
+      LIU_OPENCODE_GO_API_KEY?: string
+
+      /** 01: advanced model first within each provider phase; default low-tier first */
+      LIU_REVERSE_MODEL_VERSION_CALL?: "01"
+
       /** Summary */
       LIU_SUMMARY_BASE_URL?: string
       LIU_SUMMARY_API_KEY?: string

@@ -730,7 +730,8 @@
     "gitee-ai": "模力方舟",
     "qiniu": "七牛云",
     "tencent-lkeap": "腾讯云知识能力引擎",
-    "suanleme": "算了么"
+    "suanleme": "算了么",
+    "opencode-go": "OpenCode Go"
   },
   "bind": {
     "phone_title": "手机号绑定",

@@ -113,7 +113,77 @@ const fastAiWorkers: LiuAi.AiWorker[] = [
     "computingProvider": "siliconflow",
     "model": "zai-org/GLM-4.6",
     "character": "zhipu",
-  }
+  },
+  {
+    "computingProvider": "opencode-go",
+    "model": "qwen3.7-max",
+    "character": "tongyi-qwen",
+    "stream": false,
+  },
+  {
+    "computingProvider": "opencode-go",
+    "model": "qwen3.6-plus",
+    "character": "tongyi-qwen",
+    "stream": false,
+  },
+  {
+    "computingProvider": "opencode-go",
+    "model": "qwen3.5-plus",
+    "character": "tongyi-qwen",
+    "stream": false,
+  },
+  {
+    "computingProvider": "opencode-go",
+    "model": "glm-5.1",
+    "character": "zhipu",
+    "stream": false,
+  },
+  {
+    "computingProvider": "opencode-go",
+    "model": "glm-5",
+    "character": "zhipu",
+    "stream": false,
+  },
+  {
+    "computingProvider": "opencode-go",
+    "model": "kimi-k2.6",
+    "character": "kimi",
+    "stream": false,
+  },
+  {
+    "computingProvider": "opencode-go",
+    "model": "kimi-k2.5",
+    "character": "kimi",
+    "stream": false,
+  },
+  {
+    "computingProvider": "opencode-go",
+    "model": "deepseek-v4-flash",
+    "character": "deepseek",
+    "stream": false,
+  },
+  {
+    "computingProvider": "opencode-go",
+    "model": "minimax-m2.7",
+    "character": "hailuo",
+    "stream": false,
+  },
+  {
+    "computingProvider": "opencode-go",
+    "model": "minimax-m2.5",
+    "character": "hailuo",
+    "stream": false,
+  },
+  {
+    "computingProvider": "opencode-go",
+    "model": "mimo-v2.5",
+    "stream": false,
+  },
+  {
+    "computingProvider": "opencode-go",
+    "model": "mimo-v2.5-pro",
+    "stream": false,
+  },
 ]
 
 export async function main(ctx: FunctionContext) {
@@ -726,13 +796,21 @@ class ClusterHelper {
 
   static getAiWorker(
     filterModels: string[] = [],
+    useOfficialPool = false,
   ) {
-    const workers = valTool.copyObject(fastAiWorkers)
+    const allWorkers = valTool.copyObject(fastAiWorkers)
+    let workers = useOfficialPool
+      ? allWorkers.filter(w => w.computingProvider !== "opencode-go")
+      : allWorkers.filter(w => w.computingProvider === "opencode-go")
+
+    if (!useOfficialPool && workers.length === 0) {
+      return ClusterHelper.getAiWorker(filterModels, true)
+    }
 
     let runTimes = 0
     while (workers.length > 0) {
       runTimes++
-      if (runTimes > 10) return
+      if (runTimes > 10) break
       const r = Math.random()
       const index = Math.floor(r * workers.length)
       const worker = workers[index]
@@ -743,6 +821,10 @@ class ClusterHelper {
         return { worker, apiEndpoint }
       }
       workers.splice(index, 1)
+    }
+
+    if (!useOfficialPool) {
+      return ClusterHelper.getAiWorker(filterModels, true)
     }
   }
 
