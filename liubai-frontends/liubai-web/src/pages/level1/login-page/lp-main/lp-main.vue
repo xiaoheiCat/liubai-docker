@@ -33,10 +33,6 @@ const {
     <span>{{ t('common.login') }}</span>
   </div>
 
-  <div v-if="props.loginOnly" class="liu-no-user-select lpm-login-only-hint">
-    <span>{{ t('login.registration_closed_hint') }}</span>
-  </div>
-
   <div class="lpm-selects" ref="lpSelectsEl">
 
     <!-- Email or Phone -->
@@ -228,14 +224,6 @@ const {
   font-weight: 600;
   color: var(--main-text);
   margin-block-end: 10px;
-}
-
-.lpm-login-only-hint {
-  width: 100%;
-  font-size: var(--mini-font);
-  color: var(--main-note);
-  line-height: 1.5;
-  margin-block-end: 8px;
 }
 
 .lpm-selects {

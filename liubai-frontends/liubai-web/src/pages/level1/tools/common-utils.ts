@@ -73,13 +73,6 @@ export async function afterFetchingLogin(
     return false
   }
 
-  // 3.2 registration is disabled (login-only mode)
-  if(code === "B0004") {
-    await showEmojiTip("login.registration_closed", "🔒")
-    redirectToLoginPage(rr)
-    return false
-  }
-
   // 4. 其他异常，弹提示；提示完回到 login 页
   if(code !== "0000" || !data) {
     await showErrMsg("login", res)

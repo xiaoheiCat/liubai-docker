@@ -15,15 +15,6 @@ export function isEverythingOkay(
     })
     return false
   }
-  if(initCode === "B0002") {
-    cui.showModal({
-      title: "🔒",
-      content_key: "tip.login_closed",
-      showCancel: false,
-      isTitleEqualToEmoji: true,
-    })
-    return false
-  }
   if(initCode && initCode !== "0000") {
     cui.showModal({
       title: "🥲",
