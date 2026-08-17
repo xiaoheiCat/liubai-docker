@@ -2,8 +2,6 @@ import { loadStoredCredentials } from "./credentials.js"
 
 export interface LiubaiMcpConfig {
   apiDomain: string
-  token: string
-  serial: string
   assistantName: string
   messageFormat: "markdown" | "plain"
 }
@@ -15,26 +13,8 @@ export function loadConfig(): LiubaiMcpConfig {
     stored?.apiDomain ||
     ""
   ).trim()
-  const token = (process.env.LIUBAI_TOKEN?.trim() || stored?.token || "").trim()
-  const serial = (process.env.LIUBAI_SERIAL?.trim() || stored?.serial || "").trim()
-
-  const missing: string[] = []
-  if (!apiDomain) missing.push("LIUBAI_API_DOMAIN")
-  if (!token) missing.push("LIUBAI_TOKEN")
-  if (!serial) missing.push("LIUBAI_SERIAL")
-
-  if (missing.length > 0) {
-    throw new Error(
-      `Missing credentials: ${missing.join(", ")}. ` +
-        "Run `npm run login -- --api-domain http://localhost:9000/` first, " +
-        "or see liubai-mcp/installation/SKILL.md.",
-    )
-  }
-
   return {
-    apiDomain: normalizeApiDomain(apiDomain),
-    token,
-    serial,
+    apiDomain: apiDomain ? normalizeApiDomain(apiDomain) : "",
     assistantName: getAssistantName(),
     messageFormat: getMessageFormat(),
   }

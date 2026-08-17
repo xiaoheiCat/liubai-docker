@@ -1,3 +1,5 @@
+import { LIUBAI_MCP_API_VERSION } from "./version.js"
+
 let diff = 0
 
 export function getTime(): number {
@@ -19,7 +21,7 @@ export async function calibrateTime(apiDomain: string): Promise<void> {
     body: JSON.stringify({
       x_liu_language: "zh-CN",
       x_liu_theme: theme,
-      x_liu_version: "0.31",
+      x_liu_version: LIUBAI_MCP_API_VERSION,
       x_liu_stamp: getTime(),
       x_liu_timezone: getTimezone(),
       x_liu_client: "mcp",

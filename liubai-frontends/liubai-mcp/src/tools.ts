@@ -1,5 +1,6 @@
 import { z } from "zod"
 import type { LiubaiClient } from "./client.js"
+import type { LoginManager } from "./login.js"
 import { formatPendingToolResult } from "./pending-format.js"
 
 const addCalendarSpecificDates = [
@@ -49,7 +50,11 @@ export interface McpToolDef {
   name: string
   description: string
   inputSchema: Record<string, unknown>
-  handler: (client: LiubaiClient, args: Record<string, unknown>) => Promise<string>
+  handler: (
+    client: LiubaiClient,
+    args: Record<string, unknown>,
+    login: LoginManager,
+  ) => Promise<string>
 }
 
 function textResult(data: Record<string, unknown>): string {
@@ -60,6 +65,43 @@ const PENDING_TOOL_HINT =
   "将工具返回结果原文发给用户（含同意/编辑链接的微信式待确认话术）。"
 
 export const tools: McpToolDef[] = [
+  {
+    name: "login_start",
+    description:
+      "开始 Liubai 登录并生成授权链接。返回内容必须原样发送给用户；apiDomain 仅在 MCP 未配置 LIUBAI_API_DOMAIN 时传入。",
+    inputSchema: {
+      type: "object",
+      properties: {
+        apiDomain: {
+          type: "string",
+          description: "Liubai 后端 API 根地址，例如 http://localhost:9000/",
+        },
+      },
+    },
+    handler: async (_client, args, login) => {
+      const parsed = z.object({ apiDomain: z.string().url().optional() }).parse(args)
+      return login.start(parsed.apiDomain)
+    },
+  },
+  {
+    name: "login_finish",
+    description:
+      "完成 Liubai 登录。用户完成授权后，把其提供的浏览器地址栏完整回调链接传入。",
+    inputSchema: {
+      type: "object",
+      properties: {
+        callbackUrl: {
+          type: "string",
+          description: "http://127.0.0.1:端口/callback?code=...&state=... 完整链接",
+        },
+      },
+      required: ["callbackUrl"],
+    },
+    handler: async (_client, args, login) => {
+      const parsed = z.object({ callbackUrl: z.string().min(1) }).parse(args)
+      return login.finish(parsed.callbackUrl)
+    },
+  },
   {
     name: "liubai_health",
     description: "检查 Liubai 账号连接是否正常。",

@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
 import { loadConfig } from "./config.js"
 import { startServer } from "./server.js"

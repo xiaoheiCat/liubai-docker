@@ -25,13 +25,9 @@
 
 ## MCP 🔧
 
-自部署完成后，将以下内容发送给任意支持 MCP 协议的 LLM 客户端完成 Liubai MCP 的安装:
+从 [GitHub Releases](https://github.com/xiaoheiCat/liubai-docker/releases) 下载与系统架构匹配的 `liubai-mcp` 可执行文件，并把它配置为 MCP 客户端的启动命令，无需安装 Node.js。
 
-```text
-请参考此 Agent Skill，查看该 Skill 中的教程，帮助我完成 Liubai MCP 的安装:
-https://github.com/xiaoheiCat/liubai-docker/raw/refs/heads/main/liubai-frontends/liubai-mcp/installation/SKILL.md
-如果 github.com 在部分国家/地区访问过慢，可以尝试将 github.com/... 替换为 gh-proxy.com/github.com/... 来尝试提速。
-```
+启动后由 Agent 调用 `login_start` 获取授权链接；用户授权并返回浏览器地址栏中的完整回调链接后，再由 Agent 调用 `login_finish` 完成登录。详细配置见 [`liubai-frontends/liubai-mcp/README.md`](liubai-frontends/liubai-mcp/README.md)。
 
 ## 已实现 🥂
 
@@ -96,4 +92,3 @@ https://github.com/xiaoheiCat/liubai-docker/raw/refs/heads/main/liubai-frontends
 ## 开源许可 📝
 
 AGPLv3
-

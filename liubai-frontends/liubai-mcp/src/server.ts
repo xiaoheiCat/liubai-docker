@@ -4,17 +4,58 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js"
-import { LiubaiClient } from "./client.js"
+import {
+  LiubaiClient,
+  LoginRequiredError,
+  LOGIN_REQUIRED_MESSAGE,
+} from "./client.js"
 import type { LiubaiMcpConfig } from "./config.js"
+import { LoginManager } from "./login.js"
 import { tools } from "./tools.js"
+import { LIUBAI_MCP_PACKAGE_VERSION } from "./version.js"
+
+export async function handleToolCall(
+  client: LiubaiClient,
+  login: LoginManager,
+  name: string,
+  args: Record<string, unknown> = {},
+) {
+  const tool = tools.find((item) => item.name === name)
+  if (!tool) {
+    return {
+      content: [{ type: "text" as const, text: `Unknown tool: ${name}` }],
+      isError: true,
+    }
+  }
+
+  try {
+    const text = await tool.handler(client, args, login)
+    return {
+      content: [{ type: "text" as const, text }],
+    }
+  } catch (err) {
+    if (err instanceof LoginRequiredError) {
+      return {
+        content: [{ type: "text" as const, text: LOGIN_REQUIRED_MESSAGE }],
+        isError: true,
+      }
+    }
+    const message = err instanceof Error ? err.message : String(err)
+    return {
+      content: [{ type: "text" as const, text: `Error: ${message}` }],
+      isError: true,
+    }
+  }
+}
 
 export async function startServer(config: LiubaiMcpConfig) {
   const client = new LiubaiClient(config)
+  const login = new LoginManager(config)
 
   const server = new Server(
     {
       name: "liubai-mcp",
-      version: "0.31.0",
+      version: LIUBAI_MCP_PACKAGE_VERSION,
     },
     {
       capabilities: {
@@ -32,27 +73,8 @@ export async function startServer(config: LiubaiMcpConfig) {
   }))
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
-    const tool = tools.find((t) => t.name === request.params.name)
-    if (!tool) {
-      return {
-        content: [{ type: "text", text: `Unknown tool: ${request.params.name}` }],
-        isError: true,
-      }
-    }
-
-    try {
-      const args = (request.params.arguments ?? {}) as Record<string, unknown>
-      const text = await tool.handler(client, args)
-      return {
-        content: [{ type: "text", text }],
-      }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err)
-      return {
-        content: [{ type: "text", text: `Error: ${message}` }],
-        isError: true,
-      }
-    }
+    const args = (request.params.arguments ?? {}) as Record<string, unknown>
+    return handleToolCall(client, login, request.params.name, args)
   })
 
   const transport = new StdioServerTransport()

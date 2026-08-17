@@ -119,9 +119,6 @@
     "liubai-frontends/liubai-mcp": {
       "name": "liubai-mcp",
       "version": "0.31.0",
-      "bin": {
-        "liubai-mcp": "./dist/index.js",
-      },
       "dependencies": {
         "@modelcontextprotocol/sdk": "^1.29.0",
         "zod": "^3.25.76",

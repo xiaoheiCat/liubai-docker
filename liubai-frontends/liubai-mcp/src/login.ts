@@ -1,222 +1,181 @@
-#!/usr/bin/env node
-
-import http from "node:http"
-import type { AddressInfo } from "node:net"
-import { execFile } from "node:child_process"
-import { promisify } from "node:util"
+import { randomInt } from "node:crypto"
+import type { LiubaiMcpConfig } from "./config.js"
+import {
+  getCredentialsPath,
+  loadStoredCredentials,
+  saveStoredCredentials,
+} from "./credentials.js"
 import { createClientKey } from "./crypto.js"
-import { getCredentialsPath, saveStoredCredentials } from "./credentials.js"
-import { calibrateTime, getTime } from "./time.js"
 import {
   loginAuthRequest,
   loginAuthSubmit,
   loginInit,
 } from "./login-api.js"
+import { calibrateTime, getTime } from "./time.js"
 
-const execFileAsync = promisify(execFile)
+const LOGIN_START_GUIDE =
+  "请要求用户打开该链接完成授权，完成后页面会跳转到无法打开的 http://127.0.0.1:xxx，请要求用户复制浏览器地址栏完整链接并发送给你，并调用 login_finish 完成登录。"
 
-function normalizeApiDomain(domain: string): string {
-  return domain.endsWith("/") ? domain : `${domain}/`
+interface PendingLogin {
+  apiDomain: string
+  credential: string
+  encClientKey: string
+  redirectUri: string
+  state: string
 }
 
-function parseApiDomain(args: string[]): string | undefined {
-  const idx = args.indexOf("--api-domain")
-  if (idx >= 0 && args[idx + 1]) return args[idx + 1]
-  return process.env.LIUBAI_API_DOMAIN?.trim()
+export interface LoginManagerDependencies {
+  calibrateTime: typeof calibrateTime
+  createClientKey: typeof createClientKey
+  getCredentialsPath: typeof getCredentialsPath
+  getTime: typeof getTime
+  loadStoredCredentials: typeof loadStoredCredentials
+  loginAuthRequest: typeof loginAuthRequest
+  loginAuthSubmit: typeof loginAuthSubmit
+  loginInit: typeof loginInit
+  randomPort: () => number
+  saveStoredCredentials: typeof saveStoredCredentials
 }
 
-/** Returns true if a browser was launched; false if unavailable or failed. */
-async function tryOpenBrowser(url: string): Promise<boolean> {
-  try {
-    const platform = process.platform
-    if (platform === "darwin") {
-      await execFileAsync("open", [url])
-      return true
-    }
-    if (platform === "win32") {
-      await execFileAsync("cmd", ["/c", "start", "", url])
-      return true
-    }
-    await execFileAsync("xdg-open", [url])
-    return true
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err)
-    console.warn(`无法自动打开浏览器（${msg}），已跳过。`)
-    return false
+const defaultDependencies: LoginManagerDependencies = {
+  calibrateTime,
+  createClientKey,
+  getCredentialsPath,
+  getTime,
+  loadStoredCredentials,
+  loginAuthRequest,
+  loginAuthSubmit,
+  loginInit,
+  randomPort: () => randomInt(49152, 65536),
+  saveStoredCredentials,
+}
+
+export class LoginManager {
+  private pending?: PendingLogin
+  private readonly dependencies: LoginManagerDependencies
+
+  constructor(
+    private readonly config: LiubaiMcpConfig,
+    dependencies: Partial<LoginManagerDependencies> = {},
+  ) {
+    this.dependencies = { ...defaultDependencies, ...dependencies }
   }
-}
 
-function printRemoteAuthGuide(authUrl: string, redirectUri: string) {
-  console.log("")
-  console.log("=== 无本地浏览器 / 远程授权 ===")
-  console.log("")
-  console.log("当前环境可能无法打开浏览器。请在另一台有浏览器的设备上打开以下授权链接：")
-  console.log("")
-  console.log(authUrl)
-  console.log("")
-  console.log("授权完成后，浏览器会跳转到本机回调地址并显示「无法打开此网页」，这是正常现象。")
-  console.log("请复制地址栏中的完整链接（形如）：")
-  console.log(`${redirectUri}?code=...&state=...`)
-  console.log("")
-  console.log("回到运行 login 的本机，执行：")
-  console.log('  curl "<完整链接>"')
-  console.log("")
-  console.log("若由 AI 协助安装：把完整链接发给 AI，让 AI 在本机终端执行上述 curl。")
-  console.log("login 进程须保持运行，直到 curl 成功或终端显示 Login successful。")
-  console.log("")
-}
+  async start(apiDomainInput?: string): Promise<string> {
+    const apiDomain = this.resolveApiDomain(apiDomainInput)
+    await this.dependencies.calibrateTime(apiDomain)
 
-function startCallbackServer(expectedState: string) {
-  const server = http.createServer()
-  let port = 0
-  let settled = false
+    const initRes = await this.dependencies.loginInit(apiDomain)
+    const { publicKey, state } = initRes
+    if (!publicKey || !state) {
+      throw new Error("user-login init did not return publicKey/state")
+    }
 
-  const codePromise = new Promise<string>((resolve, reject) => {
-    server.on("request", (req, res) => {
-      try {
-        const host = req.headers.host ?? `127.0.0.1:${port}`
-        const url = new URL(req.url ?? "/", `http://${host}`)
-        if (url.pathname !== "/callback") {
-          res.writeHead(404)
-          res.end("Not found")
-          return
-        }
+    const { cipher } = await this.dependencies.createClientKey(publicKey)
+    if (!cipher) throw new Error("Failed to create client encryption key")
 
-        const gotCode = url.searchParams.get("code")
-        const gotState = url.searchParams.get("state")
-        if (!gotCode || gotState !== expectedState) {
-          res.writeHead(400, { "Content-Type": "text/plain; charset=utf-8" })
-          res.end(
-            "OAuth callback invalid (missing code or state mismatch). " +
-              "Check the URL and retry curl on the machine running login.",
-          )
-          console.warn("收到无效回调，仍在等待正确的 callback URL……")
-          return
-        }
-
-        if (settled) {
-          res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" })
-          res.end("Already authorized.")
-          return
-        }
-        settled = true
-
-        res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" })
-        res.end(
-          "<!DOCTYPE html><html><body><p>Liubai MCP 登录成功，可以关闭此页面。</p></body></html>",
-        )
-        server.close(() => resolve(gotCode))
-      } catch (err) {
-        if (!settled) {
-          settled = true
-          reject(err instanceof Error ? err : new Error(String(err)))
-        }
-        server.close()
-      }
-    })
-  })
-
-  const ready = new Promise<void>((resolve, reject) => {
-    server.on("error", reject)
-    server.listen(0, "127.0.0.1", () => {
-      const addr = server.address() as AddressInfo
-      port = addr.port
-      resolve()
-    })
-  })
-
-  return {
-    ready,
-    getPort: () => port,
-    getRedirectUri: () => `http://127.0.0.1:${port}/callback`,
-    waitForCode: () => codePromise,
-  }
-}
-
-export async function runLogin(apiDomainInput?: string): Promise<void> {
-  const apiDomainRaw = apiDomainInput?.trim()
-  if (!apiDomainRaw) {
-    throw new Error(
-      "Missing API domain. Pass --api-domain http://localhost:9000/ or set LIUBAI_API_DOMAIN.",
+    const port = this.dependencies.randomPort()
+    const redirectUri = `http://127.0.0.1:${port}/callback`
+    const authReq = await this.dependencies.loginAuthRequest(
+      apiDomain,
+      redirectUri,
+      state,
     )
-  }
-  const apiDomain = normalizeApiDomain(apiDomainRaw)
+    const authUrl = new URL("/authorize", authReq.baseUrl)
+    authUrl.searchParams.set("credential", authReq.credential)
+    authUrl.searchParams.set("state", state)
 
-  console.log("Calibrating time...")
-  await calibrateTime(apiDomain)
+    this.pending = {
+      apiDomain,
+      credential: authReq.credential,
+      encClientKey: cipher,
+      redirectUri,
+      state,
+    }
 
-  console.log("Initializing login...")
-  const initRes = await loginInit(apiDomain)
-  const publicKey = initRes.publicKey
-  const state = initRes.state
-  if (!publicKey || !state) {
-    throw new Error("user-login init did not return publicKey/state")
-  }
-
-  const { aesKey, cipher } = await createClientKey(publicKey)
-  if (!aesKey || !cipher) {
-    throw new Error("Failed to create client encryption key")
+    return `${authUrl.toString()}\n${LOGIN_START_GUIDE}`
   }
 
-  const callback = startCallbackServer(state)
-  await callback.ready
-  const redirectUri = callback.getRedirectUri()
+  async finish(callbackUrlInput: string): Promise<string> {
+    const pending = this.pending
+    if (!pending) {
+      throw new Error("没有待完成的登录，请先调用 login_start。")
+    }
 
-  const authReq = await loginAuthRequest(apiDomain, redirectUri, state)
-  const authUrl = new URL("/authorize", authReq.baseUrl)
-  authUrl.searchParams.set("credential", authReq.credential)
-  authUrl.searchParams.set("state", state)
-  const authUrlStr = authUrl.toString()
+    const callbackUrl = this.parseCallbackUrl(callbackUrlInput, pending)
+    const code = callbackUrl.searchParams.get("code")
+    if (!code) throw new Error("回调链接缺少 code。")
 
-  console.log("")
-  console.log("授权链接：")
-  console.log(authUrlStr)
-  console.log("")
-  console.log(`本机回调地址：${redirectUri}`)
-  console.log("")
+    const submitRes = await this.dependencies.loginAuthSubmit(
+      pending.apiDomain,
+      pending.credential,
+      code,
+      pending.encClientKey,
+    )
+    const token = submitRes.token
+    const serial = submitRes.serial_id
+    if (!token || !serial) {
+      throw new Error("auth_submit did not return token/serial_id")
+    }
 
-  const opened = await tryOpenBrowser(authUrlStr)
-  if (opened) {
-    console.log("已在本地尝试打开浏览器，请在页面中完成登录并授权。")
-  } else {
-    printRemoteAuthGuide(authUrlStr, redirectUri)
+    const nickname = submitRes.spaceMemberList?.find(
+      (item) => item.spaceType === "ME",
+    )?.member_name
+
+    this.dependencies.saveStoredCredentials({
+      apiDomain: pending.apiDomain,
+      token,
+      serial,
+      updatedStamp: this.dependencies.getTime(),
+      nickname,
+    })
+    this.pending = undefined
+
+    const account = nickname ? `，账号：${nickname}` : ""
+    return `登录成功${account}，凭据已保存到 ${this.dependencies.getCredentialsPath()}。`
   }
 
-  console.log("等待授权完成（可在本机用 curl 访问 callback URL）……")
-  const code = await callback.waitForCode()
-
-  console.log("Submitting authorization code...")
-  const submitRes = await loginAuthSubmit(apiDomain, authReq.credential, code, cipher)
-  const token = submitRes.token
-  const serial = submitRes.serial_id
-  if (!token || !serial) {
-    throw new Error("auth_submit did not return token/serial_id")
+  private resolveApiDomain(apiDomainInput?: string): string {
+    const stored = this.dependencies.loadStoredCredentials()
+    const apiDomain = (
+      apiDomainInput?.trim() ||
+      process.env.LIUBAI_API_DOMAIN?.trim() ||
+      stored?.apiDomain ||
+      this.config.apiDomain ||
+      ""
+    ).trim()
+    if (!apiDomain) {
+      throw new Error(
+        "缺少 Liubai API 地址，请在 login_start 的 apiDomain 参数中传入。",
+      )
+    }
+    return apiDomain.endsWith("/") ? apiDomain : `${apiDomain}/`
   }
 
-  const nickname = submitRes.spaceMemberList?.find((v) => v.spaceType === "ME")?.member_name
+  private parseCallbackUrl(
+    callbackUrlInput: string,
+    pending: PendingLogin,
+  ): URL {
+    let callbackUrl: URL
+    try {
+      callbackUrl = new URL(callbackUrlInput.trim())
+    } catch {
+      throw new Error("回调链接格式无效，请提供浏览器地址栏中的完整链接。")
+    }
 
-  saveStoredCredentials({
-    apiDomain,
-    token,
-    serial,
-    updatedStamp: getTime(),
-    nickname,
-  })
+    const expected = new URL(pending.redirectUri)
+    if (
+      callbackUrl.protocol !== expected.protocol ||
+      callbackUrl.hostname !== expected.hostname ||
+      callbackUrl.port !== expected.port ||
+      callbackUrl.pathname !== expected.pathname
+    ) {
+      throw new Error("回调链接与当前登录请求不匹配，请重新复制完整链接。")
+    }
 
-  console.log("")
-  console.log("Login successful.")
-  if (nickname) console.log(`Account: ${nickname}`)
-  console.log(`Credentials saved to ${getCredentialsPath()}`)
-  console.log("")
-  console.log("You can now start the MCP server (token/serial load from that file automatically).")
+    if (callbackUrl.searchParams.get("state") !== pending.state) {
+      throw new Error("回调链接中的 state 无效，请重新调用 login_start。")
+    }
+    return callbackUrl
+  }
 }
-
-async function main() {
-  const apiDomain = parseApiDomain(process.argv.slice(2))
-  await runLogin(apiDomain)
-}
-
-main().catch((err) => {
-  console.error(err instanceof Error ? err.message : err)
-  process.exit(1)
-})

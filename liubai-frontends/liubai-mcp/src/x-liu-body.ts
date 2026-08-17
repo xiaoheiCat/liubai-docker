@@ -1,6 +1,5 @@
 import { getTime, getTimezone } from "./time.js"
-
-export const LIUBAI_MCP_VERSION = "0.31"
+import { LIUBAI_MCP_API_VERSION } from "./version.js"
 
 /** Backend Sch_X_Liu only accepts "light" | "dark", not "system". */
 export function getMcpTheme(): "light" | "dark" {
@@ -16,7 +15,7 @@ export function buildXLiuBody(
   return {
     x_liu_language: "zh-CN",
     x_liu_theme: getMcpTheme(),
-    x_liu_version: LIUBAI_MCP_VERSION,
+    x_liu_version: LIUBAI_MCP_API_VERSION,
     x_liu_stamp: getTime(),
     x_liu_timezone: getTimezone(),
     x_liu_client: "mcp",

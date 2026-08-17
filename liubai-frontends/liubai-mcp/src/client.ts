@@ -1,5 +1,16 @@
 import type { LiubaiMcpConfig } from "./config.js"
+import { loadStoredCredentials } from "./credentials.js"
 import { buildXLiuBody } from "./x-liu-body.js"
+
+export const LOGIN_REQUIRED_MESSAGE =
+  "未登录/登录态失效，请使用 login_start 开始一个新的登录。"
+
+export class LoginRequiredError extends Error {
+  constructor() {
+    super(LOGIN_REQUIRED_MESSAGE)
+    this.name = "LoginRequiredError"
+  }
+}
 
 export type McpOperateType =
   | "mcp-health"
@@ -17,26 +28,30 @@ interface LiuRqReturn<T = Record<string, unknown>> {
 }
 
 export class LiubaiClient {
-  private readonly url: string
-
-  constructor(private readonly config: LiubaiMcpConfig) {
-    this.url = `${config.apiDomain}liubai-mcp`
-  }
+  constructor(
+    private readonly config: LiubaiMcpConfig,
+    private readonly credentialLoader = loadStoredCredentials,
+    private readonly fetcher: typeof fetch = fetch,
+  ) {}
 
   async call<T extends Record<string, unknown>>(
     operateType: McpOperateType,
     params: Record<string, unknown> = {},
   ): Promise<T> {
+    const credentials = this.resolveCredentials()
+    if (!credentials) throw new LoginRequiredError()
+
+    const url = `${credentials.apiDomain}liubai-mcp`
     const body = buildXLiuBody({
       operateType,
-      x_liu_token: this.config.token,
-      x_liu_serial: this.config.serial,
+      x_liu_token: credentials.token,
+      x_liu_serial: credentials.serial,
       ...params,
     })
 
     let res: Response
     try {
-      res = await fetch(this.url, {
+      res = await this.fetcher(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -44,7 +59,7 @@ export class LiubaiClient {
       })
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      throw new Error(`Failed to reach Liubai backend at ${this.url}: ${msg}`)
+      throw new Error(`Failed to reach Liubai backend at ${url}: ${msg}`)
     }
 
     let json: LiuRqReturn<T>
@@ -54,11 +69,37 @@ export class LiubaiClient {
       throw new Error(`Invalid JSON response from Liubai (HTTP ${res.status})`)
     }
 
+    if (
+      json.code === "E4003" &&
+      json.errMsg === "the verification of token failed"
+    ) {
+      throw new LoginRequiredError()
+    }
+
     if (json.code !== "0000" || !json.data) {
       const detail = json.errMsg ? `: ${json.errMsg}` : ""
       throw new Error(`Liubai API error ${json.code}${detail}`)
     }
 
     return json.data
+  }
+
+  private resolveCredentials() {
+    const stored = this.credentialLoader()
+    const apiDomain = (
+      process.env.LIUBAI_API_DOMAIN?.trim() ||
+      stored?.apiDomain ||
+      this.config.apiDomain ||
+      ""
+    ).trim()
+    const token = (process.env.LIUBAI_TOKEN?.trim() || stored?.token || "").trim()
+    const serial = (process.env.LIUBAI_SERIAL?.trim() || stored?.serial || "").trim()
+    if (!apiDomain || token.length < 32 || !serial) return
+
+    return {
+      apiDomain: apiDomain.endsWith("/") ? apiDomain : `${apiDomain}/`,
+      token,
+      serial,
+    }
   }
 }

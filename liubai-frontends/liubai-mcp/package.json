@@ -9,19 +9,13 @@
   },
   "license": "AGPL-3.0-or-later",
   "type": "module",
-  "bin": {
-    "liubai-mcp": "./dist/index.js",
-    "liubai-mcp-login": "./dist/login.js"
-  },
   "scripts": {
     "build": "tsc",
     "dev": "bun run src/index.ts",
-    "login": "node dist/login.js",
-    "start": "node dist/index.js",
+    "compile": "bun build --compile src/index.ts --outfile release/liubai-mcp",
+    "start": "bun run src/index.ts",
+    "test": "bun test",
     "typecheck": "tsc --noEmit"
-  },
-  "engines": {
-    "node": ">=22"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
